@@ -18,22 +18,20 @@ package nest.view
 		private var _vertex:ByteArray;
 		private var _fragment:ByteArray;
 		
+		private var _normal:Boolean;
 		private var _changed:Boolean = false;
 		
-		public var uv:Boolean;
-		public var normal:Boolean;
-		
-		public function Shader3D(uv:Boolean = false, normal:Boolean = false) {
-			this.uv = uv;
-			this.normal = normal;
+		public function Shader3D() {
+			
 		}
 		
-		public function setFromString(vertex:String, fragment:String):void {
+		public function setFromString(vertex:String, fragment:String, normal:Boolean):void {
 			_changed = true;
 			Shader3D.assembler.assemble(Context3DProgramType.VERTEX, vertex);
 			_vertex = Shader3D.assembler.agalcode;
 			Shader3D.assembler.assemble(Context3DProgramType.FRAGMENT, fragment);
 			_fragment = Shader3D.assembler.agalcode;
+			_normal = normal;
 		}
 		
 		public function update(context3D:Context3D):void {
@@ -50,6 +48,10 @@ package nest.view
 		///////////////////////////////////
 		// getter/setters
 		///////////////////////////////////
+		
+		public function get normal():Boolean {
+			return _normal;
+		}
 		
 		public function get changed():Boolean {
 			return _changed;

@@ -10,6 +10,8 @@ package nest.view.materials
 		function upload(context3D:Context3D):void;
 		function unload(context3D:Context3D):void;
 		
+		function get uv():Boolean;
+		
 	}
 	
 }

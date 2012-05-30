@@ -2,12 +2,12 @@ package
 {
 	import flash.display3D.Context3DTriangleFace;
 	import flash.display3D.Context3DBlendFactor;
-	import nest.view.materials.ColorMaterial;
 	
 	import nest.control.factories.PrimitiveFactory;
 	import nest.control.factories.ShaderFactory;
 	import nest.object.data.MeshData;
 	import nest.object.Mesh;
+	import nest.view.materials.ColorMaterial;
 	import nest.view.materials.TextureMaterial;
 	import nest.view.Shader3D;
 	
@@ -26,8 +26,8 @@ package
 		override public function init():void {
 			var data:MeshData = PrimitiveFactory.createSphere(5, 32, 24);
 			var material:TextureMaterial = new TextureMaterial(new bitmap().bitmapData);
-			var shader:Shader3D = new Shader3D(true, false);
-			ShaderFactory.create(shader, null, null, false, true);
+			var shader:Shader3D = new Shader3D();
+			ShaderFactory.create(shader, true, false, null, null, false, true);
 			
 			var mesh:Mesh = new Mesh(data, material, shader);
 			mesh.culling = Context3DTriangleFace.NONE;
@@ -46,8 +46,8 @@ package
 				scene.addChild(mesh);
 			}
 			
-			shader = new Shader3D(false, false);
-			ShaderFactory.create(shader);
+			shader = new Shader3D();
+			ShaderFactory.create(shader, false);
 			
 			mesh = new Mesh(data, new ColorMaterial(), shader);
 			mesh.culling = Context3DTriangleFace.NONE;

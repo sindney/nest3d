@@ -21,8 +21,8 @@ package
 			var materialList:Vector.<IMaterial> = new Vector.<IMaterial>();
 			var distantList:Vector.<Number> = new Vector.<Number>();
 			
-			var shader:Shader3D = new Shader3D(false, false);
-			ShaderFactory.create(shader);
+			var shader:Shader3D = new Shader3D();
+			ShaderFactory.create(shader, false);
 			
 			dataList.push(PrimitiveFactory.createPlane(100, 100, 4, 4));
 			materialList.push(new ColorMaterial(0xffffff));

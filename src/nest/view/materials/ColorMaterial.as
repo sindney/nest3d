@@ -44,6 +44,10 @@ package nest.view.materials
 			return _rgba;
 		}
 		
+		public function get uv():Boolean {
+			return false;
+		}
+		
 		///////////////////////////////////
 		// toString
 		///////////////////////////////////

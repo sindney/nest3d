@@ -71,24 +71,24 @@ package nest.object.data
 			}
 			
 			var i:int, j:int;
+			var vertex:Vertex;
 			var triangle:Triangle;
-			var v0:Vertex, v1:Vertex, v2:Vertex;
-			var vt0:Vector3D = new Vector3D();
-			var vt1:Vector3D = new Vector3D();
 			
 			for (i = 0; i < _numVertices; i++) {
-				v0 = _vertices[i];
+				vertex = _vertices[i];
 				// vertex
 				j = i * 3;
-				_vertex[j] = v0.x;
-				_vertex[j + 1] = v0.y;
-				_vertex[j + 2] = v0.z;
+				_vertex[j] = vertex.x;
+				_vertex[j + 1] = vertex.y;
+				_vertex[j + 2] = vertex.z;
+				// normal
+				_normal[j] = vertex.normal.x;
+				_normal[j + 1] = vertex.normal.y;
+				_normal[j + 2] = vertex.normal.z;
 				// uv
 				j = i * 2;
-				_uv[j] = v0.u;
-				_uv[j + 1] = v0.v;
-				// reset normal
-				v0.normal.setTo(0, 0, 0);
+				_uv[j] = vertex.u;
+				_uv[j + 1] = vertex.v;
 			}
 			
 			for (i = 0; i < _numTriangles; i++) {
@@ -98,32 +98,6 @@ package nest.object.data
 				_index[j] = triangle.index0;
 				_index[j + 1] = triangle.index1;
 				_index[j + 2] = triangle.index2;
-				v0 = _vertices[triangle.index0];
-				v1 = _vertices[triangle.index1];
-				v2 = _vertices[triangle.index2];
-				vt0.setTo(v1.x - v0.x, v1.y - v0.y, v1.z - v0.z);
-				vt1.setTo(v2.x - v1.x, v2.y - v1.y, v2.z - v1.z);
-				// face normal
-				triangle.normal.copyFrom(vt0.crossProduct(vt1));
-				// vertex normal
-				v0.normal.x += triangle.normal.x;
-				v0.normal.y += triangle.normal.y;
-				v0.normal.z += triangle.normal.z;
-				v1.normal.x += triangle.normal.x;
-				v1.normal.y += triangle.normal.y;
-				v1.normal.z += triangle.normal.z;
-				v2.normal.x += triangle.normal.x;
-				v2.normal.y += triangle.normal.y;
-				v2.normal.z += triangle.normal.z;
-			}
-			
-			for (i = 0; i < _numVertices; i++) {
-				v0 = _vertices[i];
-				v0.normal.normalize();
-				j = i * 3;
-				_normal[j] = v0.normal.x;
-				_normal[j + 1] = v0.normal.y;
-				_normal[j + 2] = v0.normal.z;
 			}
 			
 			_changed = true;

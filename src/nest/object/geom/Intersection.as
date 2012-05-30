@@ -294,9 +294,10 @@ package nest.object.geom
 						result.point.x += orgion.x;
 						result.point.y += orgion.y;
 						result.point.z += orgion.z;
-						break;
+						return;
 					}
 				}
+				result.intersected = false;
 			}
 		}
 		

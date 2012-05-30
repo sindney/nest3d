@@ -58,8 +58,8 @@ package
 			pe_nightVision = new NightVision();
 			pe_sepia = new Sepia();
 			
-			shader = new Shader3D(true, true);
-			ShaderFactory.create(shader, view.lights);
+			shader = new Shader3D();
+			ShaderFactory.create(shader, true, false, view.lights);
 			
 			var hm:BitmapData = new heightmap().bitmapData;
 			//var hm:BitmapData = new BitmapData(512, 512, false);
@@ -110,19 +110,19 @@ package
 			switch(cbg.index) {
 				case 0:
 					view.effect = null;
-					ShaderFactory.create(shader, view.lights);
+					ShaderFactory.create(shader, true, false, view.lights);
 					break;
 				case 1:
 					view.effect = pe_grayScale;
-					ShaderFactory.create(shader, view.lights, pe_grayScale);
+					ShaderFactory.create(shader, true, false, view.lights, pe_grayScale);
 					break;
 				case 2:
 					view.effect = pe_nightVision;
-					ShaderFactory.create(shader, view.lights, pe_nightVision);
+					ShaderFactory.create(shader, true, false, view.lights, pe_nightVision);
 					break;
 				case 3:
 					view.effect = pe_sepia;
-					ShaderFactory.create(shader, view.lights, pe_sepia);
+					ShaderFactory.create(shader, true, false, view.lights, pe_sepia);
 					break;
 			}
 		}

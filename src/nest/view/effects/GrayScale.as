@@ -8,7 +8,7 @@ package nest.view.effects
 	 */
 	public class GrayScale implements IEffect {
 		
-		private const _fragment:String = "mul ft1.x, ft0, fc18\n" + 
+		private const _fragment:String = "mul ft1.x, ft0, fc17\n" + 
 										"mov ft0, ft1.x\n";
 		
 		private const data:Vector.<Number> = new Vector.<Number>(4, true);
@@ -21,7 +21,7 @@ package nest.view.effects
 		}
 		
 		public function update(context3D:Context3D):void {
-			context3D.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, 18, data);
+			context3D.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, 17, data);
 		}
 		
 		///////////////////////////////////

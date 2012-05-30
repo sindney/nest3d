@@ -34,7 +34,7 @@ package
 		[Embed(source = "assets/earth.jpg")]
 		private const bitmap:Class;
 		
-		[Embed(source = "assets/planet_compressed.obj", mimeType = "application/octet-stream")]
+		[Embed(source = "assets/planet.obj", mimeType = "application/octet-stream")]
 		private const model:Class;
 		
 		private var view:ViewPort;
@@ -79,11 +79,11 @@ package
 			byte.uncompress();
 			var data:MeshData = parser.parse(byte);
 			
-			var shader:Shader3D = new Shader3D(true, true);
-			ShaderFactory.create(shader, view.lights);
+			var shader:Shader3D = new Shader3D();
+			ShaderFactory.create(shader, true, false, view.lights);
 			
-			var colorShader:Shader3D = new Shader3D(false);
-			ShaderFactory.create(colorShader);
+			var colorShader:Shader3D = new Shader3D();
+			ShaderFactory.create(colorShader, false);
 			
 			container = new Container3D();
 			scene.addChild(container);

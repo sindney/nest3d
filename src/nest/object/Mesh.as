@@ -59,7 +59,7 @@ package nest.object
 			context3D.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 0, matrix, true);
 			context3D.setProgramConstantsFromMatrix(Context3DProgramType.FRAGMENT, 23, _invertMatrix, true);
 			
-			_data.upload(context3D, _shader.uv, _shader.normal);
+			_data.upload(context3D, _material.uv, _shader.normal);
 			_material.upload(context3D);
 			_shader.update(context3D);
 			

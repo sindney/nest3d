@@ -8,8 +8,8 @@ package nest.view.effects
 	public interface IEffect {
 		
 		/**
-		 * <p>upload fragmentConstants here if you need them.</p>
-		 * <p>note:You will need to use fc like fc19, fc18 ... </p>
+		 * <p>Upload fragmentConstants here if you need them.</p>
+		 * <p>Note:You will need to use fc like fc18, fc17 ... </p>
 		 */
 		function update(context3D:Context3D):void;
 		

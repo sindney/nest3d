@@ -4,8 +4,6 @@ package nest.view
 	
 	/**
 	 * BlendMode3D
-	 * <p>Qpaque: Context3DBlendFactor.ONE, Context3DBlendFactor.ZERO, false</p>
-	 * <p>Transparent: Context3DBlendFactor.SOURCE_ALPHA, Context3DBlendFactor.ONE_MINUS_SOURCE_ALPHA, true</p>
 	 * 
 	 * @see flash.display3D.Context3DBlendFactor
 	 */

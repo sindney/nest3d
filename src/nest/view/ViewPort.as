@@ -80,7 +80,7 @@ package nest.view
 			vertices[7] = new Vector3D();
 			
 			_draw = new Matrix3D();
-			_lights = new Vector.<ILight>(9, true);
+			_lights = new Vector.<ILight>(8, true);
 			
 			_width = width;
 			_height = height;
@@ -94,7 +94,7 @@ package nest.view
 		
 		/**
 		 * Project a point from world space to screen space.
-		 * <p>If the point is in front of camera, then result.z = 0, otherwise, result.z = 1.</p>
+		 * <p>If the point is in front of the camera, then result.z = 0, otherwise, result.z = 1.</p>
 		 */
 		public function projectVector(p:Vector3D):Vector3D {
 			const vx:Number = _width * 0.5;
@@ -238,7 +238,7 @@ package nest.view
 		///////////////////////////////////
 		
 		/**
-		 * There's 17 empty fc left. 
+		 * There's 16 empty fc left. 
 		 * <p>Ambient light absorbs 1 fc.</p>
 		 * <p>Directional light takes 2.</p>
 		 * <p>PointLight light takes 3.</p>
