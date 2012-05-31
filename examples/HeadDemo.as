@@ -22,6 +22,8 @@ package
 		[Embed(source = "assets/head.obj", mimeType = "application/octet-stream")]
 		private const model:Class;
 		
+		private var mesh:Mesh;
+		
 		public function HeadDemo() {
 			super();
 		}
@@ -37,7 +39,7 @@ package
 			var shader:Shader3D = new Shader3D();
 			ShaderFactory.create(shader, true, true, view.lights);
 			
-			var mesh:Mesh = new Mesh(data, texture, shader);
+			mesh = new Mesh(data, texture, shader);
 			mesh.scale.setTo(10, 10, 10);
 			mesh.rotation.y = Math.PI;
 			mesh.changed = true;
@@ -46,6 +48,11 @@ package
 			speed = 10;
 			camera.position.z = -120;
 			camera.changed = true;
+		}
+		
+		override public function loop():void {
+			mesh.rotation.y += 0.01;
+			mesh.changed = true;
 		}
 		
 	}

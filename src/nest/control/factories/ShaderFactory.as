@@ -27,14 +27,14 @@ package nest.control.factories
 			if (specular) fragment += "tex ft6, v1, fs1 <2d,linear,mipnone>\n";
 			if (kil) fragment += "sub ft7.w, ft7.w, fc22.w\nkil ft7.w\n";
 			
+			// ft5 vertex -> camera
+			fragment += "mov ft5, fc21\n" + 
+						"m44 ft5, ft5, fc23\n" + 
+						"nrm ft5.xyz, ft5\n";
+			
 			if (lights) {
 				// ambient
 				fragment += "mul ft0, ft7, fc0\n";
-				
-				// view direction
-				fragment += "mov ft5, fc21\n" + 
-							"m44 ft5, ft5, fc23\n";
-							"nrm ft5.xyz, ft5\n";
 				
 				var j:int = 1;
 				var light:ILight;
