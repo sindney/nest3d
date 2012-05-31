@@ -25,7 +25,7 @@ package
 		override public function init():void {
 			view.lights[0] = new AmbientLight(0x333333);
 			view.lights[1] = new DirectionalLight();
-			view.lights[2] = new DirectionalLight(0xffff00, -1);
+			view.lights[2] = new DirectionalLight(0xffff00, -1, 1);
 			
 			var material:TextureMaterial = new TextureMaterial(new bitmap().bitmapData);
 			

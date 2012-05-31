@@ -30,13 +30,12 @@ package nest.control.factories
 			if (lights) {
 				// ambient
 				fragment += "mul ft0, ft7, fc0\n";
-				// diffuse & specular
-				if (specular) {
-					// view direction
-					fragment += "mov ft5, fc21\n" + 
-								"m44 ft5, ft5, fc23\n";
-								"nrm ft5.xyz, ft5\n";
-				}
+				
+				// view direction
+				fragment += "mov ft5, fc21\n" + 
+							"m44 ft5, ft5, fc23\n";
+							"nrm ft5.xyz, ft5\n";
+				
 				var j:int = 1;
 				var light:ILight;
 				for each(light in lights) {
