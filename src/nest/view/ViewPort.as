@@ -188,9 +188,9 @@ package nest.view
 			
 			var light:ILight;
 			var i:int, j:int = 1;
-			var k:int = lights.length;
-			for (i = 0; i < k; i++) {
+			for (i = 0; i < 8; i++) {
 				light = lights[i];
+				if (!light) continue;
 				if (light is AmbientLight) {
 					_context3D.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, 0, light.rgba);
 				} else if (light is DirectionalLight) {

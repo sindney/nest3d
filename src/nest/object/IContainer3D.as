@@ -18,9 +18,6 @@ package nest.object
 		function get visible():Boolean;
 		function set visible(value:Boolean):void;
 		
-		function get calculateIntersection():Boolean;
-		function set calculateIntersection(value:Boolean):void;
-		
 		function get numChildren():int;
 		
 	}

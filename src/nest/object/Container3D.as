@@ -9,7 +9,6 @@ package nest.object
 	public class Container3D extends Object3D implements IContainer3D {
 		
 		protected var _visible:Boolean = true;
-		protected var _calculateIntersection:Boolean = true;
 		
 		protected var _numChildren:int = 0;
 		
@@ -56,14 +55,6 @@ package nest.object
 		
 		public function set visible(value:Boolean):void {
 			_visible = value;
-		}
-		
-		public function get calculateIntersection():Boolean {
-			return _calculateIntersection;
-		}
-		
-		public function set calculateIntersection(value:Boolean):void {
-			_calculateIntersection = value;
 		}
 		
 		public function get numChildren():int {
