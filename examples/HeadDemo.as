@@ -41,12 +41,12 @@ package
 			
 			mesh = new Mesh(data, texture, shader);
 			mesh.scale.setTo(10, 10, 10);
-			mesh.rotation.y = Math.PI;
 			mesh.changed = true;
 			scene.addChild(mesh);
 			
 			speed = 10;
-			camera.position.z = -120;
+			camera.position.z = 120;
+			camera.rotation.y = Math.PI;
 			camera.changed = true;
 		}
 		

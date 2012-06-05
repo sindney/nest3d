@@ -37,11 +37,14 @@ package nest.object
 		protected var _visible:Boolean = true;
 		protected var _cliping:Boolean = true;
 		
+		private var _tempMatrix:Matrix3D;
+		
 		public function Mesh(data:MeshData, material:IMaterial, shader:Shader3D, bound:IBound = null) {
 			super();
 			_shader = shader;
 			_material = material;
 			_blendMode = new BlendMode3D();
+			_tempMatrix = new Matrix3D();
 			
 			if (bound) {
 				_bound = bound;
@@ -57,7 +60,7 @@ package nest.object
 			context3D.setBlendFactors(_blendMode.source, _blendMode.dest);
 			context3D.setDepthTest(_blendMode.depthMask, Context3DCompareMode.LESS);
 			context3D.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 0, matrix, true);
-			context3D.setProgramConstantsFromMatrix(Context3DProgramType.FRAGMENT, 23, _invertMatrix, true);
+			context3D.setProgramConstantsFromMatrix(Context3DProgramType.FRAGMENT, 23, _tempMatrix, true);
 			
 			_data.upload(context3D, _material.uv, _shader.normal);
 			_material.upload(context3D);
@@ -81,6 +84,17 @@ package nest.object
 			result.culling = _culling;
 			result.visible = _visible;
 			return result;
+		}
+		
+		override public function recompose():void {
+			super.recompose();
+			const sx:Number = _components[2].x;
+			const sy:Number = _components[2].y;
+			const sz:Number = _components[2].z;
+			_components[2].setTo(1, 1, 1);
+			_tempMatrix.recompose(_components, _orientation);
+			_tempMatrix.invert();
+			_components[2].setTo(sx, sy, sz);
 		}
 		
 		///////////////////////////////////

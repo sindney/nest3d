@@ -1,22 +1,22 @@
 package nest.view
 {
+	import flash.display.BitmapData;
 	import flash.display.Stage3D;
 	import flash.display3D.Context3D;
 	import flash.display3D.Context3DProgramType;
 	import flash.display3D.Context3DTextureFormat;
 	import flash.display3D.Context3DTriangleFace;
 	import flash.display3D.Context3DVertexBufferFormat;
-	import flash.display3D.Program3D;
 	import flash.events.Event;
 	import flash.events.EventDispatcher;
 	import flash.geom.Matrix3D;
 	import flash.geom.Utils3D;
 	import flash.geom.Vector3D;
 	
-	import nest.view.effects.IEffect;
 	import nest.view.lights.PointLight;
 	import nest.view.lights.AmbientLight;
 	import nest.view.lights.DirectionalLight;
+	import nest.view.lights.SpotLight;
 	import nest.view.lights.ILight;
 	import nest.object.geom.AABB;
 	import nest.object.geom.BSphere;
@@ -52,7 +52,6 @@ package nest.view
 		private var _shaderParameters:Vector.<Number> = new Vector.<Number>(4, true);
 		
 		private var _lights:Vector.<ILight>;
-		private var _effect:IEffect;
 		private var _fog:Fog;
 		
 		private var _diagram:Diagram;
@@ -80,7 +79,7 @@ package nest.view
 			vertices[7] = new Vector3D();
 			
 			_draw = new Matrix3D();
-			_lights = new Vector.<ILight>(8, true);
+			_lights = new Vector.<ILight>(10, true);
 			
 			_width = width;
 			_height = height;
@@ -177,14 +176,12 @@ package nest.view
 		/**
 		 * Put this into a loop to draw your scene on stage3d.
 		 */
-		public function calculate():void {
+		public function calculate(bitmapData:BitmapData = null, draw:Boolean = true):void {
 			if (!camera || !root || !_context3D) return;
 			
 			_context3D.clear(_rgba[0], _rgba[1], _rgba[2], 1);
 			
 			_diagram.update();
-			
-			if (_effect) _effect.update(_context3D);
 			
 			var light:ILight;
 			var i:int, j:int = 1;
@@ -202,6 +199,12 @@ package nest.view
  					_context3D.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, j + 1, (light as PointLight).position);
 					_context3D.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, j + 2, (light as PointLight).radius);
 					j += 3;
+				} else if (light is SpotLight) {
+					_context3D.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, j, light.rgba);
+ 					_context3D.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, j + 1, (light as SpotLight).position);
+					_context3D.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, j + 2, (light as SpotLight).direction);
+					_context3D.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, j + 3, (light as SpotLight).lightParameters);
+					j += 4;
 				}
 			}
 			
@@ -230,7 +233,8 @@ package nest.view
 			
 			doContainer(root);
 			
-			_context3D.present();
+			if (bitmapData) _context3D.drawToBitmapData(bitmapData);
+			if (draw) _context3D.present();
 		}
 		
 		///////////////////////////////////
@@ -238,10 +242,11 @@ package nest.view
 		///////////////////////////////////
 		
 		/**
-		 * There's 16 empty fc left. 
+		 * There's 19 empty fc left. 
 		 * <p>Ambient light absorbs 1 fc.</p>
 		 * <p>Directional light takes 2.</p>
 		 * <p>PointLight light takes 3.</p>
+		 * <p>SpotLight light takes 4.</p>
 		 */
 		public function get lights():Vector.<ILight> {
 			return _lights;
@@ -253,9 +258,11 @@ package nest.view
 		
 		public function set width(value:Number):void {
 			if (_width != value) {
-				_width = value;
-				if (_context3D) _context3D.configureBackBuffer(_width, _height, _antiAlias, true);
-				camera.aspect = _width / _height;
+				if (_context3D) {
+					_width = value;
+					_context3D.configureBackBuffer(_width, _height, _antiAlias, true);
+					camera.aspect = _width / _height;
+				}
 			}
 		}
 		
@@ -265,9 +272,11 @@ package nest.view
 		
 		public function set height(value:Number):void {
 			if (_height != value) {
-				_height = value;
-				if (_context3D) _context3D.configureBackBuffer(_width, _height, _antiAlias, true);
-				camera.aspect = _width / _height;
+				if (_context3D) {
+					_height = value;
+					_context3D.configureBackBuffer(_width, _height, _antiAlias, true);
+					camera.aspect = _width / _height;
+				}
 			}
 		}
 		
@@ -328,14 +337,6 @@ package nest.view
 		
 		public function set fog(value:Fog):void {
 			_fog = value;
-		}
-		
-		public function get effect():IEffect {
-			return _effect;
-		}
-		
-		public function set effect(value:IEffect):void {
-			_effect = value;
 		}
 		
 		public function get context3D():Context3D {

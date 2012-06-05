@@ -3,13 +3,6 @@ package
 	import flash.display.BitmapData;
 	import flash.geom.Vector3D;
 	
-	import bloom.components.CheckBox;
-	import bloom.components.CheckBoxGroup;
-	import bloom.components.FlowContainer;
-	import bloom.components.Label;
-	import bloom.core.ThemeBase;
-	import bloom.themes.BlueTheme;
-	
 	import nest.control.factories.PrimitiveFactory;
 	import nest.control.factories.ShaderFactory;
 	import nest.object.Terrain;
@@ -29,12 +22,6 @@ package
 		[Embed(source = "assets/terrain_heights.jpg")]
 		private const heightmap:Class;
 		
-		private var pe_grayScale:GrayScale;
-		private var pe_nightVision:NightVision;
-		private var pe_sepia:Sepia;
-		
-		private var shader:Shader3D;
-		
 		private var pointLight:PointLight;
 		
 		private var mesh:Terrain;
@@ -45,20 +32,13 @@ package
 		
 		override public function init():void {
 			view.lights[0] = new AmbientLight(0x000000);
-			
-			var light:DirectionalLight = new DirectionalLight(0xffffff);
-			light.direction[0] = 1;
-			light.direction[1] = 0.4;
-			view.lights[1] = light;
+			view.lights[1] = new DirectionalLight(0xffffff, -1);
+			(view.lights[1] as DirectionalLight).normalize();
 			
 			pointLight = new PointLight(0xffffff, 200, 0, 0, 0);
 			view.lights[2] = pointLight;
 			
-			pe_grayScale = new GrayScale();
-			pe_nightVision = new NightVision();
-			pe_sepia = new Sepia();
-			
-			shader = new Shader3D();
+			var shader:Shader3D = new Shader3D();
 			ShaderFactory.create(shader, true, false, view.lights);
 			
 			var hm:BitmapData = new heightmap().bitmapData;
@@ -81,50 +61,6 @@ package
 			camera.position.z = -10;
 			camera.position.y = 10;
 			camera.changed = true;
-			
-			// setup ui
-			ThemeBase.initialize(stage);
-			ThemeBase.theme = new BlueTheme();
-			
-			var flow:FlowContainer = new FlowContainer(this);
-			
-			var cbg:CheckBoxGroup = new CheckBoxGroup( -1);
-			var checkbox:CheckBox = new CheckBox(flow.content, "None", false);
-			cbg.addChild(checkbox);
-			checkbox = new CheckBox(flow.content, "GrayScale", false);
-			cbg.addChild(checkbox);
-			checkbox = new CheckBox(flow.content, "NightVision", false);
-			cbg.addChild(checkbox);
-			checkbox = new CheckBox(flow.content, "Sepia", false);
-			cbg.addChild(checkbox);
-			
-			cbg.index = 0;
-			cbg.add(onPEChanged);
-			
-			flow.update();
-			flow.size(120, 120);
-			flow.move(5, 85);
-		}
-		
-		private function onPEChanged(cbg:CheckBoxGroup):void {
-			switch(cbg.index) {
-				case 0:
-					view.effect = null;
-					ShaderFactory.create(shader, true, false, view.lights);
-					break;
-				case 1:
-					view.effect = pe_grayScale;
-					ShaderFactory.create(shader, true, false, view.lights, pe_grayScale);
-					break;
-				case 2:
-					view.effect = pe_nightVision;
-					ShaderFactory.create(shader, true, false, view.lights, pe_nightVision);
-					break;
-				case 3:
-					view.effect = pe_sepia;
-					ShaderFactory.create(shader, true, false, view.lights, pe_sepia);
-					break;
-			}
 		}
 		
 		override public function loop():void {

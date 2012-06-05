@@ -25,7 +25,7 @@ package
 		
 		override public function init():void {
 			view.lights[0] = new AmbientLight(0x333333);
-			view.lights[1] = new DirectionalLight(0xffffff, 1.414, 1.414, 0);
+			view.lights[1] = new DirectionalLight(0xffffff, -1.414, -1.414, 0);
 			
 			var data:MeshData = PrimitiveFactory.createBox(20, 20, 20);
 			

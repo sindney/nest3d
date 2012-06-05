@@ -1,6 +1,5 @@
 package nest.control.factories
 {
-	import nest.view.effects.IEffect;
 	import nest.view.lights.*;
 	import nest.view.Shader3D;
 	
@@ -12,7 +11,7 @@ package nest.control.factories
 		/**
 		 * Create necessary data for shader3d object.
 		 */
-		public static function create(shader:Shader3D, uv:Boolean = true, specular:Boolean = false, lights:Vector.<ILight> = null, effect:IEffect = null, fog:Boolean = false, kil:Boolean = false):void {
+		public static function create(shader:Shader3D, uv:Boolean = true, specular:Boolean = false, lights:Vector.<ILight> = null, fog:Boolean = false, kil:Boolean = false):void {
 			const normal:Boolean = lights != null;
 			
 			// vertex shader
@@ -45,19 +44,20 @@ package nest.control.factories
 						fragment += "mov ft2, fc" + (j + 1) + "\n" + 
 									"m44 ft2, ft2, fc23\n" + 
 									"nrm ft2.xyz, ft2\n" + 
-									"dp3 ft3, ft2, v2\n" + 
-									"sat ft1, ft3\n" + 
+									"neg ft2, ft2\n" + 
+									"dp3 ft4, ft2, v2\n" + 
+									"sat ft1, ft4\n" + 
 									"mul ft1, ft1, ft7\n" + 
 									"mul ft1, ft1, fc" + j + "\n" + 
 									"add ft0, ft0, ft1\n";
 						if (specular) {
 							fragment += "add ft1, ft2, ft5\n" + 
-										"dp3 ft4, ft1, ft1\n" + 
-										"sqt ft4, ft4\n" + 
-										"div ft1, ft1, ft4\n" + 
+										"dp3 ft3, ft1, ft1\n" + 
+										"sqt ft3, ft3\n" + 
+										"div ft1, ft1, ft3\n" + 
 										"dp3 ft1, ft1, v2\n" + 
 										"pow ft1, ft1, fc18.x\n" + 
-										"mul ft1, ft1, ft3\n" + 
+										"mul ft1, ft1, ft4\n" + 
 										"sat ft1, ft1\n" + 
 										"mul ft1, ft1, ft6\n" + 
 										"mul ft1, ft1, fc" + j + "\n" + 
@@ -71,38 +71,84 @@ package nest.control.factories
 						fragment += "mov ft2, fc" + (j + 1) + "\n" + 
 									"m44 ft2, ft2, fc23\n" + 
 									"sub ft2, ft2, v0\n" + 
-									"dp3 ft3, ft2, ft2\n" + 
-									"sqt ft3, ft3\n" + 
-									"sub ft3, fc" + (j + 2) + ".w, ft3\n" + 
-									"div ft3, ft3, fc" + (j + 2) + ".w\n" + 
+									"dp3 ft1, ft2, ft2\n" + 
+									"sqt ft1, ft1\n" + 
+									"sub ft1, fc" + (j + 2) + ".w, ft1\n" + 
+									"div ft1, ft1, fc" + (j + 2) + ".w\n" + 
+									"sat ft4, ft1\n" + 
+									"nrm ft2.xyz, ft2\n" + 
+									"dp3 ft3, ft2, v2\n" + 
 									"sat ft3, ft3\n" + 
-									"dp3 ft1, ft2, v2\n" + 
-									"sat ft1, ft1\n" + 
-									"mul ft1, ft1, ft7\n" + 
+									"mul ft1, ft3, ft7\n" + 
 									"mul ft1, ft1, fc" + j + "\n" + 
-									"mul ft1, ft1, ft3\n" + 
+									"mul ft1, ft1, ft4\n" + 
 									"add ft0, ft0, ft1\n";
 						if (specular) {
 							fragment += "add ft1, ft2, ft5\n" + 
-										"dp3 ft4, ft1, ft1\n" + 
-										"sqt ft4, ft4\n" + 
-										"div ft1, ft1, ft4\n" + 
+										"dp3 ft3, ft1, ft1\n" + 
+										"sqt ft3, ft3\n" + 
+										"div ft1, ft1, ft3\n" + 
 										"dp3 ft1, ft1, v2\n" + 
 										"pow ft1, ft1, fc18.x\n" + 
+										"dp3 ft3, ft2, v2\n" + 
+										"sat ft3, ft3\n" + 
 										"mul ft1, ft1, ft3\n" + 
-										"sat ft1, ft1\n" + 
+										"mul ft1, ft1, ft4\n" + 
 										"mul ft1, ft1, ft6\n" + 
 										"mul ft1, ft1, fc" + j + "\n" + 
+										"sat ft1, ft1\n" + 
 										"add ft0, ft0, ft1\n";
 						}
 						j += 3;
+					} else if (light is SpotLight) {
+						// j    : color
+						// j + 1: position
+						// j + 2: direction
+						// j + 3: lightParameters
+						fragment += "mov ft2, fc" + (j + 1) + "\n" + 
+									"m44 ft2, ft2, fc23\n" + 
+									"sub ft2, ft2, v0\n" + 
+									"dp3 ft1, ft2, ft2\n" + 
+									"sqt ft1, ft1\n" + 
+									"sub ft1, fc" + (j + 3) + ".w, ft1\n" + 
+									"div ft1, ft1, fc" + (j + 3) + ".w\n" + 
+									"sat ft4, ft1\n" + 
+									"nrm ft2.xyz, ft2\n" + 
+									"neg ft1, fc" + (j + 2) + "\n" + 
+									"m44 ft1, ft1, fc23\n" + 
+									"nrm ft1.xyz, ft1\n" + 
+									"dp3 ft1, ft1, ft2\n" + 
+									"max ft1, ft1, fc" + (j + 3) + ".y\n" + 
+									"pow ft1, ft1, fc" + (j + 3) + ".z\n" + 
+									"mul ft4, ft4, ft1\n" + 
+									"dp3 ft3, ft2, v2\n" + 
+									"sat ft3, ft3\n" + 
+									"mul ft1, ft3, ft7\n" + 
+									"mul ft1, ft1, fc" + j + "\n" + 
+									"mul ft1, ft1, ft4\n" + 
+									"add ft0, ft0, ft1\n";
+						if (specular) {
+							fragment += "add ft1, ft2, ft5\n" + 
+										"dp3 ft3, ft1, ft1\n" + 
+										"sqt ft3, ft3\n" + 
+										"div ft1, ft1, ft3\n" + 
+										"dp3 ft1, ft1, v2\n" + 
+										"pow ft1, ft1, fc18.x\n" + 
+										"dp3 ft3, ft2, v2\n" + 
+										"sat ft3, ft3\n" + 
+										"mul ft1, ft1, ft3\n" + 
+										"mul ft1, ft1, ft4\n" + 
+										"mul ft1, ft1, ft6\n" + 
+										"mul ft1, ft1, fc" + j + "\n" + 
+										"sat ft1, ft1\n" + 
+										"add ft0, ft0, ft1\n";
+						}
+						j += 4;
 					}
 				}
 			} else {
 				fragment += "mov ft0, ft7\n";
 			}
-			
-			if (effect) fragment += effect.fragment;
 			
 			if (fog) {
 				fragment += "mov ft2,   fc21           \n" + 

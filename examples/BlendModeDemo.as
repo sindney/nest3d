@@ -27,7 +27,7 @@ package
 			var data:MeshData = PrimitiveFactory.createSphere(5, 32, 24);
 			var material:TextureMaterial = new TextureMaterial(new bitmap().bitmapData);
 			var shader:Shader3D = new Shader3D();
-			ShaderFactory.create(shader, true, false, null, null, false, true);
+			ShaderFactory.create(shader, true, false, null, null, true);
 			
 			var mesh:Mesh = new Mesh(data, material, shader);
 			mesh.culling = Context3DTriangleFace.NONE;
