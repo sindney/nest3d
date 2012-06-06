@@ -184,9 +184,8 @@ package nest.view
 			_diagram.update();
 			
 			var light:ILight;
-			var i:int, j:int = 1;
-			for (i = 0; i < 8; i++) {
-				light = lights[i];
+			var j:int = 1;
+			for each(light in lights) {
 				if (!light) continue;
 				if (light is AmbientLight) {
 					_context3D.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, 0, light.rgba);

@@ -39,7 +39,12 @@ package nest.control.factories
 				var j:int = 1;
 				var light:ILight;
 				for each(light in lights) {
+					if (!light) continue;
 					if (light is DirectionalLight) {
+						if (!light.active) {
+							j += 2;
+							continue;
+						}
 						// j    : color
 						// j + 1: direction
 						fragment += "mov ft2, fc" + (j + 1) + "\n" + 
@@ -66,6 +71,10 @@ package nest.control.factories
 						}
 						j += 2;
 					} else if (light is PointLight) {
+						if (!light.active) {
+							j += 3;
+							continue;
+						}
 						// j    : color
 						// j + 1: position
 						// j + 2: radius
@@ -102,6 +111,10 @@ package nest.control.factories
 						}
 						j += 3;
 					} else if (light is SpotLight) {
+						if (!light.active) {
+							j += 4;
+							continue;
+						}
 						// j    : color
 						// j + 1: position
 						// j + 2: direction

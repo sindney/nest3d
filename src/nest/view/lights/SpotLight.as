@@ -13,6 +13,8 @@ package nest.view.lights
 		private var _lightParameters:Vector.<Number>;
 		private var _direction:Vector.<Number>;
 		
+		private var _active:Boolean = true;
+		
 		public function SpotLight(color:uint = 0xffffff, radius:Number = 400, focus:Number = 10, x:Number = 0, y:Number = 0, z:Number = 0, dx:Number = 0, dy:Number = 0, dz:Number = 0) {
 			_rgba = new Vector.<Number>(4, true);
 			_position = new Vector.<Number>(4, true);
@@ -84,6 +86,14 @@ package nest.view.lights
 		 */
 		public function get direction():Vector.<Number> {
 			return _direction;
+		}
+		
+		public function get active():Boolean {
+			return _active;
+		}
+		
+		public function set active(value:Boolean):void {
+			_active = value;
 		}
 		
 		///////////////////////////////////

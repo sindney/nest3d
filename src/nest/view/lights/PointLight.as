@@ -12,6 +12,8 @@ package nest.view.lights
 		private var _position:Vector.<Number>;
 		private var _radius:Vector.<Number>;
 		
+		private var _active:Boolean = true;
+		
 		public function PointLight(color:uint = 0xffffff, radius:Number = 400, x:Number = 0, y:Number = 0, z:Number = 0) {
 			_position = new Vector.<Number>(4, true);
 			_position[0] = x;
@@ -62,6 +64,14 @@ package nest.view.lights
 		 */
 		public function get radius():Vector.<Number> {
 			return _radius;
+		}
+		
+		public function get active():Boolean {
+			return _active;
+		}
+		
+		public function set active(value:Boolean):void {
+			_active = value;
 		}
 		
 		///////////////////////////////////

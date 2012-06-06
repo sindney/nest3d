@@ -11,6 +11,8 @@ package nest.view.lights
 		private var _direction:Vector.<Number>;
 		private var _rgba:Vector.<Number>;
 		
+		private var _active:Boolean = true;
+		
 		public function DirectionalLight(color:uint = 0xffffff, x:Number = 1, y:Number = 0, z:Number = 0) {
 			_direction = new Vector.<Number>(4, true);
 			_direction[0] = x;
@@ -50,6 +52,14 @@ package nest.view.lights
 		
 		public function get rgba():Vector.<Number> {
 			return _rgba;
+		}
+		
+		public function get active():Boolean {
+			return _active;
+		}
+		
+		public function set active(value:Boolean):void {
+			_active = value;
 		}
 		
 		///////////////////////////////////

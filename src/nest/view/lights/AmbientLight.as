@@ -9,6 +9,8 @@ package nest.view.lights
 		private var _color:uint;
 		private var _rgba:Vector.<Number>;
 		
+		private var _active:Boolean = true;
+		
 		public function AmbientLight(color:uint = 0x333333) {
 			_rgba = new Vector.<Number>(4, true);
 			this.color = color;
@@ -32,6 +34,14 @@ package nest.view.lights
 		
 		public function get rgba():Vector.<Number> {
 			return _rgba;
+		}
+		
+		public function get active():Boolean {
+			return _active;
+		}
+		
+		public function set active(value:Boolean):void {
+			_active = value;
 		}
 		
 		///////////////////////////////////
