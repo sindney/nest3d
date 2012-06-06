@@ -11,7 +11,7 @@ package nest.control.factories
 		/**
 		 * Create necessary data for shader3d object.
 		 */
-		public static function create(shader:Shader3D, uv:Boolean = true, specular:Boolean = false, mipmapping:Boolean = false, lights:Vector.<ILight> = null, fog:Boolean = false, kil:Boolean = false):void {
+		public static function create(shader:Shader3D, uv:Boolean = true, specular:Boolean = false, mipmapping:Boolean = false, lights:Vector.<ILight> = null, lightmap:Boolean = false, fog:Boolean = false, kil:Boolean = false):void {
 			const normal:Boolean = lights != null;
 			
 			// vertex shader
@@ -23,6 +23,7 @@ package nest.control.factories
 			
 			// fragment shader
 			var fragment:String = uv ? "tex ft7, v1, fs0 <2d,linear," + (mipmapping ? "miplinear" : "mipnone") + ">\n" : "mov ft7, fc27\n";
+			if (lightmap) fragment += "tex ft6, v1, fs2 <2d,linear," + (mipmapping ? "miplinear" : "mipnone") + ">\nmul ft7, ft7, ft6\nsat ft7, ft7\n";
 			if (specular) fragment += "tex ft6, v1, fs1 <2d,linear," + (mipmapping ? "miplinear" : "mipnone") + ">\n";
 			if (kil) fragment += "sub ft7.w, ft7.w, fc22.w\nkil ft7.w\n";
 			
