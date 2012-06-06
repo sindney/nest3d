@@ -32,7 +32,7 @@ package
 			var colorMat:ColorMaterial = new ColorMaterial(0xff0000);
 			
 			var shader:Shader3D = new Shader3D();
-			ShaderFactory.create(shader, false, false, view.lights);
+			ShaderFactory.create(shader, false, false, false, view.lights);
 			
 			box = new Mesh(data, colorMat, shader);
 			scene.addChild(box);

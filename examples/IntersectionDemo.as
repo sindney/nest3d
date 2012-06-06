@@ -32,7 +32,7 @@ package
 			view.lights[1] = new PointLight(0xffffff, 200, 0, 0, 0);
 			
 			var shader:Shader3D = new Shader3D();
-			ShaderFactory.create(shader, false, false, view.lights);
+			ShaderFactory.create(shader, false, false, false, view.lights);
 			
 			box = new Mesh(PrimitiveFactory.createBox(10, 10, 10), new ColorMaterial(0xff0000), shader);
 			box.position.z = 40;

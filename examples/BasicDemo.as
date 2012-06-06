@@ -33,7 +33,7 @@ package
 			var colorMat1:ColorMaterial = new ColorMaterial(0x00ff00);
 			
 			var shader:Shader3D = new Shader3D();
-			ShaderFactory.create(shader, false, false, view.lights);
+			ShaderFactory.create(shader, false, false, false, view.lights);
 			
 			var cube:Mesh;
 			var i:int, j:int, k:int;

@@ -37,7 +37,7 @@ package
 			var data:MeshData = parser.parse(new model());
 			var texture:TextureMaterial = new TextureMaterial(new diffuse().bitmapData, new specular().bitmapData, 40);
 			var shader:Shader3D = new Shader3D();
-			ShaderFactory.create(shader, true, true, view.lights);
+			ShaderFactory.create(shader, true, true, false, view.lights);
 			
 			mesh = new Mesh(data, texture, shader);
 			mesh.scale.setTo(10, 10, 10);

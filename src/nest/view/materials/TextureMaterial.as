@@ -5,6 +5,7 @@ package nest.view.materials
 	import flash.display3D.Context3DProgramType;
 	import flash.display3D.Context3DTextureFormat;
 	import flash.display3D.textures.Texture;
+	import flash.geom.Matrix;
 	
 	/**
 	 * TextureMaterial
@@ -20,13 +21,15 @@ package nest.view.materials
 		private var _glossiness:int;
 		
 		private var _optimizeForRenderToTexture:Boolean = true;
+		private var _mipmapping:Boolean = false;
 		private var _changed:Boolean = false;
 		
-		public function TextureMaterial(diffuse:BitmapData, specular:BitmapData = null, glossiness:int = 10) {
+		public function TextureMaterial(diffuse:BitmapData, specular:BitmapData = null, glossiness:int = 10, mipmapping:Boolean = false) {
 			_data = new Vector.<Number>(4, true);
 			this.diffuse = diffuse;
 			this.specular = specular;
 			this.glossiness = glossiness;
+			this.mipmapping = mipmapping;
 		}
 		
 		public function upload(context3D:Context3D):void {
@@ -34,11 +37,11 @@ package nest.view.materials
 				_changed = false;
 				if (_diffuse) _diffuse.dispose();
 				_diffuse = context3D.createTexture(_diff_data.width, _diff_data.height, Context3DTextureFormat.BGRA, _optimizeForRenderToTexture);
-				_diffuse.uploadFromBitmapData(_diff_data);
+				_mipmapping ? uploadWithMipmaps(_diffuse, _diff_data) : _diffuse.uploadFromBitmapData(_diff_data);
 				if (_specular) _specular.dispose();
 				if (_spec_data) {
 					_specular = context3D.createTexture(_spec_data.width, _spec_data.height, Context3DTextureFormat.BGRA, _optimizeForRenderToTexture);
-					_specular.uploadFromBitmapData(_spec_data);
+					_mipmapping ? uploadWithMipmaps(_specular, _spec_data) : _specular.uploadFromBitmapData(_spec_data);
 				}
 			}
 			context3D.setTextureAt(0, _diffuse);
@@ -59,6 +62,24 @@ package nest.view.materials
 			if (_specular) _specular.dispose();
 			if (_spec_data) _spec_data.dispose();
 			_data = null;
+		}
+		
+		private function uploadWithMipmaps(texture:Texture, bmd:BitmapData):void {
+			var width:int = bmd.width;
+			var height:int = bmd.height;
+			var leve:int = 0;
+			var image:BitmapData = new BitmapData(bmd.width, bmd.height);
+			var matrix:Matrix = new Matrix();
+			
+			while (width > 0 && height > 0) {
+				image.draw(bmd, matrix, null, null, null, true);
+				texture.uploadFromBitmapData(image, leve);
+				matrix.scale(0.5, 0.5);
+				leve++;
+				width >>= 1;
+				height >>= 1;
+			}
+			image.dispose();
 		}
 		
 		///////////////////////////////////
@@ -108,6 +129,17 @@ package nest.view.materials
 		
 		public function get uv():Boolean {
 			return true;
+		}
+		
+		public function get mipmapping():Boolean {
+			return _mipmapping;
+		}
+		
+		public function set mipmapping(value:Boolean):void {
+			if (_mipmapping != value) {
+				_mipmapping = value;
+				_changed = true;
+			}
 		}
 		
 		///////////////////////////////////
