@@ -30,19 +30,21 @@ package
 		}
 		
 		override public function init():void {
-			view.lights[0] = new AmbientLight(0x000000);
-			view.lights[1] = new DirectionalLight(0xffffff, -1, -1);
-			(view.lights[1] as DirectionalLight).normalize();
+			var dl:DirectionalLight = new DirectionalLight(0xffffff, -1, -1);
+			dl.normalize();
 			
 			pointLight = new PointLight(0xffffff, 200, 0, 0, 0);
-			view.lights[2] = pointLight;
+			
+			view.light = new AmbientLight(0x000000);
+			view.light.next = dl;
+			dl.next = pointLight;
 			
 			var shader:Shader3D = new Shader3D();
-			ShaderFactory.create(shader, true, false, true, view.lights);
+			ShaderFactory.create(shader, true, false, true, view.light);
 			
 			var hm:BitmapData = new heightmap().bitmapData;
 			
-			var material:TextureMaterial = new TextureMaterial(new terrain().bitmapData, null, 10, true);
+			var material:TextureMaterial = new TextureMaterial(new terrain().bitmapData, null, 10, null, true);
 			
 			mesh = new Terrain(PrimitiveFactory.createPlane(1000, 1000, 100, 100), material, shader);
 			mesh.heightMap = hm;

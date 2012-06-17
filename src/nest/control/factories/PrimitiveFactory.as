@@ -44,10 +44,7 @@ package nest.control.factories
 			}
 			
 			j = vertices.length;
-			for (i = 0; i < j; i++) {
-				v1 = vertices[i];
-				v1.normal.normalize();
-			}
+			for (i = 0; i < j; i++) vertices[i].normal.normalize();
 		}
 		
 		public static function createBox(width:Number = 100, height:Number = 100, depth:Number = 100, segmentsW:uint = 1, segmentsH:uint = 1, segmentsD:uint = 1):MeshData {

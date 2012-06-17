@@ -22,10 +22,10 @@ package
 		}
 		
 		override public function init():void {
-			view.lights[0] = new AmbientLight(0x333333);
+			view.light = new AmbientLight(0x333333);
 			
 			pointLight = new PointLight(0xffffff, 200, 0, 0, 0);
-			view.lights[1] = pointLight;
+			view.light.next = pointLight;
 			
 			var data:MeshData = PrimitiveFactory.createBox(10, 10, 10);
 			
@@ -33,7 +33,7 @@ package
 			var colorMat1:ColorMaterial = new ColorMaterial(0x00ff00);
 			
 			var shader:Shader3D = new Shader3D();
-			ShaderFactory.create(shader, false, false, false, view.lights);
+			ShaderFactory.create(shader, false, false, false, view.light);
 			
 			var cube:Mesh;
 			var i:int, j:int, k:int;

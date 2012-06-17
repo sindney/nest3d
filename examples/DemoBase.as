@@ -42,12 +42,13 @@ package
 		
 		protected var controller:ObjectController;
 		
+		protected var actived:Boolean = true;
 		protected var speed:Number = 2;
 		
 		public function DemoBase() {
 			stage.scaleMode = StageScaleMode.NO_SCALE;
 			stage.align = StageAlign.TOP_LEFT;
-			stage.frameRate = 30;
+			stage.frameRate = 40;
 			stage.addEventListener(MouseEvent.RIGHT_CLICK, onRightClick);
 			
 			camera = new Camera3D();
@@ -66,6 +67,21 @@ package
 			view.addEventListener(Event.CONTEXT3D_CREATE, onContext3DCreated);
 		}
 		
+		private function onStageDeactived(e:Event):void {
+			if (actived) {
+				stage.removeEventListener(Event.ENTER_FRAME, onEnterFrame);
+				view.diagram.message = "Paused ... ";
+				actived = false;
+			}
+		}
+		
+		private function onStageActived(e:Event):void {
+			if (!actived) {
+				stage.addEventListener(Event.ENTER_FRAME, onEnterFrame);
+				actived = true;
+			}
+		}
+		
 		private function onRightClick(e:MouseEvent):void {
 			
 		}
@@ -74,6 +90,8 @@ package
 			stage.addEventListener(Event.RESIZE, onResize);
 			stage.addEventListener(KeyboardEvent.KEY_UP, onKeyUp);
 			stage.addEventListener(KeyboardEvent.KEY_DOWN, onKeyDown);
+			stage.addEventListener(Event.ACTIVATE, onStageActived);
+			stage.addEventListener(Event.DEACTIVATE, onStageDeactived);
 			stage.addEventListener(Event.ENTER_FRAME, onEnterFrame);
 		}
 		

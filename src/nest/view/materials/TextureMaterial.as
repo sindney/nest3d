@@ -14,11 +14,13 @@ package nest.view.materials
 		
 		private var _diff_data:BitmapData;
 		private var _spec_data:BitmapData;
+		private var _nm_data:BitmapData;
 		private var _lm_data:BitmapData;
 		private var _data:Vector.<Number>;
 		
 		private var _diffuse:Texture;
 		private var _specular:Texture;
+		private var _normalmap:Texture;
 		private var _lightmap:Texture;
 		private var _glossiness:int;
 		
@@ -26,11 +28,15 @@ package nest.view.materials
 		private var _mipmapping:Boolean = false;
 		private var _changed:Boolean = false;
 		
-		public function TextureMaterial(diffuse:BitmapData, specular:BitmapData = null, glossiness:int = 10, mipmapping:Boolean = false) {
+		public function TextureMaterial(diffuse:BitmapData, specular:BitmapData = null, glossiness:int = 10, normalmap:BitmapData = null, mipmapping:Boolean = false) {
 			_data = new Vector.<Number>(4, true);
+			_data[1] = 2;
+			_data[2] = 1;
+			_data[3] = 0;
 			this.diffuse = diffuse;
 			this.specular = specular;
 			this.glossiness = glossiness;
+			this.normalmap = normalmap;
 			this.mipmapping = mipmapping;
 		}
 		
@@ -45,6 +51,11 @@ package nest.view.materials
 					_specular = context3D.createTexture(_spec_data.width, _spec_data.height, Context3DTextureFormat.BGRA, _optimizeForRenderToTexture);
 					_mipmapping ? uploadWithMipmaps(_specular, _spec_data) : _specular.uploadFromBitmapData(_spec_data);
 				}
+				if (_normalmap) _normalmap.dispose();
+				if (_nm_data) {
+					_normalmap = context3D.createTexture(_nm_data.width, _nm_data.height, Context3DTextureFormat.BGRA, _optimizeForRenderToTexture);
+					_mipmapping ? uploadWithMipmaps(_normalmap, _nm_data) : _normalmap.uploadFromBitmapData(_nm_data);
+				}
 				if (_lightmap) _lightmap.dispose();
 				if (_lm_data) {
 					_lightmap = context3D.createTexture(_lm_data.width, _lm_data.height, Context3DTextureFormat.BGRA, _optimizeForRenderToTexture);
@@ -52,16 +63,17 @@ package nest.view.materials
 				}
 			}
 			context3D.setTextureAt(0, _diffuse);
-			if (_spec_data) {
-				context3D.setTextureAt(1, _specular);
-				context3D.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, 18, _data);
-			}
-			if (_lm_data) context3D.setTextureAt(2, _lightmap);
+			if (_spec_data) context3D.setTextureAt(1, _specular);
+			if (_nm_data) context3D.setTextureAt(2, _normalmap);
+			if (_spec_data || _nm_data) context3D.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, 21, _data);
+			if (_lm_data) context3D.setTextureAt(3, _lightmap);
 		}
 		
 		public function unload(context3D:Context3D):void {
 			if (_diffuse) context3D.setTextureAt(0, null);
 			if (_specular) context3D.setTextureAt(1, null);
+			if (_normalmap) context3D.setTextureAt(2, null);
+			if (_lightmap) context3D.setTextureAt(3, null);
 		}
 		
 		public function dispose():void {
@@ -69,6 +81,8 @@ package nest.view.materials
 			if (_diff_data) _diff_data.dispose();
 			if (_specular) _specular.dispose();
 			if (_spec_data) _spec_data.dispose();
+			if (_normalmap) _normalmap.dispose();
+			if (_nm_data) _nm_data.dispose();
 			if (_lightmap) _lightmap.dispose();
 			if (_lm_data) _lm_data.dispose();
 			_data = null;
@@ -114,6 +128,17 @@ package nest.view.materials
 		public function set specular(value:BitmapData):void {
 			if (_spec_data != value) {
 				_spec_data = value;
+				_changed = true;
+			}
+		}
+		
+		public function get normalmap():BitmapData {
+			return _nm_data;
+		}
+		
+		public function set normalmap(value:BitmapData):void {
+			if (_nm_data != value) {
+				_nm_data = value;
 				_changed = true;
 			}
 		}

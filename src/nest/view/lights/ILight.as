@@ -6,6 +6,9 @@ package nest.view.lights
 	 */
 	public interface ILight {
 		
+		function get next():ILight;
+		function set next(value:ILight):void;
+		
 		function get color():uint;
 		function get rgba():Vector.<Number>;
 		

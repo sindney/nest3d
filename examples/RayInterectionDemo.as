@@ -24,15 +24,15 @@ package
 		private var spot:Mesh;
 		
 		override public function init():void {
-			view.lights[0] = new AmbientLight(0x333333);
-			view.lights[1] = new DirectionalLight(0xffffff, -1.414, -1.414, 0);
+			view.light = new AmbientLight(0x333333);
+			view.light.next = new DirectionalLight(0xffffff, -1.414, -1.414, 0);
 			
 			var data:MeshData = PrimitiveFactory.createBox(20, 20, 20);
 			
 			var colorMat:ColorMaterial = new ColorMaterial(0xff0000);
 			
 			var shader:Shader3D = new Shader3D();
-			ShaderFactory.create(shader, false, false, false, view.lights);
+			ShaderFactory.create(shader, false, false, false, view.light);
 			
 			box = new Mesh(data, colorMat, shader);
 			scene.addChild(box);

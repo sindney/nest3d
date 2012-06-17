@@ -7,6 +7,8 @@ package nest.view.lights
 	 */
 	public class SpotLight implements ILight {
 		
+		private var _next:ILight;
+		
 		private var _color:uint;
 		private var _rgba:Vector.<Number>;
 		private var _position:Vector.<Number>;
@@ -73,9 +75,7 @@ package nest.view.lights
 		}
 		
 		/**
-		 * lightParameters
-		 * <p>2: focus</p>
-		 * <p>3: radius</p>
+		 * 0,0,focus,radius
 		 */
 		public function get lightParameters():Vector.<Number> {
 			return _lightParameters;
@@ -94,6 +94,14 @@ package nest.view.lights
 		
 		public function set active(value:Boolean):void {
 			_active = value;
+		}
+		
+		public function get next():ILight {
+			return _next;
+		}
+		
+		public function set next(value:ILight):void {
+			_next = value;
 		}
 		
 		///////////////////////////////////

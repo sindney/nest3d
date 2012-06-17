@@ -7,6 +7,8 @@ package nest.view.lights
 	 */
 	public class PointLight implements ILight {
 		
+		private var _next:ILight;
+		
 		private var _color:uint;
 		private var _rgba:Vector.<Number>;
 		private var _position:Vector.<Number>;
@@ -60,7 +62,7 @@ package nest.view.lights
 		}
 		
 		/**
-		 * radius
+		 * 0,0,0,radius
 		 */
 		public function get radius():Vector.<Number> {
 			return _radius;
@@ -72,6 +74,14 @@ package nest.view.lights
 		
 		public function set active(value:Boolean):void {
 			_active = value;
+		}
+		
+		public function get next():ILight {
+			return _next;
+		}
+		
+		public function set next(value:ILight):void {
+			_next = value;
 		}
 		
 		///////////////////////////////////

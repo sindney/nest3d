@@ -7,6 +7,8 @@ package nest.view.lights
 	 */
 	public class DirectionalLight implements ILight {
 		
+		private var _next:ILight;
+		
 		private var _color:uint;
 		private var _direction:Vector.<Number>;
 		private var _rgba:Vector.<Number>;
@@ -60,6 +62,14 @@ package nest.view.lights
 		
 		public function set active(value:Boolean):void {
 			_active = value;
+		}
+		
+		public function get next():ILight {
+			return _next;
+		}
+		
+		public function set next(value:ILight):void {
+			_next = value;
 		}
 		
 		///////////////////////////////////

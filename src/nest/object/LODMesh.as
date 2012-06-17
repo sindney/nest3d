@@ -13,11 +13,11 @@ package nest.object
 	 */
 	public class LODMesh extends Mesh {
 		
-		protected var _dataList:Vector.<MeshData>;
-		protected var _materialList:Vector.<IMaterial>;
-		protected var _distantList:Vector.<Number>;
+		private var _dataList:Vector.<MeshData>;
+		private var _materialList:Vector.<IMaterial>;
+		private var _distantList:Vector.<Number>;
 		
-		protected var _index:int = 0;
+		private var _index:int = 0;
 		
 		public function LODMesh(dataList:Vector.<MeshData>, materialList:Vector.<IMaterial>, distantList:Vector.<Number>, shader:Shader3D, bound:IBound = null) {
 			super(null, null, shader, bound);

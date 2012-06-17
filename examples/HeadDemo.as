@@ -19,6 +19,9 @@ package
 		[Embed(source = "assets/head_diffuse.jpg")]
 		private const diffuse:Class;
 		
+		[Embed(source = "assets/head_normals.jpg")]
+		private const normals:Class;
+		
 		[Embed(source = "assets/head.obj", mimeType = "application/octet-stream")]
 		private const model:Class;
 		
@@ -29,15 +32,17 @@ package
 		}
 		
 		override public function init():void {
-			view.lights[0] = new AmbientLight(0x333333);
-			view.lights[1] = new DirectionalLight(0xffffff, 0, 0, -1);
+			view.light = new AmbientLight(0x333333);
+			
+			var dl:DirectionalLight = new DirectionalLight(0xffffff, 0, 0, -1);
+			view.light.next = dl;
 			
 			var parser:OBJParser = new OBJParser();
 			
 			var data:MeshData = parser.parse(new model());
-			var texture:TextureMaterial = new TextureMaterial(new diffuse().bitmapData, new specular().bitmapData, 40);
+			var texture:TextureMaterial = new TextureMaterial(new diffuse().bitmapData, new specular().bitmapData, 40, new normals().bitmapData);
 			var shader:Shader3D = new Shader3D();
-			ShaderFactory.create(shader, true, true, false, view.lights);
+			ShaderFactory.create(shader, true, true, false, view.light, true);
 			
 			mesh = new Mesh(data, texture, shader);
 			mesh.scale.setTo(10, 10, 10);

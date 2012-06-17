@@ -28,11 +28,11 @@ package
 		private var free:ColorMaterial = new ColorMaterial(0x00ff00);
 		
 		override public function init():void {
-			view.lights[0] = new AmbientLight(0x333333);
-			view.lights[1] = new PointLight(0xffffff, 200, 0, 0, 0);
+			view.light = new AmbientLight(0x333333);
+			view.light.next = new PointLight(0xffffff, 200, 0, 0, 0);
 			
 			var shader:Shader3D = new Shader3D();
-			ShaderFactory.create(shader, false, false, false, view.lights);
+			ShaderFactory.create(shader, false, false, false, view.light);
 			
 			box = new Mesh(PrimitiveFactory.createBox(10, 10, 10), new ColorMaterial(0xff0000), shader);
 			box.position.z = 40;

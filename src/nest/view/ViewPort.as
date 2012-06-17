@@ -49,9 +49,10 @@ package nest.view
 		private var _color:uint = 0x000000;
 		private var _rgba:Vector.<Number> = new Vector.<Number>(4, true);
 		private var _camPos:Vector.<Number> = new Vector.<Number>(4, true);
-		private var _shaderParameters:Vector.<Number> = new Vector.<Number>(4, true);
+		private var _vertexParameters:Vector.<Number> = new Vector.<Number>(4, true);
+		private var _fragmentParameters:Vector.<Number> = new Vector.<Number>(4, true);
 		
-		private var _lights:Vector.<ILight>;
+		private var _light:AmbientLight;
 		private var _fog:Fog;
 		
 		private var _diagram:Diagram;
@@ -68,6 +69,16 @@ package nest.view
 			_camera = camera;
 			_root = root;
 			
+			_vertexParameters[0] = 0;
+			_vertexParameters[1] = 0;
+			_vertexParameters[2] = 0;
+			_vertexParameters[3] = 1;
+			
+			_fragmentParameters[0] = 0;
+			_fragmentParameters[1] = 0;
+			_fragmentParameters[2] = 0;
+			_fragmentParameters[3] = 0.01;
+			
 			vertices = new Vector.<Vector3D>(8, true);
 			vertices[0] = new Vector3D();
 			vertices[1] = new Vector3D();
@@ -79,7 +90,6 @@ package nest.view
 			vertices[7] = new Vector3D();
 			
 			_draw = new Matrix3D();
-			_lights = new Vector.<ILight>(10, true);
 			
 			_width = width;
 			_height = height;
@@ -176,17 +186,16 @@ package nest.view
 		/**
 		 * Put this into a loop to draw your scene on stage3d.
 		 */
-		public function calculate(bitmapData:BitmapData = null, draw:Boolean = true):void {
+		public function calculate(bitmapData:BitmapData = null):void {
 			if (!camera || !root || !_context3D) return;
 			
 			_context3D.clear(_rgba[0], _rgba[1], _rgba[2], 1);
 			
 			_diagram.update();
 			
-			var light:ILight;
+			var light:ILight = _light;
 			var j:int = 1;
-			for each(light in lights) {
-				if (!light) continue;
+			while (light) {
 				if (light is AmbientLight) {
 					_context3D.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, 0, light.rgba);
 				} else if (light is DirectionalLight) {
@@ -205,26 +214,24 @@ package nest.view
 					_context3D.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, j + 3, (light as SpotLight).lightParameters);
 					j += 4;
 				}
+				light = light.next;
 			}
 			
-			_shaderParameters[0] = 0;
-			_shaderParameters[1] = 0;
-			_shaderParameters[2] = 0;
-			_shaderParameters[3] = 0.01;
-			_context3D.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, 22, _shaderParameters);
+			if (camera.changed) camera.recompose();
 			
 			_camPos[0] = camera.position.x;
 			_camPos[1] = camera.position.y;
 			_camPos[2] = camera.position.z;
 			_camPos[3] = 1;
-			_context3D.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, 21, _camPos);
+			_context3D.setProgramConstantsFromVector(Context3DProgramType.VERTEX, 8, _camPos);
 			
 			if (fog) {
+ 				_context3D.setProgramConstantsFromVector(Context3DProgramType.VERTEX, 9, fog.data);
 				_context3D.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, 20, fog.color);
- 				_context3D.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, 19, fog.data);
 			}
 			
-			if (camera.changed) camera.recompose();
+			_context3D.setProgramConstantsFromVector(Context3DProgramType.VERTEX, 11, _vertexParameters);
+			_context3D.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, 22, _fragmentParameters);
 			
 			_numVertices = 0;
 			_numTriangles = 0;
@@ -233,7 +240,7 @@ package nest.view
 			doContainer(root);
 			
 			if (bitmapData) _context3D.drawToBitmapData(bitmapData);
-			if (draw) _context3D.present();
+			_context3D.present();
 		}
 		
 		///////////////////////////////////
@@ -241,14 +248,22 @@ package nest.view
 		///////////////////////////////////
 		
 		/**
-		 * There's 19 empty fc left. 
+		 * There's 20 empty fc left.
 		 * <p>Ambient light absorbs 1 fc.</p>
 		 * <p>Directional light takes 2.</p>
 		 * <p>PointLight light takes 3.</p>
 		 * <p>SpotLight light takes 4.</p>
 		 */
-		public function get lights():Vector.<ILight> {
-			return _lights;
+		public function get light():AmbientLight {
+			return _light;
+		}
+		
+		/**
+		 * The root light is an AmbientLight.
+		 * <p>Link new light source to lights.next.</p>
+		 */
+		public function set light(value:AmbientLight):void {
+			_light = value;
 		}
 		
 		public function get width():Number {

@@ -60,6 +60,7 @@ package nest.object
 			context3D.setBlendFactors(_blendMode.source, _blendMode.dest);
 			context3D.setDepthTest(_blendMode.depthMask, Context3DCompareMode.LESS);
 			context3D.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 0, matrix, true);
+			context3D.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 4, _tempMatrix, true);
 			context3D.setProgramConstantsFromMatrix(Context3DProgramType.FRAGMENT, 23, _tempMatrix, true);
 			
 			_data.upload(context3D, _material.uv, _shader.normal);
