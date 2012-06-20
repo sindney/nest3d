@@ -2,6 +2,8 @@ package nest.object.geom
 {
 	import flash.geom.Vector3D;
 	
+	import nest.object.data.JointLinker;
+	
 	/**
 	 * Vertex
 	 */
@@ -15,6 +17,8 @@ package nest.object.geom
 		public var v:Number;
 		
 		public var normal:Vector3D;
+		
+		public var linker:JointLinker;
 		
 		public function Vertex(x:Number = 0, y:Number = 0, z:Number = 0, u:Number = 0, v:Number = 0) {
 			this.x = x;

@@ -8,9 +8,9 @@ package nest.control.parsers
 	import nest.object.geom.Vertex;
 	
 	/**
-	 * OBJParser
+	 * ParserOBJ
 	 */
-	public class OBJParser {
+	public class ParserOBJ {
 		
 		private var LINE_END:String = String.fromCharCode(10);
 		private var SPACE:String = String.fromCharCode(32);
@@ -33,7 +33,7 @@ package nest.control.parsers
 		private var _faceIndex:int;
 		private var _scale:Number;
 		
-		public function OBJParser() {
+		public function ParserOBJ() {
 			
 		}
 		
@@ -150,6 +150,14 @@ package nest.control.parsers
 			
 			_rawTriangle.push(t);
 			_faceIndex += 3;
+		}
+		
+		///////////////////////////////////
+		// toString
+		///////////////////////////////////
+		
+		public function toString():String {
+			return "[nest.control.parsers.ParserOBJ]";
 		}
 		
 	}

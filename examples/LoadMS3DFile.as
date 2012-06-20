@@ -1,7 +1,7 @@
 package  
 {
 	import nest.control.factories.ShaderFactory;
-	import nest.control.parsers.ParserOBJ;
+	import nest.control.parsers.ParserMS3D;
 	import nest.object.data.MeshData;
 	import nest.object.Mesh;
 	import nest.view.lights.*;
@@ -9,9 +9,10 @@ package
 	import nest.view.Shader3D;
 	
 	/**
-	 * HeadDemo
+	 * LoadMS3DFile
 	 */
-	public class HeadDemo extends DemoBase {
+	public class LoadMS3DFile extends DemoBase {
+		
 		
 		[Embed(source = "assets/head_specular.jpg")]
 		private const specular:Class;
@@ -22,12 +23,12 @@ package
 		[Embed(source = "assets/head_normals.jpg")]
 		private const normals:Class;
 		
-		[Embed(source = "assets/head.obj", mimeType = "application/octet-stream")]
+		[Embed(source = "assets/head.ms3d", mimeType = "application/octet-stream")]
 		private const model:Class;
 		
 		private var mesh:Mesh;
 		
-		public function HeadDemo() {
+		public function LoadMS3DFile() {
 			super();
 		}
 		
@@ -37,14 +38,16 @@ package
 			var dl:DirectionalLight = new DirectionalLight(0xffffff, 0, 0, -1);
 			view.light.next = dl;
 			
-			var parser:ParserOBJ = new ParserOBJ();
+			var parser:ParserMS3D = new ParserMS3D();
+			parser.parse(new model());
 			
-			var data:MeshData = parser.parse(new model());
 			var texture:TextureMaterial = new TextureMaterial(new diffuse().bitmapData, new specular().bitmapData, 40, new normals().bitmapData);
 			var shader:Shader3D = new Shader3D();
 			ShaderFactory.create(shader, true, true, false, view.light, true);
 			
-			mesh = new Mesh(data, texture, shader);
+			mesh = parser.objects[0] as Mesh;
+			mesh.material = texture;
+			mesh.shader = shader;
 			mesh.scale.setTo(10, 10, 10);
 			mesh.changed = true;
 			scene.addChild(mesh);
@@ -56,8 +59,8 @@ package
 		}
 		
 		override public function loop():void {
-			mesh.rotation.y += 0.01;
-			mesh.changed = true;
+			//mesh.rotation.y += 0.01;
+			//mesh.changed = true;
 		}
 		
 	}
