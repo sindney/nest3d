@@ -39,14 +39,12 @@ package
 			
 			var parser:ParserOBJ = new ParserOBJ();
 			
-			var data:MeshData = parser.parse(new model());
+			var data:MeshData = parser.parse(new model(), 10);
 			var texture:TextureMaterial = new TextureMaterial(new diffuse().bitmapData, new specular().bitmapData, 40, new normals().bitmapData);
 			var shader:Shader3D = new Shader3D();
 			ShaderFactory.create(shader, true, true, false, view.light, true);
 			
 			mesh = new Mesh(data, texture, shader);
-			mesh.scale.setTo(10, 10, 10);
-			mesh.changed = true;
 			scene.addChild(mesh);
 			
 			speed = 10;

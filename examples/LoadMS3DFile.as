@@ -13,7 +13,6 @@ package
 	 */
 	public class LoadMS3DFile extends DemoBase {
 		
-		
 		[Embed(source = "assets/head_specular.jpg")]
 		private const specular:Class;
 		
@@ -39,7 +38,7 @@ package
 			view.light.next = dl;
 			
 			var parser:ParserMS3D = new ParserMS3D();
-			parser.parse(new model());
+			parser.parse(new model(), 10);
 			
 			var texture:TextureMaterial = new TextureMaterial(new diffuse().bitmapData, new specular().bitmapData, 40, new normals().bitmapData);
 			var shader:Shader3D = new Shader3D();
@@ -48,8 +47,6 @@ package
 			mesh = parser.objects[0] as Mesh;
 			mesh.material = texture;
 			mesh.shader = shader;
-			mesh.scale.setTo(10, 10, 10);
-			mesh.changed = true;
 			scene.addChild(mesh);
 			
 			speed = 10;
@@ -59,8 +56,8 @@ package
 		}
 		
 		override public function loop():void {
-			//mesh.rotation.y += 0.01;
-			//mesh.changed = true;
+			mesh.rotation.y += 0.01;
+			mesh.changed = true;
 		}
 		
 	}

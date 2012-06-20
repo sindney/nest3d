@@ -98,9 +98,9 @@ package nest.control.parsers
 		private function parseNormal(data:Array):void {
 			if (data[0] == BLANK || data[0] == BLANK1)
 				data = data.slice(1);
-			_normals.push(Number(data[0]) * _scale);
-			_normals.push(Number(data[1]) * _scale);
-			_normals.push(Number(data[2]) * _scale);
+			_normals.push(Number(data[0]));
+			_normals.push(Number(data[1]));
+			_normals.push(Number(data[2]));
 		}
 		
 		private function parseUV(data:Array):void {
