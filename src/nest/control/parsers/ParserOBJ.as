@@ -22,134 +22,103 @@ package nest.control.parsers
 		private var UV:String = "vt";
 		private var INDEX:String = "f";
 		
-		private var _vertices:Vector.<Number>;
-		private var _normals:Vector.<Number>;
-		private var _uvs:Vector.<Number>;
-		private var _indices:Vector.<uint>;
-		
-		private var _rawVertex:Vector.<Vertex>;
-		private var _rawTriangle:Vector.<Triangle>;
-		
-		private var _faceIndex:int;
-		private var _scale:Number;
-		
 		public function ParserOBJ() {
 			
 		}
 		
 		public function parse(model:ByteArray, scale:Number = 1):MeshData {
-			_vertices = new Vector.<Number>();
-			_normals = new Vector.<Number>();
-			_uvs = new Vector.<Number>();
-			_indices = new Vector.<uint>();
+			var vertices:Vector.<Number> = new Vector.<Number>();
+			var normals:Vector.<Number> = new Vector.<Number>();
+			var uvs:Vector.<Number> = new Vector.<Number>();
+			var indices:Vector.<uint> = new Vector.<uint>();
 			
-			_rawVertex = new Vector.<Vertex>();
-			_rawTriangle = new Vector.<Triangle>();
-			
-			_faceIndex = 0;
-			_scale = scale;
+			var rawVertex:Vector.<Vertex> = new Vector.<Vertex>();
+			var rawTriangle:Vector.<Triangle> = new Vector.<Triangle>();
 			
 			var source:String = model.readUTFBytes(model.bytesAvailable);
 			var lines:Array = source.split(LINE_END);
-			var i:int = 0, j:int = lines.length;
-			for (i == 0; i < j; i++)
-				parseLine(lines[i]);
+			var i:int, j:int, k:int, l:int;
 			
-			_vertices = null;
-			_normals = null;
-			_uvs = null;
-			_indices = null;
-			
-			return new MeshData(_rawVertex, _rawTriangle);
-		}
-		
-		private function parseLine(line:String):void {
-			var words:Array = line.split(SPACE);
-			if (words.length > 0) {
-				var data:Array = words.slice(1);
-			} else {
-				return;
-			}
-			
-			switch(words[0]) {
-				case VERTEX:
-					parseVertex(data);
-					break;
-				case NORMAL:
-					parseNormal(data);
-					break;
-				case UV:
-					parseUV(data);
-					break;
-				case INDEX:
-					parseIndex(data);
-					break;
-			}
-		}
-		
-		private function parseVertex(data:Array):void {
-			if (data[0] == BLANK || data[0] == BLANK1)
-				data = data.slice(1);
-			_vertices.push(Number(data[0]) * _scale);
-			_vertices.push(Number(data[1]) * _scale);
-			_vertices.push(Number(data[2]) * _scale);
-		}
-		
-		private function parseNormal(data:Array):void {
-			if (data[0] == BLANK || data[0] == BLANK1)
-				data = data.slice(1);
-			_normals.push(Number(data[0]));
-			_normals.push(Number(data[1]));
-			_normals.push(Number(data[2]));
-		}
-		
-		private function parseUV(data:Array):void {
-			if (data[0] == BLANK || data[0] == BLANK1)
-				data = data.slice(1);
-			_uvs.push(Number(data[0]));
-			_uvs.push(Number(data[1]));
-		}
-		
-		private function parseIndex(data:Array):void {
+			var start:int;
 			var triplet:String;
-			var subdata:Array;
-			var vertexIndex:int;
-			var uvIndex:int;
+			var words:Array, data:Array, subdata:Array;
 			
-			var v0:Vertex, v1:Vertex, v2:Vertex;
-			var i:int, j:int, k:int, l:int = data.length;
-			var start:int = 0;
-			while (data[start] == BLANK || data[start] == BLANK1)
-				start++;
-			l = start + 3;
-			for (i = start; i < l; ++i) {
-				triplet = data[i];
-				subdata = triplet.split(SLASH);
-				vertexIndex = int(subdata[0]) - 1;
-				uvIndex = int(subdata[1]) - 1;
+			j = lines.length;
+			for (i = 0; i < j; i++) {
+				words = lines[i].split(SPACE);
+				if (words.length > 0) {
+					data = words.slice(1);
+				} else {
+					continue;
+				}
 				
-				if (vertexIndex < 0) vertexIndex = 0;
-				if (uvIndex < 0) uvIndex = 0;
-				
-				j = vertexIndex * 3;
-				k = uvIndex * 2;
-				v0 = new Vertex(_vertices[j], _vertices[j + 1], _vertices[j + 2], _uvs[k], 1 - _uvs[k + 1]);
-				v0.normal.setTo(_normals[j], _normals[j + 1], _normals[j + 2]);
-				_rawVertex.push(v0);
+				switch(words[0]) {
+					case VERTEX:
+						if (data[0] == BLANK || data[0] == BLANK1) data = data.slice(1);
+						vertices.push(Number(data[0]) * scale, Number(data[1]) * scale, Number(data[2]) * scale);
+						break;
+					case NORMAL:
+						if (data[0] == BLANK || data[0] == BLANK1) data = data.slice(1);
+						normals.push(Number(data[0]), Number(data[1]), Number(data[2]));
+						break;
+					case UV:
+						if (data[0] == BLANK || data[0] == BLANK1) data = data.slice(1);
+						uvs.push(Number(data[0]), Number(data[1]));
+						break;
+					case INDEX:
+						start = 0;
+						while (data[start] == BLANK || data[start] == BLANK1) start++;
+						l = start + 3;
+						for (k = start; k < l; ++k) {
+							triplet = data[k];
+							subdata = triplet.split(SLASH);
+							indices.push(subdata[0], subdata[1], subdata[2]);
+						}
+						break;
+				}
 			}
 			
-			var t:Triangle = new Triangle(_faceIndex, _faceIndex + 1, _faceIndex + 2);
+			var tri:Triangle;
+			var vt1:Vertex, vt2:Vertex, vt3:Vertex;
+			var v1:Vector3D = new Vector3D(), v2:Vector3D = new Vector3D();
 			
-			v0 = _rawVertex[_faceIndex];
-			v1 = _rawVertex[_faceIndex + 1];
-			v2 = _rawVertex[_faceIndex + 2];
+			j = vertices.length;
+			for (i = 0; i < j; i += 3) {
+				rawVertex[i / 3] = new Vertex(vertices[i], vertices[i + 1], vertices[i + 2]);
+			}
 			
-			var vt:Vector3D = new Vector3D(v1.x - v0.x, v1.y - v0.y, v1.z - v0.z);
-			t.normal.setTo(v2.x - v1.x, v2.y - v1.y, v2.z - v1.z);
-			t.normal.copyFrom(vt.crossProduct(t.normal));
+			j = indices.length;
+			for (i = 0; i < j; i += 9) {
+				tri = rawTriangle[i / 9] = new Triangle(indices[i] - 1, indices[i + 3] - 1, indices[i + 6] - 1);
+				
+				vt1 = rawVertex[tri.index0];
+				k = (indices[i + 1] - 1) * 2;
+				vt1.u = uvs[k];
+				vt1.v = 1 - uvs[k + 1];
+				k = (indices[i + 2] - 1) * 3;
+				vt1.normal.setTo(normals[k], normals[k + 1], normals[k + 2]);
+				
+				vt2 = rawVertex[tri.index1];
+				k = (indices[i + 4] - 1) * 2;
+				vt2.u = uvs[k];
+				vt2.v = 1 - uvs[k + 1];
+				k = (indices[i + 5] - 1) * 3;
+				vt2.normal.setTo(normals[k], normals[k + 1], normals[k + 2]);
+				
+				vt3 = rawVertex[tri.index2];
+				k = (indices[i + 7] - 1) * 2;
+				vt3.u = uvs[k];
+				vt3.v = 1 - uvs[k + 1];
+				k = (indices[i + 8] - 1) * 3;
+				vt3.normal.setTo(normals[k], normals[k + 1], normals[k + 2]);
+				
+				v1.setTo(vt2.x - vt1.x, vt2.y - vt1.y, vt2.z - vt1.z);
+				v2.setTo(vt3.x - vt2.x, vt3.y - vt2.y, vt3.z - vt2.z);
+				tri.normal.copyFrom(v1.crossProduct(v2));
+				tri.normal.normalize();
+			}
 			
-			_rawTriangle.push(t);
-			_faceIndex += 3;
+			return new MeshData(rawVertex, rawTriangle);
 		}
 		
 		///////////////////////////////////

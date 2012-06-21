@@ -78,8 +78,8 @@ package nest.object.geom
 			
 			_local.recompose(temp, Orientation3D.QUATERNION);
 			
-			_combined.copyFrom(parent);
-			_combined.append(_local);
+			_combined.copyFrom(_local);
+			_combined.append(parent);
 			
 			_result.copyFrom(_combined);
 			_result.invert();

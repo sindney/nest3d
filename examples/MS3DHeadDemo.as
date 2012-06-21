@@ -9,9 +9,9 @@ package
 	import nest.view.Shader3D;
 	
 	/**
-	 * LoadMS3DFile
+	 * MS3DHeadDemo
 	 */
-	public class LoadMS3DFile extends DemoBase {
+	public class MS3DHeadDemo extends DemoBase {
 		
 		[Embed(source = "assets/head_specular.jpg")]
 		private const specular:Class;
@@ -27,7 +27,7 @@ package
 		
 		private var mesh:Mesh;
 		
-		public function LoadMS3DFile() {
+		public function MS3DHeadDemo() {
 			super();
 		}
 		

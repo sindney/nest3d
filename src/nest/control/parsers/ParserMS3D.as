@@ -39,13 +39,14 @@ package nest.control.parsers
 			var v1:Vector3D = new Vector3D();
 			var v2:Vector3D = new Vector3D();
 			
-			var vt1:Vertex, vt2:Vertex, vt3:Vertex;
-			var triangle:Triangle;
+			var vt1:Vertex, vt2:Vertex, vt3:Vertex, vt4:Vertex;
+			var tri1:Triangle, tri2:Triangle;
 			var vertBoneId:Vector.<int>;
 			var rawVertices:Vector.<Vertex>;
 			var rawTriangles:Vector.<Triangle>;
 			var rawVertex:Vector.<Vertex>;
 			var rawTriangle:Vector.<Triangle>;
+			var rawVtSign:Array;
 			
 			var meshData:MeshData;
 			
@@ -85,10 +86,10 @@ package nest.control.parsers
 			for (i = 0; i < j; i++) {
 				if (model.readUnsignedShort() != 2) {
 					// tri indices v0, v1, v2
-					triangle = rawTriangles[i] = new Triangle(model.readUnsignedShort(), model.readUnsignedShort(), model.readUnsignedShort());
-					vt1 = rawVertices[triangle.index0];
-					vt2 = rawVertices[triangle.index1];
-					vt3 = rawVertices[triangle.index2];
+					tri1 = rawTriangles[i] = new Triangle(model.readUnsignedShort(), model.readUnsignedShort(), model.readUnsignedShort());
+					vt1 = rawVertices[tri1.index0];
+					vt2 = rawVertices[tri1.index1];
+					vt3 = rawVertices[tri1.index2];
 					// vertex normal
 					vt1.normal.setTo(model.readFloat(), model.readFloat(), model.readFloat());
 					vt2.normal.setTo(model.readFloat(), model.readFloat(), model.readFloat());
@@ -96,8 +97,8 @@ package nest.control.parsers
 					// calculate triangle normal
 					v1.setTo(vt2.x - vt1.x, vt2.y - vt1.y, vt2.z - vt1.z);
 					v2.setTo(vt3.x - vt2.x, vt3.y - vt2.y, vt3.z - vt2.z);
-					triangle.normal.copyFrom(v1.crossProduct(v2));
-					triangle.normal.normalize();
+					tri1.normal.copyFrom(v1.crossProduct(v2));
+					tri1.normal.normalize();
 					// vertex uv
 					vt1.u = model.readFloat();
 					vt2.u = model.readFloat();
@@ -122,26 +123,49 @@ package nest.control.parsers
 					id = "";
 					for (k = 0; k < 32; k++) id += String.fromCharCode(model.readUnsignedByte());
 					// numTriangles
+					n = 0;
 					k = model.readUnsignedShort();
-					rawVertex = new Vector.<Vertex>(k * 3, true);
+					rawVtSign = new Array();
+					rawVertex = new Vector.<Vertex>();
 					rawTriangle = new Vector.<Triangle>(k, true);
 					for (l = 0; l < k; l++) {
-						m = model.readUnsignedShort();
-						n = l * 3;
+						tri1 = rawTriangles[model.readUnsignedShort()];
+						vt1 = rawVertices[tri1.index0];
+						vt2 = rawVertices[tri1.index1];
+						vt3 = rawVertices[tri1.index2];
 						
-						triangle = rawTriangles[m];
-						rawTriangle[l] = new Triangle(n, n + 1, n + 2);
-						rawTriangle[l].normal.copyFrom(triangle.normal);
+						tri2 = rawTriangle[l] = new Triangle();
+						tri2.normal.copyFrom(tri1.normal);
 						
-						vt1 = rawVertices[triangle.index0];
-						vt2 = rawVertices[triangle.index1];
-						vt3 = rawVertices[triangle.index2];
-						rawVertex[n] = new Vertex(vt1.x, vt1.y, vt1.z, vt1.u, vt1.v);
-						rawVertex[n].normal.copyFrom(vt1.normal);
-						rawVertex[n + 1] = new Vertex(vt2.x, vt2.y, vt2.z, vt2.u, vt2.v);
-						rawVertex[n + 1].normal.copyFrom(vt2.normal);
-						rawVertex[n + 2] = new Vertex(vt3.x, vt3.y, vt3.z, vt3.u, vt3.v);
-						rawVertex[n + 2].normal.copyFrom(vt3.normal);
+						m = rawVtSign[tri1.index0];
+						if (m) {
+							tri2.index0 += m;
+						} else {
+							tri2.index0 = rawVtSign[tri1.index0] = n;
+							vt4 = rawVertex[n] = new Vertex(vt1.x, vt1.y, vt1.z, vt1.u, vt1.v);
+							vt4.normal.copyFrom(vt1.normal);
+							n++;
+						}
+						
+						m = rawVtSign[tri1.index1];
+						if (m) {
+							tri2.index1 += m;
+						} else {
+							tri2.index1 = rawVtSign[tri1.index1] = n;
+							vt4 = rawVertex[n] = new Vertex(vt2.x, vt2.y, vt2.z, vt2.u, vt2.v);
+							vt4.normal.copyFrom(vt2.normal);
+							n++;
+						}
+						
+						m = rawVtSign[tri1.index2];
+						if (m) {
+							tri2.index2 += m;
+						} else {
+							tri2.index2 = rawVtSign[tri1.index2] = n;
+							vt4 = rawVertex[n] = new Vertex(vt3.x, vt3.y, vt3.z, vt3.u, vt3.v);
+							vt4.normal.copyFrom(vt3.normal);
+							n++;
+						}
 					}
 					
 					meshData = new MeshData(rawVertex, rawTriangle);
