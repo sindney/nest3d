@@ -11,6 +11,13 @@ package nest.object.geom
 		public var index1:uint;
 		public var index2:uint;
 		
+		public var u0:Number;
+		public var u1:Number;
+		public var u2:Number;
+		public var v0:Number;
+		public var v1:Number;
+		public var v2:Number;
+		
 		public var normal:Vector3D;
 		
 		public function Triangle(index0:uint = 0, index1:uint = 0, index2:uint = 0) {

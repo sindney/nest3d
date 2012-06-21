@@ -93,22 +93,22 @@ package nest.control.parsers
 				
 				vt1 = rawVertex[tri.index0];
 				k = (indices[i + 1] - 1) * 2;
-				vt1.u = uvs[k];
-				vt1.v = 1 - uvs[k + 1];
+				tri.u0 = vt1.u = uvs[k];
+				tri.v0 = vt1.v = 1 - uvs[k + 1];
 				k = (indices[i + 2] - 1) * 3;
 				vt1.normal.setTo(normals[k], normals[k + 1], normals[k + 2]);
 				
 				vt2 = rawVertex[tri.index1];
 				k = (indices[i + 4] - 1) * 2;
-				vt2.u = uvs[k];
-				vt2.v = 1 - uvs[k + 1];
+				tri.u1 = vt2.u = uvs[k];
+				tri.v1 = vt2.v = 1 - uvs[k + 1];
 				k = (indices[i + 5] - 1) * 3;
 				vt2.normal.setTo(normals[k], normals[k + 1], normals[k + 2]);
 				
 				vt3 = rawVertex[tri.index2];
 				k = (indices[i + 7] - 1) * 2;
-				vt3.u = uvs[k];
-				vt3.v = 1 - uvs[k + 1];
+				tri.u2 = vt3.u = uvs[k];
+				tri.v2 = vt3.v = 1 - uvs[k + 1];
 				k = (indices[i + 8] - 1) * 3;
 				vt3.normal.setTo(normals[k], normals[k + 1], normals[k + 2]);
 				

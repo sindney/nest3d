@@ -100,12 +100,12 @@ package nest.control.parsers
 					tri1.normal.copyFrom(v1.crossProduct(v2));
 					tri1.normal.normalize();
 					// vertex uv
-					vt1.u = model.readFloat();
-					vt2.u = model.readFloat();
-					vt3.u = model.readFloat();
-					vt1.v = model.readFloat();
-					vt2.v = model.readFloat();
-					vt3.v = model.readFloat();
+					tri1.u0 = vt1.u = model.readFloat();
+					tri1.u1 = vt2.u = model.readFloat();
+					tri1.u2 = vt3.u = model.readFloat();
+					tri1.v0 = vt1.v = model.readFloat();
+					tri1.v1 = vt2.v = model.readFloat();
+					tri1.v2 = vt3.v = model.readFloat();
 					// smoothGroup
 					model.readUnsignedByte();
 					// groupIndex
@@ -136,6 +136,12 @@ package nest.control.parsers
 						
 						tri2 = rawTriangle[l] = new Triangle();
 						tri2.normal.copyFrom(tri1.normal);
+						tri2.u0 = tri1.u0;
+						tri2.u1 = tri1.u1;
+						tri2.u2 = tri1.u2;
+						tri2.v0 = tri1.v0;
+						tri2.v1 = tri1.v1;
+						tri2.v2 = tri1.v2;
 						
 						m = rawVtSign[tri1.index0];
 						if (m) {
