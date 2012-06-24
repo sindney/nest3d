@@ -12,15 +12,15 @@ package nest.control.parsers
 	 */
 	public class ParserOBJ {
 		
-		private var LINE_END:String = String.fromCharCode(10);
-		private var SPACE:String = String.fromCharCode(32);
-		private var BLANK:String = "";
-		private var BLANK1:String = " ";
-		private var SLASH:String = "/";
-		private var VERTEX:String = "v";
-		private var NORMAL:String = "vn";
-		private var UV:String = "vt";
-		private var INDEX:String = "f";
+		private const LINE_END:String = String.fromCharCode(10);
+		private const SPACE:String = String.fromCharCode(32);
+		private const BLANK:String = "";
+		private const BLANK1:String = " ";
+		private const SLASH:String = "/";
+		private const VERTEX:String = "v";
+		private const NORMAL:String = "vn";
+		private const UV:String = "vt";
+		private const INDEX:String = "f";
 		
 		public function ParserOBJ() {
 			

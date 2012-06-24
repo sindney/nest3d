@@ -14,6 +14,40 @@ package nest.object.data
 	 */
 	public class MeshData {
 		
+		public static function calculateNormal(vertices:Vector.<Vertex>, triangles:Vector.<Triangle>):void {
+			var i:int, j:int;
+			var tri:Triangle;
+			var v1:Vertex, v2:Vertex, v3:Vertex;
+			var n1:Vector3D = new Vector3D();
+			var n2:Vector3D = new Vector3D();
+			
+			j = triangles.length;
+			for (i = 0; i < j; i++) {
+				tri = triangles[i];
+				v1 = vertices[tri.index0];
+				v2 = vertices[tri.index1];
+				v3 = vertices[tri.index2];
+				
+				n1.setTo(v2.x - v1.x, v2.y - v1.y, v2.z - v1.z);
+				n2.setTo(v3.x - v2.x, v3.y - v2.y, v3.z - v2.z);
+				tri.normal.copyFrom(n1.crossProduct(n2));
+				tri.normal.normalize();
+				
+				v1.normal.x += tri.normal.x;
+				v1.normal.y += tri.normal.y;
+				v1.normal.z += tri.normal.z;
+				v2.normal.x += tri.normal.x;
+				v2.normal.y += tri.normal.y;
+				v2.normal.z += tri.normal.z;
+				v3.normal.x += tri.normal.x;
+				v3.normal.y += tri.normal.y;
+				v3.normal.z += tri.normal.z;
+			}
+			
+			j = vertices.length;
+			for (i = 0; i < j; i++) vertices[i].normal.normalize();
+		}
+		
 		private var _vertexBuffer:VertexBuffer3D;
 		private var _uvBuffer:VertexBuffer3D;
 		private var _indexBuffer:IndexBuffer3D;
