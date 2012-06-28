@@ -6,12 +6,6 @@ By sindney, dongdong, impaler
 A light weight and flexible 3d engine for as3 programmers
 ----------------------------------------------------------------
 
-Commercial use: 
-
-Please contact us (sindneymail@gmail.com) for a paid license.
-
-Non-commercial use: 
-
 Copyright (C) 2012 - 2100 Nest3D Team.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
