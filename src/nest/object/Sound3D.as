@@ -97,14 +97,6 @@ package nest.object
 			return _position;
 		}
 		
-		///////////////////////////////////
-		// toString
-		///////////////////////////////////
-		
-		public function toString():String {
-			return "[nest.object.Sound3D]";
-		}
-		
 	}
 
 }

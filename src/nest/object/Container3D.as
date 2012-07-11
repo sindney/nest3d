@@ -61,14 +61,6 @@ package nest.object
 			return _numChildren;
 		}
 		
-		///////////////////////////////////
-		// toString
-		///////////////////////////////////
-		
-		override public function toString():String {
-			return "[nest.object.Container3D]";
-		}
-		
 	}
 
 }

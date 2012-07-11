@@ -49,14 +49,6 @@ package nest.object.geom
 			return a * p.x + b * p.y + c * p.z + d;
 		}
 		
-		///////////////////////////////////
-		// toString
-		///////////////////////////////////
-		
-		public function toString():String {
-			return "[nest.object.geom.Plane]";
-		}
-		
 	}
 
 }

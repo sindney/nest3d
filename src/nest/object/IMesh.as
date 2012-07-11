@@ -36,6 +36,8 @@ package nest.object
 		function get visible():Boolean;
 		function set visible(value:Boolean):void;
 		
+		function get alphaTest():Boolean;
+		
 		function get blendMode():BlendMode3D;
 		
 	}

@@ -5,10 +5,12 @@ package nest.control.parsers
 	import flash.utils.Endian;
 	
 	import nest.object.data.*;
+	import nest.object.geom.Joint;
 	import nest.object.geom.Triangle;
 	import nest.object.geom.Vertex;
 	import nest.object.IMesh;
 	import nest.object.Mesh;
+	import nest.object.SkinnedMesh;
 	
 	/**
 	 * ParserMS3D
@@ -32,6 +34,10 @@ package nest.control.parsers
 		public function parse(model:ByteArray, scale:Number = 1):void {
 			_objects = new Vector.<IMesh>();
 			
+			var numVts:int;
+			var animation:Boolean = false;
+			var skeletalAnimation:Boolean = false;
+			
 			var i:int, j:int, k:int, l:int, m:int, n:int;
 			
 			var id:String = "";
@@ -41,7 +47,7 @@ package nest.control.parsers
 			
 			var vt1:Vertex, vt2:Vertex, vt3:Vertex, vt4:Vertex;
 			var tri1:Triangle, tri2:Triangle;
-			var vertBoneId:Vector.<int>;
+			var rawVtBone:Vector.<Boolean>;
 			var rawVertices:Vector.<Vertex>;
 			var rawTriangles:Vector.<Triangle>;
 			var rawVertex:Vector.<Vertex>;
@@ -60,19 +66,21 @@ package nest.control.parsers
 			
 			// vertices
 			// numVertices
-			j = model.readUnsignedShort();
+			numVts = model.readUnsignedShort();
+			rawVtBone = new Vector.<Boolean>(j, true);
 			rawVertices = new Vector.<Vertex>(j, true);
-			for (i = 0; i < j; i++) {
+			for (i = 0; i < numVts; i++) {
 				// flag
 				if (model.readUnsignedByte() != 2) {
 					// vert pos x,y,z
 					vt1 = rawVertices[i] = new Vertex(model.readFloat() * scale, model.readFloat() * scale, model.readFloat() * scale);
 					// bone, -1 no bone
 					k = model.readByte();
+					rawVtBone[i] = false;
 					if (k != -1) {
-						/*vt1.linker = new JointLinker();
-						if (!vertBoneId) vertBoneId = new Vector.<int>(j, true);
-						vertBoneId[i] = k;*/
+						skeletalAnimation = true;
+						rawVtBone[i] = true;
+						vt1.joints[0] = k;
 					}
 					// refCount
 					model.readUnsignedByte();
@@ -125,14 +133,12 @@ package nest.control.parsers
 					// numTriangles
 					n = 0;
 					k = model.readUnsignedShort();
+					animation = false;
 					rawVtSign = new Array();
 					rawVertex = new Vector.<Vertex>();
 					rawTriangle = new Vector.<Triangle>(k, true);
 					for (l = 0; l < k; l++) {
 						tri1 = rawTriangles[model.readUnsignedShort()];
-						vt1 = rawVertices[tri1.index0];
-						vt2 = rawVertices[tri1.index1];
-						vt3 = rawVertices[tri1.index2];
 						
 						tri2 = rawTriangle[l] = new Triangle();
 						tri2.normal.copyFrom(tri1.normal);
@@ -142,6 +148,15 @@ package nest.control.parsers
 						tri2.v0 = tri1.v0;
 						tri2.v1 = tri1.v1;
 						tri2.v2 = tri1.v2;
+						
+						if (rawVtBone[tri1.index0] || rawVtBone[tri1.index1] || rawVtBone[tri1.index2]) {
+							animation = true;
+							continue;
+						}
+						
+						vt1 = rawVertices[tri1.index0];
+						vt2 = rawVertices[tri1.index1];
+						vt3 = rawVertices[tri1.index2];
 						
 						m = rawVtSign[tri1.index0];
 						if (m) {
@@ -174,13 +189,157 @@ package nest.control.parsers
 						}
 					}
 					
-					meshData = new MeshData(rawVertex, rawTriangle);
-					_objects[i] = new Mesh(meshData, null, null);
+					if (animation) {
+						meshData = new MeshData(null, rawTriangle);
+						_objects[i] = new SkinnedMesh(meshData, null, null);
+					} else {
+						meshData = new MeshData(rawVertex, rawTriangle);
+						_objects[i] = new Mesh(meshData, null, null);
+					}
 					(_objects[i] as Mesh).name = id;
 					// material index
 					model.readUnsignedByte();
 				}
 			}
+			
+			if (!skeletalAnimation) return;
+			
+			var joint:Joint;
+			var frame1:KeyFrame, frame2:KeyFrame;
+			var rawJointParent:Vector.<String>;
+			var rawJoints:Vector.<Joint>;
+			
+			// numMaterials times material struct
+			model.position += model.readUnsignedShort() * 361;
+			
+			// animation fps, currentTime, totalFrames
+			model.position += 12;
+			
+			// numJoints
+			j = model.readUnsignedShort();
+			rawJoints = new Vector.<Joint>(j, true);
+			rawJointParent = new Vector.<String>(j, true);
+			for (i = 0; i < j; i++) {
+				if (model.readUnsignedByte() != 2) {
+					// name of the joint
+					id = "";
+					for (k = 0; k < 32; k++) id += String.fromCharCode(model.readUnsignedByte());
+					joint = rawJoints[i] = new Joint();
+					joint.name = id;
+					// parent name
+					id = "";
+					for (k = 0; k < 32; k++) id += String.fromCharCode(model.readUnsignedByte());
+					rawJointParent[i] = id;
+					// local transforms
+					joint.local.appendRotation(model.readFloat(), Vector3D.X_AXIS);
+					joint.local.appendRotation(model.readFloat(), Vector3D.Y_AXIS);
+					joint.local.appendRotation(model.readFloat(), Vector3D.Z_AXIS);
+					joint.local.appendTranslation(model.readFloat(), model.readFloat(), model.readFloat());
+					// numRotationKeyFrames
+					k = model.readUnsignedShort();
+					// numPositionKeyFrames
+					l = model.readUnsignedShort();
+					// rotation keyFrames
+					for (m = 0; m < k; m++) {
+						frame2 = new KeyFrame(KeyFrame.ROTATION);
+						frame2.time = model.readFloat();
+						frame2.component.x = model.readFloat();
+						frame2.component.y = model.readFloat();
+						frame2.component.z = model.readFloat();
+						if (frame1) {
+							frame1.next = frame2;
+							frame1 = frame2;
+						} else {
+							joint.rotation = frame1 = frame2;
+						}
+					}
+					frame1 = null;
+					// position keyFrames
+					for (m = 0; m < k; m++) {
+						frame2 = new KeyFrame(KeyFrame.POSITION);
+						frame2.time = model.readFloat();
+						frame2.component.x = model.readFloat();
+						frame2.component.y = model.readFloat();
+						frame2.component.z = model.readFloat();
+						if (frame1) {
+							frame1.next = frame2;
+							frame1 = frame2;
+						} else {
+							joint.position = frame1 = frame2;
+						}
+					}
+				}
+			}
+			
+			// subVersion of the comments
+			model.position += 4;
+			// number of group comments
+			k = model.readUnsignedInt();
+			for (m = 0; m < k; m++) {
+				// index
+				model.position += 4;
+				// commentLength
+				n = model.readInt();
+				model.position += n;
+			}
+			
+			// number of material comments
+			k = model.readUnsignedInt();
+			for (m = 0; m < k; m++) {
+				// index
+				model.position += 4;
+				// commentLength
+				n = model.readInt();
+				model.position += n;
+			}
+			
+			// number of joint comments
+			k = model.readUnsignedInt();
+			for (m = 0; m < k; m++) {
+				// index
+				model.position += 4;
+				// commentLength
+				n = model.readInt();
+				model.position += n;
+			}
+			
+			// number of model comments 0/1
+			k = model.readUnsignedInt();
+			for (m = 0; m < k; m++) {
+				// index
+				model.position += 4;
+				// commentLength
+				n = model.readInt();
+				model.position += n;
+			}
+			
+			// subversion of the vertex extra information
+			k = model.readInt();
+			for (l = 0; l < numVts; l++) {
+				vt1 = rawVertices[l];
+				vt1.joints[1] = int(String.fromCharCode(model.readByte()));
+				vt1.joints[2] = int(String.fromCharCode(model.readByte()));
+				vt1.joints[3] = int(String.fromCharCode(model.readByte()));
+				n = 0;
+				m = model.readByte();
+				if (vt1.joints[0] != -1) n += vt1.weights[0] = (m + 128) / 255;
+				m = model.readByte();
+				if (vt1.joints[1] != -1) n += vt1.weights[1] = (m + 128) / 255;
+				m = model.readByte();
+				if (vt1.joints[2] != -1) n += vt1.weights[2] = (m + 128) / 255;
+				m = model.readByte();
+				if (vt1.joints[3] != -1) vt1.weights[3] = 1 - n;
+				if (k == 2) model.position += 4;
+			}
+			
+			// TODO: 使用jointParent来连接joint tree
+			
+			// TODO: 遍历_objects数组，非SkinnedMesh跳过，SkinnedMesh根据其MeshData存储的triangles信息
+			// 从rawVertices数组得到MeshData的vertices信息(更新过joint索引与权重)
+			// 记得根据当前SkinnedMesh任意Joint得到根joint并附给SkinnedMesh.joint
+			// 还要把所有出现的joint存入SkinnedMesh.joints，顺序要和joint索引一致
+			
+			model.position = 0;
 		}
 		
 		///////////////////////////////////
@@ -189,14 +348,6 @@ package nest.control.parsers
 		
 		public function get objects():Vector.<IMesh> {
 			return _objects;
-		}
-		
-		///////////////////////////////////
-		// toString
-		///////////////////////////////////
-		
-		public function toString():String {
-			return "[nest.control.parsers.ParserMS3D]";
 		}
 		
 	}

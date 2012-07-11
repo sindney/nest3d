@@ -3,7 +3,6 @@ package nest.object
 	import flash.display.BitmapData;
 	import flash.geom.Vector3D;
 	
-	import nest.control.factories.PrimitiveFactory;
 	import nest.object.data.MeshData;
 	import nest.object.geom.Vertex;
 	import nest.object.geom.IBound;
@@ -51,7 +50,7 @@ package nest.object
 				}
 			}
 			
-			PrimitiveFactory.calculateNormal(_data.vertices, _data.triangles);
+			MeshData.calculateNormal(_data.vertices, _data.triangles);
 			
 			_data.update();
 			_bound.update(_data.vertices);
@@ -82,14 +81,6 @@ package nest.object
 			result.visible = _visible;
 			result.update();
 			return result;
-		}
-		
-		///////////////////////////////////
-		// toString
-		///////////////////////////////////
-		
-		override public function toString():String {
-			return "[nest.object.Terrain]";
 		}
 		
 	}

@@ -83,7 +83,7 @@ package nest.object.data
 		 * Call this when you modified vertices/triangles list.
 		 */
 		public function update(recreate:Boolean = false):void {
-			if (!_vertices && !_triangles) return;
+			if (!_vertices || !_triangles) return;
 			
 			_numVertices = _vertices.length;
 			_numTriangles = _triangles.length;
@@ -272,14 +272,6 @@ package nest.object.data
 		
 		public function get indexBuffer():IndexBuffer3D {
 			return _indexBuffer;
-		}
-		
-		///////////////////////////////////
-		// toString
-		///////////////////////////////////
-		
-		public function toString():String {
-			return "[nest.object.data.MeshData]";
 		}
 		
 	}

@@ -79,14 +79,6 @@ package nest.view
 			if (value)_changed = true;
 		}
 		
-		///////////////////////////////////
-		// toString
-		///////////////////////////////////
-		
-		public function toString():String {
-			return "[nest.view.Shader3D]";
-		}
-		
 	}
 
 }

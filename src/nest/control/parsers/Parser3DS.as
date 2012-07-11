@@ -154,14 +154,6 @@ package nest.control.parsers
 			return _objects;
 		}
 		
-		///////////////////////////////////
-		// toString
-		///////////////////////////////////
-		
-		public function toString():String {
-			return "[nest.control.parsers.Parser3DS]";
-		}
-		
 	}
 
 }

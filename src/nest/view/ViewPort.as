@@ -9,22 +9,16 @@ package nest.view
 	import flash.display3D.Context3DVertexBufferFormat;
 	import flash.events.Event;
 	import flash.events.EventDispatcher;
-	import flash.geom.Matrix3D;
 	import flash.geom.Utils3D;
-	import flash.geom.Vector3D;
+	import flash.geom.Vector3D
 	
+	import nest.object.IContainer3D;
 	import nest.view.lights.PointLight;
 	import nest.view.lights.AmbientLight;
 	import nest.view.lights.DirectionalLight;
 	import nest.view.lights.SpotLight;
 	import nest.view.lights.ILight;
-	import nest.object.geom.AABB;
-	import nest.object.geom.BSphere;
-	import nest.object.IPlaceable;
-	import nest.object.IContainer3D;
-	import nest.object.IMesh;
-	import nest.object.LODMesh;
-	import nest.object.Sound3D;
+	import nest.view.managers.ISceneManager;
 	
 	/** 
 	 * Dispatched when context3D is created.
@@ -38,10 +32,8 @@ package nest.view
 	public class ViewPort extends EventDispatcher {
 		
 		private var stage3d:Stage3D;
-		private var vertices:Vector.<Vector3D>;
 		
 		private var _context3D:Context3D;
-		private var _draw:Matrix3D;
 		private var _width:Number;
 		private var _height:Number;
 		private var _antiAlias:int = 0;
@@ -50,46 +42,32 @@ package nest.view
 		private var _rgba:Vector.<Number> = new Vector.<Number>(4, true);
 		private var _camPos:Vector.<Number> = new Vector.<Number>(4, true);
 		private var _vertexParameters:Vector.<Number> = new Vector.<Number>(4, true);
-		private var _fragmentParameters:Vector.<Number> = new Vector.<Number>(4, true);
 		
 		private var _light:AmbientLight;
-		private var _fog:Fog;
+		
+		private var _fog:Boolean = false;
+		private var _fogColor:Vector.<Number> = new Vector.<Number>(4, true);
+		private var _fogData:Vector.<Number> = new Vector.<Number>(4, true);
 		
 		private var _diagram:Diagram;
-		private var _numVertices:int = 0;
-		private var _numTriangles:int = 0;
-		private var _numObjects:int = 0;
 		
 		private var _camera:Camera3D;
 		private var _root:IContainer3D;
+		private var _manager:ISceneManager;
 		
-		public function ViewPort(width:Number, height:Number, stage3d:Stage3D, camera:Camera3D, root:IContainer3D) {
+		public function ViewPort(width:Number, height:Number, stage3d:Stage3D, camera:Camera3D, root:IContainer3D, manager:ISceneManager) {
 			this.stage3d = stage3d;
 			
 			_camera = camera;
 			_root = root;
+			_manager = manager;
+			_manager.camera = _camera;
+			_manager.root = _root;
 			
 			_vertexParameters[0] = 0;
 			_vertexParameters[1] = 0;
 			_vertexParameters[2] = 0;
 			_vertexParameters[3] = 1;
-			
-			_fragmentParameters[0] = 0;
-			_fragmentParameters[1] = 0;
-			_fragmentParameters[2] = 0;
-			_fragmentParameters[3] = 0.01;
-			
-			vertices = new Vector.<Vector3D>(8, true);
-			vertices[0] = new Vector3D();
-			vertices[1] = new Vector3D();
-			vertices[2] = new Vector3D();
-			vertices[3] = new Vector3D();
-			vertices[4] = new Vector3D();
-			vertices[5] = new Vector3D();
-			vertices[6] = new Vector3D();
-			vertices[7] = new Vector3D();
-			
-			_draw = new Matrix3D();
 			
 			_width = width;
 			_height = height;
@@ -101,6 +79,16 @@ package nest.view
 			stage3d.requestContext3D();
 		}
 		
+		public function setupFog(color:uint, max:Number, min:Number):void {
+			_fogColor[0] = ((color >> 16) & 0xFF) / 255;
+			_fogColor[1] = ((color >> 8) & 0xFF) / 255;
+			_fogColor[2] = (color & 0xFF) / 255;
+			_fogColor[3] = 1;
+			_fogData[0] = max * max;
+			_fogData[1] = min * min;
+			_fogData[2] = _fogData[3] = 0;
+		}
+		
 		/**
 		 * Project a point from world space to screen space.
 		 * <p>If the point is in front of the camera, then result.z = 0, otherwise, result.z = 1.</p>
@@ -108,88 +96,19 @@ package nest.view
 		public function projectVector(p:Vector3D):Vector3D {
 			const vx:Number = _width * 0.5;
 			const vy:Number = _height * 0.5;
-			var result:Vector3D = Utils3D.projectVector(camera.pm, camera.invertMatrix.transformVector(p));
+			var result:Vector3D = Utils3D.projectVector(_camera.pm, _camera.invertMatrix.transformVector(p));
 			result.x = result.x * vx + vx;
 			result.y = vy - result.y * vy;
 			return result;
-		}
-		
-		private function init(e:Event):void {
-			_context3D = stage3d.context3D;
-			_context3D.configureBackBuffer(_width, _height, _antiAlias, true);
-			camera.aspect = _width / _height;
-			dispatchEvent(new Event(Event.CONTEXT3D_CREATE));
-		}
-		
-		private function doMesh(mesh:IMesh):void {
-			_numVertices += mesh.data.numVertices;
-			_numTriangles += mesh.data.numTriangles;
-			_numObjects += 1;
-			_draw.copyFrom(mesh.matrix);
-			_draw.append(camera.invertMatrix);
-			_draw.append(camera.pm);
-			mesh.draw(_context3D, _draw);
-		}
-		
-		private function doContainer(container:IContainer3D, parent:IContainer3D = null, changed:Boolean = false):void {
-			if (!container.visible) return;
-			var mark:Boolean = changed;
-			
-			if (container.changed || parent && changed) {
-				mark = true;
-				container.recompose();
-				if (parent) container.matrix.append(parent.matrix);
-			}
-			
-			var mesh:IMesh;
-			var object:IPlaceable;
-			var i:int, j:int = container.numChildren;
-			for (i = 0; i < j; i++) {
-				object = container.getChildAt(i);
-				if (object is IContainer3D) {
-					doContainer(object as IContainer3D, container, mark);
-				} else if (object is IMesh) {
-					mesh = object as IMesh;
-					if (mesh.changed || mark) {
-						mesh.recompose();
-						mesh.matrix.append(container.matrix);
-					}
-					if (mesh.visible) {
-						if (mesh is LODMesh) (mesh as LODMesh).update(camera.position);
-						if (!mesh.cliping || classifyMesh(mesh)) doMesh(mesh);
-					}
-				} else if (object is Sound3D) {
-					(object as Sound3D).update(camera.invertMatrix, container.matrix);
-				}
-			}
-		}
-		
-		private function classifyMesh(mesh:IMesh):Boolean {
-			var i:int;
-			var v:Vector3D = new Vector3D();
-			if (mesh.bound is AABB) {
-				for (i = 0; i < 8; i++) {
-					v.copyFrom((mesh.bound as AABB).vertices[i]);
-					v.copyFrom(camera.invertMatrix.transformVector(mesh.matrix.transformVector(v)));
-					vertices[i].copyFrom(v);
-				}
-				return camera.frustum.classifyAABB(vertices);
-			}
-			
-			// BoundingShpere
-			i = mesh.scale.x > mesh.scale.y ? mesh.scale.x : mesh.scale.y;
-			if (mesh.scale.z > i) i = mesh.scale.z;
-			v.copyFrom(camera.invertMatrix.transformVector(mesh.matrix.transformVector(mesh.bound.center)));
-			return camera.frustum.classifyBSphere(v, (mesh.bound as BSphere).radius * i);
 		}
 		
 		/**
 		 * Put this into a loop to draw your scene on stage3d.
 		 */
 		public function calculate(bitmapData:BitmapData = null):void {
-			if (!camera || !root || !_context3D) return;
+			if (!_camera || !_root || !_context3D || !_manager) return;
 			
-			_context3D.clear(_rgba[0], _rgba[1], _rgba[2], 1);
+			_context3D.clear(_rgba[0], _rgba[1], _rgba[2], _rgba[3]);
 			
 			_diagram.update();
 			
@@ -224,23 +143,25 @@ package nest.view
 			_camPos[2] = camera.position.z;
 			_camPos[3] = 1;
 			_context3D.setProgramConstantsFromVector(Context3DProgramType.VERTEX, 8, _camPos);
+			_context3D.setProgramConstantsFromVector(Context3DProgramType.VERTEX, 10, _vertexParameters);
 			
-			if (fog) {
- 				_context3D.setProgramConstantsFromVector(Context3DProgramType.VERTEX, 9, fog.data);
-				_context3D.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, 20, fog.color);
+			if (_fog) {
+ 				_context3D.setProgramConstantsFromVector(Context3DProgramType.VERTEX, 9, _fogData);
+				_context3D.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, 20, _fogColor);
 			}
 			
-			_context3D.setProgramConstantsFromVector(Context3DProgramType.VERTEX, 11, _vertexParameters);
-			_context3D.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, 22, _fragmentParameters);
-			
-			_numVertices = 0;
-			_numTriangles = 0;
-			_numObjects = 0;
-			
-			doContainer(root);
+			_manager.calculate();
 			
 			if (bitmapData) _context3D.drawToBitmapData(bitmapData);
 			_context3D.present();
+		}
+		
+		private function init(e:Event):void {
+			_context3D = stage3d.context3D;
+			_context3D.configureBackBuffer(_width, _height, _antiAlias, true);
+			camera.aspect = _width / _height;
+			_manager.context3D = _context3D;
+			dispatchEvent(new Event(Event.CONTEXT3D_CREATE));
 		}
 		
 		///////////////////////////////////
@@ -248,7 +169,7 @@ package nest.view
 		///////////////////////////////////
 		
 		/**
-		 * There's 20 empty fc left.
+		 * There's 21 empty fc left.
 		 * <p>Ambient light absorbs 1 fc.</p>
 		 * <p>Directional light takes 2.</p>
 		 * <p>PointLight light takes 3.</p>
@@ -260,7 +181,7 @@ package nest.view
 		
 		/**
 		 * The root light is an AmbientLight.
-		 * <p>Link new light source to lights.next.</p>
+		 * <p>Link new light source to light.next.</p>
 		 */
 		public function set light(value:AmbientLight):void {
 			_light = value;
@@ -294,6 +215,14 @@ package nest.view
 			}
 		}
 		
+		public function get alpha():Number {
+			return _rgba[3];
+		}
+		
+		public function set alpha(value:Number):void {
+			_rgba[3] = value;
+		}
+		
 		public function get color():uint {
 			return _color;
 		}
@@ -306,7 +235,6 @@ package nest.view
 			_rgba[0] = ((value >> 16) & 0xFF) / 255;
 			_rgba[1] = ((value >> 8) & 0xFF) / 255;
 			_rgba[2] = (value & 0xFF) / 255;
-			_rgba[3] = 1;
 		}
 		
 		public function get antiAlias():int {
@@ -320,37 +248,8 @@ package nest.view
 			}
 		}
 		
-		/**
-		 * Get the amount of vertices drawn during last rendering process.
-		 */
-		public function get numVertices():int {
-			return _numVertices;
-		}
-		
-		/**
-		 * Get the amount of triangles drawn during last rendering process.
-		 */
-		public function get numTriangles():int {
-			return _numTriangles;
-		}
-		
-		/**
-		 * Get the amount of objects drawn during last rendering process.
-		 */
-		public function get numObjects():int {
-			return _numObjects;
-		}
-		
 		public function get diagram():Diagram {
 			return _diagram;
-		}
-		
-		public function get fog():Fog {
-			return _fog;
-		}
-		
-		public function set fog(value:Fog):void {
-			_fog = value;
 		}
 		
 		public function get context3D():Context3D {
@@ -365,12 +264,23 @@ package nest.view
 			return _root;
 		}
 		
-		///////////////////////////////////
-		// toString
-		///////////////////////////////////
+		public function get manager():ISceneManager {
+			return _manager;
+		}
 		
-		override public function toString():String {
-			return "[nest.view.ViewPort]";
+		public function set manager(value:ISceneManager):void {
+			_manager = value;
+			_manager.camera = _camera;
+			_manager.root = _root;
+			_manager.context3D = _context3D;
+		}
+		
+		public function get fog():Boolean {
+			return _fog;
+		}
+		
+		public function set fog(value:Boolean):void {
+			_fog = value;
 		}
 		
 	}

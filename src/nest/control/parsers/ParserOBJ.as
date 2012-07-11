@@ -121,14 +121,6 @@ package nest.control.parsers
 			return new MeshData(rawVertex, rawTriangle);
 		}
 		
-		///////////////////////////////////
-		// toString
-		///////////////////////////////////
-		
-		public function toString():String {
-			return "[nest.control.parsers.ParserOBJ]";
-		}
-		
 	}
 
 }

@@ -5,7 +5,6 @@ package
 	import nest.object.data.MeshData;
 	import nest.object.Mesh;
 	import nest.view.materials.ColorMaterial;
-	import nest.view.Fog;
 	import nest.view.Shader3D;
 	
 	/**
@@ -18,7 +17,8 @@ package
 		}
 		
 		override public function init():void {
-			view.fog = new Fog(0x0066ff, 400, 100);
+			view.setupFog(0x0066ff, 400, 0);
+			view.fog = true;
 			view.color = 0x0066ff;
 			
 			camera.far = 400;
@@ -28,7 +28,7 @@ package
 			var colorMat:ColorMaterial = new ColorMaterial(0xffffff);
 			
 			var shader:Shader3D = new Shader3D();
-			ShaderFactory.create(shader, false, false, false, null, false, false, true);
+			ShaderFactory.create(shader, false, false, false, false, false, false, null, true);
 			
 			var cube:Mesh;
 			var i:int, j:int, k:int;

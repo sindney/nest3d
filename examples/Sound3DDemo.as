@@ -1,5 +1,6 @@
 package  
 {
+	import flash.display.BitmapData;
 	import flash.media.Sound;
 	
 	import nest.control.factories.*;
@@ -10,6 +11,8 @@ package
 	import nest.view.materials.TextureMaterial;
 	import nest.view.materials.IMaterial;
 	import nest.view.materials.ColorMaterial;
+	import nest.view.materials.SkyBoxMaterial;
+	import nest.view.materials.EnvMapMaterial;
 	import nest.view.Shader3D;
 	
 	/**
@@ -43,30 +46,30 @@ package
 		}
 		
 		override public function init():void {
-			var data:MeshData = PrimitiveFactory.createPlane(100, 100, 4, 4);
-			var shader:Shader3D = new Shader3D();
-			ShaderFactory.create(shader, false);
+			var cubicmap:Vector.<BitmapData> = new Vector.<BitmapData>(6, true);
+			cubicmap[0] = new right().bitmapData;
+			cubicmap[1] = new left().bitmapData;
+			cubicmap[2] = new top().bitmapData;
+			cubicmap[3] = new bottom().bitmapData;
+			cubicmap[4] = new front().bitmapData;
+			cubicmap[5] = new back().bitmapData;
 			
-			var mesh:Mesh = new Mesh(data, new ColorMaterial(), shader);
+			var shader:Shader3D = new Shader3D();
+			ShaderFactory.create(shader, true, false, false, false, true);
+			
+			var mesh:Mesh = new Mesh(PrimitiveFactory.createPlane(100, 100, 4, 4), new EnvMapMaterial(cubicmap, 1, new BitmapData(1, 1, false)), shader);
 			scene.addChild(mesh);
 			
-			mesh = new Mesh(PrimitiveFactory.createPlane(10, 10, 1, 1), new ColorMaterial(0xffff00), shader);
+			shader = new Shader3D();
+			ShaderFactory.create(shader, false);
+			
+			mesh = new Mesh(PrimitiveFactory.createPlane(10, 10, 1, 1), new ColorMaterial(), shader);
 			mesh.position.setTo(50, 5, 50);
 			mesh.rotation.setTo(Math.PI / 2, -Math.PI * 0.75, 0);
 			mesh.changed = true;
 			scene.addChild(mesh);
 			
-			var skyBoxMat:Vector.<IMaterial> = new Vector.<IMaterial>(6, true);
-			skyBoxMat[SkyBox.TOP] = new TextureMaterial(new top().bitmapData);
-			skyBoxMat[SkyBox.BOTTOM] = new TextureMaterial(new bottom().bitmapData);
-			skyBoxMat[SkyBox.LEFT] = new TextureMaterial(new left().bitmapData);
-			skyBoxMat[SkyBox.RIGHT] = new TextureMaterial(new right().bitmapData);
-			skyBoxMat[SkyBox.FRONT] = new TextureMaterial(new front().bitmapData);
-			skyBoxMat[SkyBox.BACK] = new TextureMaterial(new back().bitmapData);
-			
-			shader = new Shader3D();
-			ShaderFactory.create(shader);
-			var skyBox:SkyBox = new SkyBox(1000, skyBoxMat, shader);
+			var skyBox:SkyBox = new SkyBox(1000, new SkyBoxMaterial(cubicmap));
 			scene.addChild(skyBox);
 			
 			var sound:Sound3D = new Sound3D(new rain() as Sound);

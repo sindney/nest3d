@@ -54,14 +54,6 @@ package nest.view.lights
 			_next = value;
 		}
 		
-		///////////////////////////////////
-		// toString
-		///////////////////////////////////
-		
-		public function toString():String {
-			return "[nest.view.lights.AmbientLight]";
-		}
-		
 	}
 
 }

@@ -73,14 +73,6 @@ package nest.object.geom
 			return _center;
 		}
 		
-		///////////////////////////////////
-		// toString
-		///////////////////////////////////
-		
-		public function toString():String {
-			return "[nest.object.geom.AABB]";
-		}
-		
 	}
 
 }

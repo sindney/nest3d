@@ -10,13 +10,13 @@ package nest.view
 	 */
 	public class Camera3D extends Object3D {
 		
-		private var _pm:Matrix3D;
-		private var _frustum:Frustum;
+		protected var _pm:Matrix3D;
+		protected var _frustum:Frustum;
 		
-		private var _aspect:Number = 4 / 3;
-		private var _near:Number = 0.1;
-		private var _far:Number = 10000;
-		private var _fov:Number = 45 * Math.PI / 180;
+		protected var _aspect:Number = 4 / 3;
+		protected var _near:Number = 0.1;
+		protected var _far:Number = 10000;
+		protected var _fov:Number = 45 * Math.PI / 180;
 		
 		public function Camera3D() {
 			super();
@@ -25,7 +25,7 @@ package nest.view
 			update();
 		}
 		
-		private function update():void {
+		protected function update():void {
 			const ys:Number = 1.0 / Math.tan(_fov / 2.0);
 			const xs:Number = ys / _aspect;
 			
@@ -91,16 +91,12 @@ package nest.view
 			return _pm;
 		}
 		
-		public function get frustum():Frustum {
-			return _frustum;
+		public function set pm(matrix:Matrix3D):void {
+			
 		}
 		
-		///////////////////////////////////
-		// toString
-		///////////////////////////////////
-		
-		override public function toString():String {
-			return "[nest.view.Camera3D]";
+		public function get frustum():Frustum {
+			return _frustum;
 		}
 		
 	}

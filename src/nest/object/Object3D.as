@@ -39,8 +39,15 @@ package nest.object
 		
 		public function recompose():void {
 			_matrix.recompose(_components, _orientation);
-			_invertMatrix.copyFrom(_matrix);
+			
+			const sx:Number = _components[2].x;
+			const sy:Number = _components[2].y;
+			const sz:Number = _components[2].z;
+			_components[2].setTo(1, 1, 1);
+			_invertMatrix.recompose(_components, _orientation);
 			_invertMatrix.invert();
+			_components[2].setTo(sx, sy, sz);
+			
 			_changed = false;
 		}
 		
@@ -86,14 +93,6 @@ package nest.object
 		
 		public function set changed(value:Boolean):void {
 			_changed = value;
-		}
-		
-		///////////////////////////////////
-		// toString
-		///////////////////////////////////
-		
-		public function toString():String {
-			return "[nest.object.Object3D]";
 		}
 		
 	}

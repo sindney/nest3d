@@ -17,6 +17,7 @@ package nest.object
 	public class SkinnedMesh extends Mesh {
 		
 		public var joint:Joint;
+		public var joints:Vector.<Joint>;
 		public var vertices:Vector.<Vertex>;
 		
 		public var tracks:Dictionary;
@@ -25,7 +26,7 @@ package nest.object
 			super(data, material, shader, bound);
 		}
 		
-		public function clone():IMesh {
+		override public function clone():IMesh {
 			var bound:IBound;
 			if (_bound is BSphere) bound = new BSphere(); 
 			var result:SkinnedMesh = new SkinnedMesh(_data, _material, _shader, bound);
@@ -36,18 +37,12 @@ package nest.object
 			result.culling = _culling;
 			result.visible = _visible;
 			result.joint = joint;
+			result.joints = joints;
 			result.vertices = vertices;
 			result.tracks = tracks;
 			return result;
 		}
 		
-		///////////////////////////////////
-		// toString
-		///////////////////////////////////
-		
-		public function toString():String {
-			return "[nest.object.SkinnedMesh]";
-		}
 	}
 
 }

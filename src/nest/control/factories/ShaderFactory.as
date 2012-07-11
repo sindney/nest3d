@@ -11,10 +11,10 @@ package nest.control.factories
 		/**
 		 * Create necessary data for shader3d object.
 		 */
-		public static function create(shader:Shader3D, uv:Boolean = true, specular:Boolean = false, mipmapping:Boolean = false, 
-										light:AmbientLight = null, normalmap:Boolean = false, lightmap:Boolean = false, 
-										fog:Boolean = false, kil:Boolean = false):void {
-			const normal:Boolean = light != null;
+		public static function create(shader:Shader3D, uv:Boolean = true, specular:Boolean = false, 
+										normalmap:Boolean = false, lightmap:Boolean = false, envmap:Boolean = false,
+										mipmapping:Boolean = false, light:AmbientLight = null, fog:Boolean = false):void {
+			const normal:Boolean = (light != null || envmap);
 			
 			// vertex shader
 			var vertex:String = "m44 op, va0, vc0\n" + 
@@ -37,14 +37,27 @@ package nest.control.factories
 							"div vt1.x, vt1.x, vt1.y\n" + 
 							"mov v7, vt1.x\n";
 			}
+			if (envmap) {
+				// v5 = I - 2*N*dot(N,I)
+				vertex += "m44 vt1, va2, vc11\n" + 
+							"nrm vt1.xyz, vt1\n" + 
+							"m44 vt2, va0, vc11\n" + 
+							"sub vt2, vt2, vc8\n" + 
+							"dp3 vt3, vt1, vt2\n" + 
+							"add vt1, vt1, vt1\n" + 
+							"mul vt3, vt3, vt1\n" + 
+							"sub vt2, vt2, vt3\n" + 
+							"nrm vt2.xyz, vt2\n" + 
+							"mov v5, vt2\n";
+			}
 			if (uv) vertex += "mov v1, va1\n";
 			if (normal) vertex += "mov v2, va2\n";
 			if (normalmap) {
-				vertex +=  "mov vt0, vc11.x\n" + 
-							"mov vt0.z, vc11.w\n" + 
+				vertex +=  "mov vt0, vc10.x\n" + 
+							"mov vt0.z, vc10.w\n" + 
 							"crs vt1.xyz, va2, vt0\n" + 
-							"mov vt0.z, vc11.x\n" + 
-							"mov vt0.y, vc11.w\n" + 
+							"mov vt0.z, vc10.x\n" + 
+							"mov vt0.y, vc10.w\n" + 
 							"crs vt0.xyz, va2, vt0\n" + 
 							// vt0 = (vt1.length > vt0.length ? vt1 : vt0);
 							"dp3 vt3, vt1, vt1\n" + 
@@ -59,7 +72,7 @@ package nest.control.factories
 							"mov v4, vt5\n" + 
 							// vt6, v3 = binormal
 							"crs vt6.xyz, va2, vt0\n" + 
-							"mov vt6.w, vc11.w\n" + 
+							"mov vt6.w, vc10.w\n" + 
 							"mov v3, vt6\n";
 			}
 			
@@ -67,8 +80,8 @@ package nest.control.factories
 			var fragment:String = uv ? "tex ft7, v1, fs0 <2d,linear," + (mipmapping ? "miplinear" : "mipnone") + ">\n" : "mov ft7, fc27\n";
 			if (normalmap) {
 				fragment += "tex ft5, v1, fs2 <2d,linear," + (mipmapping ? "miplinear" : "mipnone") + ">\n" + 
-							"mul ft5, ft5, fc21.y\n" + 
-							"sub ft5, ft5, fc21.z\n" + 
+							"add ft5, ft5, ft5\n" + 
+							"sub ft5, ft5, fc22.y\n" + 
 							"mul ft0, v4, ft5.x\n" + 
 							"mul ft1, v3, ft5.y\n" + 
 							"add ft0, ft0, ft1\n" + 
@@ -77,7 +90,6 @@ package nest.control.factories
 			}
 			if (lightmap) fragment += "tex ft6, v1, fs3 <2d,linear," + (mipmapping ? "miplinear" : "mipnone") + ">\nmul ft7, ft7, ft6\nsat ft7, ft7\n";
 			if (specular) fragment += "tex ft6, v1, fs1 <2d,linear," + (mipmapping ? "miplinear" : "mipnone") + ">\n";
-			if (kil) fragment += "sub ft7.w, ft7.w, fc22.w\nkil ft7.w\n";
 			
 			if (light) {
 				// ambient
@@ -110,7 +122,7 @@ package nest.control.factories
 										"sqt ft3, ft3\n" + 
 										"div ft1, ft1, ft3\n" + 
 										"dp3 ft1, ft1, ft5\n" + 
-										"pow ft1, ft1, fc21.x\n" + 
+										"pow ft1, ft1, fc22.x\n" + 
 										"mul ft1, ft1, ft4\n" + 
 										"sat ft1, ft1\n" + 
 										"mul ft1, ft1, ft6\n" + 
@@ -148,7 +160,7 @@ package nest.control.factories
 										"sqt ft3, ft3\n" + 
 										"div ft1, ft1, ft3\n" + 
 										"dp3 ft1, ft1, ft5\n" + 
-										"pow ft1, ft1, fc21.x\n" + 
+										"pow ft1, ft1, fc22.x\n" + 
 										"dp3 ft3, ft2, ft5\n" + 
 										"sat ft3, ft3\n" + 
 										"mul ft1, ft1, ft3\n" + 
@@ -198,7 +210,7 @@ package nest.control.factories
 										"sqt ft3, ft3\n" + 
 										"div ft1, ft1, ft3\n" + 
 										"dp3 ft1, ft1, ft5\n" + 
-										"pow ft1, ft1, fc21.x\n" + 
+										"pow ft1, ft1, fc22.x\n" + 
 										"dp3 ft3, ft2, ft5\n" + 
 										"sat ft3, ft3\n" + 
 										"mul ft1, ft1, ft3\n" + 
@@ -214,6 +226,13 @@ package nest.control.factories
 				}
 			} else {
 				fragment += "mov ft0, ft7\n";
+			}
+			
+			if (envmap) {
+				fragment += "tex ft1, v5, fs3 <cube,linear,miplinear>\n" + 
+							"mul ft1, ft1, fc22.z\n" + 
+							"mul ft0, ft0, fc22.w\n" + 
+							"add ft0, ft0, ft1\n";
 			}
 			
 			if (fog) fragment += "sub ft1, fc20, ft0\nmul ft1, v7.x, ft1\nadd ft0, ft0, ft1\n";

@@ -32,7 +32,7 @@ package
 			var colorMat:ColorMaterial = new ColorMaterial(0xff0000);
 			
 			var shader:Shader3D = new Shader3D();
-			ShaderFactory.create(shader, false, false, false, view.light);
+			ShaderFactory.create(shader, false, false, false, false, false, false, view.light);
 			
 			box = new Mesh(data, colorMat, shader);
 			scene.addChild(box);
@@ -52,11 +52,10 @@ package
 		override public function loop():void {
 			camera.recompose();
 			box.recompose();
-			var orgion:Vector3D = box.matrix.transformVector(camera.position);
-			var delta:Vector3D = box.matrix.transformVector(camera.matrix.transformVector(new Vector3D(0, 0, 200)));
+			var orgion:Vector3D = box.invertMatrix.transformVector(camera.position);
+			var delta:Vector3D = box.invertMatrix.transformVector(camera.matrix.transformVector(new Vector3D(0, 0, 200)));
 			
 			var result:IntersectionData = new IntersectionData();
-			
 			Intersection.Ray_Mesh(result, orgion, delta, box);
 			
 			spot.position.copyFrom(result.point);

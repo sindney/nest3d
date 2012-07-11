@@ -48,14 +48,6 @@ package nest.view.materials
 			return false;
 		}
 		
-		///////////////////////////////////
-		// toString
-		///////////////////////////////////
-		
-		public function toString():String {
-			return "[nest.view.materials.ColorMaterial]";
-		}
-		
 	}
 
 }

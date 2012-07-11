@@ -7,32 +7,32 @@ package nest.object.data
 	 */
 	public class KeyFrame {
 		
+		public static const ROTATION:int = 0;
+		public static const POSITION:int = 1;
+		
 		public var time:Number;
 		
 		public var next:KeyFrame;
 		
-		private var _components:Vector.<Vector3D> = new Vector.<Vector3D>(3, true);
+		private var _type:int;
 		
-		public function KeyFrame() {
-			_components[0] = new Vector3D();
-			_components[1] = new Vector3D();
-			_components[2] = new Vector3D(1, 1, 1);
+		private var _component:Vector3D;
+		
+		public function KeyFrame(type:int) {
+			_type = type;
+			_component = new Vector3D();
 		}
 		
 		///////////////////////////////////
 		// getter/setters
 		///////////////////////////////////
 		
-		public function get components():Vector.<Vector3D> {
-			return _components;
+		public function get type():int {
+			return _type;
 		}
 		
-		///////////////////////////////////
-		// toString
-		///////////////////////////////////
-		
-		public function toString():String {
-			return "[nest.object.data.KeyFrame]";
+		public function get component():Vector3D {
+			return _component;
 		}
 		
 	}

@@ -21,24 +21,10 @@ package nest.object
 		
 		public function LODMesh(dataList:Vector.<MeshData>, materialList:Vector.<IMaterial>, distantList:Vector.<Number>, shader:Shader3D, bound:IBound = null) {
 			super(null, null, shader, bound);
-			reset(dataList, materialList, distantList);
-		}
-		
-		public function addChild(data:MeshData, material:IMaterial, distant:Number):void {
-			_dataList.push(data);
-			_materialList.push(material);
-			_distantList.push(distant);
-		}
-		
-		public function reset(dataList:Vector.<MeshData>, materialList:Vector.<IMaterial>, distantList:Vector.<Number>):void {
 			_dataList = dataList;
 			_materialList = materialList;
 			_distantList = distantList;
-			if (_dataList) {
-				data = _dataList[_index];
-				_bound.update(_data.vertices);
-			}
-			if (_materialList) material = _materialList[_index];
+			_bound.update(_dataList[0].vertices);
 		}
 		
 		public function update(camera:Vector3D):void {
@@ -83,12 +69,16 @@ package nest.object
 			return _index;
 		}
 		
-		///////////////////////////////////
-		// toString
-		///////////////////////////////////
+		public function get dataList():Vector.<MeshData> {
+			return _dataList;
+		}
 		
-		override public function toString():String {
-			return "[nest.object.LODMesh]";
+		public function get materialList():Vector.<IMaterial> {
+			return _materialList;
+		}
+		
+		public function get distantList():Vector.<Number> {
+			return _distantList;
 		}
 		
 	}

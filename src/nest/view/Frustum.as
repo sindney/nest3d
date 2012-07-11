@@ -161,14 +161,6 @@ package nest.view
 			return new Vector3D(v.x * k, v.y * k, v.z * k);
 		}
 		
-		///////////////////////////////////
-		// toString
-		///////////////////////////////////
-		
-		public function toString():String {
-			return "[nest.view.Frustum]";
-		}
-		
 	}
 
 }

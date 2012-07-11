@@ -70,14 +70,6 @@ package nest.view
 			_msg.text = value;
 		}
 		
-		///////////////////////////////////
-		// toString
-		///////////////////////////////////
-		
-		override public function toString():String {
-			return "[nest.view.Diagram]";
-		}
-		
 	}
 
 }

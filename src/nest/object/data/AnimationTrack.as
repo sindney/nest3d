@@ -4,7 +4,7 @@ package nest.object.data
 	 * AnimationTrack
 	 */
 	public class AnimationTrack {
-
+		
 		public var name:String;
 		
 		public var start:Number;
@@ -16,13 +16,6 @@ package nest.object.data
 			this.end = end;
 		}
 		
-		///////////////////////////////////
-		// toString
-		///////////////////////////////////
-		
-		public function toString():String {
-			return "[nest.object.data.AnimationTrack]";
-		}
 	}
 
 }

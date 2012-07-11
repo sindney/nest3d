@@ -15,33 +15,30 @@ package nest.object.geom
 		// AABB / BSphere
 		///////////////////////////////////
 		
-		/**
-		 * center should be translated into aabb's croodinate space.
-		 */
-		public static function AABB_BSphere(aabb:AABB, center:Vector3D, radius:Number):Boolean {
-			const r2:Number = radius * radius;
+		public static function AABB_BSphere(max:Vector3D, min:Vector3D, center:Vector3D, r:Number):Boolean {
+			const r2:Number = r * r;
 			const a:Vector3D = new Vector3D();
 			
-			if (center.x < aabb.min.x) {
-				a.x = aabb.min.x;
-			} else if (center.x > aabb.max.x) {
-				a.x = aabb.max.x;
+			if (center.x < min.x) {
+				a.x = min.x;
+			} else if (center.x > max.x) {
+				a.x = max.x;
 			} else {
 				a.x = center.x;
 			}
 			
-			if (center.y < aabb.min.y) {
-				a.y = aabb.min.y;
-			} else if (center.y > aabb.max.y) {
-				a.y = aabb.max.y;
+			if (center.y < min.y) {
+				a.y = min.y;
+			} else if (center.y > max.y) {
+				a.y = max.y;
 			} else {
 				a.y = center.y;
 			}
 			
-			if (center.z < aabb.min.z) {
-				a.z = aabb.min.z;
-			} else if (center.z > aabb.max.z) {
-				a.z = aabb.max.z;
+			if (center.z < min.z) {
+				a.z = min.z;
+			} else if (center.z > max.z) {
+				a.z = max.z;
 			} else {
 				a.z = center.z;
 			}
@@ -54,28 +51,22 @@ package nest.object.geom
 			return d < r2;
 		}
 		
-		/**
-		 * max/min should be translated into aabb's croodinate space.
-		 */
-		public static function AABB_AABB(aabb:AABB, max:Vector3D, min:Vector3D):Boolean {
-			if (aabb.min.x > max.x) return false;
-			if (aabb.max.x < min.x) return false;
-			if (aabb.min.y > max.y) return false;
-			if (aabb.max.y < min.y) return false;
-			if (aabb.min.z > max.z) return false;
-			if (aabb.max.z < min.z) return false;
+		public static function AABB_AABB(max:Vector3D, min:Vector3D, max1:Vector3D, min1:Vector3D):Boolean {
+			if (min.x > max1.x) return false;
+			if (max.x < min1.x) return false;
+			if (min.y > max1.y) return false;
+			if (max.y < min1.y) return false;
+			if (min.z > max1.z) return false;
+			if (max.z < min1.z) return false;
 			return true;
 		}
 		
-		/**
-		 * center should be translated into bsphere's croodinate space.
-		 */
-		public static function BSphere_BSphere(bsphere:BSphere, center:Vector3D, radius:Number):Boolean {
-			const x:Number = bsphere.center.x - center.x;
-			const y:Number = bsphere.center.y - center.y;
-			const z:Number = bsphere.center.z - center.z;
+		public static function BSphere_BSphere(center:Vector3D, r:Number, center1:Vector3D, r1:Number):Boolean {
+			const x:Number = center.x - center1.x;
+			const y:Number = center.y - center1.y;
+			const z:Number = center.z - center1.z;
 			const d:Number = x * x + y * y + z * z;
-			return d < (bsphere.radius + radius) * (bsphere.radius + radius);
+			return d < (r + r1) * (r + r1);
 		}
 		
 		///////////////////////////////////

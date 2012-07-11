@@ -19,14 +19,6 @@ package nest.view
 			this.depthMask = depthMask;
 		}
 		
-		///////////////////////////////////
-		// toString
-		///////////////////////////////////
-		
-		public function toString():String {
-			return "[nest.view.BlendMode3D]";
-		}
-		
 	}
 
 }

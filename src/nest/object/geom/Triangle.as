@@ -11,12 +11,12 @@ package nest.object.geom
 		public var index1:uint;
 		public var index2:uint;
 		
-		public var u0:Number;
-		public var u1:Number;
-		public var u2:Number;
-		public var v0:Number;
-		public var v1:Number;
-		public var v2:Number;
+		public var u0:Number = 0;
+		public var u1:Number = 0;
+		public var u2:Number = 0;
+		public var v0:Number = 0;
+		public var v1:Number = 0;
+		public var v2:Number = 0;
 		
 		public var normal:Vector3D;
 		
@@ -25,14 +25,6 @@ package nest.object.geom
 			this.index1 = index1;
 			this.index2 = index2;
 			normal = new Vector3D();
-		}
-		
-		///////////////////////////////////
-		// toString
-		///////////////////////////////////
-		
-		public function toString():String {
-			return "[nest.object.geom.Triangle]";
 		}
 		
 	}

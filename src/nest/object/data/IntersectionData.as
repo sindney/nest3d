@@ -14,14 +14,6 @@ package nest.object.data
 			point = new Vector3D();
 		}
 		
-		///////////////////////////////////
-		// toString
-		///////////////////////////////////
-		
-		public function toString():String {
-			return "[nest.object.data.IntersectionData]";
-		}
-		
 	}
 
 }

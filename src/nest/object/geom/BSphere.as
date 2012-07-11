@@ -43,14 +43,6 @@ package nest.object.geom
 			return _radius;
 		}
 		
-		///////////////////////////////////
-		// toString
-		///////////////////////////////////
-		
-		public function toString():String {
-			return "[nest.object.geom.BSphere]";
-		}
-		
 	}
 
 }

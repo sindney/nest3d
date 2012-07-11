@@ -30,7 +30,7 @@ package
 			var material:TextureMaterial = new TextureMaterial(new bitmap().bitmapData);
 			
 			var shader:Shader3D = new Shader3D();
-			ShaderFactory.create(shader, true, false, false, view.light);
+			ShaderFactory.create(shader, true, false, false, false, false, false, view.light);
 			
 			var mesh:Mesh = new Mesh(PrimitiveFactory.createSphere(5, 8, 6), material, shader);
 			scene.addChild(mesh);

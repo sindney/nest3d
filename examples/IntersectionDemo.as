@@ -32,7 +32,7 @@ package
 			view.light.next = new PointLight(0xffffff, 200, 0, 0, 0);
 			
 			var shader:Shader3D = new Shader3D();
-			ShaderFactory.create(shader, false, false, false, view.light);
+			ShaderFactory.create(shader, false, false, false, false, false, false, view.light);
 			
 			box = new Mesh(PrimitiveFactory.createBox(10, 10, 10), new ColorMaterial(0xff0000), shader);
 			box.position.z = 40;
@@ -59,7 +59,7 @@ package
 				state = !state;
 			}
 			
-			if (Intersection.AABB_BSphere(box.bound as AABB, box.invertMatrix.transformVector(sphere.position), (sphere.bound as BSphere).radius)) {
+			if (Intersection.AABB_BSphere((box.bound as AABB).max, (box.bound as AABB).min, box.invertMatrix.transformVector(sphere.matrix.transformVector(sphere.bound.center)), (sphere.bound as BSphere).radius)) {
 				sphere.material = hit;
 			} else {
 				sphere.material = free;

@@ -1,93 +1,69 @@
 package nest.object 
 {
-	import nest.control.factories.PrimitiveFactory;
+	import flash.display.BitmapData;
+	
 	import nest.object.data.MeshData;
+	import nest.object.geom.Triangle;
+	import nest.object.geom.Vertex;
 	import nest.view.materials.IMaterial;
+	import nest.view.materials.SkyBoxMaterial;
 	import nest.view.Shader3D;
 	
 	/**
 	 * SkyBox
 	 */
-	public class SkyBox extends Container3D {
+	public class SkyBox extends Mesh {
 		
-		public static const TOP:int = 0;
-		public static const BOTTOM:int = 1;
-		public static const LEFT:int = 2;
-		public static const RIGHT:int = 3;
-		public static const FRONT:int = 4;
-		public static const BACK:int = 5;
-		
-		private var _planes:Vector.<Mesh>;
-		
-		public function SkyBox(size:Number, materials:Vector.<IMaterial>, shader:Shader3D) {
-			super();
+		public function SkyBox(size:Number, material:SkyBoxMaterial) {
+			var s2:Number = size / 2;
+			var tri:Triangle;
+			var vertices:Vector.<Vertex> = new Vector.<Vertex>(8, true);
+			var triangles:Vector.<Triangle> = new Vector.<Triangle>(12, true);
 			
-			_planes = new Vector.<Mesh>(6, true);
+			vertices[0] = new Vertex( -s2, s2, -s2);
+			vertices[1] = new Vertex(s2, s2, -s2);
+			vertices[2] = new Vertex(s2, -s2, -s2);
+			vertices[3] = new Vertex( -s2, -s2, -s2);
 			
-			var size2:Number = size / 2;
-			var mesh:Mesh;
-			var data:MeshData = PrimitiveFactory.createPlane(size, size);
+			vertices[4] = new Vertex(s2, s2, s2);
+			vertices[5] = new Vertex( -s2, s2, s2);
+			vertices[6] = new Vertex( -s2, -s2, s2);
+			vertices[7] = new Vertex(s2, -s2, s2);
 			
-			mesh = new Mesh(data, materials[TOP], shader);
-			mesh.position.y = size2;
-			mesh.rotation.x = Math.PI;
-			mesh.changed = true;
-			addChild(mesh);
-			_planes[TOP] = mesh;
+			// front
+			tri = triangles[0] = new Triangle(0, 3, 2);
+			tri = triangles[1] = new Triangle(0, 2, 1);
 			
-			mesh = new Mesh(data, materials[BOTTOM], shader);
-			mesh.position.y = -size2;
-			mesh.changed = true;
-			addChild(mesh);
-			_planes[BOTTOM] = mesh;
+			// back
+			tri = triangles[2] = new Triangle(4, 7, 6);
+			tri = triangles[3] = new Triangle(4, 6, 5);
 			
-			mesh = new Mesh(data, materials[LEFT], shader);
-			mesh.position.x = -size2;
-			mesh.rotation.y = -Math.PI / 2;
-			mesh.rotation.z = -Math.PI / 2;
-			mesh.changed = true;
-			addChild(mesh);
-			_planes[LEFT] = mesh;
+			// top
+			tri = triangles[4] = new Triangle(5, 0, 1);
+			tri = triangles[5] = new Triangle(5, 1, 4);
 			
-			mesh = new Mesh(data, materials[RIGHT], shader);
-			mesh.position.x = size2;
-			mesh.rotation.y = Math.PI / 2;
-			mesh.rotation.z = Math.PI / 2;
-			mesh.changed = true;
-			addChild(mesh);
-			_planes[RIGHT] = mesh;
+			// bottom
+			tri = triangles[6] = new Triangle(7, 2, 3);
+			tri = triangles[7] = new Triangle(7, 3, 6);
 			
-			mesh = new Mesh(data, materials[FRONT], shader);
-			mesh.position.z = size2;
-			mesh.rotation.x = -Math.PI / 2;
-			mesh.changed = true;
-			addChild(mesh);
-			_planes[FRONT] = mesh;
+			// left
+			tri = triangles[8] = new Triangle(5, 6, 3);
+			tri = triangles[9] = new Triangle(5, 3, 0);
 			
-			mesh = new Mesh(data, materials[BACK], shader);
-			mesh.position.z = -size2;
-			mesh.rotation.x = Math.PI / 2;
-			mesh.rotation.z = -Math.PI;
-			mesh.changed = true;
-			addChild(mesh);
-			_planes[BACK] = mesh;
+			// right
+			tri = triangles[10] = new Triangle(1, 2, 7);
+			tri = triangles[11] = new Triangle(1, 7, 4);
+			
+			MeshData.calculateNormal(vertices, triangles);
+			var data:MeshData = new MeshData(vertices, triangles);
+			
+			var shader:Shader3D = new Shader3D();
+			shader.setFromString("m44 op, va0, vc0\nmov v0, va0\n", 
+								"tex oc, v0, fs0 <cube,linear,miplinear>\n", false);
+			
+			super(data, material, shader);
 		}
 		
-		///////////////////////////////////
-		// getter/setters
-		///////////////////////////////////
-		
-		public function get planes():Vector.<Mesh> {
-			return _planes;
-		}
-		
-		///////////////////////////////////
-		// toString
-		///////////////////////////////////
-		
-		override public function toString():String {
-			return "[nest.object.geom.SkyBox]";
-		}
 	}
 
 }

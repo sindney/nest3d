@@ -9,11 +9,9 @@ package
 	import flash.geom.Vector3D;
 	
 	import nest.object.Container3D;
+	import nest.view.managers.BasicManager;
 	import nest.view.Camera3D;
 	import nest.view.ViewPort;
-	
-	import bloom.core.ThemeBase;
-	import bloom.themes.BlueTheme;
 	
 	/**
 	 * DemoBase
@@ -39,6 +37,7 @@ package
 		protected var view:ViewPort;
 		protected var camera:Camera3D;
 		protected var scene:Container3D;
+		protected var manager:BasicManager;
 		
 		protected var controller:ObjectController;
 		
@@ -48,17 +47,15 @@ package
 		public function DemoBase() {
 			stage.scaleMode = StageScaleMode.NO_SCALE;
 			stage.align = StageAlign.TOP_LEFT;
-			stage.frameRate = 40;
+			stage.frameRate = 60;
 			stage.addEventListener(MouseEvent.RIGHT_CLICK, onRightClick);
 			
 			camera = new Camera3D();
 			scene = new Container3D();
-			view = new ViewPort(800, 600, stage.stage3Ds[0], camera, scene);
+			manager = new BasicManager();
+			view = new ViewPort(800, 600, stage.stage3Ds[0], camera, scene, manager);
 			
 			controller = new ObjectController(camera, stage);
-			
-			ThemeBase.initialize(stage);
-			ThemeBase.theme = new BlueTheme();
 			
 			init();
 			
@@ -67,7 +64,7 @@ package
 			view.addEventListener(Event.CONTEXT3D_CREATE, onContext3DCreated);
 		}
 		
-		private function onStageDeactived(e:Event):void {
+		protected function onStageDeactived(e:Event):void {
 			if (actived) {
 				stage.removeEventListener(Event.ENTER_FRAME, onEnterFrame);
 				view.diagram.message = "Paused ... ";
@@ -75,18 +72,18 @@ package
 			}
 		}
 		
-		private function onStageActived(e:Event):void {
+		protected function onStageActived(e:Event):void {
 			if (!actived) {
 				stage.addEventListener(Event.ENTER_FRAME, onEnterFrame);
 				actived = true;
 			}
 		}
 		
-		private function onRightClick(e:MouseEvent):void {
+		protected function onRightClick(e:MouseEvent):void {
 			
 		}
 		
-		private function onContext3DCreated(e:Event):void {
+		protected function onContext3DCreated(e:Event):void {
 			stage.addEventListener(Event.RESIZE, onResize);
 			stage.addEventListener(KeyboardEvent.KEY_UP, onKeyUp);
 			stage.addEventListener(KeyboardEvent.KEY_DOWN, onKeyDown);
@@ -111,7 +108,7 @@ package
 			keys[e.keyCode] = false;
 		}
 		
-		private function onResize(e:Event):void {
+		protected function onResize(e:Event):void {
 			view.width = stage.stageWidth;
 			view.height = stage.stageHeight;
 		}
@@ -125,7 +122,7 @@ package
 			loop();
 			
 			view.calculate();
-			view.diagram.message = "Objects: " + view.numObjects + "\nTriangles: " + view.numTriangles + "\nVertices: " + view.numVertices;
+			view.diagram.message = "Objects: " + manager.numObjects + "\nTriangles: " + manager.numTriangles + "\nVertices: " + manager.numVertices;
 		}
 		
 	}
