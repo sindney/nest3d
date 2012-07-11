@@ -29,13 +29,14 @@ package nest.object
 		override public function clone():IMesh {
 			var bound:IBound;
 			if (_bound is BSphere) bound = new BSphere(); 
-			var result:SkinnedMesh = new SkinnedMesh(_data, _material, _shader, bound);
+			var result:SkinnedMesh = new SkinnedMesh(_data, _material, _shader, null);
 			result.blendMode.source = _blendMode.source;
 			result.blendMode.dest = _blendMode.dest;
 			result.blendMode.depthMask = _blendMode.depthMask;
 			result.cliping = _cliping;
 			result.culling = _culling;
 			result.visible = _visible;
+			result.alphaTest = _alphaTest;
 			result.joint = joint;
 			result.joints = joints;
 			result.vertices = vertices;
