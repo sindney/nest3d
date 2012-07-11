@@ -54,6 +54,7 @@ package nest.object
 			result.cliping = _cliping;
 			result.culling = _culling;
 			result.visible = _visible;
+			result.alphaTest = _alphaTest;
 			return result;
 		}
 		
