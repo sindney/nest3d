@@ -12,9 +12,6 @@ package nest.view.lights
 		function get color():uint;
 		function get rgba():Vector.<Number>;
 		
-		function get active():Boolean;
-		function set active(value:Boolean):void;
-		
 	}
 	
 }

@@ -47,11 +47,15 @@ package nest.view.materials
 					uploadWithMipmaps(_cubicmap, _cm_data[5], 5);
 				}
 			}
+			uploadLights(context3D);
 			context3D.setTextureAt(0, _diffuse);
 			if (_spec_data) context3D.setTextureAt(1, _specular);
-			if (_nm_data) context3D.setTextureAt(2, _normalmap);
+			if (_nm_data) {
+				context3D.setTextureAt(2, _normalmap);
+				context3D.setProgramConstantsFromVector(Context3DProgramType.VERTEX, 10, _vertData);
+			}
 			if (_cm_data[0]) context3D.setTextureAt(3, _cubicmap);
-			if (_spec_data || _nm_data || _cm_data[0]) context3D.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, 22, _data);
+			if (_spec_data || _nm_data || _cm_data[0]) context3D.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, 22, _fragData);
 		}
 		
 		override public function unload(context3D:Context3D):void {
@@ -77,7 +81,9 @@ package nest.view.materials
 				_cm_data[4].dispose();
 				_cm_data[5].dispose();
 			}
-			_data = null;
+			_light = null;
+			_vertData = null;
+			_fragData = null;
 		}
 		
 		///////////////////////////////////
@@ -93,12 +99,12 @@ package nest.view.materials
 		}
 		
 		public function get reflectivity():Number {
-			return _data[3];
+			return _fragData[3];
 		}
 		
 		public function set reflectivity(value:Number):void {
-			_data[2] = value;
-			_data[3] = 1 - value;
+			_fragData[2] = value;
+			_fragData[3] = 1 - value;
 		}
 		
 	}

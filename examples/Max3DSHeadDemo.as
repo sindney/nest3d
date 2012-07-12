@@ -32,17 +32,16 @@ package
 		}
 		
 		override public function init():void {
-			view.light = new AmbientLight(0x000000);
-			
-			var dl:DirectionalLight = new DirectionalLight(0xffffff, 0, 0, -1);
-			view.light.next = dl;
+			var light:AmbientLight = new AmbientLight(0x000000);
+			light.next = new DirectionalLight(0xffffff, 0, 0, -1);
 			
 			var parser:Parser3DS = new Parser3DS();
 			parser.parse(new model(), 10);
 			
 			var texture:TextureMaterial = new TextureMaterial(new diffuse().bitmapData, new specular().bitmapData, 40, new normals().bitmapData);
+			texture.light = light;
 			var shader:Shader3D = new Shader3D();
-			ShaderFactory.create(shader, true, true, true, false, false, false, view.light);
+			ShaderFactory.create(shader, true, true, true, false, false, false, light);
 			
 			mesh = parser.getObjectByName("head");
 			mesh.material = texture;

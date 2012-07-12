@@ -57,16 +57,17 @@ package
 			
 			pointLight = new PointLight(0xffffff, 400, 0, 0, 0);
 			
-			view.light = new AmbientLight(0x000000);
-			view.light.next = dl;
+			var light:AmbientLight = new AmbientLight(0x000000);
+			light.next = dl;
 			dl.next = pointLight;
 			
 			var shader:Shader3D = new Shader3D();
-			ShaderFactory.create(shader, true, false, false, false, false, true, view.light);
+			ShaderFactory.create(shader, true, false, false, false, false, true, light);
 			
 			var hm:BitmapData = new heightmap().bitmapData;
 			
 			var material:TextureMaterial = new TextureMaterial(new diffuse().bitmapData, null, 10, null, true);
+			material.light = light;
 			
 			var cubicmap:Vector.<BitmapData> = new Vector.<BitmapData>();
 			cubicmap[0] = new right().bitmapData;

@@ -13,11 +13,6 @@ package nest.view
 	import flash.geom.Vector3D
 	
 	import nest.object.IContainer3D;
-	import nest.view.lights.PointLight;
-	import nest.view.lights.AmbientLight;
-	import nest.view.lights.DirectionalLight;
-	import nest.view.lights.SpotLight;
-	import nest.view.lights.ILight;
 	import nest.view.managers.ISceneManager;
 	
 	/** 
@@ -41,9 +36,6 @@ package nest.view
 		private var _color:uint = 0x000000;
 		private var _rgba:Vector.<Number> = new Vector.<Number>(4, true);
 		private var _camPos:Vector.<Number> = new Vector.<Number>(4, true);
-		private var _vertexParameters:Vector.<Number> = new Vector.<Number>(4, true);
-		
-		private var _light:AmbientLight;
 		
 		private var _fog:Boolean = false;
 		private var _fogColor:Vector.<Number> = new Vector.<Number>(4, true);
@@ -64,10 +56,7 @@ package nest.view
 			_manager.camera = _camera;
 			_manager.root = _root;
 			
-			_vertexParameters[0] = 0;
-			_vertexParameters[1] = 0;
-			_vertexParameters[2] = 0;
-			_vertexParameters[3] = 1;
+			_rgba[3] = 1;
 			
 			_width = width;
 			_height = height;
@@ -112,30 +101,6 @@ package nest.view
 			
 			_diagram.update();
 			
-			var light:ILight = _light;
-			var j:int = 1;
-			while (light) {
-				if (light is AmbientLight) {
-					_context3D.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, 0, light.rgba);
-				} else if (light is DirectionalLight) {
-					_context3D.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, j, light.rgba);
- 					_context3D.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, j + 1, (light as DirectionalLight).direction);
-					j += 2;
-				} else if (light is PointLight) {
-					_context3D.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, j, light.rgba);
- 					_context3D.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, j + 1, (light as PointLight).position);
-					_context3D.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, j + 2, (light as PointLight).radius);
-					j += 3;
-				} else if (light is SpotLight) {
-					_context3D.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, j, light.rgba);
- 					_context3D.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, j + 1, (light as SpotLight).position);
-					_context3D.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, j + 2, (light as SpotLight).direction);
-					_context3D.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, j + 3, (light as SpotLight).lightParameters);
-					j += 4;
-				}
-				light = light.next;
-			}
-			
 			if (camera.changed) camera.recompose();
 			
 			_camPos[0] = camera.position.x;
@@ -143,11 +108,10 @@ package nest.view
 			_camPos[2] = camera.position.z;
 			_camPos[3] = 1;
 			_context3D.setProgramConstantsFromVector(Context3DProgramType.VERTEX, 8, _camPos);
-			_context3D.setProgramConstantsFromVector(Context3DProgramType.VERTEX, 10, _vertexParameters);
 			
 			if (_fog) {
  				_context3D.setProgramConstantsFromVector(Context3DProgramType.VERTEX, 9, _fogData);
-				_context3D.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, 20, _fogColor);
+				_context3D.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, 21, _fogColor);
 			}
 			
 			_manager.calculate();
@@ -167,25 +131,6 @@ package nest.view
 		///////////////////////////////////
 		// getter/setters
 		///////////////////////////////////
-		
-		/**
-		 * There's 21 empty fc left.
-		 * <p>Ambient light absorbs 1 fc.</p>
-		 * <p>Directional light takes 2.</p>
-		 * <p>PointLight light takes 3.</p>
-		 * <p>SpotLight light takes 4.</p>
-		 */
-		public function get light():AmbientLight {
-			return _light;
-		}
-		
-		/**
-		 * The root light is an AmbientLight.
-		 * <p>Link new light source to light.next.</p>
-		 */
-		public function set light(value:AmbientLight):void {
-			_light = value;
-		}
 		
 		public function get width():Number {
 			return _width;

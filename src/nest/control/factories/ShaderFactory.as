@@ -54,10 +54,10 @@ package nest.control.factories
 			if (normal) vertex += "mov v2, va2\n";
 			if (normalmap) {
 				vertex +=  "mov vt0, vc10.x\n" + 
-							"mov vt0.z, vc10.w\n" + 
+							"mov vt0.z, vc10.y\n" + 
 							"crs vt1.xyz, va2, vt0\n" + 
 							"mov vt0.z, vc10.x\n" + 
-							"mov vt0.y, vc10.w\n" + 
+							"mov vt0.y, vc10.y\n" + 
 							"crs vt0.xyz, va2, vt0\n" + 
 							// vt0 = (vt1.length > vt0.length ? vt1 : vt0);
 							"dp3 vt3, vt1, vt1\n" + 
@@ -72,7 +72,7 @@ package nest.control.factories
 							"mov v4, vt5\n" + 
 							// vt6, v3 = binormal
 							"crs vt6.xyz, va2, vt0\n" + 
-							"mov vt6.w, vc10.w\n" + 
+							"mov vt6.w, vc10.y\n" + 
 							"mov v3, vt6\n";
 			}
 			
@@ -100,11 +100,6 @@ package nest.control.factories
 				var l:ILight = light;
 				while (l) {
 					if (l is DirectionalLight) {
-						if (!l.active) {
-							j += 2;
-							l = l.next;
-							continue;
-						}
 						// j    : color
 						// j + 1: direction
 						fragment += "mov ft2, fc" + (j + 1) + "\n" + 
@@ -131,11 +126,6 @@ package nest.control.factories
 						}
 						j += 2;
 					} else if (l is PointLight) {
-						if (!l.active) {
-							j += 3;
-							l = l.next;
-							continue;
-						}
 						// j    : color
 						// j + 1: position
 						// j + 2: radius
@@ -172,11 +162,6 @@ package nest.control.factories
 						}
 						j += 3;
 					} else if (l is SpotLight) {
-						if (!l.active) {
-							j += 4;
-							l = l.next;
-							continue;
-						}
 						// j    : color
 						// j + 1: position
 						// j + 2: direction
@@ -235,7 +220,7 @@ package nest.control.factories
 							"add ft0, ft0, ft1\n";
 			}
 			
-			if (fog) fragment += "sub ft1, fc20, ft0\nmul ft1, v7.x, ft1\nadd ft0, ft0, ft1\n";
+			if (fog) fragment += "sub ft1, fc21, ft0\nmul ft1, v7.x, ft1\nadd ft0, ft0, ft1\n";
 			fragment += "mov oc, ft0\n";
 			
 			shader.setFromString(vertex, fragment, normal);

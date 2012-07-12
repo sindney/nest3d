@@ -11,11 +11,11 @@ package nest.view.materials
 	 */
 	public class SkyBoxMaterial implements IMaterial {
 		
-		private var _cubicmap:CubeTexture;
-		private var _cm_data:Vector.<BitmapData>;
+		protected var _cubicmap:CubeTexture;
+		protected var _cm_data:Vector.<BitmapData>;
 		
-		private var _optimizeForRenderToTexture:Boolean = false;
-		private var _changed:Boolean = true;
+		protected var _optimizeForRenderToTexture:Boolean = false;
+		protected var _changed:Boolean = true;
 		
 		public function SkyBoxMaterial(cubicmap:Vector.<BitmapData>) {
 			_cm_data = cubicmap;

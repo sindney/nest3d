@@ -41,11 +41,15 @@ package nest.view.materials
 					_mipmapping ? uploadWithMipmaps(_lightmap, _lm_data) : _lightmap.uploadFromBitmapData(_lm_data);
 				}
 			}
+			uploadLights(context3D);
 			context3D.setTextureAt(0, _diffuse);
 			if (_spec_data) context3D.setTextureAt(1, _specular);
-			if (_nm_data) context3D.setTextureAt(2, _normalmap);
-			if (_spec_data || _nm_data) context3D.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, 22, _data);
+			if (_nm_data) {
+				context3D.setTextureAt(2, _normalmap);
+				context3D.setProgramConstantsFromVector(Context3DProgramType.VERTEX, 10, _vertData);
+			}
 			if (_lm_data) context3D.setTextureAt(3, _lightmap);
+			if (_spec_data || _nm_data) context3D.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, 22, _fragData);
 		}
 		
 		override public function unload(context3D:Context3D):void {
@@ -64,7 +68,9 @@ package nest.view.materials
 			if (_nm_data) _nm_data.dispose();
 			if (_lightmap) _lightmap.dispose();
 			if (_lm_data) _lm_data.dispose();
-			_data = null;
+			_light = null;
+			_vertData = null;
+			_fragData = null;
 		}
 		
 		///////////////////////////////////

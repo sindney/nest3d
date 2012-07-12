@@ -24,15 +24,16 @@ package
 		private var spot:Mesh;
 		
 		override public function init():void {
-			view.light = new AmbientLight(0x333333);
-			view.light.next = new DirectionalLight(0xffffff, -1.414, -1.414, 0);
+			var light:AmbientLight = new AmbientLight(0x333333);
+			light.next = new DirectionalLight(0xffffff, -1.414, -1.414, 0);
 			
 			var data:MeshData = PrimitiveFactory.createBox(20, 20, 20);
 			
 			var colorMat:ColorMaterial = new ColorMaterial(0xff0000);
+			colorMat.light = light;
 			
 			var shader:Shader3D = new Shader3D();
-			ShaderFactory.create(shader, false, false, false, false, false, false, view.light);
+			ShaderFactory.create(shader, false, false, false, false, false, false, light);
 			
 			box = new Mesh(data, colorMat, shader);
 			scene.addChild(box);
@@ -40,6 +41,7 @@ package
 			data = PrimitiveFactory.createSphere(1, 8, 8);
 			
 			colorMat = new ColorMaterial(0xffffff);
+			colorMat.light = light;
 			
 			spot = new Mesh(data, colorMat, shader);
 			scene.addChild(spot);

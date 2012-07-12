@@ -9,6 +9,8 @@ package nest.view.materials
 	import flash.display3D.textures.TextureBase;
 	import flash.geom.Matrix;
 	
+	import nest.view.lights.*;
+	
 	/**
 	 * TextureMaterial
 	 */
@@ -45,14 +47,20 @@ package nest.view.materials
 		protected var _normalmap:Texture;
 		protected var _glossiness:int;
 		
-		protected var _data:Vector.<Number>;
+		protected var _light:AmbientLight;
+		
+		protected var _vertData:Vector.<Number>;
+		protected var _fragData:Vector.<Number>;
 		protected var _optimizeForRenderToTexture:Boolean = true;
 		protected var _mipmapping:Boolean = false;
 		protected var _changed:Boolean = false;
 		
 		public function TextureMaterial(diffuse:BitmapData, specular:BitmapData = null, glossiness:int = 10, normalmap:BitmapData = null, mipmapping:Boolean = false) {
-			_data = new Vector.<Number>(4, true);
-			_data[1] = 1;
+			_vertData = new Vector.<Number>(4, true);
+			_vertData[0] = _vertData[2] = _vertData[3] = 0;
+			_vertData[1] = 1;
+			_fragData = new Vector.<Number>(4, true);
+			_fragData[1] = 1;
 			this.diffuse = diffuse;
 			this.specular = specular;
 			this.glossiness = glossiness;
@@ -77,10 +85,14 @@ package nest.view.materials
 					_mipmapping ? uploadWithMipmaps(_normalmap, _nm_data) : _normalmap.uploadFromBitmapData(_nm_data);
 				}
 			}
+			uploadLights(context3D);
 			context3D.setTextureAt(0, _diffuse);
 			if (_spec_data) context3D.setTextureAt(1, _specular);
-			if (_nm_data) context3D.setTextureAt(2, _normalmap);
-			if (_spec_data || _nm_data) context3D.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, 22, _data);
+			if (_nm_data) {
+				context3D.setTextureAt(2, _normalmap);
+				context3D.setProgramConstantsFromVector(Context3DProgramType.VERTEX, 10, _vertData);
+			}
+			if (_spec_data || _nm_data) context3D.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, 22, _fragData);
 		}
 		
 		public function unload(context3D:Context3D):void {
@@ -96,12 +108,59 @@ package nest.view.materials
 			if (_spec_data) _spec_data.dispose();
 			if (_normalmap) _normalmap.dispose();
 			if (_nm_data) _nm_data.dispose();
-			_data = null;
+			_light = null;
+			_vertData = null;
+			_fragData = null;
+		}
+		
+		protected function uploadLights(context3D:Context3D):void {
+			var light:ILight = _light;
+			var j:int = 1;
+			while (light) {
+				if (light is AmbientLight) {
+					context3D.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, 0, light.rgba);
+				} else if (light is DirectionalLight) {
+					context3D.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, j, light.rgba);
+ 					context3D.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, j + 1, (light as DirectionalLight).direction);
+					j += 2;
+				} else if (light is PointLight) {
+					context3D.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, j, light.rgba);
+ 					context3D.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, j + 1, (light as PointLight).position);
+					context3D.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, j + 2, (light as PointLight).radius);
+					j += 3;
+				} else if (light is SpotLight) {
+					context3D.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, j, light.rgba);
+ 					context3D.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, j + 1, (light as SpotLight).position);
+					context3D.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, j + 2, (light as SpotLight).direction);
+					context3D.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, j + 3, (light as SpotLight).lightParameters);
+					j += 4;
+				}
+				light = light.next;
+			}
 		}
 		
 		///////////////////////////////////
 		// getter/setters
 		///////////////////////////////////
+		
+		/**
+		 * There's 21 empty fc left.
+		 * <p>Ambient light absorbs 1 fc.</p>
+		 * <p>Directional light takes 2.</p>
+		 * <p>PointLight light takes 3.</p>
+		 * <p>SpotLight light takes 4.</p>
+		 */
+		public function get light():AmbientLight {
+			return _light;
+		}
+		
+		/**
+		 * The root light is an AmbientLight.
+		 * <p>Link new light source to light.next.</p>
+		 */
+		public function set light(value:AmbientLight):void {
+			_light = value;
+		}
 		
 		public function get diffuse():BitmapData {
 			return _diff_data;
@@ -141,7 +200,7 @@ package nest.view.materials
 		}
 		
 		public function set glossiness(value:int):void {
-			_glossiness = _data[0] = value;
+			_glossiness = _fragData[0] = value;
 		}
 		
 		public function get optimizeForRenderToTexture():Boolean {
