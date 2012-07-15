@@ -2,7 +2,6 @@ package nest.object.geom
 {
 	import flash.geom.Vector3D;
 	
-	import nest.object.data.IntersectionData;
 	import nest.object.geom.Vertex;
 	import nest.object.IMesh;
 	
@@ -75,36 +74,40 @@ package nest.object.geom
 		
 		/**
 		 * Orgion and delta should be translated into mesh's croodinate space.
+		 * <p>result.w == 0 means they aren't intersected.</p>
+		 * <p>result.w == 1 means they're intersected.</p>
 		 */
-		public static function Ray_BSphere(result:IntersectionData, orgion:Vector3D, delta:Vector3D, bsphere:BSphere):void {
+		public static function Ray_BSphere(result:Vector3D, orgion:Vector3D, delta:Vector3D, bsphere:BSphere):void {
 			const e:Vector3D = new Vector3D(bsphere.center.x - orgion.x, bsphere.center.y - orgion.y, bsphere.center.z - orgion.z);
 			const a:Number = e.dotProduct(delta) / delta.length;
 			var f:Number = bsphere.radius * bsphere.radius - e.lengthSquared + a * a;
 			if (f < 0) {
 				// no intersection.
-				result.intersected = false;
+				result.w = 0;
 				return;
 			}
 			f = a - Math.sqrt(f);
 			if (f > delta.length || f < 0) {
 				// no intersection.
-				result.intersected = false;
+				result.w = 0;
 				return;
 			}
-			result.intersected = true;
-			result.point.copyFrom(delta);
-			result.point.scaleBy(f);
-			result.point.x += orgion.x;
-			result.point.y += orgion.y;
-			result.point.z += orgion.z;
+			result.w = 0;
+			result.copyFrom(delta);
+			result.scaleBy(f);
+			result.x += orgion.x;
+			result.y += orgion.y;
+			result.z += orgion.z;
 		}
 		
 		/**
 		 * Orgion and delta should be translated into mesh's croodinate space.
 		 * <p>Graphics Gems I p395</p>
+		 * <p>result.w == 0 means they aren't intersected.</p>
+		 * <p>result.w == 1 means they're intersected.</p>
 		 */
-		public static function Ray_AABB(result:IntersectionData, orgion:Vector3D, delta:Vector3D, aabb:AABB):void {
-			result.intersected = false;
+		public static function Ray_AABB(result:Vector3D, orgion:Vector3D, delta:Vector3D, aabb:AABB):void {
+			result.w = 0;
 			var inside:Boolean = true;
 			var xt:Number, xn:Number;
 			if (orgion.x < aabb.min.x) {
@@ -189,12 +192,12 @@ package nest.object.geom
 					if (y < aabb.min.y || y > aabb.max.y) return;
 					break;
 			}
-			result.intersected = true;
-			result.point.copyFrom(delta);
-			result.point.scaleBy(t);
-			result.point.x += orgion.x;
-			result.point.y += orgion.y;
-			result.point.z += orgion.z;
+			result.w = 1;
+			result.copyFrom(delta);
+			result.scaleBy(t);
+			result.x += orgion.x;
+			result.y += orgion.y;
+			result.z += orgion.z;
 		}
 		
 		/**
@@ -264,14 +267,16 @@ package nest.object.geom
 		
 		/**
 		 * Orgion and delta should be translated into mesh's croodinate space.
+		 * <p>result.w == 0 means they aren't intersected.</p>
+		 * <p>result.w == 1 means they're intersected.</p>
 		 */
-		public static function Ray_Mesh(result:IntersectionData, orgion:Vector3D, delta:Vector3D, mesh:IMesh):void {
+		public static function Ray_Mesh(result:Vector3D, orgion:Vector3D, delta:Vector3D, mesh:IMesh):void {
 			if (mesh.bound is AABB) {
 				Ray_AABB(result, orgion, delta, mesh.bound as AABB);
 			} else {
 				Ray_BSphere(result, orgion, delta, mesh.bound as BSphere);
 			}
-			if (result.intersected) {
+			if (result.w == 1) {
 				var t:Number;
 				var triangle:Triangle;
 				for each(triangle in mesh.data.triangles) {
@@ -280,15 +285,15 @@ package nest.object.geom
 													mesh.data.vertices[triangle.index2], 
 													triangle.normal);
 					if (t <= 1) {
-						result.point.copyFrom(delta);
-						result.point.scaleBy(t);
-						result.point.x += orgion.x;
-						result.point.y += orgion.y;
-						result.point.z += orgion.z;
+						result.copyFrom(delta);
+						result.scaleBy(t);
+						result.x += orgion.x;
+						result.y += orgion.y;
+						result.z += orgion.z;
 						return;
 					}
 				}
-				result.intersected = false;
+				result.w = 0;
 			}
 		}
 		

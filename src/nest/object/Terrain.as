@@ -68,6 +68,7 @@ package nest.object
 			var bound:IBound;
 			if (_bound is BSphere) bound = new BSphere(); 
 			var result:Terrain = new Terrain(_data, _material, _shader, bound);
+			result.heightMap = heightMap;
 			result.width = width;
 			result.height = height;
 			result.segmentsW = segmentsW;
@@ -80,7 +81,6 @@ package nest.object
 			result.culling = _culling;
 			result.visible = _visible;
 			result.alphaTest = _alphaTest;
-			result.update();
 			return result;
 		}
 		

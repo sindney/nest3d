@@ -20,17 +20,13 @@ package nest.control
 		public var advanceTime:Number;
 		
 		public var track:AnimationTrack;
-		
 		public var target:SkinnedMesh;
 		
 		public function AnimationController() {
 			matrix.identity();
 		}
 		
-		/**
-		 * @param	bound Update mesh's bound.
-		 */
-		public function update(bound:Boolean = true):void {
+		public function update():void {
 			if (!target || !track) return;
 			if (time > track.end || time < track.start) time = track.start;
 			
@@ -38,6 +34,7 @@ package nest.control
 			target.joint.update(matrix, time);
 			
 			// update vertices
+			var w:Number;
 			var i:int, j:int = target.data.numVertices, k:int;
 			var v0:Vector3D = new Vector3D();
 			var v1:Vector3D = new Vector3D();
@@ -46,27 +43,31 @@ package nest.control
 			var vt0:Vertex;
 			var joint:Joint;
 			for (i = 0; i < j; i++) {
-				vt0 = target.vertices[i];
-				v0.setTo(vt0.x, vt0.y, vt0.z);
+				k = i * 3;
+				vt0 = target.data.vertices[i];
+				v0.setTo(target.vertices[k], target.vertices[k + 1], target.vertices[k + 2]);
 				v2.setTo(0, 0, 0);
 				v3.setTo(0, 0, 0);
 				
-				k == 0;
-				while (k < 4) {
+				for (k = 0; k < 4; k++) {
+					if (vt0.joints[k] == -1) break;
+					w = vt0.weights[k];
 					joint = target.joints[vt0.joints[k]];
 					v1 = joint.result.transformVector(v0);
-					v1.scaleBy(vt0.weights[k]);
-					v2.add(v1);
+					v2.x += v1.x * w;
+					v2.y += v1.y * w;
+					v2.z += v1.z * w;
 					v1 = joint.result.transformVector(vt0.normal);
-					v1.scaleBy(vt0.weights[k]);
-					v3.add(v1);
+					v3.x += v1.x * w;
+					v3.y += v1.y * w;
+					v3.z += v1.z * w;
 				}
 				
-				vt0 = target.data.vertices[i];
+				v3.normalize();
+				vt0.normal.copyFrom(v3);
 				vt0.x = v2.x;
 				vt0.y = v2.y;
 				vt0.z = v2.z;
-				vt0.normal.setTo(v3.x, v3.y, v3.z);
 			}
 			
 			var triangle:Triangle;
@@ -84,7 +85,6 @@ package nest.control
 			}
 			
 			target.data.update();
-			if (bound) target.bound.update(target.data.vertices);
 			
 			time += advanceTime;
 		}

@@ -11,32 +11,19 @@ package nest.object.geom
 	 */
 	public class Joint {
 		
-		public static function interpolate(time:Number, k0:KeyFrame, k1:KeyFrame, output:Vector3D):void {
-			if (k0.time == time) {
-				output.copyFrom(k0.component);
-				return;
-			} else if (k1.time == time) {
-				output.copyFrom(k1.component);
-				return;
-			}
-			
-			const t:Number = (time - k0.time) / (k1.time - k0.time);
-			
+		public static function interpolate(k0:KeyFrame, k1:KeyFrame, time:Number, output:Vector3D):void {
+			time = (time - k0.time) / (k1.time - k0.time);
 			if (k0.type == KeyFrame.POSITION) {
-				v3Lerp(k0.component, k1.component, time, output);
+				output.x = k1.component.x - k0.component.x;
+				output.y = k1.component.y - k0.component.y;
+				output.z = k1.component.z - k0.component.z;
+				output.scaleBy(time);
+				output.x = k0.component.x + output.x;
+				output.y = k0.component.y + output.y;
+				output.z = k0.component.z + output.z;
 			} else {
 				Quaternion.slerp(k0.component, k1.component, time, output);
 			}
-		}
-		
-		public static function v3Lerp(v0:Vector3D, v1:Vector3D, time:Number, output:Vector3D):void {
-			output.x = v1.x - v0.x;
-			output.y = v1.y - v0.y;
-			output.z = v1.z - v0.z;
-			output.scaleBy(time);
-			output.x = v0.x + output.x;
-			output.y = v0.y + output.y;
-			output.z = v0.z + output.z;
 		}
 		
 		public var firstChild:Joint;
@@ -51,18 +38,19 @@ package nest.object.geom
 		private var currentPos:KeyFrame;
 		private var temp:Vector.<Vector3D>;
 		
-		private var _combined:Matrix3D;
+		private var _offset:Matrix3D;
 		private var _local:Matrix3D;
+		private var _combined:Matrix3D;
 		private var _result:Matrix3D;
 		
 		public function Joint() {
 			temp = new Vector.<Vector3D>(3, true);
 			temp[0] = new Vector3D();
 			temp[1] = new Vector3D();
-			temp[2] = new Vector3D(1, 1, 1);
-			
-			_combined = new Matrix3D();
+			temp[2] = new Vector3D(1, 1, 1, 1);
+			_offset = new Matrix3D();
 			_local = new Matrix3D();
+			_combined = new Matrix3D();
 			_result = new Matrix3D();
 		}
 		
@@ -78,7 +66,7 @@ package nest.object.geom
 				if (currentPos.next.time > time && currentPos.time < time) break;
 				currentPos = currentPos.next;
 			}
-			interpolate(time, currentPos, currentPos.next, temp[0]);
+			interpolate(currentPos, currentPos.next, time, temp[0]);
 			
 			if (!currentRot) currentRot = rotation;
 			while (currentRot) {
@@ -89,14 +77,16 @@ package nest.object.geom
 				if (currentRot.next.time > time && currentRot.time < time) break;
 				currentRot = currentRot.next;
 			}
-			interpolate(time, currentRot, currentRot.next, temp[1]);
+			interpolate(currentRot, currentRot.next, time, temp[1]);
+			Quaternion.normalize(temp[1]);
 			
 			_local.recompose(temp, Orientation3D.QUATERNION);
 			
 			_combined.copyFrom(_local);
-			_combined.append(parent);
+			_combined.prepend(parent);
 			
 			_result.copyFrom(_combined);
+			_result.append(_offset);
 			_result.invert();
 			
 			if (sibling) sibling.update(parent, time);
@@ -107,12 +97,16 @@ package nest.object.geom
 		// getter/setters
 		///////////////////////////////////
 		
-		public function get combined():Matrix3D {
-			return _combined;
+		public function get offset():Matrix3D {
+			return _offset;
 		}
 		
 		public function get local():Matrix3D {
 			return _local;
+		}
+		
+		public function get combined():Matrix3D {
+			return _combined;
 		}
 		
 		public function get result():Matrix3D {

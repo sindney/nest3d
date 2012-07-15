@@ -42,6 +42,19 @@ package nest.object.geom
 			object.z = Math.sin(t2);
 		}
 		
+		public static function rotationXYZ(object:Vector3D, x:Number, y:Number, z:Number):void {
+			const c1:Number = Math.cos(x / 2);
+			const c2:Number = Math.cos(y / 2);
+			const c3:Number = Math.cos(z / 2);
+			const s1:Number = Math.sin(x / 2);
+			const s2:Number = Math.sin(y / 2);
+			const s3:Number = Math.sin(z / 2);
+			object.w = c1 * c2 * c3 + s1 * s2 * s3;
+			object.x = s1 * c2 * c3 - c1 * s2 * s3;
+			object.y = c1 * s2 * c3 + s1 * c2 * s3;
+			object.z = c1 * c2 * s3 - s1 * s2 * c3;
+		}
+		
 		/**
 		 * Rotate Quaternion object to a certain angle around given axis.
 		 * @param	axis Axis must be normalized.
@@ -85,31 +98,7 @@ package nest.object.geom
 		}
 		
 		public static function slerp(a:Vector3D, b:Vector3D, t:Number, output:Vector3D):void {
-			if (t <= 0) {
-				output.copyFrom(a);
-				return;
-			}
-			if (t >= 1) {
-				output.copyFrom(b);
-				return;
-			}
-			
-			var cos:Number = dotProduct(a, b);
-			var bw:Number = b.w;
-			var bx:Number = b.x;
-			var by:Number = b.y;
-			var bz:Number = b.z;
-			
-			if (cos < 0) {
-				bw = -bw;
-				bx = -bx;
-				by = -by;
-				bz = -bz;
-				cos = -cos;
-			}
-			
-			if (cos > 1) cos = 1;
-			
+			const cos:Number = dotProduct(a, b);
 			var k0:Number, k1:Number;
 			if (cos > ONE) {
 				k0 = 1 - t;
@@ -121,10 +110,10 @@ package nest.object.geom
 				k0 = Math.sin((1 - t) * o) * sin2;
 				k1 = Math.sin(t * o) * sin2;
 			}
-			output.w = k0 * a.w + k1 * bw;
-			output.x = k0 * a.x + k1 * bx;
-			output.y = k0 * a.y + k1 * by;
-			output.z = k0 * a.z + k1 * bz;
+			output.w = k0 * a.w + k1 * b.w;
+			output.x = k0 * a.x + k1 * b.x;
+			output.y = k0 * a.y + k1 * b.y;
+			output.z = k0 * a.z + k1 * b.z;
 		}
 		
 		public static function conjugate(object:Vector3D, output:Vector3D):void {
