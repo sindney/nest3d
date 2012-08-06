@@ -51,7 +51,6 @@ package nest.view.materials
 		
 		protected var _vertData:Vector.<Number>;
 		protected var _fragData:Vector.<Number>;
-		protected var _optimizeForRenderToTexture:Boolean = true;
 		protected var _mipmapping:Boolean = false;
 		protected var _changed:Boolean = false;
 		
@@ -68,37 +67,37 @@ package nest.view.materials
 			this.mipmapping = mipmapping;
 		}
 		
-		public function upload(context3D:Context3D):void {
+		public function upload(context3d:Context3D):void {
 			if (_changed) {
 				_changed = false;
 				if (_diffuse) _diffuse.dispose();
-				_diffuse = context3D.createTexture(_diff_data.width, _diff_data.height, Context3DTextureFormat.BGRA, _optimizeForRenderToTexture);
+				_diffuse = context3d.createTexture(_diff_data.width, _diff_data.height, Context3DTextureFormat.BGRA, true);
 				_mipmapping ? uploadWithMipmaps(_diffuse, _diff_data) : _diffuse.uploadFromBitmapData(_diff_data);
 				if (_specular) _specular.dispose();
 				if (_spec_data) {
-					_specular = context3D.createTexture(_spec_data.width, _spec_data.height, Context3DTextureFormat.BGRA, _optimizeForRenderToTexture);
+					_specular = context3d.createTexture(_spec_data.width, _spec_data.height, Context3DTextureFormat.BGRA, true);
 					_mipmapping ? uploadWithMipmaps(_specular, _spec_data) : _specular.uploadFromBitmapData(_spec_data);
 				}
 				if (_normalmap) _normalmap.dispose();
 				if (_nm_data) {
-					_normalmap = context3D.createTexture(_nm_data.width, _nm_data.height, Context3DTextureFormat.BGRA, _optimizeForRenderToTexture);
+					_normalmap = context3d.createTexture(_nm_data.width, _nm_data.height, Context3DTextureFormat.BGRA, true);
 					_mipmapping ? uploadWithMipmaps(_normalmap, _nm_data) : _normalmap.uploadFromBitmapData(_nm_data);
 				}
 			}
-			uploadLights(context3D);
-			context3D.setTextureAt(0, _diffuse);
-			if (_spec_data) context3D.setTextureAt(1, _specular);
+			uploadLights(context3d);
+			context3d.setTextureAt(0, _diffuse);
+			if (_spec_data) context3d.setTextureAt(1, _specular);
 			if (_nm_data) {
-				context3D.setTextureAt(2, _normalmap);
-				context3D.setProgramConstantsFromVector(Context3DProgramType.VERTEX, 10, _vertData);
+				context3d.setTextureAt(2, _normalmap);
+				context3d.setProgramConstantsFromVector(Context3DProgramType.VERTEX, 10, _vertData);
 			}
-			if (_spec_data || _nm_data) context3D.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, 22, _fragData);
+			if (_spec_data || _nm_data) context3d.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, 22, _fragData);
 		}
 		
-		public function unload(context3D:Context3D):void {
-			if (_diffuse) context3D.setTextureAt(0, null);
-			if (_specular) context3D.setTextureAt(1, null);
-			if (_normalmap) context3D.setTextureAt(2, null);
+		public function unload(context3d:Context3D):void {
+			if (_diffuse) context3d.setTextureAt(0, null);
+			if (_specular) context3d.setTextureAt(1, null);
+			if (_normalmap) context3d.setTextureAt(2, null);
 		}
 		
 		public function dispose():void {
@@ -113,26 +112,26 @@ package nest.view.materials
 			_fragData = null;
 		}
 		
-		protected function uploadLights(context3D:Context3D):void {
+		protected function uploadLights(context3d:Context3D):void {
 			var light:ILight = _light;
 			var j:int = 1;
 			while (light) {
 				if (light is AmbientLight) {
-					context3D.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, 0, light.rgba);
+					context3d.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, 0, light.rgba);
 				} else if (light is DirectionalLight) {
-					context3D.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, j, light.rgba);
- 					context3D.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, j + 1, (light as DirectionalLight).direction);
+					context3d.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, j, light.rgba);
+ 					context3d.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, j + 1, (light as DirectionalLight).direction);
 					j += 2;
 				} else if (light is PointLight) {
-					context3D.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, j, light.rgba);
- 					context3D.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, j + 1, (light as PointLight).position);
-					context3D.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, j + 2, (light as PointLight).radius);
+					context3d.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, j, light.rgba);
+ 					context3d.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, j + 1, (light as PointLight).position);
+					context3d.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, j + 2, (light as PointLight).radius);
 					j += 3;
 				} else if (light is SpotLight) {
-					context3D.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, j, light.rgba);
- 					context3D.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, j + 1, (light as SpotLight).position);
-					context3D.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, j + 2, (light as SpotLight).direction);
-					context3D.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, j + 3, (light as SpotLight).lightParameters);
+					context3d.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, j, light.rgba);
+ 					context3d.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, j + 1, (light as SpotLight).position);
+					context3d.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, j + 2, (light as SpotLight).direction);
+					context3d.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, j + 3, (light as SpotLight).lightParameters);
 					j += 4;
 				}
 				light = light.next;
@@ -199,17 +198,6 @@ package nest.view.materials
 		
 		public function set glossiness(value:int):void {
 			_glossiness = _fragData[0] = value;
-		}
-		
-		public function get optimizeForRenderToTexture():Boolean {
-			return _optimizeForRenderToTexture;
-		}
-		
-		public function set optimizeForRenderToTexture(value:Boolean):void {
-			if (_optimizeForRenderToTexture != value) {
-				_optimizeForRenderToTexture = value;
-				_changed = true;
-			}
 		}
 		
 		public function get uv():Boolean {

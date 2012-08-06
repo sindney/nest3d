@@ -1,6 +1,5 @@
 package nest.control 
 {
-	import flash.geom.Matrix3D;
 	import flash.geom.Vector3D;
 	
 	import nest.object.data.AnimationTrack;;
@@ -14,8 +13,6 @@ package nest.control
 	 */
 	public class AnimationController {
 		
-		private const matrix:Matrix3D = new Matrix3D();
-		
 		public var time:Number;
 		public var advanceTime:Number;
 		
@@ -23,7 +20,7 @@ package nest.control
 		public var target:SkinnedMesh;
 		
 		public function AnimationController() {
-			matrix.identity();
+			
 		}
 		
 		public function update():void {
@@ -31,11 +28,11 @@ package nest.control
 			if (time > track.end || time < track.start) time = track.start;
 			
 			// update joints
-			target.joint.update(matrix, time);
+			target.joint.update(target.matrix, time);
 			
 			// update vertices
 			var w:Number;
-			var i:int, j:int = target.data.numVertices, k:int;
+			var i:int, j:int = target.data.numVertices, k:int, l:int;
 			var v0:Vector3D = new Vector3D();
 			var v1:Vector3D = new Vector3D();
 			var v2:Vector3D = new Vector3D();
@@ -49,7 +46,8 @@ package nest.control
 				v2.setTo(0, 0, 0);
 				v3.setTo(0, 0, 0);
 				
-				for (k = 0; k < 4; k++) {
+				l = vt0.joints.length;
+				for (k = 0; k < l; k++) {
 					if (vt0.joints[k] == -1) break;
 					w = vt0.weights[k];
 					joint = target.joints[vt0.joints[k]];

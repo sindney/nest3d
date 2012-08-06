@@ -16,8 +16,8 @@ package nest.object.geom
 		
 		public var normal:Vector3D;
 		
-		public var joints:Vector.<int> = new Vector.<int>(4, true);
-		public var weights:Vector.<Number> = new Vector.<Number>(4, true);
+		public var joints:Vector.<int>;
+		public var weights:Vector.<Number>;
 		
 		public function Vertex(x:Number = 0, y:Number = 0, z:Number = 0, u:Number = 0, v:Number = 0) {
 			this.x = x;
@@ -26,7 +26,6 @@ package nest.object.geom
 			this.u = u;
 			this.v = v;
 			normal = new Vector3D();
-			joints[0] = joints[1] = joints[2] = joints[3] = -1;
 		}
 		
 	}

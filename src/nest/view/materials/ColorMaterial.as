@@ -21,35 +21,35 @@ package nest.view.materials
 			this.alpha = alpha;
 		}
 		
-		public function upload(context3D:Context3D):void {
-			uploadLights(context3D);
-			context3D.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, 27, _rgba);
+		public function upload(context3d:Context3D):void {
+			uploadLights(context3d);
+			context3d.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, 27, _rgba);
 		}
 		
-		public function unload(context3D:Context3D):void {
+		public function unload(context3d:Context3D):void {
 			
 		}
 		
-		protected function uploadLights(context3D:Context3D):void {
+		protected function uploadLights(context3d:Context3D):void {
 			var light:ILight = _light;
 			var j:int = 1;
 			while (light) {
 				if (light is AmbientLight) {
-					context3D.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, 0, light.rgba);
+					context3d.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, 0, light.rgba);
 				} else if (light is DirectionalLight) {
-					context3D.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, j, light.rgba);
- 					context3D.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, j + 1, (light as DirectionalLight).direction);
+					context3d.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, j, light.rgba);
+ 					context3d.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, j + 1, (light as DirectionalLight).direction);
 					j += 2;
 				} else if (light is PointLight) {
-					context3D.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, j, light.rgba);
- 					context3D.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, j + 1, (light as PointLight).position);
-					context3D.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, j + 2, (light as PointLight).radius);
+					context3d.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, j, light.rgba);
+ 					context3d.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, j + 1, (light as PointLight).position);
+					context3d.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, j + 2, (light as PointLight).radius);
 					j += 3;
 				} else if (light is SpotLight) {
-					context3D.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, j, light.rgba);
- 					context3D.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, j + 1, (light as SpotLight).position);
-					context3D.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, j + 2, (light as SpotLight).direction);
-					context3D.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, j + 3, (light as SpotLight).lightParameters);
+					context3d.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, j, light.rgba);
+ 					context3d.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, j + 1, (light as SpotLight).position);
+					context3d.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, j + 2, (light as SpotLight).direction);
+					context3d.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, j + 3, (light as SpotLight).lightParameters);
 					j += 4;
 				}
 				light = light.next;

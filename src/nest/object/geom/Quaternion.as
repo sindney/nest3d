@@ -99,6 +99,11 @@ package nest.object.geom
 		
 		public static function slerp(a:Vector3D, b:Vector3D, t:Number, output:Vector3D):void {
 			const cos:Number = dotProduct(a, b);
+			if (cos == 0) {
+				output.copyFrom(a);
+				output.w = a.w;
+				return;
+			}
 			var k0:Number, k1:Number;
 			if (cos > ONE) {
 				k0 = 1 - t;

@@ -196,35 +196,35 @@ package nest.object.data
 			_changed = true;
 		}
 		
-		public function upload(context3D:Context3D, uv:Boolean, normal:Boolean):void {
+		public function upload(context3d:Context3D, uv:Boolean, normal:Boolean):void {
 			if (_changed) {
 				_changed = false;
 				if (_vertexBuffer)_vertexBuffer.dispose();
-				_vertexBuffer = context3D.createVertexBuffer(_bNumVts, 3);
+				_vertexBuffer = context3d.createVertexBuffer(_bNumVts, 3);
 				_vertexBuffer.uploadFromVector(_vertex, 0, _bNumVts);
 				if (_uvBuffer)_uvBuffer.dispose();
 				if (uv) {
-					_uvBuffer = context3D.createVertexBuffer(_bNumVts, 2);
+					_uvBuffer = context3d.createVertexBuffer(_bNumVts, 2);
 					_uvBuffer.uploadFromVector(_uv, 0, _bNumVts);
 				}
 				if (_normalBuffer)_normalBuffer.dispose();
 				if (normal) {
-					_normalBuffer = context3D.createVertexBuffer(_bNumVts, 3);
+					_normalBuffer = context3d.createVertexBuffer(_bNumVts, 3);
 					_normalBuffer.uploadFromVector(_normal, 0, _bNumVts);
 				}
 				if (_indexBuffer)_indexBuffer.dispose();
-				_indexBuffer = context3D.createIndexBuffer(_numIndices);
+				_indexBuffer = context3d.createIndexBuffer(_numIndices);
 				_indexBuffer.uploadFromVector(_index, 0, _numIndices);
 			}
-			context3D.setVertexBufferAt(0, _vertexBuffer, 0, Context3DVertexBufferFormat.FLOAT_3);
-			if (uv) context3D.setVertexBufferAt(1, _uvBuffer, 0, Context3DVertexBufferFormat.FLOAT_2);
-			if (normal) context3D.setVertexBufferAt(2, _normalBuffer, 0, Context3DVertexBufferFormat.FLOAT_3);
+			context3d.setVertexBufferAt(0, _vertexBuffer, 0, Context3DVertexBufferFormat.FLOAT_3);
+			if (uv) context3d.setVertexBufferAt(1, _uvBuffer, 0, Context3DVertexBufferFormat.FLOAT_2);
+			if (normal) context3d.setVertexBufferAt(2, _normalBuffer, 0, Context3DVertexBufferFormat.FLOAT_3);
 		}
 		
-		public function unload(context3D:Context3D):void {
-			context3D.setVertexBufferAt(0, null, 0, Context3DVertexBufferFormat.FLOAT_3);
-			context3D.setVertexBufferAt(1, null, 0, Context3DVertexBufferFormat.FLOAT_2);
-			context3D.setVertexBufferAt(2, null, 0, Context3DVertexBufferFormat.FLOAT_3);
+		public function unload(context3d:Context3D):void {
+			context3d.setVertexBufferAt(0, null, 0, Context3DVertexBufferFormat.FLOAT_3);
+			context3d.setVertexBufferAt(1, null, 0, Context3DVertexBufferFormat.FLOAT_2);
+			context3d.setVertexBufferAt(2, null, 0, Context3DVertexBufferFormat.FLOAT_3);
 		}
 		
 		public function dispose():void {

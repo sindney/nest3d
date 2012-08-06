@@ -7,8 +7,8 @@ package nest.view.materials
 	 */
 	public interface IMaterial {
 		
-		function upload(context3D:Context3D):void;
-		function unload(context3D:Context3D):void;
+		function upload(context3d:Context3D):void;
+		function unload(context3d:Context3D):void;
 		
 		function get uv():Boolean;
 		

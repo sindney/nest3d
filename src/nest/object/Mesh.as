@@ -54,25 +54,25 @@ package nest.object
 			this.data = data;
 		}
 		
-		public function draw(context3D:Context3D, matrix:Matrix3D):void {
-			context3D.setCulling(_culling);
-			context3D.setBlendFactors(_blendMode.source, _blendMode.dest);
-			context3D.setDepthTest(_blendMode.depthMask, Context3DCompareMode.LESS);
-			context3D.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 0, matrix, true);
-			context3D.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 4, _invertMatrix, true);
-			context3D.setProgramConstantsFromMatrix(Context3DProgramType.FRAGMENT, 23, _invertMatrix, true);
+		public function draw(context3d:Context3D, matrix:Matrix3D):void {
+			context3d.setCulling(_culling);
+			context3d.setBlendFactors(_blendMode.source, _blendMode.dest);
+			context3d.setDepthTest(_blendMode.depthMask, Context3DCompareMode.LESS);
+			context3d.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 0, matrix, true);
+			context3d.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 4, _invertMatrix, true);
+			context3d.setProgramConstantsFromMatrix(Context3DProgramType.FRAGMENT, 23, _invertMatrix, true);
 			
-			if (_material is EnvMapMaterial) context3D.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 11, _matrix, true);
+			if (_material is EnvMapMaterial) context3d.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 11, _matrix, true);
 			
-			_data.upload(context3D, _material.uv, _shader.normal);
-			_material.upload(context3D);
-			_shader.update(context3D);
+			_data.upload(context3d, _material.uv, _shader.normal);
+			_material.upload(context3d);
+			_shader.update(context3d);
 			
-			context3D.setProgram(_shader.program);
-			context3D.drawTriangles(_data.indexBuffer);
+			context3d.setProgram(_shader.program);
+			context3d.drawTriangles(_data.indexBuffer);
 			
-			_data.unload(context3D);
-			_material.unload(context3D);
+			_data.unload(context3d);
+			_material.unload(context3d);
 		}
 		
 		public function clone():IMesh {

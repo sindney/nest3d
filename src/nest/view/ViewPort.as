@@ -13,10 +13,11 @@ package nest.view
 	import flash.geom.Vector3D
 	
 	import nest.object.IContainer3D;
+	import nest.view.effects.IPostEffect;
 	import nest.view.managers.ISceneManager;
 	
 	/** 
-	 * Dispatched when context3D is created.
+	 * Dispatched when context3d is created.
 	 * @eventType flash.events.Event
 	 */
 	[Event(name = Event.CONTEXT3D_CREATE, type = "flash.events.Event")]
@@ -28,7 +29,7 @@ package nest.view
 		
 		private var stage3d:Stage3D;
 		
-		private var _context3D:Context3D;
+		private var _context3d:Context3D;
 		private var _width:Number;
 		private var _height:Number;
 		private var _antiAlias:int = 0;
@@ -46,6 +47,7 @@ package nest.view
 		private var _camera:Camera3D;
 		private var _root:IContainer3D;
 		private var _manager:ISceneManager;
+		private var _effect:IPostEffect;
 		
 		public function ViewPort(width:Number, height:Number, stage3d:Stage3D, camera:Camera3D, root:IContainer3D, manager:ISceneManager) {
 			this.stage3d = stage3d;
@@ -95,9 +97,14 @@ package nest.view
 		 * Put this into a loop to draw your scene on stage3d.
 		 */
 		public function calculate(bitmapData:BitmapData = null):void {
-			if (!_camera || !_root || !_context3D || !_manager) return;
+			if (!_camera || !_root || !_context3d || !_manager) return;
 			
-			_context3D.clear(_rgba[0], _rgba[1], _rgba[2], _rgba[3]);
+			if (_effect) {
+				_effect.context3d = _context3d;
+				_effect.createTexture(_width, _height);
+				_context3d.setRenderToTexture(_effect.texture, _effect.enableDepthAndStencil, _antiAlias);
+			}
+			_context3d.clear(_rgba[0], _rgba[1], _rgba[2], _rgba[3]);
 			
 			_diagram.update();
 			
@@ -107,24 +114,41 @@ package nest.view
 			_camPos[1] = camera.position.y;
 			_camPos[2] = camera.position.z;
 			_camPos[3] = 1;
-			_context3D.setProgramConstantsFromVector(Context3DProgramType.VERTEX, 8, _camPos);
+			_context3d.setProgramConstantsFromVector(Context3DProgramType.VERTEX, 8, _camPos);
 			
 			if (_fog) {
- 				_context3D.setProgramConstantsFromVector(Context3DProgramType.VERTEX, 9, _fogData);
-				_context3D.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, 21, _fogColor);
+ 				_context3d.setProgramConstantsFromVector(Context3DProgramType.VERTEX, 9, _fogData);
+				_context3d.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, 21, _fogColor);
 			}
 			
 			_manager.calculate();
 			
-			if (bitmapData) _context3D.drawToBitmapData(bitmapData);
-			_context3D.present();
+			if (_effect) {
+				var effect:IPostEffect = _effect;
+				while (effect) {
+					if (effect.next) {
+						effect.next.context3d = _context3d;
+						effect.next.createTexture(_width, _height);
+						_context3d.setRenderToTexture(effect.next.texture, effect.next.enableDepthAndStencil, _antiAlias);
+					} else {
+						_context3d.setRenderToBackBuffer();
+					}
+					effect.calculate();
+					effect = effect.next;
+				}
+			}
+			
+			if (bitmapData) _context3d.drawToBitmapData(bitmapData);
+			
+			_context3d.present();
 		}
 		
 		private function init(e:Event):void {
-			_context3D = stage3d.context3D;
-			_context3D.configureBackBuffer(_width, _height, _antiAlias, true);
+			_context3d = stage3d.context3D;
+			_context3d.enableErrorChecking = true;
+			_context3d.configureBackBuffer(_width, _height, _antiAlias, true);
 			camera.aspect = _width / _height;
-			_manager.context3D = _context3D;
+			_manager.context3d = _context3d;
 			dispatchEvent(new Event(Event.CONTEXT3D_CREATE));
 		}
 		
@@ -138,9 +162,9 @@ package nest.view
 		
 		public function set width(value:Number):void {
 			if (_width != value) {
-				if (_context3D) {
+				if (_context3d) {
 					_width = value;
-					_context3D.configureBackBuffer(_width, _height, _antiAlias, true);
+					_context3d.configureBackBuffer(_width, _height, _antiAlias, true);
 					camera.aspect = _width / _height;
 				}
 			}
@@ -152,9 +176,9 @@ package nest.view
 		
 		public function set height(value:Number):void {
 			if (_height != value) {
-				if (_context3D) {
+				if (_context3d) {
 					_height = value;
-					_context3D.configureBackBuffer(_width, _height, _antiAlias, true);
+					_context3d.configureBackBuffer(_width, _height, _antiAlias, true);
 					camera.aspect = _width / _height;
 				}
 			}
@@ -189,7 +213,7 @@ package nest.view
 		public function set antiAlias(value:int):void {
 			if (_antiAlias != value) {
 				_antiAlias = value;
-				if (_context3D) _context3D.configureBackBuffer(_width, _height, _antiAlias, true);
+				if (_context3d) _context3d.configureBackBuffer(_width, _height, _antiAlias, true);
 			}
 		}
 		
@@ -197,8 +221,8 @@ package nest.view
 			return _diagram;
 		}
 		
-		public function get context3D():Context3D {
-			return _context3D;
+		public function get context3d():Context3D {
+			return _context3d;
 		}
 		
 		public function get camera():Camera3D {
@@ -217,7 +241,7 @@ package nest.view
 			_manager = value;
 			_manager.camera = _camera;
 			_manager.root = _root;
-			_manager.context3D = _context3D;
+			_manager.context3d = _context3d;
 		}
 		
 		public function get fog():Boolean {
@@ -226,6 +250,14 @@ package nest.view
 		
 		public function set fog(value:Boolean):void {
 			_fog = value;
+		}
+		
+		public function get effect():IPostEffect {
+			return _effect;
+		}
+		
+		public function set effect(value:IPostEffect):void {
+			_effect = value;
 		}
 		
 	}

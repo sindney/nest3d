@@ -29,7 +29,7 @@ package nest.view.managers
 		
 		protected var _camera:Camera3D;
 		protected var _root:IContainer3D;
-		protected var _context3D:Context3D;
+		protected var _context3d:Context3D;
 		
 		public function BasicManager() {
 			vertices = new Vector.<Vector3D>(9, true);
@@ -98,7 +98,7 @@ package nest.view.managers
 			draw.copyFrom(mesh.matrix);
 			draw.append(_camera.invertMatrix);
 			draw.append(_camera.pm);
-			mesh.draw(_context3D, draw);
+			mesh.draw(_context3d, draw);
 		}
 		
 		protected function classifyMesh(mesh:IMesh):Boolean {
@@ -145,12 +145,12 @@ package nest.view.managers
 			return _numObjects;
 		}
 		
-		public function get context3D():Context3D {
-			return _context3D;
+		public function get context3d():Context3D {
+			return _context3d;
 		}
 		
-		public function set context3D(value:Context3D):void {
-			_context3D = value;
+		public function set context3d(value:Context3D):void {
+			_context3d = value;
 		}
 		
 		public function get root():IContainer3D {

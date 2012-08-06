@@ -18,8 +18,8 @@ package nest.view.managers
 		function get root():IContainer3D;
 		function set root(value:IContainer3D):void;
 		
-		function get context3D():Context3D;
-		function set context3D(value:Context3D):void;
+		function get context3d():Context3D;
+		function set context3d(value:Context3D):void;
 		
 		function get numVertices():int;
 		function get numTriangles():int;

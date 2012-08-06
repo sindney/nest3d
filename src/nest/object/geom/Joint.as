@@ -86,7 +86,6 @@ package nest.object.geom
 			_combined.prepend(parent);
 			
 			_result.copyFrom(_combined);
-			_result.append(_offset);
 			_result.invert();
 			
 			if (sibling) sibling.update(parent, time);

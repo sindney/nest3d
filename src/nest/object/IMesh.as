@@ -15,7 +15,7 @@ package nest.object
 	 */
 	public interface IMesh extends IObject3D {
 		
-		function draw(context3D:Context3D, matrix:Matrix3D):void;
+		function draw(context3d:Context3D, matrix:Matrix3D):void;
 		
 		function clone():IMesh;
 		

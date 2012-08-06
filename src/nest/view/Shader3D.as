@@ -34,10 +34,10 @@ package nest.view
 			_normal = normal;
 		}
 		
-		public function update(context3D:Context3D):void {
+		public function update(context3d:Context3D):void {
 			if (!_changed) return;
 			_changed = false;
-			if (!_program)_program = context3D.createProgram();
+			if (!_program)_program = context3d.createProgram();
 			_program.upload(_vertex, _fragment);
 		}
 		

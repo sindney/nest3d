@@ -19,44 +19,44 @@ package nest.view.materials
 			_lm_data = lightmap;
 		}
 		
-		override public function upload(context3D:Context3D):void {
+		override public function upload(context3d:Context3D):void {
 			if (_changed) {
 				_changed = false;
 				if (_diffuse) _diffuse.dispose();
-				_diffuse = context3D.createTexture(_diff_data.width, _diff_data.height, Context3DTextureFormat.BGRA, _optimizeForRenderToTexture);
+				_diffuse = context3d.createTexture(_diff_data.width, _diff_data.height, Context3DTextureFormat.BGRA, true);
 				_mipmapping ? uploadWithMipmaps(_diffuse, _diff_data) : _diffuse.uploadFromBitmapData(_diff_data);
 				if (_specular) _specular.dispose();
 				if (_spec_data) {
-					_specular = context3D.createTexture(_spec_data.width, _spec_data.height, Context3DTextureFormat.BGRA, _optimizeForRenderToTexture);
+					_specular = context3d.createTexture(_spec_data.width, _spec_data.height, Context3DTextureFormat.BGRA, true);
 					_mipmapping ? uploadWithMipmaps(_specular, _spec_data) : _specular.uploadFromBitmapData(_spec_data);
 				}
 				if (_normalmap) _normalmap.dispose();
 				if (_nm_data) {
-					_normalmap = context3D.createTexture(_nm_data.width, _nm_data.height, Context3DTextureFormat.BGRA, _optimizeForRenderToTexture);
+					_normalmap = context3d.createTexture(_nm_data.width, _nm_data.height, Context3DTextureFormat.BGRA, true);
 					_mipmapping ? uploadWithMipmaps(_normalmap, _nm_data) : _normalmap.uploadFromBitmapData(_nm_data);
 				}
 				if (_lightmap) _lightmap.dispose();
 				if (_lm_data) {
-					_lightmap = context3D.createTexture(_lm_data.width, _lm_data.height, Context3DTextureFormat.BGRA, _optimizeForRenderToTexture);
+					_lightmap = context3d.createTexture(_lm_data.width, _lm_data.height, Context3DTextureFormat.BGRA, true);
 					_mipmapping ? uploadWithMipmaps(_lightmap, _lm_data) : _lightmap.uploadFromBitmapData(_lm_data);
 				}
 			}
-			uploadLights(context3D);
-			context3D.setTextureAt(0, _diffuse);
-			if (_spec_data) context3D.setTextureAt(1, _specular);
+			uploadLights(context3d);
+			context3d.setTextureAt(0, _diffuse);
+			if (_spec_data) context3d.setTextureAt(1, _specular);
 			if (_nm_data) {
-				context3D.setTextureAt(2, _normalmap);
-				context3D.setProgramConstantsFromVector(Context3DProgramType.VERTEX, 10, _vertData);
+				context3d.setTextureAt(2, _normalmap);
+				context3d.setProgramConstantsFromVector(Context3DProgramType.VERTEX, 10, _vertData);
 			}
-			if (_lm_data) context3D.setTextureAt(3, _lightmap);
-			if (_spec_data || _nm_data) context3D.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, 22, _fragData);
+			if (_lm_data) context3d.setTextureAt(3, _lightmap);
+			if (_spec_data || _nm_data) context3d.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, 22, _fragData);
 		}
 		
-		override public function unload(context3D:Context3D):void {
-			if (_diffuse) context3D.setTextureAt(0, null);
-			if (_specular) context3D.setTextureAt(1, null);
-			if (_normalmap) context3D.setTextureAt(2, null);
-			if (_lightmap) context3D.setTextureAt(3, null);
+		override public function unload(context3d:Context3D):void {
+			if (_diffuse) context3d.setTextureAt(0, null);
+			if (_specular) context3d.setTextureAt(1, null);
+			if (_normalmap) context3d.setTextureAt(2, null);
+			if (_lightmap) context3d.setTextureAt(3, null);
 		}
 		
 		override public function dispose():void {

@@ -59,6 +59,8 @@ package nest.control.parsers
 					k = model.readByte();
 					if (k != -1) {
 						animation = true;
+						vt1.joints = new Vector.<int>(4, true);
+						vt1.weights = new Vector.<Number>(4, true);
 						vt1.joints[0] = k;
 					}
 					// refCount

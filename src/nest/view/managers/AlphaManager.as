@@ -24,7 +24,7 @@ package nest.view.managers
 			
 			// sort objects
 			var i:int, j:int = distance.length - 1;
-			if (j > 0) quickSort(distance, 0, j);
+			if (j > 1) quickSort(distance, 0, j);
 			
 			// draw meshes
 			var mesh:IMesh;
@@ -33,7 +33,7 @@ package nest.view.managers
 				draw.copyFrom(mesh.matrix);
 				draw.append(_camera.invertMatrix);
 				draw.append(_camera.pm);
-				mesh.draw(_context3D, draw);
+				mesh.draw(_context3d, draw);
 			}
 		}
 		
@@ -51,7 +51,7 @@ package nest.view.managers
 				draw.copyFrom(mesh.matrix);
 				draw.append(_camera.invertMatrix);
 				draw.append(_camera.pm);
-				mesh.draw(_context3D, draw);
+				mesh.draw(_context3d, draw);
 			}
 		}
 		
