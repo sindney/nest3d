@@ -124,6 +124,8 @@ package nest.control.parsers
 			var frame1:KeyFrame, frame2:KeyFrame;
 			var rawJointParent:Vector.<String>;
 			var rawJoint:Vector.<Joint>;
+			var components:Vector.<Vector3D> = new Vector.<Vector3D>(3, true);
+			var v3:Vector3D = new Vector3D();
 			
 			// numMaterials times material struct
 			i = model.readUnsignedShort();
@@ -135,6 +137,9 @@ package nest.control.parsers
 			j = model.readUnsignedShort();
 			rawJoint = new Vector.<Joint>(j, true);
 			rawJointParent = new Vector.<String>(j, true);
+			components[0] = v1;
+			components[1] = v2;
+			components[2] = v3;
 			for (i = 0; i < j; i++) {
 				if (model.readUnsignedByte() != 2) {
 					// name of the joint
@@ -149,11 +154,8 @@ package nest.control.parsers
 					// local transforms
 					v1.setTo(model.readFloat(), model.readFloat(), model.readFloat());
 					v2.setTo(model.readFloat(), model.readFloat(), model.readFloat());
-					joint1.offset.identity();
-					joint1.offset.appendRotation(v1.x, Vector3D.X_AXIS);
-					joint1.offset.appendRotation(v1.y, Vector3D.Y_AXIS);
-					joint1.offset.appendRotation(v1.z, Vector3D.Z_AXIS);
-					joint1.offset.appendTranslation(v2.x, v2.y, v2.z);
+					v3.setTo(scale, scale, scale);
+					joint1.offset.recompose(components);
 					// numRotationKeyFrames
 					k = model.readUnsignedShort();
 					// numPositionKeyFrames

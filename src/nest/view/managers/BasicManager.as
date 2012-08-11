@@ -8,7 +8,7 @@ package nest.view.managers
 	import nest.object.geom.BSphere;
 	import nest.object.IContainer3D;
 	import nest.object.IMesh;
-	import nest.object.IPlaceable;
+	import nest.object.IObject3D;
 	import nest.object.LODMesh;
 	import nest.object.Mesh;
 	import nest.object.SkyBox;
@@ -52,6 +52,16 @@ package nest.view.managers
 			doContainer(_root, null, _root.changed);
 		}
 		
+		protected function doMesh(mesh:IMesh):void {
+			_numVertices += mesh.data.numVertices;
+			_numTriangles += mesh.data.numTriangles;
+			_numObjects++;
+			draw.copyFrom(mesh.matrix);
+			draw.append(_camera.invertMatrix);
+			draw.append(_camera.pm);
+			mesh.draw(_context3d, draw);
+		}
+		
 		protected function doContainer(container:IContainer3D, parent:IContainer3D = null, changed:Boolean = false):void {
 			if (!container.visible) return;
 			var mark:Boolean = changed;
@@ -63,22 +73,18 @@ package nest.view.managers
 			}
 			
 			var mesh:IMesh;
-			var object:IPlaceable;
+			var object:IObject3D;
 			var i:int, j:int = container.numChildren;
 			for (i = 0; i < j; i++) {
 				object = container.getChildAt(i);
+				if (object.changed || mark) {
+					object.recompose();
+					object.matrix.append(container.matrix);
+				}
 				if (object is IContainer3D) {
 					doContainer(object as IContainer3D, container, mark);
 				} else if (object is IMesh) {
 					mesh = object as IMesh;
-					if (mesh is SkyBox) {
-						mesh.position.copyFrom(_camera.position);
-						mesh.changed = true;
-					}
-					if (mesh.changed || mark) {
-						mesh.recompose();
-						mesh.matrix.append(container.matrix);
-					}
 					if (mesh.visible) {
 						if (!mesh.cliping || classifyMesh(mesh)) {
 							if (mesh is LODMesh) (mesh as LODMesh).update(_camera.position);
@@ -89,16 +95,6 @@ package nest.view.managers
 					(object as Sound3D).update(_camera.invertMatrix, container.matrix);
 				}
 			}
-		}
-		
-		protected function doMesh(mesh:IMesh):void {
-			_numVertices += mesh.data.numVertices;
-			_numTriangles += mesh.data.numTriangles;
-			_numObjects++;
-			draw.copyFrom(mesh.matrix);
-			draw.append(_camera.invertMatrix);
-			draw.append(_camera.pm);
-			mesh.draw(_context3d, draw);
 		}
 		
 		protected function classifyMesh(mesh:IMesh):Boolean {

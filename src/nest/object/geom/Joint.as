@@ -81,9 +81,10 @@ package nest.object.geom
 			Quaternion.normalize(temp[1]);
 			
 			_local.recompose(temp, Orientation3D.QUATERNION);
+			_local.append(_offset);
 			
 			_combined.copyFrom(_local);
-			_combined.prepend(parent);
+			if (parent) _combined.append(parent);
 			
 			_result.copyFrom(_combined);
 			_result.invert();

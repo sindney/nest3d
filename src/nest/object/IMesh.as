@@ -40,6 +40,8 @@ package nest.object
 		
 		function get blendMode():BlendMode3D;
 		
+		function get scale():Vector3D;
+		
 	}
 	
 }

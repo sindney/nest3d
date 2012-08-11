@@ -7,13 +7,15 @@ package nest.object
 	 */
 	public interface IContainer3D extends IObject3D {
 		
-		function addChild(object:IPlaceable):void;
+		function addChild(object:IObject3D):void;
 		
-		function removeChild(object:IPlaceable):void;
+		function removeChild(object:IObject3D):void;
 		
-		function removeChildAt(index:int):IPlaceable;
+		function removeChildAt(index:int):IObject3D;
 		
-		function getChildAt(index:int):IPlaceable;
+		function getChildAt(index:int):IObject3D;
+		
+		function get invertMatrix():Matrix3D;
 		
 		function get visible():Boolean;
 		function set visible(value:Boolean):void;

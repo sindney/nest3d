@@ -6,8 +6,9 @@ package nest.object
 	/**
 	 * Object3D Interface
 	 */
-	public interface IObject3D extends IPlaceable {
+	public interface IObject3D {
 		
+		function decompose():void;
 		function recompose():void;
 		
 		function translate(axis:Vector3D, value:Number):void;
@@ -18,16 +19,12 @@ package nest.object
 		function get orientation():String;
 		function set orientation(value:String):void;
 		
-		function get components():Vector.<Vector3D>;
-		
 		function get rotation():Vector3D;
 		
-		function get scale():Vector3D;
+		function get position():Vector3D;
 		
 		function get matrix():Matrix3D;
-		
-		function get invertMatrix():Matrix3D;
-		
+
 	}
 	
 }

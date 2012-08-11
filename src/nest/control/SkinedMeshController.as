@@ -2,33 +2,33 @@ package nest.control
 {
 	import flash.geom.Vector3D;
 	
-	import nest.object.data.AnimationTrack;;
+	import nest.object.data.AnimationTrack;
 	import nest.object.geom.Joint;
 	import nest.object.geom.Triangle;
 	import nest.object.geom.Vertex;
 	import nest.object.SkinnedMesh;
 	
 	/**
-	 * AnimationController
+	 * SkinedMeshController
 	 */
-	public class AnimationController {
+	public class SkinedMeshController implements IAnimationController {
 		
-		public var time:Number;
-		public var advanceTime:Number;
+		private var _track:AnimationTrack;
+		private var _time:Number = 0;
+		private var _advanceTime:Number = 0;
+		private var _paused:Boolean = true;
 		
-		public var track:AnimationTrack;
 		public var target:SkinnedMesh;
 		
-		public function AnimationController() {
+		public function SkinedMeshController() {
 			
 		}
 		
 		public function update():void {
-			if (!target || !track) return;
-			if (time > track.end || time < track.start) time = track.start;
+			if (_paused || !target || !_track) return;
 			
 			// update joints
-			target.joint.update(target.matrix, time);
+			target.joint.update(null, _time);
 			
 			// update vertices
 			var w:Number;
@@ -84,7 +84,45 @@ package nest.control
 			
 			target.data.update();
 			
-			time += advanceTime;
+			_time += _advanceTime;
+		}
+		
+		///////////////////////////////////
+		// getter/setters
+		///////////////////////////////////
+		
+		public function get paused():Boolean {
+			return _paused;
+		}
+		
+		public function set paused(value:Boolean):void {
+			_paused = value;
+		}
+		
+		public function get time():Number {
+			return _time;
+		}
+		
+		public function set time(value:Number):void {
+			_time = value;
+			if (_track) if (_time < _track.start|| _time > _track.end) _time = track.start;
+		}
+		
+		public function get advanceTime():Number {
+			return _advanceTime;
+		}
+		
+		public function set advanceTime(value:Number):void {
+			_advanceTime = value;
+		}
+		
+		public function get track():AnimationTrack {
+			return _track;
+		}
+		
+		public function set track(value:AnimationTrack):void {
+			_track = value;
+			if (_time < _track.start|| _time > _track.end) _time = track.start;
 		}
 		
 	}

@@ -9,7 +9,7 @@ package nest.object
 	/**
 	 * Sound3D
 	 */
-	public class Sound3D implements IPlaceable {
+	public class Sound3D extends Object3D {
 		
 		private const PI1:Number = 1 / (Math.PI);
 		
@@ -19,8 +19,6 @@ package nest.object
 		private var _transform:SoundTransform;
 		private var _channel:SoundChannel;
 		
-		private var _position:Vector3D;
-		
 		private var _stopped:Boolean = true;
 		
 		public var volumn:Number = 1;
@@ -28,16 +26,16 @@ package nest.object
 		public var near:Number = 40;
 		
 		public function Sound3D(data:Sound) {
+			super();
 			_transform = new SoundTransform(0, 0);
 			v0 = new Vector3D();
-			_position = new Vector3D();
 			this.data = data;
 		}
 		
 		public function update(camera:Matrix3D, container:Matrix3D):void {
 			if (_stopped) return;
 			
-			v0.copyFrom(_position);
+			v0.copyFrom(_components[0]);
 			v0 = camera.transformVector(container.transformVector(v0));
 			
 			const d:int = v0.length;
@@ -91,10 +89,6 @@ package nest.object
 				_channel = _data.play(0, 0, _transform);
 				_channel.stop();
 			}
-		}
-		
-		public function get position():Vector3D {
-			return _position;
 		}
 		
 	}

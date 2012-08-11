@@ -20,8 +20,8 @@ package nest.view.effects
 		protected var _context3d:Context3D;
 		protected var _next:IPostEffect;
 		
-		protected var width:Number;
-		protected var height:Number;
+		protected var width:Number = 0;
+		protected var height:Number = 0;
 		
 		protected var program:Program3D;
 		

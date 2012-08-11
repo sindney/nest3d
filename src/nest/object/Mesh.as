@@ -35,6 +35,8 @@ package nest.object
 		
 		protected var _blendMode:BlendMode3D;
 		
+		protected var _invertMatrix:Matrix3D;
+
 		protected var _visible:Boolean = true;
 		protected var _cliping:Boolean = true;
 		protected var _alphaTest:Boolean = false;
@@ -44,6 +46,7 @@ package nest.object
 			_shader = shader;
 			_material = material;
 			_blendMode = new BlendMode3D();
+			_invertMatrix = new Matrix3D();
 			
 			if (bound) {
 				_bound = bound;
@@ -53,7 +56,7 @@ package nest.object
 			
 			this.data = data;
 		}
-		
+
 		public function draw(context3d:Context3D, matrix:Matrix3D):void {
 			context3d.setCulling(_culling);
 			context3d.setBlendFactors(_blendMode.source, _blendMode.dest);
@@ -66,7 +69,11 @@ package nest.object
 			
 			_data.upload(context3d, _material.uv, _shader.normal);
 			_material.upload(context3d);
-			_shader.update(context3d);
+			if (_shader.changed) {
+				_shader.changed = false;
+				if (!_shader.program) _shader.program = context3d.createProgram();
+				_shader.program.upload(_shader.vertex, _shader.fragment);
+			}
 			
 			context3d.setProgram(_shader.program);
 			context3d.drawTriangles(_data.indexBuffer);
@@ -87,6 +94,22 @@ package nest.object
 			result.visible = _visible;
 			result.alphaTest = _alphaTest;
 			return result;
+		}
+		
+		override public function decompose():void {
+			_components = _matrix.decompose(_orientation);
+			_invertMatrix.copyFrom(_matrix);
+			_invertMatrix.appendScale(1 / _components[2].x, 1 / _components[2].y, 1 / _components[2].z);
+			_invertMatrix.invert();
+			_changed = false;
+		}
+		
+		override public function recompose():void {
+			_matrix.recompose(_components, _orientation);
+			_invertMatrix.copyFrom(_matrix);
+			_invertMatrix.appendScale(1 / _components[2].x, 1 / _components[2].y, 1 / _components[2].z);
+			_invertMatrix.invert();
+			_changed = false;
 		}
 		
 		///////////////////////////////////
@@ -159,7 +182,11 @@ package nest.object
 		public function set alphaTest(value:Boolean):void {
 			_alphaTest = value;
 		}
-		
+
+		public function get scale():Vector3D {
+			return _components[2];
+		}
+
 	}
 
 }

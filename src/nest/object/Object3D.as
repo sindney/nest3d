@@ -18,7 +18,6 @@ package nest.object
 		protected var _components:Vector.<Vector3D>;
 		
 		protected var _matrix:Matrix3D;
-		protected var _invertMatrix:Matrix3D;
 		
 		public function Object3D() {
 			_components = new Vector.<Vector3D>(3, true);
@@ -27,7 +26,6 @@ package nest.object
 			_components[2] = new Vector3D(1, 1, 1, 1);
 			
 			_matrix = new Matrix3D();
-			_invertMatrix = new Matrix3D();
 		}
 		
 		public function translate(axis:Vector3D, value:Number):void {
@@ -37,27 +35,19 @@ package nest.object
 			_changed = true;
 		}
 		
+		public function decompose():void {
+			_components = _matrix.decompose(_orientation);
+			_changed = false;
+		}
+		
 		public function recompose():void {
 			_matrix.recompose(_components, _orientation);
-			
-			const sx:Number = _components[2].x;
-			const sy:Number = _components[2].y;
-			const sz:Number = _components[2].z;
-			_components[2].setTo(1, 1, 1);
-			_invertMatrix.recompose(_components, _orientation);
-			_invertMatrix.invert();
-			_components[2].setTo(sx, sy, sz);
-			
 			_changed = false;
 		}
 		
 		///////////////////////////////////
 		// getter/setters
 		///////////////////////////////////
-		
-		public function get components():Vector.<Vector3D> {
-			return _components;
-		}
 		
 		public function get position():Vector3D {
 			return _components[0];
@@ -67,18 +57,10 @@ package nest.object
 			return _components[1];
 		}
 		
-		public function get scale():Vector3D {
-			return _components[2];
-		}
-		
 		public function get matrix():Matrix3D {
 			return _matrix;
 		}
-		
-		public function get invertMatrix():Matrix3D {
-			return _invertMatrix;
-		}
-		
+
 		public function get orientation():String {
 			return _orientation;
 		}
