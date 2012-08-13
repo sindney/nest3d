@@ -4,7 +4,6 @@ package
 	
 	import nest.control.factories.PrimitiveFactory;
 	import nest.control.factories.ShaderFactory;
-	import nest.object.data.IntersectionData;
 	import nest.object.data.*;
 	import nest.object.geom.AABB;
 	import nest.object.geom.BSphere;
@@ -46,7 +45,7 @@ package
 			spot = new Mesh(data, colorMat, shader);
 			scene.addChild(spot);
 			
-			speed = 10;
+			controller.speed = 1;
 			camera.position.z = -40;
 			camera.changed = true;
 		}
@@ -57,10 +56,10 @@ package
 			var orgion:Vector3D = box.invertMatrix.transformVector(camera.position);
 			var delta:Vector3D = box.invertMatrix.transformVector(camera.matrix.transformVector(new Vector3D(0, 0, 200)));
 			
-			var result:IntersectionData = new IntersectionData();
+			var result:Vector3D = new Vector3D();
 			Intersection.Ray_Mesh(result, orgion, delta, box);
 			
-			spot.position.copyFrom(result.point);
+			spot.position.copyFrom(result);
 			spot.changed = true;
 		}
 		

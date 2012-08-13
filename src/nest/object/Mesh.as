@@ -1,10 +1,7 @@
 package nest.object
 {
 	import flash.display3D.Context3D;
-	import flash.display3D.Context3DCompareMode;
-	import flash.display3D.Context3DProgramType;
 	import flash.display3D.Context3DTriangleFace;
-	import flash.display3D.VertexBuffer3D;
 	import flash.geom.Matrix3D;
 	import flash.geom.Vector3D;
 	
@@ -12,9 +9,7 @@ package nest.object
 	import nest.object.geom.AABB;
 	import nest.object.geom.BSphere;
 	import nest.object.geom.IBound;
-	import nest.object.geom.Vertex;
 	import nest.view.materials.IMaterial;
-	import nest.view.materials.EnvMapMaterial;
 	import nest.view.BlendMode3D;
 	import nest.view.Shader3D;
 	
@@ -31,22 +26,22 @@ package nest.object
 		
 		protected var _bound:IBound;
 		
-		protected var _culling:String = Context3DTriangleFace.BACK;
-		
 		protected var _blendMode:BlendMode3D;
 		
-		protected var _invertMatrix:Matrix3D;
-
+		protected var _culling:String = Context3DTriangleFace.BACK;
+		
 		protected var _visible:Boolean = true;
 		protected var _cliping:Boolean = true;
 		protected var _alphaTest:Boolean = false;
+		protected var _mouseEnabled:Boolean = false;
+		
+		protected var _id:uint;
 		
 		public function Mesh(data:MeshData, material:IMaterial, shader:Shader3D, bound:IBound = null) {
 			super();
 			_shader = shader;
 			_material = material;
 			_blendMode = new BlendMode3D();
-			_invertMatrix = new Matrix3D();
 			
 			if (bound) {
 				_bound = bound;
@@ -55,31 +50,6 @@ package nest.object
 			}
 			
 			this.data = data;
-		}
-
-		public function draw(context3d:Context3D, matrix:Matrix3D):void {
-			context3d.setCulling(_culling);
-			context3d.setBlendFactors(_blendMode.source, _blendMode.dest);
-			context3d.setDepthTest(_blendMode.depthMask, Context3DCompareMode.LESS);
-			context3d.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 0, matrix, true);
-			context3d.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 4, _invertMatrix, true);
-			context3d.setProgramConstantsFromMatrix(Context3DProgramType.FRAGMENT, 23, _invertMatrix, true);
-			
-			if (_material is EnvMapMaterial) context3d.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 11, _matrix, true);
-			
-			_data.upload(context3d, _material.uv, _shader.normal);
-			_material.upload(context3d);
-			if (_shader.changed) {
-				_shader.changed = false;
-				if (!_shader.program) _shader.program = context3d.createProgram();
-				_shader.program.upload(_shader.vertex, _shader.fragment);
-			}
-			
-			context3d.setProgram(_shader.program);
-			context3d.drawTriangles(_data.indexBuffer);
-			
-			_data.unload(context3d);
-			_material.unload(context3d);
 		}
 		
 		public function clone():IMesh {
@@ -131,7 +101,7 @@ package nest.object
 		public function set data(value:MeshData):void {
 			if (_data != value) {
 				_data = value;
-				if (_data) _bound.update(_data.vertices);
+				if (_data && _bound) _bound.update(_data.vertices);
 			}
 		}
 		
@@ -145,6 +115,11 @@ package nest.object
 		
 		public function get bound():IBound {
 			return _bound;
+		}
+		
+		public function set bound(value:IBound):void {
+			_bound = value;
+			if (_data && _bound) _bound.update(_data.vertices);
 		}
 		
 		public function get cliping():Boolean {
@@ -182,11 +157,27 @@ package nest.object
 		public function set alphaTest(value:Boolean):void {
 			_alphaTest = value;
 		}
-
+		
 		public function get scale():Vector3D {
 			return _components[2];
 		}
-
+		
+		public function get mouseEnabled():Boolean {
+			return _mouseEnabled;
+		}
+		
+		public function set mouseEnabled(value:Boolean):void {
+			_mouseEnabled = value;
+		}
+		
+		public function get id():uint {
+			return _id;
+		}
+		
+		public function set id(value:uint):void {
+			_id = value;
+		}
+		
 	}
 
 }

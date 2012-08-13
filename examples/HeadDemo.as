@@ -44,7 +44,6 @@ package
 			mesh = new Mesh(data, texture, shader);
 			scene.addChild(mesh);
 			
-			speed = 10;
 			camera.position.z = 120;
 			camera.rotation.y = Math.PI;
 			camera.changed = true;

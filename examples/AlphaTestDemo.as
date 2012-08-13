@@ -9,6 +9,8 @@ package
 	
 	import nest.control.factories.PrimitiveFactory;
 	import nest.control.factories.ShaderFactory;
+	import nest.control.CameraController;
+	import nest.control.GlobalMethods;
 	import nest.object.data.MeshData;
 	import nest.object.Container3D;
 	import nest.object.Mesh;
@@ -30,26 +32,12 @@ package
 		private const diffuse:Class;
 		
 		public function AlphaTestDemo() {
-			stage.scaleMode = StageScaleMode.NO_SCALE;
-			stage.align = StageAlign.TOP_LEFT;
-			stage.frameRate = 60;
-			stage.addEventListener(MouseEvent.RIGHT_CLICK, onRightClick);
-			
-			camera = new Camera3D();
-			scene = new Container3D();
-			manager = new AlphaManager();
-			view = new ViewPort(800, 600, stage.stage3Ds[0], camera, scene, manager);
-			
-			controller = new ObjectController(camera, stage);
-			
-			init();
-			
-			addChild(view.diagram);
-			
-			view.addEventListener(Event.CONTEXT3D_CREATE, onContext3DCreated);
+			super();
 		}
 		
 		override public function init():void {
+			GlobalMethods.manager = manager = new AlphaManager();
+			
 			var data:MeshData = PrimitiveFactory.createSphere(10);
 			var material:TextureMaterial = new TextureMaterial(new diffuse().bitmapData);
 			var shader:Shader3D = new Shader3D();
@@ -78,7 +66,6 @@ package
 				}
 			}
 			
-			speed = 10;
 			camera.position.z = -20;
 			camera.changed = true;
 		}

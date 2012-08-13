@@ -71,20 +71,42 @@ package nest.view.materials
 			if (_changed) {
 				_changed = false;
 				if (_diffuse) _diffuse.dispose();
-				_diffuse = context3d.createTexture(_diff_data.width, _diff_data.height, Context3DTextureFormat.BGRA, true);
+				_diffuse = context3d.createTexture(_diff_data.width, _diff_data.height, Context3DTextureFormat.BGRA, false);
 				_mipmapping ? uploadWithMipmaps(_diffuse, _diff_data) : _diffuse.uploadFromBitmapData(_diff_data);
 				if (_specular) _specular.dispose();
 				if (_spec_data) {
-					_specular = context3d.createTexture(_spec_data.width, _spec_data.height, Context3DTextureFormat.BGRA, true);
+					_specular = context3d.createTexture(_spec_data.width, _spec_data.height, Context3DTextureFormat.BGRA, false);
 					_mipmapping ? uploadWithMipmaps(_specular, _spec_data) : _specular.uploadFromBitmapData(_spec_data);
 				}
 				if (_normalmap) _normalmap.dispose();
 				if (_nm_data) {
-					_normalmap = context3d.createTexture(_nm_data.width, _nm_data.height, Context3DTextureFormat.BGRA, true);
+					_normalmap = context3d.createTexture(_nm_data.width, _nm_data.height, Context3DTextureFormat.BGRA, false);
 					_mipmapping ? uploadWithMipmaps(_normalmap, _nm_data) : _normalmap.uploadFromBitmapData(_nm_data);
 				}
 			}
-			uploadLights(context3d);
+			var light:ILight = _light;
+			var j:int = 1;
+			while (light) {
+				if (light is AmbientLight) {
+					context3d.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, 0, light.rgba);
+				} else if (light is DirectionalLight) {
+					context3d.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, j, light.rgba);
+ 					context3d.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, j + 1, (light as DirectionalLight).direction);
+					j += 2;
+				} else if (light is PointLight) {
+					context3d.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, j, light.rgba);
+ 					context3d.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, j + 1, (light as PointLight).position);
+					context3d.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, j + 2, (light as PointLight).radius);
+					j += 3;
+				} else if (light is SpotLight) {
+					context3d.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, j, light.rgba);
+ 					context3d.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, j + 1, (light as SpotLight).position);
+					context3d.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, j + 2, (light as SpotLight).direction);
+					context3d.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, j + 3, (light as SpotLight).lightParameters);
+					j += 4;
+				}
+				light = light.next;
+			}
 			context3d.setTextureAt(0, _diffuse);
 			if (_spec_data) context3d.setTextureAt(1, _specular);
 			if (_nm_data) {
@@ -112,32 +134,6 @@ package nest.view.materials
 			_fragData = null;
 		}
 		
-		protected function uploadLights(context3d:Context3D):void {
-			var light:ILight = _light;
-			var j:int = 1;
-			while (light) {
-				if (light is AmbientLight) {
-					context3d.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, 0, light.rgba);
-				} else if (light is DirectionalLight) {
-					context3d.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, j, light.rgba);
- 					context3d.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, j + 1, (light as DirectionalLight).direction);
-					j += 2;
-				} else if (light is PointLight) {
-					context3d.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, j, light.rgba);
- 					context3d.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, j + 1, (light as PointLight).position);
-					context3d.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, j + 2, (light as PointLight).radius);
-					j += 3;
-				} else if (light is SpotLight) {
-					context3d.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, j, light.rgba);
- 					context3d.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, j + 1, (light as SpotLight).position);
-					context3d.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, j + 2, (light as SpotLight).direction);
-					context3d.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, j + 3, (light as SpotLight).lightParameters);
-					j += 4;
-				}
-				light = light.next;
-			}
-		}
-		
 		///////////////////////////////////
 		// getter/setters
 		///////////////////////////////////
@@ -145,7 +141,7 @@ package nest.view.materials
 		/**
 		 * Root light is an AmbientLight.
 		 * <p>Link new light source to light.next.</p>
-		 * <p>There's 21 empty fc left.</p>
+		 * <p>There's 20 empty fc left.</p>
 		 * <p>Ambient light absorbs 1 fc.</p>
 		 * <p>Directional light takes 2.</p>
 		 * <p>PointLight light takes 3.</p>

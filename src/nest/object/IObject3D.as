@@ -1,17 +1,21 @@
 package nest.object
 {
+	import flash.events.IEventDispatcher;
 	import flash.geom.Matrix3D;
 	import flash.geom.Vector3D;
 	
 	/**
 	 * Object3D Interface
 	 */
-	public interface IObject3D {
+	public interface IObject3D extends IEventDispatcher {
 		
 		function decompose():void;
 		function recompose():void;
 		
 		function translate(axis:Vector3D, value:Number):void;
+		
+		function get parent():IContainer3D;
+		function set parent(value:IContainer3D):void;
 		
 		function get changed():Boolean;
 		function set changed(value:Boolean):void;
@@ -24,7 +28,9 @@ package nest.object
 		function get position():Vector3D;
 		
 		function get matrix():Matrix3D;
-
+		
+		function get invertMatrix():Matrix3D;
+		
 	}
 	
 }

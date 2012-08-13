@@ -1,7 +1,7 @@
 package nest.view.effects 
 {
-	import flash.display3D.Context3D;
 	import flash.display3D.textures.TextureBase;
+	
 	
 	/**
 	 * IPostEffect
@@ -16,11 +16,11 @@ package nest.view.effects
 		
 		function get enableDepthAndStencil():Boolean;
 		
+		function get antiAlias():int;
+		function set antiAlias(value:int):void;
+		
 		function get next():IPostEffect;
 		function set next(value:IPostEffect):void;
-		
-		function get context3d():Context3D;
-		function set context3d(value:Context3D):void;
 		
 	}
 	

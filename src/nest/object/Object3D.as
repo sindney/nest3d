@@ -1,5 +1,6 @@
 package nest.object  
 {
+	import flash.events.EventDispatcher;
 	import flash.geom.Matrix3D;
 	import flash.geom.Orientation3D;
 	import flash.geom.Vector3D;
@@ -7,7 +8,7 @@ package nest.object
 	/**
 	 * Object3D
 	 */
-	public class Object3D implements IObject3D {
+	public class Object3D extends EventDispatcher implements IObject3D {
 		
 		public var name:String;
 		
@@ -18,6 +19,9 @@ package nest.object
 		protected var _components:Vector.<Vector3D>;
 		
 		protected var _matrix:Matrix3D;
+		protected var _invertMatrix:Matrix3D;
+		
+		protected var _parent:IContainer3D;
 		
 		public function Object3D() {
 			_components = new Vector.<Vector3D>(3, true);
@@ -26,6 +30,7 @@ package nest.object
 			_components[2] = new Vector3D(1, 1, 1, 1);
 			
 			_matrix = new Matrix3D();
+			_invertMatrix = new Matrix3D();
 		}
 		
 		public function translate(axis:Vector3D, value:Number):void {
@@ -37,11 +42,15 @@ package nest.object
 		
 		public function decompose():void {
 			_components = _matrix.decompose(_orientation);
+			_invertMatrix.copyFrom(_matrix);
+			_invertMatrix.invert();
 			_changed = false;
 		}
 		
 		public function recompose():void {
 			_matrix.recompose(_components, _orientation);
+			_invertMatrix.copyFrom(_matrix);
+			_invertMatrix.invert();
 			_changed = false;
 		}
 		
@@ -60,7 +69,11 @@ package nest.object
 		public function get matrix():Matrix3D {
 			return _matrix;
 		}
-
+		
+		public function get invertMatrix():Matrix3D {
+			return _invertMatrix;
+		}
+		
 		public function get orientation():String {
 			return _orientation;
 		}
@@ -75,6 +88,14 @@ package nest.object
 		
 		public function set changed(value:Boolean):void {
 			_changed = value;
+		}
+		
+		public function get parent():IContainer3D {
+			return _parent;
+		}
+		
+		public function set parent(value:IContainer3D):void {
+			_parent = value;
 		}
 		
 	}

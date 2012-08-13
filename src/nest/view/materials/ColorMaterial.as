@@ -22,15 +22,6 @@ package nest.view.materials
 		}
 		
 		public function upload(context3d:Context3D):void {
-			uploadLights(context3d);
-			context3d.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, 27, _rgba);
-		}
-		
-		public function unload(context3d:Context3D):void {
-			
-		}
-		
-		protected function uploadLights(context3d:Context3D):void {
 			var light:ILight = _light;
 			var j:int = 1;
 			while (light) {
@@ -54,6 +45,11 @@ package nest.view.materials
 				}
 				light = light.next;
 			}
+			context3d.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, 27, _rgba);
+		}
+		
+		public function unload(context3d:Context3D):void {
+			
 		}
 		
 		///////////////////////////////////

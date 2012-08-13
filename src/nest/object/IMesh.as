@@ -11,21 +11,23 @@ package nest.object
 	import nest.view.Shader3D;
 	
 	/**
-	 * Mesh Interface.
+	 * Mesh Interface
 	 */
 	public interface IMesh extends IObject3D {
-		
-		function draw(context3d:Context3D, matrix:Matrix3D):void;
 		
 		function clone():IMesh;
 		
 		function get data():MeshData;
+		function set data(value:MeshData):void;
 		
 		function get material():IMaterial;
+		function set material(value:IMaterial):void;
 		
 		function get shader():Shader3D;
+		function set shader(value:Shader3D):void;
 		
 		function get bound():IBound;
+		function set bound(value:IBound):void;
 		
 		function get cliping():Boolean;
 		function set cliping(value:Boolean):void;
@@ -37,10 +39,17 @@ package nest.object
 		function set visible(value:Boolean):void;
 		
 		function get alphaTest():Boolean;
+		function set alphaTest(value:Boolean):void;
 		
 		function get blendMode():BlendMode3D;
 		
 		function get scale():Vector3D;
+		
+		function get id():uint;
+		function set id(value:uint):void;
+		
+		function get mouseEnabled():Boolean;
+		function set mouseEnabled(value:Boolean):void;
 		
 	}
 	

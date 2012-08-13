@@ -43,7 +43,6 @@ package
 				}
 			}
 			
-			speed = 10;
 			camera.position.z = -20;
 			camera.changed = true;
 		}

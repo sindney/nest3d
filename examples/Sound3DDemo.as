@@ -80,6 +80,7 @@ package
 			sound.play(1000);
 			scene.addChild(sound);
 			
+			controller.speed = 1;
 			camera.position.y = 10;
 			camera.changed = true;
 		}

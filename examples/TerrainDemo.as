@@ -8,6 +8,7 @@ package
 	import nest.object.Mesh;
 	import nest.object.SkyBox;
 	import nest.object.Terrain;
+	import nest.view.effects.*;
 	import nest.view.lights.*;
 	import nest.view.materials.EnvMapMaterial;
 	import nest.view.materials.SkyBoxMaterial;
@@ -97,20 +98,14 @@ package
 			water.changed = true;
 			scene.addChild(water);
 			
-			speed = 10;
+			view.effect = new NightVision();
+			
 			camera.position.z = -10;
 			camera.position.y = 10;
 			camera.changed = true;
 		}
 		
 		override public function loop():void {
-			if (camera.position.x > 500) camera.position.x = 500;
-			if (camera.position.x < -500) camera.position.x = -500;
-			if (camera.position.y > 250) camera.position.y = 250;
-			if (camera.position.z > 500) camera.position.z = 500;
-			if (camera.position.z < -500) camera.position.z = -500;
-			camera.changed = true;
-			
 			var p:Vector3D = camera.position.clone();
 			terrain.getHeight(p);
 			

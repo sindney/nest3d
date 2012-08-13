@@ -1,69 +1,92 @@
 package nest.view.managers 
 {
 	import flash.display3D.Context3D;
+	import flash.display3D.Context3DProgramType;
+	import flash.display3D.Context3DCompareMode;
 	import flash.geom.Matrix3D;
-	import flash.geom.Vector3D;
 	
-	import nest.object.geom.AABB;
-	import nest.object.geom.BSphere;
+	import nest.control.GlobalMethods;
 	import nest.object.IContainer3D;
 	import nest.object.IMesh;
 	import nest.object.IObject3D;
 	import nest.object.LODMesh;
-	import nest.object.Mesh;
-	import nest.object.SkyBox;
 	import nest.object.Sound3D;
-	import nest.view.Camera3D;
+	import nest.view.culls.ICulling;
+	import nest.view.materials.EnvMapMaterial;
 	
 	/**
 	 * BasicManager
 	 */
 	public class BasicManager implements ISceneManager {
 		
-		protected var vertices:Vector.<Vector3D>;
 		protected var draw:Matrix3D;
 		
 		protected var _numVertices:int;
 		protected var _numTriangles:int;
 		protected var _numObjects:int;
 		
-		protected var _camera:Camera3D;
-		protected var _root:IContainer3D;
-		protected var _context3d:Context3D;
+		protected var _first:Boolean = true;
+		protected var _culling:ICulling;
+		
+		protected var _objects:Vector.<IMesh>;
 		
 		public function BasicManager() {
-			vertices = new Vector.<Vector3D>(9, true);
-			vertices[0] = new Vector3D();
-			vertices[1] = new Vector3D();
-			vertices[2] = new Vector3D();
-			vertices[3] = new Vector3D();
-			vertices[4] = new Vector3D();
-			vertices[5] = new Vector3D();
-			vertices[6] = new Vector3D();
-			vertices[7] = new Vector3D();
-			vertices[8] = new Vector3D();
 			draw = new Matrix3D();
 		}
 		
 		public function calculate():void {
-			_numVertices = 0;
-			_numTriangles = 0;
-			_numObjects = 0;
-			doContainer(_root, null, _root.changed);
+			if (_first) {
+				_numVertices = 0;
+				_numTriangles = 0;
+				_numObjects = 0;
+				_objects = new Vector.<IMesh>();
+				doContainer(GlobalMethods.root, null, GlobalMethods.root.changed);
+			} else {
+				if (!_objects) return;
+				var mesh:IMesh;
+				for each(mesh in _objects) {
+					if (!_culling) {
+						doMesh(mesh);
+					} else if (_culling.classifyMesh(mesh)) {
+						_culling.customize ? _culling.doMesh(mesh) : doMesh(mesh);
+					}
+				}
+			}
 		}
 		
 		protected function doMesh(mesh:IMesh):void {
-			_numVertices += mesh.data.numVertices;
-			_numTriangles += mesh.data.numTriangles;
-			_numObjects++;
+			var context3d:Context3D = GlobalMethods.context3d;
+			
 			draw.copyFrom(mesh.matrix);
-			draw.append(_camera.invertMatrix);
-			draw.append(_camera.pm);
-			mesh.draw(_context3d, draw);
+			draw.append(GlobalMethods.camera.invertMatrix);
+			draw.append(GlobalMethods.camera.pm);
+			
+			context3d.setCulling(mesh.culling);
+			context3d.setBlendFactors(mesh.blendMode.source, mesh.blendMode.dest);
+			context3d.setDepthTest(mesh.blendMode.depthMask, Context3DCompareMode.LESS);
+			context3d.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 0, draw, true);
+			context3d.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 4, mesh.invertMatrix, true);
+			context3d.setProgramConstantsFromMatrix(Context3DProgramType.FRAGMENT, 23, mesh.invertMatrix, true);
+			
+			if (mesh.material is EnvMapMaterial) context3d.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 11, mesh.matrix, true);
+			
+			mesh.data.upload(context3d, mesh.material.uv, mesh.shader.normal);
+			mesh.material.upload(context3d);
+			if (mesh.shader.changed) {
+				mesh.shader.changed = false;
+				if (!mesh.shader.program) mesh.shader.program = context3d.createProgram();
+				mesh.shader.program.upload(mesh.shader.vertex, mesh.shader.fragment);
+			}
+			
+			context3d.setProgram(mesh.shader.program);
+			context3d.drawTriangles(mesh.data.indexBuffer);
+			
+			mesh.data.unload(context3d);
+			mesh.material.unload(context3d);
 		}
 		
 		protected function doContainer(container:IContainer3D, parent:IContainer3D = null, changed:Boolean = false):void {
-			if (!container.visible) return;
+			if (_culling && !_culling.classifyContainer(container)) return;
 			var mark:Boolean = changed;
 			
 			if (container.changed || parent && changed) {
@@ -86,34 +109,19 @@ package nest.view.managers
 				} else if (object is IMesh) {
 					mesh = object as IMesh;
 					if (mesh.visible) {
-						if (!mesh.cliping || classifyMesh(mesh)) {
-							if (mesh is LODMesh) (mesh as LODMesh).update(_camera.position);
-							doMesh(mesh);
+						if (!mesh.cliping || _culling && _culling.classifyMesh(mesh)) {
+							if (mesh is LODMesh) (mesh as LODMesh).update();
+							_numVertices += mesh.data.numVertices;
+							_numTriangles += mesh.data.numTriangles;
+							_numObjects++;
+							_culling && _culling.customize ? _culling.doMesh(mesh) : doMesh(mesh);
+							_objects.push(mesh);
 						}
 					}
 				} else if (object is Sound3D) {
-					(object as Sound3D).update(_camera.invertMatrix, container.matrix);
+					(object as Sound3D).update();
 				}
 			}
-		}
-		
-		protected function classifyMesh(mesh:IMesh):Boolean {
-			var i:int;
-			var v:Vector3D = new Vector3D();
-			if (mesh.bound is AABB) {
-				for (i = 0; i < 8; i++) {
-					v.copyFrom((mesh.bound as AABB).vertices[i]);
-					v.copyFrom(_camera.invertMatrix.transformVector(mesh.matrix.transformVector(v)));
-					vertices[i].copyFrom(v);
-				}
-				return _camera.frustum.classifyAABB(vertices);
-			}
-			
-			// BoundingShpere
-			i = mesh.scale.x > mesh.scale.y ? mesh.scale.x : mesh.scale.y;
-			if (mesh.scale.z > i) i = mesh.scale.z;
-			v.copyFrom(_camera.invertMatrix.transformVector(mesh.matrix.transformVector(mesh.bound.center)));
-			return _camera.frustum.classifyBSphere(v, (mesh.bound as BSphere).radius * i);
 		}
 		
 		///////////////////////////////////
@@ -141,28 +149,24 @@ package nest.view.managers
 			return _numObjects;
 		}
 		
-		public function get context3d():Context3D {
-			return _context3d;
+		public function get objects():Vector.<IMesh> {
+			return _objects;
 		}
 		
-		public function set context3d(value:Context3D):void {
-			_context3d = value;
+		public function get first():Boolean {
+			return _first;
 		}
 		
-		public function get root():IContainer3D {
-			return _root;
+		public function set first(value:Boolean):void {
+			_first = value;
 		}
 		
-		public function set root(value:IContainer3D):void {
-			_root = value;
+		public function get culling():ICulling {
+			return _culling;
 		}
 		
-		public function get camera():Camera3D {
-			return _camera;
-		}
-		
-		public function set camera(value:Camera3D):void {
-			_camera = value;
+		public function set culling(value:ICulling):void {
+			_culling = value;
 		}
 		
 	}

@@ -1,13 +1,15 @@
 package nest.view.managers 
 {
+	import nest.control.GlobalMethods;
 	import nest.object.IMesh;
+	import nest.view.Camera3D;
 	
 	/**
 	 * AlphaManager
 	 */
 	public class AlphaManager extends BasicManager {
 		
-		protected var objects:Vector.<IMesh>;
+		protected var alphaObjects:Vector.<IMesh>;
 		protected var distance:Vector.<Number>;
 		
 		public function AlphaManager() {
@@ -15,43 +17,64 @@ package nest.view.managers
 		}
 		
 		override public function calculate():void {
-			_numVertices = 0;
-			_numTriangles = 0;
-			_numObjects = 0;
-			objects = new Vector.<IMesh>();
-			distance = new Vector.<Number>();
-			doContainer(_root, null, _root.changed);
-			
-			// sort objects
-			var i:int, j:int = distance.length - 1;
-			if (j > 1) quickSort(distance, 0, j);
-			
-			// draw meshes
+			var i:int, j:int;
 			var mesh:IMesh;
-			for (i = j; i > 0; i--) {
-				mesh = objects[i];
-				draw.copyFrom(mesh.matrix);
-				draw.append(_camera.invertMatrix);
-				draw.append(_camera.pm);
-				mesh.draw(_context3d, draw);
+			
+			if (_first) {
+				_numVertices = 0;
+				_numTriangles = 0;
+				_numObjects = 0;
+				
+				_objects = new Vector.<IMesh>();
+				alphaObjects = new Vector.<IMesh>();
+				distance = new Vector.<Number>();
+				doContainer(GlobalMethods.root, null, GlobalMethods.root.changed);
+				
+				j = distance.length - 1;
+				if (j > 1) quickSort(distance, 0, j);
+				
+				for (i = j; i > 0; i--) {
+					mesh = alphaObjects[i];
+					if (_culling && _culling.customize) {
+						_culling.doMesh(mesh);
+					} else {
+						super.doMesh(mesh);
+					}
+				}
+			} else {
+				if (!_objects) return;
+				for each(mesh in _objects) {
+					if (!mesh.alphaTest) {
+						if (!_culling) {
+							super.doMesh(mesh);
+						} else if (_culling.classifyMesh(mesh)) {
+							_culling.customize ? _culling.doMesh(mesh) : super.doMesh(mesh);
+						}
+					}
+				}
+				
+				j = distance.length - 1;
+				for (i = j; i > 0; i--) {
+					mesh = alphaObjects[i];
+					if (!_culling) {
+						super.doMesh(mesh);
+					} else if (_culling.classifyMesh(mesh)) {
+						_culling.customize ? _culling.doMesh(mesh) : super.doMesh(mesh);
+					}
+				}
 			}
 		}
 		
 		override protected function doMesh(mesh:IMesh):void {
-			_numVertices += mesh.data.numVertices;
-			_numTriangles += mesh.data.numTriangles;
-			_numObjects++;
 			if (mesh.alphaTest) {
-				var dx:Number = mesh.position.x - _camera.position.x;
-				var dy:Number = mesh.position.y - _camera.position.y;
-				var dz:Number = mesh.position.z - _camera.position.z;
+				var camera:Camera3D = GlobalMethods.camera;
+				var dx:Number = mesh.position.x - camera.position.x;
+				var dy:Number = mesh.position.y - camera.position.y;
+				var dz:Number = mesh.position.z - camera.position.z;
 				distance.push(dx * dx + dy * dy + dz * dz);
-				objects.push(mesh);
+				alphaObjects.push(mesh);
 			} else {
-				draw.copyFrom(mesh.matrix);
-				draw.append(_camera.invertMatrix);
-				draw.append(_camera.pm);
-				mesh.draw(_context3d, draw);
+				_culling && _culling.customize ? _culling.doMesh(mesh) : super.doMesh(mesh);
 			}
 		}
 		
@@ -69,9 +92,9 @@ package nest.view.managers
 					temp = source[i];
 					source[i] = source[j];
 					source[j] = temp;
-					obj = objects[i];
-					objects[i] = objects[j];
-					objects[j] = obj;
+					obj = alphaObjects[i];
+					alphaObjects[i] = alphaObjects[j];
+					alphaObjects[j] = obj;
 					i++;
 					j--;
 				}

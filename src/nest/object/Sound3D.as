@@ -6,6 +6,8 @@ package nest.object
 	import flash.media.SoundChannel;
 	import flash.media.SoundTransform;
 	
+	import nest.control.GlobalMethods;
+	
 	/**
 	 * Sound3D
 	 */
@@ -32,8 +34,10 @@ package nest.object
 			this.data = data;
 		}
 		
-		public function update(camera:Matrix3D, container:Matrix3D):void {
+		public function update():void {
 			if (_stopped) return;
+			var camera:Matrix3D = GlobalMethods.camera.invertMatrix;
+			var container:Matrix3D = parent.matrix;
 			
 			v0.copyFrom(_components[0]);
 			v0 = camera.transformVector(container.transformVector(v0));

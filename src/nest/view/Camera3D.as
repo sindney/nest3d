@@ -11,7 +11,6 @@ package nest.view
 	public class Camera3D extends Object3D {
 		
 		protected var _pm:Matrix3D;
-		protected var _invertMatrix:Matrix3D;
 		protected var _frustum:Frustum;
 		
 		protected var _aspect:Number = 4 / 3;
@@ -22,23 +21,8 @@ package nest.view
 		public function Camera3D() {
 			super();
 			_pm = new Matrix3D();
-			_invertMatrix = new Matrix3D();
 			_frustum = new Frustum();
 			update();
-		}
-		
-		override public function decompose():void {
-			_components = _matrix.decompose(_orientation);
-			_invertMatrix.copyFrom(_matrix);
-			_invertMatrix.invert();
-			_changed = false;
-		}
-		
-		override public function recompose():void {
-			_matrix.recompose(_components, _orientation);
-			_invertMatrix.copyFrom(_matrix);
-			_invertMatrix.invert();
-			_changed = false;
 		}
 		
 		protected function update():void {
@@ -105,10 +89,6 @@ package nest.view
 		
 		public function get pm():Matrix3D {
 			return _pm;
-		}
-		
-		public function get invertMatrix():Matrix3D {
-			return _invertMatrix;
 		}
 		
 		public function get frustum():Frustum {

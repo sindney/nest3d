@@ -9,6 +9,7 @@ package nest.view.effects
 	import flash.display3D.textures.TextureBase;
 	import flash.display3D.VertexBuffer3D;
 	
+	import nest.control.GlobalMethods;
 	import nest.view.Shader3D;
 	
 	/**
@@ -17,8 +18,8 @@ package nest.view.effects
 	public class PostEffect implements IPostEffect {
 		
 		protected var _texture:TextureBase;
-		protected var _context3d:Context3D;
 		protected var _next:IPostEffect;
+		protected var _antiAlias:int = 0;
 		
 		protected var width:Number = 0;
 		protected var height:Number = 0;
@@ -33,9 +34,19 @@ package nest.view.effects
 		protected var indexBuffer:IndexBuffer3D;
 		
 		public function PostEffect() {
+			var context3d:Context3D = GlobalMethods.context3d;
 			vertexData = Vector.<Number>([-1, 1, 0, -1, -1, 0, 1, -1, 0, 1, 1, 0]);
 			uvData = Vector.<Number>([0, 0, 0, 1, 1, 1, 1, 0]);
-			indexData = Vector.<uint>([0, 1, 2, 2, 3, 0]);
+			indexData = Vector.<uint>([0, 3, 2, 2, 1, 0]);
+			program = context3d.createProgram();
+			program.upload(Shader3D.assembler.assemble(Context3DProgramType.VERTEX, vertexShader), 
+							Shader3D.assembler.assemble(Context3DProgramType.FRAGMENT, fragmentShader));
+			vertexBuffer = context3d.createVertexBuffer(4, 3);
+			vertexBuffer.uploadFromVector(vertexData, 0, 4);
+			uvBuffer = context3d.createVertexBuffer(4, 2);
+			uvBuffer.uploadFromVector(uvData, 0, 4);
+			indexBuffer = context3d.createIndexBuffer(6);
+			indexBuffer.uploadFromVector(indexData, 0, 6);
 		}
 		
 		public function createTexture(width:Number, height:Number):void {
@@ -51,7 +62,7 @@ package nest.view.effects
 				var h:Number = 2;
 				while (height > h) h *= 2;
 				if (_texture) _texture.dispose();
-				_texture = _context3d.createTexture(w, h, Context3DTextureFormat.BGRA, true);
+				_texture = GlobalMethods.context3d.createTexture(w, h, Context3DTextureFormat.BGRA, true);
 			}
 		}
 		
@@ -66,7 +77,6 @@ package nest.view.effects
 			if (indexBuffer) indexBuffer.dispose();
 			if (_texture) _texture.dispose();
 			_next = null;
-			_context3d = null;
 			vertexData = null;
 			indexData = null;
 			uvData = null;
@@ -81,7 +91,15 @@ package nest.view.effects
 		}
 		
 		public function get enableDepthAndStencil():Boolean {
-			return false;
+			return true;
+		}
+		
+		public function get antiAlias():int {
+			return _antiAlias;
+		}
+		
+		public function set antiAlias(value:int):void {
+			_antiAlias = value;
 		}
 		
 		public function get next():IPostEffect {
@@ -90,29 +108,6 @@ package nest.view.effects
 		
 		public function set next(value:IPostEffect):void {
 			_next = value;
-		}
-		
-		public function get context3d():Context3D {
-			return _context3d;
-		}
-		
-		public function set context3d(value:Context3D):void {
-			if (_context3d != value) {
-				_context3d = value;
-				if (program) program.dispose();
-				program = context3d.createProgram();
-				program.upload(Shader3D.assembler.assemble(Context3DProgramType.VERTEX, vertexShader), 
-								Shader3D.assembler.assemble(Context3DProgramType.FRAGMENT, fragmentShader));
-				if (vertexBuffer) vertexBuffer.dispose();
-				vertexBuffer = context3d.createVertexBuffer(4, 3);
-				vertexBuffer.uploadFromVector(vertexData, 0, 4);
-				if (uvBuffer) uvBuffer.dispose();
-				uvBuffer = context3d.createVertexBuffer(4, 2);
-				uvBuffer.uploadFromVector(uvData, 0, 4);
-				if (indexBuffer) indexBuffer.dispose();
-				indexBuffer = context3d.createIndexBuffer(6);
-				indexBuffer.uploadFromVector(indexData, 0, 6);
-			}
 		}
 		
 		protected function get vertexShader():String {

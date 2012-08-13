@@ -15,12 +15,13 @@ package nest.object
 		
 		function getChildAt(index:int):IObject3D;
 		
-		function get invertMatrix():Matrix3D;
-		
 		function get visible():Boolean;
 		function set visible(value:Boolean):void;
 		
 		function get numChildren():int;
+		
+		function get mouseEnabled():Boolean;
+		function set mouseEnabled(value:Boolean):void;
 		
 	}
 	

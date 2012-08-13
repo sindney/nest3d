@@ -46,6 +46,7 @@ package
 			mesh.changed = true;
 			scene.addChild(mesh);
 			
+			controller.speed = 1;
 			camera.position.z = -20;
 			camera.changed = true;
 		}

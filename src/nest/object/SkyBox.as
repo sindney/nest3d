@@ -14,7 +14,11 @@ package nest.object
 	 */
 	public class SkyBox extends Mesh {
 		
+		private var size:Number = 0;
+		
 		public function SkyBox(size:Number, material:SkyBoxMaterial) {
+			this.size = size;
+			
 			var s2:Number = size / 2;
 			var tri:Triangle;
 			var vertices:Vector.<Vertex> = new Vector.<Vertex>(8, true);
@@ -62,6 +66,18 @@ package nest.object
 								"tex oc, v0, fs0 <cube,linear,miplinear>\n", false);
 			
 			super(data, material, shader);
+		}
+		
+		override public function clone():IMesh {
+			var result:SkyBox = new SkyBox(size, material as SkyBoxMaterial);
+			result.blendMode.source = _blendMode.source;
+			result.blendMode.dest = _blendMode.dest;
+			result.blendMode.depthMask = _blendMode.depthMask;
+			result.cliping = _cliping;
+			result.culling = _culling;
+			result.visible = _visible;
+			result.alphaTest = _alphaTest;
+			return result;
 		}
 		
 	}

@@ -1,9 +1,7 @@
 package nest.view.managers 
 {
-	import flash.display3D.Context3D;
-	
-	import nest.object.IContainer3D;
-	import nest.view.Camera3D;
+	import nest.object.IMesh;
+	import nest.view.culls.ICulling;
 	
 	/**
 	 * ISceneManager
@@ -12,14 +10,13 @@ package nest.view.managers
 		
 		function calculate():void;
 		
-		function get camera():Camera3D;
-		function set camera(value:Camera3D):void;
+		function get culling():ICulling;
+		function set culling(value:ICulling):void;
 		
-		function get root():IContainer3D;
-		function set root(value:IContainer3D):void;
+		function get first():Boolean;
+		function set first(value:Boolean):void;
 		
-		function get context3d():Context3D;
-		function set context3d(value:Context3D):void;
+		function get objects():Vector.<IMesh>;
 		
 		function get numVertices():int;
 		function get numTriangles():int;

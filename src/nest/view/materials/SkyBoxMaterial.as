@@ -24,7 +24,7 @@ package nest.view.materials
 				_changed = false;
 				if (_cubicmap) _cubicmap.dispose();
 				if (_cm_data[0]) {
-					_cubicmap = context3d.createCubeTexture(_cm_data[0].width, Context3DTextureFormat.BGRA, true);
+					_cubicmap = context3d.createCubeTexture(_cm_data[0].width, Context3DTextureFormat.BGRA, false);
 					TextureMaterial.uploadWithMipmaps(_cubicmap, _cm_data[0], 0);
 					TextureMaterial.uploadWithMipmaps(_cubicmap, _cm_data[1], 1);
 					TextureMaterial.uploadWithMipmaps(_cubicmap, _cm_data[2], 2);

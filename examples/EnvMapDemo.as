@@ -53,14 +53,13 @@ package
 			cubicmap[5] = new back().bitmapData;
 			
 			var data:MeshData = parser.parse(new model(), 10);
-			var texture:EnvMapMaterial = new EnvMapMaterial(cubicmap, 0.8, new diffuse().bitmapData);
+			var texture:EnvMapMaterial = new EnvMapMaterial(cubicmap, 0.4, new diffuse().bitmapData);
 			var shader:Shader3D = new Shader3D();
 			ShaderFactory.create(shader, true, false, false, false, true, false);
 			
 			var mesh:Mesh = new Mesh(data, texture, shader);
 			scene.addChild(mesh);
 			
-			speed = 10;
 			camera.position.z = 120;
 			camera.rotation.y = Math.PI;
 			camera.changed = true;
