@@ -32,14 +32,14 @@ package nest.control.mouse
 		private var target:IMesh;
 		private var map:BitmapData;
 		
-		private var posShader:Shader3D;
+		private var uvShader:Shader3D;
 		
 		public function MouseManager() {
 			draw = new Matrix3D();
 			culling = new MouseCulling();
 			
-			posShader = new Shader3D();
-			posShader.setFromString("m44 op, va0, vc0\nmov v0, va0" , "mov oc, v0", false);
+			uvShader = new Shader3D();
+			uvShader.setFromString("m44 op, va0, vc0\nmov v0, vc1" , "mov oc, v0", false);
 			
 			map = new BitmapData(1, 1, true, 0);
 		}
@@ -81,6 +81,7 @@ package nest.control.mouse
 				context3d.present();
 				id = map.getPixel32(0, 0) & 0xffff;
 				
+				if (target) target.dispatchEvent(new MouseEvent3D(MouseEvent3D.MOUSE_OUT));
 				if (id != 0) {
 					var color:uint;
 					var mesh:IMesh;
@@ -93,19 +94,19 @@ package nest.control.mouse
 					draw.append(camera.invertMatrix);
 					draw.append(camera.pm);
 					
-					// position
+					// uv
 					context3d.clear(0, 0, 0, 0);
 					context3d.setCulling(target.culling);
 					context3d.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 0, draw, true);
 					
-					target.data.upload(context3d, false, false);
-					if (posShader.changed) {
-						posShader.changed = false;
-						if (!posShader.program) posShader.program = context3d.createProgram();
-						posShader.program.upload(posShader.vertex, posShader.fragment);
+					target.data.upload(context3d, true, false);
+					if (uvShader.changed) {
+						uvShader.changed = false;
+						if (!uvShader.program) uvShader.program = context3d.createProgram();
+						uvShader.program.upload(uvShader.vertex, uvShader.fragment);
 					}
 					
-					context3d.setProgram(posShader.program);
+					context3d.setProgram(uvShader.program);
 					context3d.drawTriangles(target.data.indexBuffer);
 					target.data.unload(context3d);
 					
@@ -113,12 +114,10 @@ package nest.control.mouse
 					context3d.present();
 					
 					color = map.getPixel32(0, 0);
-					event.position.x = color >> 16;
-					event.position.y = color >> 8;
-					event.position.z = color >> 4;
+					event.uv[0] = ((color >> 16) & 0xff) / 255;
+					event.uv[1] = ((color >> 8) & 0xff) / 255;
 					target.dispatchEvent(event);
 				} else {
-					if (target) target.dispatchEvent(new MouseEvent3D(MouseEvent3D.MOUSE_OUT));
 					target = null;
 				}
 				

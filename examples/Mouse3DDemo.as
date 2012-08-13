@@ -55,7 +55,6 @@ package
 						cube.mouseEnabled = true;
 						cube.addEventListener(MouseEvent3D.MOUSE_OVER, onMouseOver);
 						cube.addEventListener(MouseEvent3D.MOUSE_DOWN, onMouseDown);
-						cube.addEventListener(MouseEvent3D.RIGHT_CLICK, onMouseDown);
 						cube.addEventListener(MouseEvent3D.MOUSE_OUT, onMouseOut);
 						scene.addChild(cube);
 					}
