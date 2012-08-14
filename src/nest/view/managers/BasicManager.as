@@ -4,6 +4,7 @@ package nest.view.managers
 	import flash.display3D.Context3DProgramType;
 	import flash.display3D.Context3DCompareMode;
 	import flash.geom.Matrix3D;
+	import nest.object.Graphics3D;
 	
 	import nest.control.GlobalMethods;
 	import nest.object.IContainer3D;
@@ -120,6 +121,8 @@ package nest.view.managers
 					}
 				} else if (object is Sound3D) {
 					(object as Sound3D).update();
+				}else if (object is Graphics3D) {
+					(object as Graphics3D).present();
 				}
 			}
 		}
