@@ -14,6 +14,8 @@ package nest.control.mouse
 		public static const MOUSE_OUT:String = "mouse_out";
 		public static const CLICK:String = "click";
 		public static const DOUBLE_CLICK:String = "double_click";
+		public static const RIGHT_CLICK:String = "right_click";
+		public static const RIGHT_MOUSE_DOWN:String = "right_mouse_down";
 		
 		public var uv:Vector.<Number> = new Vector.<Number>(2, true);
 		

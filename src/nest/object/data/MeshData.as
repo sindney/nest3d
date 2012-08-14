@@ -203,15 +203,11 @@ package nest.object.data
 				_vertexBuffer = context3d.createVertexBuffer(_bNumVts, 3);
 				_vertexBuffer.uploadFromVector(_vertex, 0, _bNumVts);
 				if (_uvBuffer)_uvBuffer.dispose();
-				if (uv) {
-					_uvBuffer = context3d.createVertexBuffer(_bNumVts, 2);
-					_uvBuffer.uploadFromVector(_uv, 0, _bNumVts);
-				}
+				_uvBuffer = context3d.createVertexBuffer(_bNumVts, 2);
+				_uvBuffer.uploadFromVector(_uv, 0, _bNumVts);
 				if (_normalBuffer)_normalBuffer.dispose();
-				if (normal) {
-					_normalBuffer = context3d.createVertexBuffer(_bNumVts, 3);
-					_normalBuffer.uploadFromVector(_normal, 0, _bNumVts);
-				}
+				_normalBuffer = context3d.createVertexBuffer(_bNumVts, 3);
+				_normalBuffer.uploadFromVector(_normal, 0, _bNumVts);
 				if (_indexBuffer)_indexBuffer.dispose();
 				_indexBuffer = context3d.createIndexBuffer(_numIndices);
 				_indexBuffer.uploadFromVector(_index, 0, _numIndices);

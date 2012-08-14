@@ -39,7 +39,7 @@ package nest.control.mouse
 			culling = new MouseCulling();
 			
 			uvShader = new Shader3D();
-			uvShader.setFromString("m44 op, va0, vc0\nmov v0, vc1" , "mov oc, v0", false);
+			uvShader.setFromString("m44 op, va0, vc0\nmov v0, va1" , "mov oc, v0", false);
 			
 			map = new BitmapData(1, 1, true, 0);
 		}
@@ -49,6 +49,8 @@ package nest.control.mouse
 			GlobalMethods.stage.addEventListener(MouseEvent.MOUSE_DOWN, onMouseEvent);
 			GlobalMethods.stage.addEventListener(MouseEvent.CLICK, onMouseEvent);
 			GlobalMethods.stage.addEventListener(MouseEvent.DOUBLE_CLICK, onMouseEvent);
+			GlobalMethods.stage.addEventListener(MouseEvent.RIGHT_CLICK, onMouseEvent);
+			GlobalMethods.stage.addEventListener(MouseEvent.RIGHT_MOUSE_DOWN, onMouseEvent);
 		}
 		
 		public function dispose():void {
@@ -56,6 +58,8 @@ package nest.control.mouse
 			GlobalMethods.stage.removeEventListener(MouseEvent.MOUSE_DOWN, onMouseEvent);
 			GlobalMethods.stage.removeEventListener(MouseEvent.CLICK, onMouseEvent);
 			GlobalMethods.stage.removeEventListener(MouseEvent.DOUBLE_CLICK, onMouseEvent);
+			GlobalMethods.stage.removeEventListener(MouseEvent.RIGHT_CLICK, onMouseEvent);
+			GlobalMethods.stage.removeEventListener(MouseEvent.RIGHT_MOUSE_DOWN, onMouseEvent);
 		}
 		
 		public function calculate():void {
@@ -94,11 +98,11 @@ package nest.control.mouse
 					draw.append(camera.invertMatrix);
 					draw.append(camera.pm);
 					
-					// uv
 					context3d.clear(0, 0, 0, 0);
 					context3d.setCulling(target.culling);
 					context3d.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 0, draw, true);
 					
+					// uv
 					target.data.upload(context3d, true, false);
 					if (uvShader.changed) {
 						uvShader.changed = false;
@@ -140,8 +144,15 @@ package nest.control.mouse
 					break;
 				case MouseEvent.CLICK:
 					_type = MouseEvent3D.CLICK;
+					break;
 				case MouseEvent.DOUBLE_CLICK:
 					_type = MouseEvent3D.DOUBLE_CLICK;
+					break;
+				case MouseEvent.RIGHT_CLICK:
+					_type = MouseEvent3D.RIGHT_CLICK;
+					break;
+				case MouseEvent.RIGHT_MOUSE_DOWN:
+					_type = MouseEvent3D.RIGHT_MOUSE_DOWN;
 					break;
 			}
 		}

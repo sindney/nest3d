@@ -98,7 +98,11 @@ package
 			water.changed = true;
 			scene.addChild(water);
 			
-			view.effect = new NightVision();
+			//view.effect = new NightVision();
+			//view.effect = new Gray();
+			//view.effect = new InverseColor();
+			var blurEffect:Blur = new Blur(5,10);
+			view.effect = blurEffect;
 			
 			camera.position.z = -10;
 			camera.position.y = 10;
