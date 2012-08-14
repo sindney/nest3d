@@ -3,12 +3,12 @@ package nest.view.effects
 	import flash.display3D.Context3D;
 	import flash.display3D.Context3DProgramType;
 	import flash.display3D.Context3DVertexBufferFormat;
-	import nest.view.Shader3D;
 	
 	import nest.control.GlobalMethods;
+	import nest.view.Shader3D;
 	
 	/**
-	 * NightVision
+	 * Blur
 	 */
 	public class Blur extends PostEffect {
 		
@@ -63,7 +63,7 @@ package nest.view.effects
 			
 			var samples:int = 0;
 			for (var y:Number = 0; y < _blurY; y += _stepY ) {
-				for (var x:Number = 0; x < _blurX;x+=_stepX ) {
+				for (var x:Number = 0; x < _blurX; x += _stepX ) {
 					samples++;
 				}
 			}
@@ -84,20 +84,25 @@ package nest.view.effects
 		///////////////////////////////////
 		// getter/setters
 		///////////////////////////////////
+		
 		public function get blurX():Number {
 			return _blurX;
 		}
+		
 		public function set blurX(value:Number):void {
 			_blurX = value;
 			updateBlur();
 		}
+		
 		public function get blurY():Number {
 			return _blurY;
 		}
-		public function set blurY(value:Number) {
+		
+		public function set blurY(value:Number):void {
 			_blurY = value;
 			updateBlur();
 		}
+		
 		override protected function get vertexShader():String {
 			return "mov op, va0\nmov v0, va1\n";
 		}
@@ -112,7 +117,6 @@ package nest.view.effects
 					else
 						code += "tex ft2, ft0, fs0 <2d,nearest,clamp>\n" +
 								"add ft1, ft1, ft2 \n";
-
 					if (x < _blurX)
 						code += "add ft0.x, ft0.x, fc1.x\n";
 				}

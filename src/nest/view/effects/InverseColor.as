@@ -7,7 +7,7 @@ package nest.view.effects
 	import nest.control.GlobalMethods;
 	
 	/**
-	 * Gray
+	 * InverseColor
 	 */
 	public class InverseColor extends PostEffect {
 		

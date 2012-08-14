@@ -34,7 +34,7 @@ package nest.object
 			this.data = data;
 		}
 		
-		public function update():void {
+		public function calculate():void {
 			if (_stopped) return;
 			var camera:Matrix3D = GlobalMethods.camera.invertMatrix;
 			var container:Matrix3D = parent.matrix;

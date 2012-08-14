@@ -3,15 +3,15 @@ package nest.object
 	import flash.display.Sprite;
 	import flash.geom.Matrix3D;
 	import flash.geom.Vector3D;
+	
 	import nest.control.GlobalMethods;
 	import nest.view.Camera3D;
 	
 	/**
-	 * 
-	 * @author Dong Dong
+	 * Graphics3D
 	 */
-	public class Graphics3D extends Object3D
-	{
+	public class Graphics3D extends Object3D {
+		
 		public static const MOVE_TO : int = 1;
 		public static const LINE_TO : int = 2;
 		public static const CURVE_TO : int = 3;
@@ -38,8 +38,8 @@ package nest.object
 		
 		private var _lastZ:Number;
 		
-		public function Graphics3D() 
-		{
+		public function Graphics3D() {
+			super();
 			_commands = new Vector.<int>();
 			_params = new Array();
 			
@@ -55,12 +55,14 @@ package nest.object
 			_commands.push(BEGIN_FILL);
 			_params.push(color, alpha);
 		}
+		
 		public function clear():void {
 			_commands.splice(0, _commands.length);
 			_params.splice(0, _params.length);
 			_canvas.graphics.clear();
 			_changed = false;
 		}
+		
 		public function copyFrom(g:Graphics3D):void {
 			clear();
 			var a:int = g.commands.length;
@@ -73,21 +75,25 @@ package nest.object
 			}
 			_changed = true;
 		}
+		
 		public function curveTo(controlX:Number, controlY:Number, controlZ:Number, anchorX:Number, anchorY:Number, anchorZ:Number):void {
 			_commands.push(CURVE_TO);
 			_params.push(controlX, controlY, controlZ, anchorX, anchorY, anchorZ);
 			_changed = true;
 		}
+		
 		public function drawCircle(x:Number, y:Number, z:Number, radius:Number):void {
 			_commands.push(DRAW_CIRCLE);
 			_params.push(x, y, z, radius);
 			_changed = true;
 		}
+		
 		public function drawEllipse(x:Number, y:Number, z:Number, width:Number, height:Number):void {
 			_commands.push(DRAW_ELLIPSE);
 			_params.push(x, y, z, width, height);
 			_changed = true;
 		}
+		
 		public function drawPath(commands:Vector.<int>, data:Array):void {
 			var a:int = commands.length;
 			for (var i:int = 0; i < a;i++ ) {
@@ -99,50 +105,60 @@ package nest.object
 			}
 			_changed = true;
 		}
+		
 		public function drawRect(x:Number, y:Number,z:Number, width:Number, height:Number):void {
 			_commands.push(DRAW_RECT);
 			_params.push(x, y, z, width, height);
 			_changed = true;
 		}
+		
 		public function endFill():void {
 			_commands.push(END_FILL);
 			_changed = true;
 		}
+		
 		public function lineStyle(thickness:Number = NaN, color:uint = 0, alpha:Number = 1.0, pixelHinting:Boolean = false, scaleMode:String = "normal", caps:String = null, joints:String = null, miterLimit:Number = 3):void {
 			_commands.push(LINE_STYLE);
 			_params.push(thickness, color, alpha, pixelHinting, scaleMode, caps, joints, miterLimit);
 			_changed = true;
 		}
+		
 		public function lineTo(x:Number, y:Number,z:Number):void {
 			_commands.push(LINE_TO);
 			_params.push(x, y, z);
 			_changed = true;
 		}
+		
 		public function moveTo(x:Number, y:Number,z:Number):void {
 			_commands.push(MOVE_TO);
 			_params.push(x, y, z);
 			_changed = true;
 		}
+		
 		public function translateGraphics(tx:Number, ty:Number, tz:Number):void {
 			_commands.push(TRANSLATE);
 			_params.push(tx, ty, tz);
 			_changed = true;
 		}
+		
 		public function rotateGraphics(rx:Number, ry:Number, rz:Number):void {
 			_commands.push(ROTATE);
 			_params.push(rx, ry, rz);
 			_changed = true;
 		}
+		
 		public function scaleGraphics(sx:Number, sy:Number, sz:Number):void {
 			_commands.push(SCALE);
 			_params.push(sx, sy, sz);
 			_changed = true;
 		}
+		
 		public function clearGraphics():void {
 			_commands.push(CLEAR);
 			_changed = true;
 		}
-		public function present():void {
+		
+		public function calculate():void {
 			_changed = false;
 			_canvas.graphics.clear();
 			
@@ -368,6 +384,10 @@ package nest.object
 			}
 		}
 		
+		///////////////////////////////////
+		// getter/setters
+		///////////////////////////////////
+		
 		public function get canvas():Sprite {
 			return _canvas;
 		}
@@ -375,6 +395,7 @@ package nest.object
 		public function get commands():Vector.<int> {
 			return _commands;
 		}
+		
 		public function get params():Array {
 			return _params;
 		}
