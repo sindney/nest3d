@@ -9,7 +9,7 @@ package nest.view.managers
 	 */
 	public class AlphaManager extends BasicManager {
 		
-		protected var alphaObjects:Vector.<IMesh>;
+		protected var _alphaObjects:Vector.<IMesh>;
 		protected var distance:Vector.<Number>;
 		
 		public function AlphaManager() {
@@ -26,7 +26,7 @@ package nest.view.managers
 				_numObjects = 0;
 				
 				_objects = new Vector.<IMesh>();
-				alphaObjects = new Vector.<IMesh>();
+				_alphaObjects = new Vector.<IMesh>();
 				distance = new Vector.<Number>();
 				doContainer(GlobalMethods.root, null, GlobalMethods.root.changed);
 				
@@ -34,7 +34,7 @@ package nest.view.managers
 				if (j > 1) quickSort(distance, 0, j);
 				
 				for (i = j; i > 0; i--) {
-					mesh = alphaObjects[i];
+					mesh = _alphaObjects[i];
 					_process ? _process.doMesh(mesh) : super.doMesh(mesh);
 				}
 			} else {
@@ -51,7 +51,7 @@ package nest.view.managers
 				
 				j = distance.length - 1;
 				for (i = j; i > 0; i--) {
-					mesh = alphaObjects[i];
+					mesh = _alphaObjects[i];
 					if (!_culling) {
 						_process ? _process.doMesh(mesh) : super.doMesh(mesh);
 					} else if (_culling.classifyMesh(mesh)) {
@@ -68,7 +68,7 @@ package nest.view.managers
 				var dy:Number = mesh.position.y - camera.position.y;
 				var dz:Number = mesh.position.z - camera.position.z;
 				distance.push(dx * dx + dy * dy + dz * dz);
-				alphaObjects.push(mesh);
+				_alphaObjects.push(mesh);
 			} else {
 				_process ? _process.doMesh(mesh) : super.doMesh(mesh);
 			}
@@ -88,9 +88,9 @@ package nest.view.managers
 					temp = source[i];
 					source[i] = source[j];
 					source[j] = temp;
-					obj = alphaObjects[i];
-					alphaObjects[i] = alphaObjects[j];
-					alphaObjects[j] = obj;
+					obj = _alphaObjects[i];
+					_alphaObjects[i] = _alphaObjects[j];
+					_alphaObjects[j] = obj;
 					i++;
 					j--;
 				}
@@ -98,6 +98,14 @@ package nest.view.managers
 			// swap
 			if (left < j) quickSort(source, left, j);
 			if (i < right) quickSort(source, i, right);
+		}
+		
+		///////////////////////////////////
+		// getter/setters
+		///////////////////////////////////
+		
+		public function get alphaObjects():Vector.<IMesh> {
+			return _alphaObjects;
 		}
 		
 	}

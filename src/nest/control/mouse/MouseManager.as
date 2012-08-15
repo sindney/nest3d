@@ -2,11 +2,7 @@ package nest.control.mouse
 {
 	import flash.display.BitmapData;
 	import flash.display3D.Context3D;
-	import flash.display3D.Context3DCompareMode;
-	import flash.display3D.Context3DProgramType;
 	import flash.events.MouseEvent;
-	import flash.geom.Matrix3D;
-	import flash.geom.Vector3D;
 	
 	import nest.control.GlobalMethods;
 	import nest.object.IContainer3D;
@@ -14,8 +10,8 @@ package nest.control.mouse
 	import nest.view.culls.MouseCulling;
 	import nest.view.managers.ISceneManager;
 	import nest.view.processes.IDProcess;
+	import nest.view.processes.IProcess;
 	import nest.view.Camera3D;
-	import nest.view.Shader3D;
 	
 	/**
 	 * MouseManager
@@ -23,8 +19,8 @@ package nest.control.mouse
 	public class MouseManager {
 		
 		private var _type:String;
+		private var _dataProcess:IProcess;
 		
-		private var draw:Matrix3D;
 		private var culling:MouseCulling;
 		private var process:IDProcess;
 		
@@ -34,16 +30,9 @@ package nest.control.mouse
 		private var target:IMesh;
 		private var map:BitmapData;
 		
-		private var uvShader:Shader3D;
-		
 		public function MouseManager() {
-			draw = new Matrix3D();
 			culling = new MouseCulling();
 			process = new IDProcess();
-			
-			uvShader = new Shader3D();
-			uvShader.setFromString("m44 op, va0, vc0\nmov v0, va1" , "mov oc, v0", false);
-			
 			map = new BitmapData(1, 1, true, 0);
 		}
 		
@@ -90,7 +79,6 @@ package nest.control.mouse
 				id = map.getPixel32(0, 0) & 0xffff;
 				
 				if (id != 0) {
-					var color:uint;
 					var mesh:IMesh;
 					var event:MouseEvent3D;
 					var objects:Vector.<IMesh> = GlobalMethods.manager.objects;
@@ -104,33 +92,16 @@ package nest.control.mouse
 						}
 					}
 					event = new MouseEvent3D(_type);
-					
-					draw.copyFrom(target.matrix);
-					draw.append(camera.invertMatrix);
-					draw.append(camera.pm);
-					
-					context3d.clear(0, 0, 0, 0);
-					context3d.setCulling(target.culling);
-					context3d.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 0, draw, true);
-					
-					// uv
-					target.data.upload(context3d, true, false);
-					if (uvShader.changed) {
-						uvShader.changed = false;
-						if (!uvShader.program) uvShader.program = context3d.createProgram();
-						uvShader.program.upload(uvShader.vertex, uvShader.fragment);
+					if (_dataProcess) {
+						context3d.clear(0, 0, 0, 0);
+						manager.first = false;
+						manager.culling = culling;
+						manager.process = _dataProcess;
+						manager.calculate();
+						context3d.drawToBitmapData(map);
+						context3d.present();
+						event.data = map.getPixel32(0, 0);
 					}
-					
-					context3d.setProgram(uvShader.program);
-					context3d.drawTriangles(target.data.indexBuffer);
-					target.data.unload(context3d);
-					
-					context3d.drawToBitmapData(map);
-					context3d.present();
-					
-					color = map.getPixel32(0, 0);
-					event.uv[0] = ((color >> 16) & 0xff) / 255;
-					event.uv[1] = ((color >> 8) & 0xff) / 255;
 					target.dispatchEvent(event);
 				} else {
 					if (target) target.dispatchEvent(new MouseEvent3D(MouseEvent3D.MOUSE_OUT));
@@ -175,6 +146,14 @@ package nest.control.mouse
 		
 		public function get type():String {
 			return _type;
+		}
+		
+		public function get dataProcess():IProcess {
+			return _dataProcess;
+		}
+		
+		public function set dataProcess(value:IProcess):void {
+			_dataProcess = value;
 		}
 		
 	}

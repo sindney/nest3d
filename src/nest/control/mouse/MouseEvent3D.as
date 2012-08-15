@@ -17,7 +17,7 @@ package nest.control.mouse
 		public static const RIGHT_CLICK:String = "rightClick";
 		public static const RIGHT_MOUSE_DOWN:String = "rightMouseDown";
 		
-		public var uv:Vector.<Number> = new Vector.<Number>(2, true);
+		public var data:uint;
 		
 		public function MouseEvent3D(type:String, bubbles:Boolean = false, cancelable:Boolean = false) {
 			super(type, bubbles, cancelable);
@@ -25,8 +25,7 @@ package nest.control.mouse
 		
 		override public function clone():Event {
 			var copy:MouseEvent3D = new MouseEvent3D(type, bubbles, cancelable);
-			copy.uv[0] = uv[0];
-			copy.uv[1] = uv[1];
+			copy.data = data;
 			return copy;
 		}
 	}
