@@ -55,7 +55,7 @@ package
 			var data:MeshData = parser.parse(new model(), 10);
 			var texture:EnvMapMaterial = new EnvMapMaterial(cubicmap, 0.4, new diffuse().bitmapData);
 			var shader:Shader3D = new Shader3D();
-			ShaderFactory.create(shader, true, false, false, false, true, false);
+			ShaderFactory.create(shader, null, true, false, false, false, true, false);
 			
 			var mesh:Mesh = new Mesh(data, texture, shader);
 			scene.addChild(mesh);

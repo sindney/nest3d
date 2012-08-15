@@ -22,7 +22,7 @@ package
 			var distantList:Vector.<Number> = new Vector.<Number>();
 			
 			var shader:Shader3D = new Shader3D();
-			ShaderFactory.create(shader, false);
+			ShaderFactory.create(shader, null, false);
 			
 			dataList.push(PrimitiveFactory.createPlane(100, 100, 4, 4));
 			materialList.push(new ColorMaterial(0xffffff));

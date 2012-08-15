@@ -41,7 +41,7 @@ package
 			var texture:TextureMaterial = new TextureMaterial(new diffuse().bitmapData, new specular().bitmapData, 40, new normals().bitmapData);
 			texture.light = light;
 			var shader:Shader3D = new Shader3D();
-			ShaderFactory.create(shader, true, true, true, false, false, false, light);
+			ShaderFactory.create(shader, light, true, true, true, false, false, false);
 			
 			mesh.material = texture;
 			mesh.shader = shader;

@@ -5,7 +5,6 @@ package nest.control.mouse
 	import flash.events.MouseEvent;
 	
 	import nest.control.GlobalMethods;
-	import nest.object.IContainer3D;
 	import nest.object.IMesh;
 	import nest.view.culls.MouseCulling;
 	import nest.view.managers.ISceneManager;
@@ -60,7 +59,6 @@ package nest.control.mouse
 			var manager:ISceneManager = GlobalMethods.manager;
 			var width:Number = GlobalMethods.view.width;
 			var height:Number = GlobalMethods.view.height;
-			var container:IContainer3D;
 			
 			if (context3d && mouseX <= width && mouseY <= height) {
 				var pm:Vector.<Number> = camera.pm.rawData.concat();

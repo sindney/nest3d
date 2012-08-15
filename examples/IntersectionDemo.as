@@ -34,7 +34,7 @@ package
 			free.light = hit.light = light;
 			
 			var shader:Shader3D = new Shader3D();
-			ShaderFactory.create(shader, false, false, false, false, false, false, light);
+			ShaderFactory.create(shader, light, false);
 			
 			box = new Mesh(PrimitiveFactory.createBox(10, 10, 10), free, shader);
 			box.position.z = 40;

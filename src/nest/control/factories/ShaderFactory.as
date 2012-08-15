@@ -11,9 +11,9 @@ package nest.control.factories
 		/**
 		 * Create necessary data for shader3d object.
 		 */
-		public static function create(shader:Shader3D, uv:Boolean = true, specular:Boolean = false, 
+		public static function create(shader:Shader3D, light:AmbientLight = null, uv:Boolean = true, specular:Boolean = false, 
 										normalmap:Boolean = false, lightmap:Boolean = false, envmap:Boolean = false,
-										mipmapping:Boolean = false, light:AmbientLight = null, fog:Boolean = false):void {
+										mipmapping:Boolean = false, fog:Boolean = false):void {
 			const normal:Boolean = (light != null || envmap);
 			
 			// vertex shader

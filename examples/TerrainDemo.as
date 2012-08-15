@@ -63,7 +63,7 @@ package
 			dl.next = pointLight;
 			
 			var shader:Shader3D = new Shader3D();
-			ShaderFactory.create(shader, true, false, false, false, false, true, light);
+			ShaderFactory.create(shader, light);
 			
 			var hm:BitmapData = new heightmap().bitmapData;
 			
@@ -92,17 +92,11 @@ package
 			scene.addChild(skybox);
 			
 			shader = new Shader3D();
-			ShaderFactory.create(shader, true, false, false, false, true);
+			ShaderFactory.create(shader, null, true, false, false, false, true);
 			var water:Mesh = new Mesh(PrimitiveFactory.createPlane(1000, 1000, 100, 100), new EnvMapMaterial(cubicmap, 0.8, new BitmapData(1, 1, false, 0x32328b)), shader);
 			water.position.y = -50;
 			water.changed = true;
 			scene.addChild(water);
-			
-			//view.effect = new NightVision();
-			//view.effect = new Gray();
-			//view.effect = new InverseColor();
-			var blurEffect:Blur = new Blur(5,10);
-			view.effect = blurEffect;
 			
 			camera.position.z = -10;
 			camera.position.y = 10;
