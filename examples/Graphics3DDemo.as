@@ -11,21 +11,21 @@ package
 	import nest.view.Shader3D;
 	
 	/**
-	 * ...
-	 * @author Dong Dong
+	 * Graphics3DDemo
 	 */
-	public class Graphics3DDemo extends DemoBase 
-	{
+	public class Graphics3DDemo extends DemoBase {
+	
 		private var graphics3D:Graphics3D;
 		
-		public function Graphics3DDemo() 
-		{
+		public function Graphics3DDemo() {
 			super();
 		}
+		
 		override public function init():void {
 			graphics3D = new Graphics3D();
 			addChild(graphics3D.canvas);
 			scene.addChild(graphics3D);
+			
 			graphics3D.lineStyle(0, 0xff0000);
 			graphics3D.drawRect( -10, -10, 0, 20, 20);
 			graphics3D.moveTo(-10, 0,0);
@@ -41,7 +41,6 @@ package
 			graphics3D.drawRect( -10, -10, 0, 20, 20);
 			graphics3D.moveTo(0, -10,0);
 			graphics3D.lineTo(0, 10,0);
-			
 			
 			camera.position.z = -40;
 			camera.changed = true;

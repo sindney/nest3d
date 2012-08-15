@@ -8,14 +8,14 @@ package nest.control.mouse
 	 */
 	public class MouseEvent3D extends Event {
 		
-		public static const MOUSE_DOWN:String = "mouse_down";
-		public static const MOUSE_OVER:String = "mouse_over";
-		public static const MOUSE_MOVE:String = "mouse_move";
-		public static const MOUSE_OUT:String = "mouse_out";
+		public static const MOUSE_DOWN:String = "mouseDown";
+		public static const MOUSE_OVER:String = "mouseOver";
+		public static const MOUSE_MOVE:String = "mouseMove";
+		public static const MOUSE_OUT:String = "mouseOut";
 		public static const CLICK:String = "click";
-		public static const DOUBLE_CLICK:String = "double_click";
-		public static const RIGHT_CLICK:String = "right_click";
-		public static const RIGHT_MOUSE_DOWN:String = "right_mouse_down";
+		public static const DOUBLE_CLICK:String = "doubleClick";
+		public static const RIGHT_CLICK:String = "rightClick";
+		public static const RIGHT_MOUSE_DOWN:String = "rightMouseDown";
 		
 		public var uv:Vector.<Number> = new Vector.<Number>(2, true);
 		

@@ -85,15 +85,22 @@ package nest.control.mouse
 				context3d.present();
 				id = map.getPixel32(0, 0) & 0xffff;
 				
-				if (target) target.dispatchEvent(new MouseEvent3D(MouseEvent3D.MOUSE_OUT));
 				if (id != 0) {
 					var color:uint;
 					var mesh:IMesh;
-					var event:MouseEvent3D = new MouseEvent3D(_type);
+					var event:MouseEvent3D;
 					var objects:Vector.<IMesh> = GlobalMethods.manager.objects;
 					for each(mesh in objects) {
-						if (mesh.id == id) target = mesh;
+						if (mesh.id == id) {
+							if (target != mesh) {
+								if (target) target.dispatchEvent(new MouseEvent3D(MouseEvent3D.MOUSE_OUT));
+								_type = MouseEvent3D.MOUSE_OVER;
+							}
+							target = mesh;
+						}
 					}
+					event = new MouseEvent3D(_type);
+					
 					draw.copyFrom(target.matrix);
 					draw.append(camera.invertMatrix);
 					draw.append(camera.pm);
@@ -122,6 +129,7 @@ package nest.control.mouse
 					event.uv[1] = ((color >> 8) & 0xff) / 255;
 					target.dispatchEvent(event);
 				} else {
+					if (target) target.dispatchEvent(new MouseEvent3D(MouseEvent3D.MOUSE_OUT));
 					target = null;
 				}
 				
@@ -137,7 +145,7 @@ package nest.control.mouse
 			mouseY = GlobalMethods.stage.mouseY;
 			switch(e.type) {
 				case MouseEvent.MOUSE_MOVE:
-					_type = MouseEvent3D.MOUSE_OVER;
+					_type = MouseEvent3D.MOUSE_MOVE;
 					break;
 				case MouseEvent.MOUSE_DOWN:
 					_type = MouseEvent3D.MOUSE_DOWN;

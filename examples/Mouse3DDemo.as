@@ -55,6 +55,7 @@ package
 						cube.mouseEnabled = true;
 						cube.addEventListener(MouseEvent3D.MOUSE_OVER, onMouseOver);
 						cube.addEventListener(MouseEvent3D.MOUSE_DOWN, onMouseDown);
+						cube.addEventListener(MouseEvent3D.CLICK, onMouseUp);
 						cube.addEventListener(MouseEvent3D.MOUSE_OUT, onMouseOut);
 						scene.addChild(cube);
 					}
@@ -66,6 +67,10 @@ package
 			
 			camera.position.z = -20;
 			camera.changed = true;
+		}
+		
+		private function onMouseUp(e:MouseEvent3D):void {
+			(e.target as Mesh).material = colorMat1;
 		}
 		
 		private function onMouseOut(e:MouseEvent3D):void {
