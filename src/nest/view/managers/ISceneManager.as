@@ -2,6 +2,7 @@ package nest.view.managers
 {
 	import nest.object.IMesh;
 	import nest.view.culls.ICulling;
+	import nest.view.processes.IProcess;
 	
 	/**
 	 * ISceneManager
@@ -12,6 +13,9 @@ package nest.view.managers
 		
 		function get culling():ICulling;
 		function set culling(value:ICulling):void;
+		
+		function get process():IProcess;
+		function set process(value:IProcess):void;
 		
 		function get first():Boolean;
 		function set first(value:Boolean):void;

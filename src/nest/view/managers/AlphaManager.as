@@ -35,20 +35,16 @@ package nest.view.managers
 				
 				for (i = j; i > 0; i--) {
 					mesh = alphaObjects[i];
-					if (_culling && _culling.customize) {
-						_culling.doMesh(mesh);
-					} else {
-						super.doMesh(mesh);
-					}
+					_process ? _process.doMesh(mesh) : super.doMesh(mesh);
 				}
 			} else {
 				if (!_objects) return;
 				for each(mesh in _objects) {
 					if (!mesh.alphaTest) {
 						if (!_culling) {
-							super.doMesh(mesh);
+							_process ? _process.doMesh(mesh) : super.doMesh(mesh);
 						} else if (_culling.classifyMesh(mesh)) {
-							_culling.customize ? _culling.doMesh(mesh) : super.doMesh(mesh);
+							_process ? _process.doMesh(mesh) : super.doMesh(mesh);
 						}
 					}
 				}
@@ -57,9 +53,9 @@ package nest.view.managers
 				for (i = j; i > 0; i--) {
 					mesh = alphaObjects[i];
 					if (!_culling) {
-						super.doMesh(mesh);
+						_process ? _process.doMesh(mesh) : super.doMesh(mesh);
 					} else if (_culling.classifyMesh(mesh)) {
-						_culling.customize ? _culling.doMesh(mesh) : super.doMesh(mesh);
+						_process ? _process.doMesh(mesh) : super.doMesh(mesh);
 					}
 				}
 			}
@@ -74,7 +70,7 @@ package nest.view.managers
 				distance.push(dx * dx + dy * dy + dz * dz);
 				alphaObjects.push(mesh);
 			} else {
-				_culling && _culling.customize ? _culling.doMesh(mesh) : super.doMesh(mesh);
+				_process ? _process.doMesh(mesh) : super.doMesh(mesh);
 			}
 		}
 		

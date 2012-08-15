@@ -20,7 +20,6 @@ package nest.view.effects
 		private var _stepX:Number;
 		private var _stepY:Number;
 		
-		
 		public function Blur(blurX:Number = 3, blurY:Number = 3) {
 			data = Vector.<Number>([0, 0, 0, 1,0,0,0,0]);
 			_blurX = blurX;
@@ -38,6 +37,9 @@ package nest.view.effects
 			context3d.setTextureAt(0, _texture);
 			context3d.setProgram(program);
 			context3d.drawTriangles(indexBuffer);
+			context3d.setVertexBufferAt(0, null);
+			context3d.setVertexBufferAt(1, null);
+			context3d.setTextureAt(0, null);
 		}
 		
 		override public function dispose():void {

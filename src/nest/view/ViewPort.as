@@ -111,6 +111,7 @@ package nest.view
 			
 			manager.first = true;
 			manager.culling = culling;
+			manager.process = null;
 			manager.calculate();
 			
 			if (_effect) {

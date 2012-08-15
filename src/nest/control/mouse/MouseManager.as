@@ -13,6 +13,7 @@ package nest.control.mouse
 	import nest.object.IMesh;
 	import nest.view.culls.MouseCulling;
 	import nest.view.managers.ISceneManager;
+	import nest.view.processes.IDProcess;
 	import nest.view.Camera3D;
 	import nest.view.Shader3D;
 	
@@ -25,6 +26,7 @@ package nest.control.mouse
 		
 		private var draw:Matrix3D;
 		private var culling:MouseCulling;
+		private var process:IDProcess;
 		
 		private var id:uint;
 		private var mouseX:Number;
@@ -37,6 +39,7 @@ package nest.control.mouse
 		public function MouseManager() {
 			draw = new Matrix3D();
 			culling = new MouseCulling();
+			process = new IDProcess();
 			
 			uvShader = new Shader3D();
 			uvShader.setFromString("m44 op, va0, vc0\nmov v0, va1" , "mov oc, v0", false);
@@ -77,9 +80,10 @@ package nest.control.mouse
 				camera.pm.copyRawDataFrom(pm);
 				
 				context3d.clear(0, 0, 0, 0);
-				culling.id = 0;
+				process.id = 0;
 				manager.first = false;
 				manager.culling = culling;
+				manager.process = process;
 				manager.calculate();
 				context3d.drawToBitmapData(map);
 				context3d.present();

@@ -14,6 +14,7 @@ package nest.view.managers
 	import nest.object.Sound3D;
 	import nest.view.culls.ICulling;
 	import nest.view.materials.EnvMapMaterial;
+	import nest.view.processes.IProcess;
 	
 	/**
 	 * BasicManager
@@ -28,6 +29,7 @@ package nest.view.managers
 		
 		protected var _first:Boolean = true;
 		protected var _culling:ICulling;
+		protected var _process:IProcess;
 		
 		protected var _objects:Vector.<IMesh>;
 		
@@ -47,9 +49,9 @@ package nest.view.managers
 				var mesh:IMesh;
 				for each(mesh in _objects) {
 					if (!_culling) {
-						doMesh(mesh);
+						_process ? _process.doMesh(mesh) : doMesh(mesh);
 					} else if (_culling.classifyMesh(mesh)) {
-						_culling.customize ? _culling.doMesh(mesh) : doMesh(mesh);
+						_process ? _process.doMesh(mesh) : doMesh(mesh);
 					}
 				}
 			}
@@ -115,7 +117,7 @@ package nest.view.managers
 							_numVertices += mesh.data.numVertices;
 							_numTriangles += mesh.data.numTriangles;
 							_numObjects++;
-							_culling && _culling.customize ? _culling.doMesh(mesh) : doMesh(mesh);
+							_process ? _process.doMesh(mesh) : doMesh(mesh);
 							_objects.push(mesh);
 						}
 					}
@@ -170,6 +172,14 @@ package nest.view.managers
 		
 		public function set culling(value:ICulling):void {
 			_culling = value;
+		}
+		
+		public function get process():IProcess {
+			return _process;
+		}
+		
+		public function set process(value:IProcess):void {
+			_process = value;
 		}
 		
 	}

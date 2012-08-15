@@ -12,10 +12,6 @@ package nest.view.culls
 		
 		function classifyContainer(container:IContainer3D):Boolean;
 		
-		function doMesh(mesh:IMesh):void;
-		
-		function get customize():Boolean;
-		
 	}
 	
 }

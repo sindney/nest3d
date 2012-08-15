@@ -53,16 +53,6 @@ package nest.view.culls
 			return container.visible;
 		}
 		
-		public function doMesh(mesh:IMesh):void { };
-		
-		///////////////////////////////////
-		// getter/setters
-		///////////////////////////////////
-		
-		public function get customize():Boolean {
-			return false;
-		}
-		
 	}
 
 }
