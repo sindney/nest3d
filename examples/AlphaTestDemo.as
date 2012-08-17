@@ -41,7 +41,7 @@ package
 			var data:MeshData = PrimitiveFactory.createSphere(10);
 			var material:TextureMaterial = new TextureMaterial(new diffuse().bitmapData);
 			var shader:Shader3D = new Shader3D();
-			ShaderFactory.create(shader, null, true);
+			ShaderFactory.create(shader, material);
 			
 			var material1:TextureMaterial = new TextureMaterial(new diffuse1().bitmapData);
 			

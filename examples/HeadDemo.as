@@ -39,8 +39,7 @@ package
 			texture.light = new AmbientLight(0x000000);
 			texture.light.next = new DirectionalLight(0xffffff, 0, 0, -1);
 			var shader:Shader3D = new Shader3D();
-			ShaderFactory.create(shader, texture.light, true, true, true, false, false, false);
-			
+			ShaderFactory.create(shader, texture);
 			mesh = new Mesh(data, texture, shader);
 			scene.addChild(mesh);
 			

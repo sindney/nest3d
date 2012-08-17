@@ -31,7 +31,7 @@ package
 			material.light = light;
 			
 			var shader:Shader3D = new Shader3D();
-			ShaderFactory.create(shader, light, true);
+			ShaderFactory.create(shader, material);
 			
 			var mesh:Mesh = new Mesh(PrimitiveFactory.createSphere(5, 8, 6), material, shader);
 			scene.addChild(mesh);

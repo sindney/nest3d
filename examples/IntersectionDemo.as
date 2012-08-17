@@ -34,7 +34,7 @@ package
 			free.light = hit.light = light;
 			
 			var shader:Shader3D = new Shader3D();
-			ShaderFactory.create(shader, light, false);
+			ShaderFactory.create(shader, free);
 			
 			box = new Mesh(PrimitiveFactory.createBox(10, 10, 10), free, shader);
 			box.position.z = 40;
@@ -46,6 +46,8 @@ package
 			sphere.position.z = 40;
 			sphere.changed = true;
 			scene.addChild(sphere);
+			
+			controller.speed = 1;
 		}
 		
 		private var count:int = 0;

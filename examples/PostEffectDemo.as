@@ -11,8 +11,7 @@ package
 	import nest.view.Shader3D;
 	
 	/**
-	 * ...
-	 * @author Dong Dong
+	 * PostEffectDemo
 	 */
 	public class PostEffectDemo extends DemoBase {
 		
@@ -28,7 +27,7 @@ package
 		}
 		
 		override public function init():void {
-			effects = Vector.<IPostEffect>([null, new NightVision(), new Gray(), new InverseColor(), new Blur(10, 10)]);
+			effects = Vector.<IPostEffect>([null, new NightVision(), new GrayScale(), new InverseColor(), new Blur(10, 10)]);
 			
 			var parser:ParserOBJ = new ParserOBJ();
 			
@@ -38,7 +37,7 @@ package
 			texture.light.next = new DirectionalLight(0xffffff, 1, -1);
 			(texture.light.next as DirectionalLight).normalize();
 			var shader:Shader3D = new Shader3D();
-			ShaderFactory.create(shader, texture.light, false);
+			ShaderFactory.create(shader, texture);
 			
 			mesh = new Mesh(data, texture, shader);
 			scene.addChild(mesh);

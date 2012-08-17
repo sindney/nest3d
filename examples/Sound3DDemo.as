@@ -55,15 +55,13 @@ package
 			cubicmap[5] = new back().bitmapData;
 			
 			var shader:Shader3D = new Shader3D();
-			ShaderFactory.create(shader, null, true, false, false, false, true);
-			
 			var mesh:Mesh = new Mesh(PrimitiveFactory.createPlane(100, 100, 4, 4), new EnvMapMaterial(cubicmap, 1, new BitmapData(1, 1, false)), shader);
+			ShaderFactory.create(shader, mesh.material);
 			scene.addChild(mesh);
 			
 			shader = new Shader3D();
-			ShaderFactory.create(shader, null, false);
-			
 			mesh = new Mesh(PrimitiveFactory.createPlane(10, 10, 1, 1), new ColorMaterial(), shader);
+			ShaderFactory.create(shader, mesh.material);
 			mesh.position.setTo(50, 5, 50);
 			mesh.rotation.setTo(Math.PI / 2, -Math.PI * 0.75, 0);
 			mesh.changed = true;

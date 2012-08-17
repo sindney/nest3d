@@ -21,9 +21,6 @@ package
 			var materialList:Vector.<IMaterial> = new Vector.<IMaterial>();
 			var distantList:Vector.<Number> = new Vector.<Number>();
 			
-			var shader:Shader3D = new Shader3D();
-			ShaderFactory.create(shader, null, false);
-			
 			dataList.push(PrimitiveFactory.createPlane(100, 100, 4, 4));
 			materialList.push(new ColorMaterial(0xffffff));
 			distantList.push(100);
@@ -36,11 +33,15 @@ package
 			materialList.push(new ColorMaterial(0x333333));
 			distantList.push(300);
 			
+			var shader:Shader3D = new Shader3D();
+			ShaderFactory.create(shader, materialList[0]);
+			
 			var mesh:LODMesh = new LODMesh(dataList, materialList, distantList, shader);
 			scene.addChild(mesh);
 			
 			camera.position.y = 5;
 			camera.changed = true;
+			controller.speed = 1;
 		}
 		
 	}

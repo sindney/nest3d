@@ -62,13 +62,13 @@ package
 			light.next = dl;
 			dl.next = pointLight;
 			
-			var shader:Shader3D = new Shader3D();
-			ShaderFactory.create(shader, light);
-			
 			var hm:BitmapData = new heightmap().bitmapData;
 			
 			var material:TextureMaterial = new TextureMaterial(new diffuse().bitmapData, null, 10, null, true);
 			material.light = light;
+			
+			var shader:Shader3D = new Shader3D();
+			ShaderFactory.create(shader, material);
 			
 			var cubicmap:Vector.<BitmapData> = new Vector.<BitmapData>();
 			cubicmap[0] = new right().bitmapData;
@@ -92,8 +92,8 @@ package
 			scene.addChild(skybox);
 			
 			shader = new Shader3D();
-			ShaderFactory.create(shader, null, true, false, false, false, true);
 			var water:Mesh = new Mesh(PrimitiveFactory.createPlane(1000, 1000, 100, 100), new EnvMapMaterial(cubicmap, 0.8, new BitmapData(1, 1, false, 0x32328b)), shader);
+			ShaderFactory.create(shader, water.material);
 			water.position.y = -50;
 			water.changed = true;
 			scene.addChild(water);
