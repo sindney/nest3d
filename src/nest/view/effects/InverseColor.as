@@ -46,7 +46,7 @@ package nest.view.effects
 		}
 		
 		override protected function get fragmentShader():String {
-			return "tex ft0, v0, fs0 <2d,linear,mipnone>\nsub oc.rgb,fc0.rgb,ft0.rgb";
+			return "tex ft0, v0, fs0 <2d,linear,mipnone>\nsub oc.rgb, fc0.rgb, ft0.rgb";
 		}
 		
 	}

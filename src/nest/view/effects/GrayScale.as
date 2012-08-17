@@ -7,13 +7,13 @@ package nest.view.effects
 	import nest.control.GlobalMethods;
 	
 	/**
-	 * Gray
+	 * GrayScale
 	 */
-	public class Gray extends PostEffect {
+	public class GrayScale extends PostEffect {
 		
 		private var data:Vector.<Number>;
 		
-		public function Gray() {
+		public function GrayScale() {
 			super();
 			data = Vector.<Number>([0.229, 0.587, 0.114, 1]);
 		}
@@ -46,7 +46,7 @@ package nest.view.effects
 		}
 		
 		override protected function get fragmentShader():String {
-			return "tex ft0, v0, fs0 <2d,linear,mipnone>\ndp3 ft1.rgb, ft0.rgb, fc0.rgb\nmov oc.rgb,ft1.rgb";
+			return "tex ft0, v0, fs0 <2d,linear,mipnone>\ndp3 ft1.rgb, ft0.rgb, fc0.rgb\nmov oc.rgb, ft1.rgb";
 		}
 		
 	}
