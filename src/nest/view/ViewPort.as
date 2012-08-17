@@ -90,10 +90,7 @@ package nest.view
 			
 			if (_mouseManager && _mouseManager.type) _mouseManager.calculate();
 			
-			if (_effect) {
-				_effect.createTexture(_width, _height);
-				context3d.setRenderToTexture(_effect.texture, _effect.enableDepthAndStencil, _effect.antiAlias);
-			}
+			if (_effect) context3d.setRenderToTexture(_effect.textures[0], _effect.enableDepthAndStencil, _effect.antiAlias);
 			context3d.clear(_rgba[0], _rgba[1], _rgba[2], _rgba[3]);
 			
 			_diagram.update();
@@ -117,12 +114,6 @@ package nest.view
 			if (_effect) {
 				var effect:IPostEffect = _effect;
 				while (effect) {
-					if (effect.next) {
-						effect.next.createTexture(_width, _height);
-						context3d.setRenderToTexture(effect.next.texture, effect.next.enableDepthAndStencil, effect.next.antiAlias);
-					} else {
-						context3d.setRenderToBackBuffer();
-					}
 					effect.calculate();
 					effect = effect.next;
 				}
@@ -154,6 +145,7 @@ package nest.view
 					_width = value;
 					GlobalMethods.context3d.configureBackBuffer(_width, _height, _antiAlias, true);
 					GlobalMethods.camera.aspect = _width / _height;
+					dispatchEvent(new Event(Event.RESIZE));
 				}
 			}
 		}
@@ -168,6 +160,7 @@ package nest.view
 					_height = value;
 					GlobalMethods.context3d.configureBackBuffer(_width, _height, _antiAlias, true);
 					GlobalMethods.camera.aspect = _width / _height;
+					dispatchEvent(new Event(Event.RESIZE));
 				}
 			}
 		}

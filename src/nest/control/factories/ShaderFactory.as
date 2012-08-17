@@ -1,6 +1,10 @@
 package nest.control.factories
 {
+	import flash.utils.getQualifiedClassName;
+	
+	import nest.control.GlobalMethods;
 	import nest.view.lights.*;
+	import nest.view.materials.*;
 	import nest.view.Shader3D;
 	
 	/**
@@ -8,10 +12,34 @@ package nest.control.factories
 	 */
 	public class ShaderFactory {
 		
-		/**
-		 * Create necessary data for shader3d object.
-		 */
-		public static function create(shader:Shader3D, light:AmbientLight = null, uv:Boolean = true, specular:Boolean = false, 
+		private static const COLOR_MATERIAL:String = "nest.view.materials::ColorMaterial";
+		private static const ENVMAP_MATERIAL:String = "nest.view.materials::EnvMapMaterial";
+		private static const LIGHTMAP_MATERIAL:String = "nest.view.materials::LightMapMaterial";
+		private static const TEXTURE_MATERIAL:String = "nest.view.materials::TextureMaterial";
+		
+		public static function create(shader:Shader3D, material:IMaterial):void {
+			const fog:Boolean = GlobalMethods.view.fog;
+			switch(getQualifiedClassName(material)) {
+				case COLOR_MATERIAL:
+					var color:ColorMaterial = material as ColorMaterial;
+					update(shader, color.light, false, false, false, false, false, false, fog);
+					break;
+				case ENVMAP_MATERIAL:
+					var envmap:EnvMapMaterial = material as EnvMapMaterial;
+					update(shader, envmap.light, true, envmap.specular != null, envmap.normalmap != null, false, true, envmap.mipmapping, fog);
+					break;
+				case LIGHTMAP_MATERIAL:
+					var lightmap:LightMapMaterial = material as LightMapMaterial;
+					update(shader, lightmap.light, true, lightmap.specular != null, lightmap.normalmap != null, true, false, lightmap.mipmapping, fog);
+					break;
+				case TEXTURE_MATERIAL:
+					var texture:TextureMaterial = material as TextureMaterial;
+					update(shader, texture.light, true, texture.specular != null, texture.normalmap != null, false, false, texture.mipmapping, fog);
+					break;
+			}
+		}
+		
+		private static function update(shader:Shader3D, light:AmbientLight = null, uv:Boolean = true, specular:Boolean = false, 
 										normalmap:Boolean = false, lightmap:Boolean = false, envmap:Boolean = false,
 										mipmapping:Boolean = false, fog:Boolean = false):void {
 			const normal:Boolean = (light != null || envmap);
