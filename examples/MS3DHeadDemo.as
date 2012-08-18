@@ -36,13 +36,14 @@ package
 			light.next = new DirectionalLight(0xffffff, 0, 0, -1);
 			
 			var parser:ParserMS3D = new ParserMS3D();
-			mesh = parser.parse(new model(), 10) as Mesh;
+			parser.parse(new model(), 10);
 			
 			var texture:TextureMaterial = new TextureMaterial(new diffuse().bitmapData, new specular().bitmapData, 40, new normals().bitmapData);
 			texture.light = light;
 			var shader:Shader3D = new Shader3D();
 			ShaderFactory.create(shader, texture);
 			
+			mesh = parser.getObjectByName("g0");
 			mesh.material = texture;
 			mesh.shader = shader;
 			scene.addChild(mesh);

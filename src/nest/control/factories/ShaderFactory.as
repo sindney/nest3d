@@ -18,31 +18,53 @@ package nest.control.factories
 		private static const TEXTURE_MATERIAL:String = "nest.view.materials::TextureMaterial";
 		
 		public static function create(shader:Shader3D, material:IMaterial):void {
-			const fog:Boolean = GlobalMethods.view.fog;
+			var fog:Boolean = GlobalMethods.view.fog;
+			var light:AmbientLight;
+			var uv:Boolean = false;
+			var specular:Boolean = false;
+			var normalmap:Boolean = false;
+			var lightmap:Boolean = false;
+			var envmap:Boolean = false;
+			var mipmapping:Boolean = false;
+			var normal:Boolean;
+			
 			switch(getQualifiedClassName(material)) {
 				case COLOR_MATERIAL:
-					var color:ColorMaterial = material as ColorMaterial;
-					update(shader, color.light, false, false, false, false, false, false, fog);
+					var colorMat:ColorMaterial = material as ColorMaterial;
+					light = colorMat.light;
 					break;
 				case ENVMAP_MATERIAL:
-					var envmap:EnvMapMaterial = material as EnvMapMaterial;
-					update(shader, envmap.light, true, envmap.specular != null, envmap.normalmap != null, false, true, envmap.mipmapping, fog);
+					var envmapMat:EnvMapMaterial = material as EnvMapMaterial;
+					light = envmapMat.light;
+					uv = true;
+					specular = envmapMat.specular != null;
+					normalmap = envmapMat.normalmap != null;
+					lightmap = false;
+					envmap = true;
+					mipmapping = envmapMat.mipmapping;
 					break;
 				case LIGHTMAP_MATERIAL:
-					var lightmap:LightMapMaterial = material as LightMapMaterial;
-					update(shader, lightmap.light, true, lightmap.specular != null, lightmap.normalmap != null, true, false, lightmap.mipmapping, fog);
+					var lightmapMat:LightMapMaterial = material as LightMapMaterial;
+					light = lightmapMat.light;
+					uv = true;
+					specular = lightmapMat.specular != null;
+					normalmap = lightmapMat.normalmap != null;
+					lightmap = true;
+					envmap = false;
+					mipmapping = lightmapMat.mipmapping;
 					break;
 				case TEXTURE_MATERIAL:
-					var texture:TextureMaterial = material as TextureMaterial;
-					update(shader, texture.light, true, texture.specular != null, texture.normalmap != null, false, false, texture.mipmapping, fog);
+					var textureMat:TextureMaterial = material as TextureMaterial;
+					light = textureMat.light;
+					uv = true;
+					specular = textureMat.specular != null;
+					normalmap = textureMat.normalmap != null;
+					lightmap = false;
+					envmap = false;
+					mipmapping = textureMat.mipmapping;
 					break;
 			}
-		}
-		
-		private static function update(shader:Shader3D, light:AmbientLight = null, uv:Boolean = true, specular:Boolean = false, 
-										normalmap:Boolean = false, lightmap:Boolean = false, envmap:Boolean = false,
-										mipmapping:Boolean = false, fog:Boolean = false):void {
-			const normal:Boolean = (light != null || envmap);
+			normal = (light != null || envmap);
 			
 			// vertex shader
 			var vertex:String = "m44 op, va0, vc0\n" + 
