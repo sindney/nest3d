@@ -34,10 +34,6 @@ package nest.view
 		private var _rgba:Vector.<Number> = new Vector.<Number>(4, true);
 		private var _camPos:Vector.<Number> = new Vector.<Number>(4, true);
 		
-		private var _fog:Boolean = false;
-		private var _fogColor:Vector.<Number> = new Vector.<Number>(4, true);
-		private var _fogData:Vector.<Number> = new Vector.<Number>(4, true);
-		
 		private var _diagram:Diagram;
 		
 		private var _mouseManager:MouseManager;
@@ -55,16 +51,6 @@ package nest.view
 			// setup scene
 			GlobalMethods.stage3d.addEventListener(Event.CONTEXT3D_CREATE, init);
 			GlobalMethods.stage3d.requestContext3D();
-		}
-		
-		public function setupFog(color:uint, max:Number, min:Number):void {
-			_fogColor[0] = ((color >> 16) & 0xFF) / 255;
-			_fogColor[1] = ((color >> 8) & 0xFF) / 255;
-			_fogColor[2] = (color & 0xFF) / 255;
-			_fogColor[3] = 1;
-			_fogData[0] = max * max;
-			_fogData[1] = min * min;
-			_fogData[2] = _fogData[3] = 0;
 		}
 		
 		/**
@@ -100,11 +86,6 @@ package nest.view
 			_camPos[2] = camera.position.z;
 			_camPos[3] = 1;
 			context3d.setProgramConstantsFromVector(Context3DProgramType.VERTEX, 8, _camPos);
-			
-			if (_fog) {
- 				context3d.setProgramConstantsFromVector(Context3DProgramType.VERTEX, 9, _fogData);
-				context3d.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, 21, _fogColor);
-			}
 			
 			manager.first = true;
 			manager.culling = culling;
@@ -200,14 +181,6 @@ package nest.view
 		
 		public function get diagram():Diagram {
 			return _diagram;
-		}
-		
-		public function get fog():Boolean {
-			return _fog;
-		}
-		
-		public function set fog(value:Boolean):void {
-			_fog = value;
 		}
 		
 		public function get mouseManager():MouseManager {

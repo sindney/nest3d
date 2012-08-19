@@ -71,7 +71,7 @@ package nest.view.managers
 			context3d.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 4, mesh.invertMatrix, true);
 			context3d.setProgramConstantsFromMatrix(Context3DProgramType.FRAGMENT, 23, mesh.invertMatrix, true);
 			
-			if (mesh.material is EnvMapMaterial) context3d.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 11, mesh.matrix, true);
+			if (mesh.material is EnvMapMaterial) context3d.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 10, mesh.matrix, true);
 			
 			mesh.data.upload(context3d, mesh.material.uv, mesh.shader.normal);
 			mesh.material.upload(context3d);

@@ -2,7 +2,6 @@ package nest.control.factories
 {
 	import flash.utils.getQualifiedClassName;
 	
-	import nest.control.GlobalMethods;
 	import nest.view.lights.*;
 	import nest.view.materials.*;
 	import nest.view.Shader3D;
@@ -18,7 +17,6 @@ package nest.control.factories
 		private static const TEXTURE_MATERIAL:String = "nest.view.materials::TextureMaterial";
 		
 		public static function create(shader:Shader3D, material:IMaterial):void {
-			var fog:Boolean = GlobalMethods.view.fog;
 			var light:AmbientLight;
 			var uv:Boolean = false;
 			var specular:Boolean = false;
@@ -76,22 +74,11 @@ package nest.control.factories
 								// v6 = cameraDir
 								"nrm vt7.xyz, vt1\n" + 
 								"mov v6, vt7.xyz\n";
-			if (fog) {
-				vertex += "sub vt1, vt1, va0\n" + 
-							"dp3 vt1.x, vt1, vt1\n" + 
-							"max vt1.x, vt1.x, vc9.y\n" + 
-							"min vt1.x, vt1.x, vc9.x\n" + 
-							"sub vt1.x, vt1.x, vc9.y\n" + 
-							"mov vt1.y, vc9.y\n" + 
-							"sub vt1.y, vc9.x, vt1.y\n" + 
-							"div vt1.x, vt1.x, vt1.y\n" + 
-							"mov v7, vt1.x\n";
-			}
 			if (envmap) {
 				// v5 = I - 2*N*dot(N,I)
-				vertex += "m44 vt1, va2, vc11\n" + 
+				vertex += "m44 vt1, va2, vc10\n" + 
 							"nrm vt1.xyz, vt1\n" + 
-							"m44 vt2, va0, vc11\n" + 
+							"m44 vt2, va0, vc10\n" + 
 							"sub vt2, vt2, vc8\n" + 
 							"dp3 vt3, vt1, vt2\n" + 
 							"add vt1, vt1, vt1\n" + 
@@ -103,11 +90,11 @@ package nest.control.factories
 			if (uv) vertex += "mov v1, va1\n";
 			if (normal) vertex += "mov v2, va2\n";
 			if (normalmap) {
-				vertex +=  "mov vt0, vc10.x\n" + 
-							"mov vt0.z, vc10.y\n" + 
+				vertex +=  "mov vt0, vc9.x\n" + 
+							"mov vt0.z, vc9.y\n" + 
 							"crs vt1.xyz, va2, vt0\n" + 
-							"mov vt0.z, vc10.x\n" + 
-							"mov vt0.y, vc10.y\n" + 
+							"mov vt0.z, vc9.x\n" + 
+							"mov vt0.y, vc9.y\n" + 
 							"crs vt0.xyz, va2, vt0\n" + 
 							// vt0 = (vt1.length > vt0.length ? vt1 : vt0);
 							"dp3 vt3, vt1, vt1\n" + 
@@ -122,7 +109,7 @@ package nest.control.factories
 							"mov v4, vt5\n" + 
 							// vt6, v3 = binormal
 							"crs vt6.xyz, va2, vt0\n" + 
-							"mov vt6.w, vc10.y\n" + 
+							"mov vt6.w, vc9.y\n" + 
 							"mov v3, vt6\n";
 			}
 			
@@ -270,7 +257,6 @@ package nest.control.factories
 							"add ft0, ft0, ft1\n";
 			}
 			
-			if (fog) fragment += "sub ft1, fc21, ft0\nmul ft1, v7.x, ft1\nadd ft0, ft0, ft1\n";
 			fragment += "mov oc, ft0\n";
 			
 			shader.setFromString(vertex, fragment, normal);

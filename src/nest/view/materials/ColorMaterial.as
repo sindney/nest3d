@@ -59,7 +59,7 @@ package nest.view.materials
 		/**
 		 * Root light is an AmbientLight.
 		 * <p>Link new light source to light.next.</p>
-		 * <p>There's 21 empty fc left.</p>
+		 * <p>There's 23 empty fc left.</p>
 		 * <p>Ambient light absorbs 1 fc.</p>
 		 * <p>Directional light takes 2.</p>
 		 * <p>PointLight light takes 3.</p>

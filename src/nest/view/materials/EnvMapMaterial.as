@@ -76,7 +76,7 @@ package nest.view.materials
 			if (_spec_data) context3d.setTextureAt(1, _specular);
 			if (_nm_data) {
 				context3d.setTextureAt(2, _normalmap);
-				context3d.setProgramConstantsFromVector(Context3DProgramType.VERTEX, 10, _vertData);
+				context3d.setProgramConstantsFromVector(Context3DProgramType.VERTEX, 9, _vertData);
 			}
 			if (_cm_data[0]) context3d.setTextureAt(3, _cubicmap);
 			if (_spec_data || _nm_data || _cm_data[0]) context3d.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, 22, _fragData);

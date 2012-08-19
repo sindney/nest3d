@@ -111,7 +111,7 @@ package nest.view.materials
 			if (_spec_data) context3d.setTextureAt(1, _specular);
 			if (_nm_data) {
 				context3d.setTextureAt(2, _normalmap);
-				context3d.setProgramConstantsFromVector(Context3DProgramType.VERTEX, 10, _vertData);
+				context3d.setProgramConstantsFromVector(Context3DProgramType.VERTEX, 9, _vertData);
 			}
 			if (_spec_data || _nm_data) context3d.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, 22, _fragData);
 		}
@@ -141,7 +141,7 @@ package nest.view.materials
 		/**
 		 * Root light is an AmbientLight.
 		 * <p>Link new light source to light.next.</p>
-		 * <p>There's 20 empty fc left.</p>
+		 * <p>There's 22 empty fc left.</p>
 		 * <p>Ambient light absorbs 1 fc.</p>
 		 * <p>Directional light takes 2.</p>
 		 * <p>PointLight light takes 3.</p>
