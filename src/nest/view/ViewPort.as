@@ -10,10 +10,10 @@ package nest.view
 	
 	import nest.control.mouse.MouseManager;
 	import nest.control.GlobalMethods;
-	import nest.view.culls.BasicCulling;
 	import nest.view.culls.ICulling;
 	import nest.view.effects.IPostEffect;
 	import nest.view.managers.ISceneManager;
+	import nest.view.processes.IProcess;
 	
 	/** 
 	 * Dispatched when context3d is created.
@@ -39,9 +39,9 @@ package nest.view
 		private var _mouseManager:MouseManager;
 		private var _effect:IPostEffect;
 		private var _culling:ICulling;
+		private var _process:IProcess;
 		
 		public function ViewPort(width:Number, height:Number) {
-			_culling = new BasicCulling();
 			_diagram = new Diagram();
 			
 			_rgba[3] = 1;
@@ -88,8 +88,8 @@ package nest.view
 			context3d.setProgramConstantsFromVector(Context3DProgramType.VERTEX, 8, _camPos);
 			
 			manager.first = true;
-			manager.culling = culling;
-			manager.process = null;
+			manager.culling = _culling;
+			manager.process = _process;
 			manager.calculate();
 			
 			if (_effect) {
@@ -207,6 +207,14 @@ package nest.view
 		
 		public function set culling(value:ICulling):void {
 			_culling = value;
+		}
+		
+		public function get process():IProcess {
+			return _process;
+		}
+		
+		public function set process(value:IProcess):void {
+			_process = value;
 		}
 		
 	}

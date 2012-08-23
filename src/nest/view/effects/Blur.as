@@ -17,20 +17,21 @@ package nest.view.effects
 	 */
 	public class Blur extends PostEffect {
 		
+		private const maxIteration:int = 6;
+		
 		private var program:Program3D;
 		private var vertexBuffer:VertexBuffer3D;
 		private var uvBuffer:VertexBuffer3D;
 		private var indexBuffer:IndexBuffer3D;
 		
 		private var data:Vector.<Number>;
+		private var stepX:Number;
+		private var stepY:Number;
 		
-		private var _maxIteration:int = 6;
 		private var _blurX:Number;
 		private var _blurY:Number;
-		private var _stepX:Number;
-		private var _stepY:Number;
 		
-		public function Blur(blurX:Number = 4, blurY:Number = 4) {
+		public function Blur(blurX:Number = 3, blurY:Number = 3) {
 			var context3d:Context3D = GlobalMethods.context3d;
 			var vertexData:Vector.<Number> = Vector.<Number>([-1, 1, 0, -1, -1, 0, 1, -1, 0, 1, 1, 0]);
 			var uvData:Vector.<Number> = Vector.<Number>([0, 0, 0, 1, 1, 1, 1, 0]);
@@ -79,26 +80,26 @@ package nest.view.effects
 		}
 		
 		private function update():void {
-			var invW:Number = 1 / 512;
-			var invH:Number = 1 / 512;
+			var invW:Number = 1 / GlobalMethods.view.width;
+			var invH:Number = 1 / GlobalMethods.view.height;
 			
-			if (_blurX> _maxIteration) {
-				_stepX = _blurX / _maxIteration;
+			if (_blurX > maxIteration) {
+				stepX = _blurX / maxIteration;
 			}else {
-				_stepX = 1;
+				stepX = 1;
 			}
 			
-			if (_blurY > _maxIteration) {
-				_stepY = _blurY / _maxIteration;
+			if (_blurY > maxIteration) {
+				stepY = _blurY / maxIteration;
 			}else {
-				_stepY = 1;
+				stepY = 1;
 			}
 			
 			var x:Number;
 			var y:Number;
 			var samples:int = 0;
-			for (y = 0; y < _blurY; y += _stepY ) {
-				for (x = 0; x < _blurX; x += _stepX ) {
+			for (y = 0; y < _blurY; y += stepY ) {
+				for (x = 0; x < _blurX; x += stepX ) {
 					samples++;
 				}
 			}
@@ -107,13 +108,13 @@ package nest.view.effects
 			data[1] = _blurY * .5 * invH;
 			data[2] = 1 / samples;
 			
-			data[4] = _stepX * invW;
-			data[5] = _stepY * invH;
+			data[4] = stepX * invW;
+			data[5] = stepY * invH;
 			
-			var code:String = "mov ft0,v0\nsub ft0.y, v0.y, fc0.y\n";
-			for (y = 0; y < _blurY; y += _stepY) {
+			var code:String = "mov ft0, v0\nsub ft0.y, v0.y, fc0.y\n";
+			for (y = 0; y < _blurY; y += stepY) {
 				if (y > 0) code += "sub ft0.x, v0.x, fc0.x\n";
-				for (x = 0; x < _blurX; x += _stepX) {
+				for (x = 0; x < _blurX; x += stepX) {
 					if (x == 0 && y == 0)
 						code += "tex ft1, ft0, fs0 <2d,nearest,clamp>\n";
 					else
@@ -134,15 +135,6 @@ package nest.view.effects
 		// getter/setters
 		///////////////////////////////////
 		
-		public function get maxIteration():int {
-			return _maxIteration;
-		}
-		
-		public function set maxIteration(value:int):void {
-			_maxIteration = value;
-			update();
-		}
-		
 		public function get blurX():Number {
 			return _blurX;
 		}
@@ -158,24 +150,6 @@ package nest.view.effects
 		
 		public function set blurY(value:Number):void {
 			_blurY = value;
-			update();
-		}
-		
-		public function get stepX():Number {
-			return _stepX;
-		}
-		
-		public function set stepX(value:Number):void {
-			_stepX = value;
-			update();
-		}
-		
-		public function get stepY():Number {
-			return _stepY;
-		}
-		
-		public function set stepY(value:Number):void {
-			_stepY = value;
 			update();
 		}
 		

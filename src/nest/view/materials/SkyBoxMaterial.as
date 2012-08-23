@@ -3,37 +3,21 @@ package nest.view.materials
 	import flash.display.BitmapData;
 	import flash.display3D.Context3D;
 	import flash.display3D.Context3DProgramType;
-	import flash.display3D.Context3DTextureFormat;
-	import flash.display3D.textures.CubeTexture;
 	
 	/**
 	 * SkyBoxMaterial
 	 */
 	public class SkyBoxMaterial implements IMaterial {
 		
-		protected var _cubicmap:CubeTexture;
-		protected var _cm_data:Vector.<BitmapData>;
-		protected var _changed:Boolean = true;
+		protected var _cubicmap:CubeTextureResource;
 		
 		public function SkyBoxMaterial(cubicmap:Vector.<BitmapData>) {
-			_cm_data = cubicmap;
+			_cubicmap = new CubeTextureResource();
+			_cubicmap.data = cubicmap;
 		}
 		
 		public function upload(context3d:Context3D):void {
-			if (_changed) {
-				_changed = false;
-				if (_cubicmap) _cubicmap.dispose();
-				if (_cm_data[0]) {
-					_cubicmap = context3d.createCubeTexture(_cm_data[0].width, Context3DTextureFormat.BGRA, false);
-					TextureMaterial.uploadWithMipmaps(_cubicmap, _cm_data[0], 0);
-					TextureMaterial.uploadWithMipmaps(_cubicmap, _cm_data[1], 1);
-					TextureMaterial.uploadWithMipmaps(_cubicmap, _cm_data[2], 2);
-					TextureMaterial.uploadWithMipmaps(_cubicmap, _cm_data[3], 3);
-					TextureMaterial.uploadWithMipmaps(_cubicmap, _cm_data[4], 4);
-					TextureMaterial.uploadWithMipmaps(_cubicmap, _cm_data[5], 5);
-				}
-			}
-			if (_cm_data[0]) context3d.setTextureAt(0, _cubicmap);
+			context3d.setTextureAt(0, _cubicmap.texture);
 		}
 		
 		public function unload(context3d:Context3D):void {
@@ -41,31 +25,20 @@ package nest.view.materials
 		}
 		
 		public function dispose():void {
-			if (_cubicmap) _cubicmap.dispose();
-			if (_cm_data[0]) {
-				_cm_data[0].dispose();
-				_cm_data[1].dispose();
-				_cm_data[2].dispose();
-				_cm_data[3].dispose();
-				_cm_data[4].dispose();
-				_cm_data[5].dispose();
-			}
+			_cubicmap.dispose();
+			_cubicmap = null;
 		}
 		
 		///////////////////////////////////
 		// getter/setters
 		///////////////////////////////////
 		
-		public function set changed(value:Boolean):void {
-			_changed = value;
-		}
-		
-		public function get cubicmap():Vector.<BitmapData> {
-			return _cm_data;
-		}
-		
 		public function get uv():Boolean {
 			return false;
+		}
+		
+		public function get cubicmap():CubeTextureResource {
+			return _cubicmap;
 		}
 		
 	}

@@ -23,7 +23,10 @@ package nest.control.factories
 			var normalmap:Boolean = false;
 			var lightmap:Boolean = false;
 			var envmap:Boolean = false;
-			var mipmapping:Boolean = false;
+			var diff_mip:Boolean = false;
+			var spec_mip:Boolean = false;
+			var nm_mip:Boolean = false;
+			var lm_mip:Boolean = false;
 			var normal:Boolean;
 			
 			switch(getQualifiedClassName(material)) {
@@ -35,31 +38,38 @@ package nest.control.factories
 					var envmapMat:EnvMapMaterial = material as EnvMapMaterial;
 					light = envmapMat.light;
 					uv = true;
-					specular = envmapMat.specular != null;
-					normalmap = envmapMat.normalmap != null;
+					specular = envmapMat.specular.texture != null;
+					normalmap = envmapMat.normalmap.texture != null;
 					lightmap = false;
 					envmap = true;
-					mipmapping = envmapMat.mipmapping;
+					diff_mip = envmapMat.diffuse.mipmapping;
+					spec_mip = envmapMat.specular.mipmapping;
+					nm_mip = envmapMat.normalmap.mipmapping;
 					break;
 				case LIGHTMAP_MATERIAL:
 					var lightmapMat:LightMapMaterial = material as LightMapMaterial;
 					light = lightmapMat.light;
 					uv = true;
-					specular = lightmapMat.specular != null;
-					normalmap = lightmapMat.normalmap != null;
+					specular = lightmapMat.specular.texture != null;
+					normalmap = lightmapMat.normalmap.texture != null;
 					lightmap = true;
 					envmap = false;
-					mipmapping = lightmapMat.mipmapping;
+					diff_mip = lightmapMat.diffuse.mipmapping;
+					spec_mip = lightmapMat.specular.mipmapping;
+					nm_mip = lightmapMat.normalmap.mipmapping;
+					lm_mip = lightmapMat.lightmap.mipmapping;
 					break;
 				case TEXTURE_MATERIAL:
 					var textureMat:TextureMaterial = material as TextureMaterial;
 					light = textureMat.light;
 					uv = true;
-					specular = textureMat.specular != null;
-					normalmap = textureMat.normalmap != null;
+					specular = textureMat.specular.texture != null;
+					normalmap = textureMat.normalmap.texture != null;
 					lightmap = false;
 					envmap = false;
-					mipmapping = textureMat.mipmapping;
+					diff_mip = textureMat.diffuse.mipmapping;
+					spec_mip = textureMat.specular.mipmapping;
+					nm_mip = textureMat.normalmap.mipmapping;
 					break;
 			}
 			normal = (light != null || envmap);
@@ -114,9 +124,9 @@ package nest.control.factories
 			}
 			
 			// fragment shader
-			var fragment:String = uv ? "tex ft7, v1, fs0 <2d,linear," + (mipmapping ? "miplinear" : "mipnone") + ">\n" : "mov ft7, fc27\n";
+			var fragment:String = uv ? "tex ft7, v1, fs0 <2d,linear," + (spec_mip ? "miplinear" : "mipnone") + ">\n" : "mov ft7, fc27\n";
 			if (normalmap) {
-				fragment += "tex ft5, v1, fs2 <2d,linear," + (mipmapping ? "miplinear" : "mipnone") + ">\n" + 
+				fragment += "tex ft5, v1, fs2 <2d,linear," + (nm_mip ? "miplinear" : "mipnone") + ">\n" + 
 							"add ft5, ft5, ft5\n" + 
 							"sub ft5, ft5, fc22.y\n" + 
 							"mul ft0, v4, ft5.x\n" + 
@@ -125,8 +135,8 @@ package nest.control.factories
 							"mul ft1, v2, ft5.z\n" + 
 							"add ft5, ft0, ft1\n";
 			}
-			if (lightmap) fragment += "tex ft6, v1, fs3 <2d,linear," + (mipmapping ? "miplinear" : "mipnone") + ">\nmul ft7, ft7, ft6\nsat ft7, ft7\n";
-			if (specular) fragment += "tex ft6, v1, fs1 <2d,linear," + (mipmapping ? "miplinear" : "mipnone") + ">\n";
+			if (lightmap) fragment += "tex ft6, v1, fs3 <2d,linear," + (lm_mip ? "miplinear" : "mipnone") + ">\nmul ft7, ft7, ft6\nsat ft7, ft7\n";
+			if (specular) fragment += "tex ft6, v1, fs1 <2d,linear," + (spec_mip ? "miplinear" : "mipnone") + ">\n";
 			
 			if (light) {
 				// ambient
