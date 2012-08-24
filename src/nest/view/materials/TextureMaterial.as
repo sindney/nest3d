@@ -75,7 +75,7 @@ package nest.view.materials
 				context3d.setProgramConstantsFromVector(Context3DProgramType.VERTEX, 9, _vertData);
 			}
 			if (j == 1) context3d.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, 22, _fragData);
-			context3d.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, 23, GlobalMethods.alphaThreshold, 1);
+			context3d.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, 24, GlobalMethods.alphaThreshold, 1);
 		}
 		
 		public function unload(context3d:Context3D):void {
@@ -124,7 +124,7 @@ package nest.view.materials
 			}
 			
 			var fragment:String = "tex ft7, v1, fs0 <2d,linear," + (_diffuse.mipmapping ? "miplinear" : "mipnone") + ">\n";
-			fragment += "sub ft0.w,ft7.w,fc23.w\nkil ft0.w\n";
+			fragment += "sub ft0.w,ft7.w,fc24.w\nkil ft0.w\n";
 			if (normalmap) {
 				fragment += "tex ft5, v1, fs2 <2d,linear," + (_normalmap.mipmapping ? "miplinear" : "mipnone") + ">\n" + 
 							"add ft5, ft5, ft5\n" + 

@@ -1,5 +1,6 @@
 package nest.object 
 {	
+	import flash.display.Graphics;
 	import flash.display3D.Context3D;
 	import flash.geom.Matrix3D;
 	import flash.geom.Vector3D;
@@ -46,6 +47,8 @@ package nest.object
 		
 		function get mouseEnabled():Boolean;
 		function set mouseEnabled(value:Boolean):void;
+		
+		function drawFrame(g:Graphics,color:uint=0xff0000,alpha:Number=1.0):void;
 		
 	}
 	

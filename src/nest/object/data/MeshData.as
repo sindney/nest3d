@@ -242,6 +242,10 @@ package nest.object.data
 			_vertices = value;
 		}
 		
+		public function get indices():Vector.<uint> {
+			return _index;
+		}
+		
 		public function get triangles():Vector.<Triangle> {
 			return _triangles;
 		}

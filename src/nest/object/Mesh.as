@@ -1,9 +1,13 @@
 package nest.object
 {
+	import flash.display.Graphics;
+	import flash.display.TriangleCulling;
 	import flash.display3D.Context3D;
 	import flash.display3D.Context3DTriangleFace;
 	import flash.geom.Matrix3D;
 	import flash.geom.Vector3D;
+	import nest.control.GlobalMethods;
+	import nest.object.geom.Vertex;
 	
 	import nest.object.data.MeshData;
 	import nest.object.geom.AABB;
@@ -61,6 +65,48 @@ package nest.object
 			result.visible = _visible;
 			result.alphaTest = _alphaTest;
 			return result;
+		}
+		
+		public function drawFrame(g:Graphics,color:uint=0xff0000,alpha:Number=1.0):void {
+			var draw:Matrix3D = new Matrix3D();
+			draw.copyFrom(_matrix);
+			draw.append(GlobalMethods.camera.invertMatrix);
+			var pm:Vector.<Number> = GlobalMethods.camera.pm.rawData;
+			var w_2:Number = GlobalMethods.view.width / 2;
+			var h_2:Number = GlobalMethods.view.height / 2;
+			pm[0] *= w_2;
+			pm[5] *= -h_2;
+			pm[8] = w_2;
+			pm[9] = h_2;
+			GlobalMethods.camera.pm.copyRawDataFrom(pm);
+			
+			draw.append(GlobalMethods.camera.pm);
+			var a:int = _data.vertices.length;
+			var verticesIn:Vector.<Number>=new Vector.<Number>(a*3,true);
+			for (var i:int = 0; i < a;i++ ) {
+				verticesIn[i * 3] = _data.vertices[i].x;
+				verticesIn[i * 3+1] = _data.vertices[i].y;
+				verticesIn[i * 3+2] = _data.vertices[i].z;
+			}
+			var verticesOut:Vector.<Number> = new Vector.<Number>(a * 3);
+			draw.transformVectors(verticesIn, verticesOut);
+			var vertices:Vector.<Number> = new Vector.<Number>(a * 2);
+			
+			for (i = 0; i < a;i++) {
+				vertices[i * 2] = verticesOut[i * 3] / verticesOut[i * 3 + 2];
+				vertices[i * 2 + 1] = verticesOut[i * 3 + 1] / verticesOut[i * 3 + 2];
+				if (verticesOut[i * 3 + 2]<0) {
+					vertices[i * 2] = vertices[i * 2 + 1] = 10000;
+				}
+			}
+			pm[0] /= w_2;
+			pm[5] /= -h_2;
+			pm[8] = 0;
+			pm[9] = 0;
+			GlobalMethods.camera.pm.copyRawDataFrom(pm);
+			g.clear();
+			g.lineStyle(0, color, alpha);
+			g.drawTriangles(vertices, Vector.<int>(_data.indices), null, TriangleCulling.NEGATIVE);
 		}
 		
 		override public function decompose():void {
