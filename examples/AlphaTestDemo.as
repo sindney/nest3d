@@ -34,7 +34,7 @@ package
 		}
 		
 		override public function init():void {
-			GlobalMethods.manager = manager = new BasicManager();
+			GlobalMethods.manager = manager = new BasicManager(); 
 			var data:MeshData = PrimitiveFactory.createSphere(10);
 			var material:TextureMaterial = new TextureMaterial(new diffuse().bitmapData);
 			material.update();
