@@ -1,30 +1,32 @@
 package nest.view.effects 
 {
-	import flash.display3D.textures.TextureBase;
 	import flash.display3D.Context3D;
 	import flash.display3D.Context3DProgramType;
 	import flash.display3D.Context3DVertexBufferFormat;
-	import flash.display3D.Context3DTextureFormat;
 	import flash.display3D.IndexBuffer3D;
 	import flash.display3D.Program3D;
+	import flash.display3D.textures.TextureBase;
 	import flash.display3D.VertexBuffer3D;
 	
 	import nest.control.GlobalMethods;
 	import nest.view.Shader3D;
 	
 	/**
-	 * NightVision
+	 * TransformColor
 	 */
-	public class NightVision extends PostEffect {
+	public class TransformColor extends PostEffect {
+		
+		public static const NIGHT_VISION:Vector.<Number> = Vector.<Number>([0, 1, 0, 1]);
+		public static const SEPIA:Vector.<Number> = Vector.<Number>([0.88, 0.88, 0, 1]);
 		
 		private var program:Program3D;
 		private var vertexBuffer:VertexBuffer3D;
 		private var uvBuffer:VertexBuffer3D;
 		private var indexBuffer:IndexBuffer3D;
 		
-		private var data:Vector.<Number>;
+		private var _data:Vector.<Number>;
 		
-		public function NightVision() {
+		public function TransformColor(data:Vector.<Number>) {
 			var context3d:Context3D = GlobalMethods.context3d;
 			var vertexShader:String = "mov op, va0\nmov v0, va1\n";
 			var fragmentShader:String = "tex ft0, v0, fs0 <2d,linear,mipnone>\nmul oc, ft0.rgb, fc0.rgb\n";
@@ -40,8 +42,8 @@ package nest.view.effects
 			uvBuffer.uploadFromVector(uvData, 0, 4);
 			indexBuffer = context3d.createIndexBuffer(6);
 			indexBuffer.uploadFromVector(indexData, 0, 6);
-			data = Vector.<Number>([0, 1, 0, 1]);
 			
+			_data = data;
 			_textures = new Vector.<TextureBase>(1, true);
 			super();
 		}
@@ -54,7 +56,7 @@ package nest.view.effects
 				context3d.setRenderToBackBuffer();
 			}
 			context3d.clear();
-			context3d.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, 0, data);
+			context3d.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, 0, _data);
 			context3d.setVertexBufferAt(0, vertexBuffer, 0, Context3DVertexBufferFormat.FLOAT_3);
 			context3d.setVertexBufferAt(1, uvBuffer, 0, Context3DVertexBufferFormat.FLOAT_2);
 			context3d.setTextureAt(0, _textures[0]);
@@ -74,6 +76,17 @@ package nest.view.effects
 			data = null;
 		}
 		
+		///////////////////////////////////
+		// getter/setters
+		///////////////////////////////////
+		
+		public function get data():Vector.<Number> {
+			return _data;
+		}
+		
+		public function set data(value:Vector.<Number>):void {
+			_data = value;
+		}
 	}
 
 }

@@ -24,12 +24,12 @@ package
 		}
 		
 		override public function init():void {
-			effects = Vector.<IPostEffect>([null, new NightVision(), new GrayScale(), new InverseColor(), new Blur(10, 10)]);
+			effects = Vector.<IPostEffect>([null, new TransformColor(TransformColor.NIGHT_VISION), new TransformColor(TransformColor.SEPIA), new GrayScale(), new InverseColor(), new Blur(10, 10)]);
 			
 			var parser:ParserOBJ = new ParserOBJ();
 			
 			var data:MeshData = parser.parse(new model(), 10);
-			var texture:ColorMaterial = new ColorMaterial(0x0066ff);
+			var texture:ColorMaterial = new ColorMaterial(0xffffff);
 			texture.light = new AmbientLight(0x333333);
 			texture.light.next = new DirectionalLight(0xffffff, 1, -1);
 			(texture.light.next as DirectionalLight).normalize();
