@@ -49,7 +49,7 @@ package nest.view.materials
 				}
 				light = light.next;
 			}
-			context3d.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, 27, _rgba);
+			context3d.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, 23, _rgba);
 		}
 		
 		public function unload(context3d:Context3D):void {
@@ -68,7 +68,7 @@ package nest.view.materials
 								"mov v6, vt7.xyz\n";
 			if (_light) vertex += "mov v2, va2\n";
 			
-			var fragment:String = "mov ft7, fc27\n";
+			var fragment:String = "mov ft7, fc23\n";
 			fragment += Shader3D.createLight(_light);
 			fragment += "mov oc, ft0\n";
 			

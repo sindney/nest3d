@@ -69,7 +69,7 @@ package nest.view.managers
 			context3d.setDepthTest(mesh.blendMode.depthMask, Context3DCompareMode.LESS);
 			context3d.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 0, draw, true);
 			context3d.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 4, mesh.invertMatrix, true);
-			context3d.setProgramConstantsFromMatrix(Context3DProgramType.FRAGMENT, 23, mesh.invertMatrix, true);
+			context3d.setProgramConstantsFromMatrix(Context3DProgramType.FRAGMENT, 24, mesh.invertMatrix, true);
 			
 			if (mesh.material is EnvMapMaterial) context3d.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 10, mesh.matrix, true);
 			

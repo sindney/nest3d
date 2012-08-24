@@ -15,6 +15,7 @@ package nest.object
 	 */
 	public interface IMesh extends IObject3D {
 		
+		function draw(g:Graphics, thickness:Number = 0, color:uint = 0xff0000, alpha:Number = 1.0):void;
 		function clone():IMesh;
 		
 		function get data():MeshData;
@@ -47,8 +48,6 @@ package nest.object
 		
 		function get mouseEnabled():Boolean;
 		function set mouseEnabled(value:Boolean):void;
-		
-		function drawFrame(g:Graphics,color:uint=0xff0000,alpha:Number=1.0):void;
 		
 	}
 	

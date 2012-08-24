@@ -60,7 +60,7 @@ package nest.view.materials
 				j = 1;
 				context3d.setTextureAt(3, _cubicmap.texture);
 			}
-			if (j == 1) context3d.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, 22, _fragData);
+			if (kill || j == 1) context3d.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, 22, _fragData, 2);
 		}
 		
 		override public function unload(context3d:Context3D):void {
@@ -139,6 +139,8 @@ package nest.view.materials
 						"mul ft0, ft0, fc22.w\n" + 
 						"add ft0, ft0, ft1\n" + 
 						"mov oc, ft0\n";
+			
+			if (kill) fragment += "sub ft0.w, ft0.w, fc23.w\nkil ft0.w\n";
 			
 			_shader.setFromString(vertex, fragment, true);
 		}

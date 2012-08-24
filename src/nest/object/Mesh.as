@@ -6,13 +6,13 @@ package nest.object
 	import flash.display3D.Context3DTriangleFace;
 	import flash.geom.Matrix3D;
 	import flash.geom.Vector3D;
-	import nest.control.GlobalMethods;
-	import nest.object.geom.Vertex;
 	
+	import nest.control.GlobalMethods;
 	import nest.object.data.MeshData;
 	import nest.object.geom.AABB;
 	import nest.object.geom.BSphere;
 	import nest.object.geom.IBound;
+	import nest.object.geom.Vertex;
 	import nest.view.materials.IMaterial;
 	import nest.view.BlendMode3D;
 	import nest.view.Shader3D;
@@ -53,21 +53,7 @@ package nest.object
 			this.data = data;
 		}
 		
-		public function clone():IMesh {
-			var bound:IBound;
-			if (_bound is BSphere) bound = new BSphere();
-			var result:Mesh = new Mesh(_data, _material, bound);
-			result.blendMode.source = _blendMode.source;
-			result.blendMode.dest = _blendMode.dest;
-			result.blendMode.depthMask = _blendMode.depthMask;
-			result.cliping = _cliping;
-			result.culling = _culling;
-			result.visible = _visible;
-			result.alphaTest = _alphaTest;
-			return result;
-		}
-		
-		public function drawFrame(g:Graphics,color:uint=0xff0000,alpha:Number=1.0):void {
+		public function draw(g:Graphics, thickness:Number = 0, color:uint = 0xff0000, alpha:Number = 1.0):void {
 			var draw:Matrix3D = new Matrix3D();
 			draw.copyFrom(_matrix);
 			draw.append(GlobalMethods.camera.invertMatrix);
@@ -82,11 +68,11 @@ package nest.object
 			
 			draw.append(GlobalMethods.camera.pm);
 			var a:int = _data.vertices.length;
-			var verticesIn:Vector.<Number>=new Vector.<Number>(a*3,true);
-			for (var i:int = 0; i < a;i++ ) {
+			var verticesIn:Vector.<Number> = new Vector.<Number>(a * 3, true);
+			for (var i:int = 0; i < a; i++) {
 				verticesIn[i * 3] = _data.vertices[i].x;
-				verticesIn[i * 3+1] = _data.vertices[i].y;
-				verticesIn[i * 3+2] = _data.vertices[i].z;
+				verticesIn[i * 3 + 1] = _data.vertices[i].y;
+				verticesIn[i * 3 + 2] = _data.vertices[i].z;
 			}
 			var verticesOut:Vector.<Number> = new Vector.<Number>(a * 3);
 			draw.transformVectors(verticesIn, verticesOut);
@@ -105,8 +91,22 @@ package nest.object
 			pm[9] = 0;
 			GlobalMethods.camera.pm.copyRawDataFrom(pm);
 			g.clear();
-			g.lineStyle(0, color, alpha);
+			g.lineStyle(thickness, color, alpha);
 			g.drawTriangles(vertices, Vector.<int>(_data.indices), null, TriangleCulling.NEGATIVE);
+		}
+		
+		public function clone():IMesh {
+			var bound:IBound;
+			if (_bound is BSphere) bound = new BSphere();
+			var result:Mesh = new Mesh(_data, _material, bound);
+			result.blendMode.source = _blendMode.source;
+			result.blendMode.dest = _blendMode.dest;
+			result.blendMode.depthMask = _blendMode.depthMask;
+			result.cliping = _cliping;
+			result.culling = _culling;
+			result.visible = _visible;
+			result.alphaTest = _alphaTest;
+			return result;
 		}
 		
 		override public function decompose():void {

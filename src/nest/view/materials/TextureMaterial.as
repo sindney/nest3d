@@ -3,7 +3,6 @@ package nest.view.materials
 	import flash.display.BitmapData;
 	import flash.display3D.Context3D;
 	import flash.display3D.Context3DProgramType;
-	import nest.control.GlobalMethods;
 	
 	import nest.view.lights.*;
 	import nest.view.Shader3D;
@@ -23,13 +22,16 @@ package nest.view.materials
 		protected var _light:AmbientLight;
 		protected var _shader:Shader3D;
 		
+		public var kill:Boolean = false;
+		
 		public function TextureMaterial(diffuse:BitmapData, specular:BitmapData = null, glossiness:int = 10, normalmap:BitmapData = null) {
 			_vertData = new Vector.<Number>(4, true);
 			_vertData[0] = _vertData[2] = _vertData[3] = 0;
 			_vertData[1] = 1;
-			_fragData = new Vector.<Number>(4, true);
+			_fragData = new Vector.<Number>(8, true);
 			_fragData[0] = glossiness;
 			_fragData[1] = 1;
+			_fragData[7] = 0.1;
 			_shader = new Shader3D();
 			_diffuse = new TextureResource();
 			_diffuse.data = diffuse;
@@ -74,8 +76,7 @@ package nest.view.materials
 				context3d.setTextureAt(2, _normalmap.texture);
 				context3d.setProgramConstantsFromVector(Context3DProgramType.VERTEX, 9, _vertData);
 			}
-			if (j == 1) context3d.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, 22, _fragData);
-			context3d.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, 24, GlobalMethods.alphaThreshold, 1);
+			if (kill || j == 1) context3d.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, 22, _fragData, 2);
 		}
 		
 		public function unload(context3d:Context3D):void {
@@ -124,7 +125,6 @@ package nest.view.materials
 			}
 			
 			var fragment:String = "tex ft7, v1, fs0 <2d,linear," + (_diffuse.mipmapping ? "miplinear" : "mipnone") + ">\n";
-			fragment += "sub ft0.w,ft7.w,fc24.w\nkil ft0.w\n";
 			if (normalmap) {
 				fragment += "tex ft5, v1, fs2 <2d,linear," + (_normalmap.mipmapping ? "miplinear" : "mipnone") + ">\n" + 
 							"add ft5, ft5, ft5\n" + 
@@ -138,6 +138,7 @@ package nest.view.materials
 			if (specular) fragment += "tex ft6, v1, fs1 <2d,linear," + (_specular.mipmapping ? "miplinear" : "mipnone") + ">\n";
 			fragment += Shader3D.createLight(_light, specular, normalmap);
 			fragment += "mov oc, ft0\n";
+			if (kill) fragment += "sub ft0.w, ft0.w, fc23.w\nkil ft0.w\n";
 			
 			_shader.setFromString(vertex, fragment, normal);
 		}

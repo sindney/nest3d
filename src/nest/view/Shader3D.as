@@ -28,7 +28,7 @@ package nest.view
 						// j    : color
 						// j + 1: direction
 						fragment += "mov ft2, fc" + (j + 1) + "\n" + 
-									"m44 ft2, ft2, fc23\n" + 
+									"m44 ft2, ft2, fc24\n" + 
 									"nrm ft2.xyz, ft2\n" + 
 									"neg ft2, ft2\n" + 
 									"dp3 ft4, ft2, ft5\n" + 
@@ -55,7 +55,7 @@ package nest.view
 						// j + 1: position
 						// j + 2: radius
 						fragment += "mov ft2, fc" + (j + 1) + "\n" + 
-									"m44 ft2, ft2, fc23\n" + 
+									"m44 ft2, ft2, fc24\n" + 
 									"sub ft2, ft2, v0\n" + 
 									"dp3 ft1, ft2, ft2\n" + 
 									"sqt ft1, ft1\n" + 
@@ -92,7 +92,7 @@ package nest.view
 						// j + 2: direction
 						// j + 3: lightParameters
 						fragment += "mov ft2, fc" + (j + 1) + "\n" + 
-									"m44 ft2, ft2, fc23\n" + 
+									"m44 ft2, ft2, fc24\n" + 
 									"sub ft2, ft2, v0\n" + 
 									"dp3 ft1, ft2, ft2\n" + 
 									"sqt ft1, ft1\n" + 
@@ -102,7 +102,7 @@ package nest.view
 									"nrm ft2.xyz, ft2\n" + 
 									"mov ft1, fc" + (j + 2) + "\n" + 
 									"neg ft1, ft1\n" + 
-									"m44 ft1, ft1, fc23\n" + 
+									"m44 ft1, ft1, fc24\n" + 
 									"nrm ft1.xyz, ft1\n" + 
 									"dp3 ft1, ft1, ft2\n" + 
 									"max ft1, ft1, fc" + (j + 3) + ".y\n" + 
