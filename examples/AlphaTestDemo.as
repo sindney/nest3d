@@ -6,6 +6,7 @@ package
 	import flash.display.StageScaleMode;
 	import flash.events.Event;
 	import flash.events.MouseEvent;
+	import nest.view.managers.BasicManager;
 	
 	import nest.control.factories.PrimitiveFactory;
 	import nest.control.CameraController;
@@ -34,8 +35,7 @@ package
 		}
 		
 		override public function init():void {
-			GlobalMethods.manager = manager = new AlphaManager();
-			
+			GlobalMethods.manager = manager = new BasicManager();
 			var data:MeshData = PrimitiveFactory.createSphere(10);
 			var material:TextureMaterial = new TextureMaterial(new diffuse().bitmapData);
 			material.update();

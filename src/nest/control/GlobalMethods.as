@@ -23,6 +23,7 @@ package nest.control
 		private static var _roots:Vector.<IContainer3D> = new Vector.<IContainer3D>();
 		private static var _managers:Vector.<ISceneManager> = new Vector.<ISceneManager>();
 		private static var _views:Vector.<ViewPort> = new Vector.<ViewPort>();
+		private static var _alphaThreshold:Vector.<Number> = Vector.<Number>([0.5, 0.5, 0.5, 0.5]);
 		
 		public static function get stage3ds():Vector.<Stage3D> {
 			return _stage3ds;
@@ -94,6 +95,10 @@ package nest.control
 		
 		public static function set view(value:ViewPort):void {
 			_views[index] = value;
+		}
+		
+		public static function get alphaThreshold():Vector.<Number> {
+			return _alphaThreshold;
 		}
 		
 	}
