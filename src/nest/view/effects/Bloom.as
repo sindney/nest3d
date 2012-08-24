@@ -33,7 +33,6 @@ package nest.view.effects
 		private var _maxIteration:int = 6;
 		private var _blurX:Number;
 		private var _blurY:Number;
-		private var _threshold:Number;
 		
 		public function Bloom(blurX:Number = 4, blurY:Number = 4, threshold:Number = 0.75) {
 			var context3d:Context3D = GlobalMethods.context3d;
@@ -53,8 +52,7 @@ package nest.view.effects
 			_textures = new Vector.<TextureBase>(2, true);
 			_blurX = blurX;
 			_blurY = blurY;
-			_threshold = threshold;
-			thresholds = Vector.<Number>([_threshold, _threshold, _threshold, _threshold]);
+			thresholds = Vector.<Number>([threshold, threshold, threshold, threshold]);
 			update();
 			super();
 		}
@@ -148,10 +146,10 @@ package nest.view.effects
 				}
 				if (y < _blurY) code += "add ft0.y, ft0.y, fc1.y\n";
 			}
-			code += "mul ft0, ft1, fc0.z\n";
-			code += "tex ft1, v0, fs1 <2d,nearest,clamp>\n";
-			code += "sat ft1, ft1\n";
-			code += "add oc, ft0, ft1";
+			code += "mul ft0, ft1, fc0.z\n" + 
+					"tex ft1, v0, fs1 <2d,nearest,clamp>\n" + 
+					"sat ft1, ft1\n" + 
+					"add oc, ft0, ft1";
 			
 			program1.upload(Shader3D.assembler.assemble(Context3DProgramType.VERTEX, "mov op, va0\nmov v0, va1\n"), 
 							Shader3D.assembler.assemble(Context3DProgramType.FRAGMENT, code));
@@ -192,15 +190,14 @@ package nest.view.effects
 		}
 		
 		public function get threshold():Number {
-			return _threshold;
+			return thresholds[0];
 		}
 		
 		public function set threshold(value:Number):void {
-			_threshold = value;
-			thresholds[0] = _threshold;
-			thresholds[1] = _threshold;
-			thresholds[2] = _threshold;
-			thresholds[3] = _threshold;
+			thresholds[0] = value;
+			thresholds[1] = value;
+			thresholds[2] = value;
+			thresholds[3] = value;
 		}
 	}
 
