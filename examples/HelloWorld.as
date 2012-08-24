@@ -4,21 +4,19 @@ package
 	import flash.display.StageAlign;
 	import flash.display.StageScaleMode;
 	import flash.events.Event;
-	import flash.geom.Vector3D;
 	
 	import nest.control.factories.PrimitiveFactory;
-	import nest.control.factories.ShaderFactory;
 	import nest.control.CameraController;
 	import nest.control.GlobalMethods;
 	import nest.object.Container3D;
 	import nest.object.data.MeshData;
 	import nest.object.Mesh;
+	import nest.view.culls.BasicCulling;
 	import nest.view.lights.AmbientLight;
 	import nest.view.lights.DirectionalLight;
 	import nest.view.managers.BasicManager;
 	import nest.view.materials.ColorMaterial;
 	import nest.view.Camera3D;
-	import nest.view.Shader3D;
 	import nest.view.ViewPort;
 	
 	/**
@@ -39,6 +37,7 @@ package
 			GlobalMethods.root = new Container3D();
 			GlobalMethods.manager = new BasicManager();
 			GlobalMethods.view = new ViewPort(800, 600);
+			GlobalMethods.view.culling = new BasicCulling();
 			addChild(GlobalMethods.view.diagram);
 			
 			controller = new CameraController();
@@ -57,10 +56,9 @@ package
 			var material:ColorMaterial = new ColorMaterial(0xffffff);
 			material.light = new AmbientLight();
 			material.light.next = new DirectionalLight(0xffffff, -1, -1);
-			var shader:Shader3D = new Shader3D();
-			ShaderFactory.create(shader, material);
+			material.update();
 			
-			var mesh:Mesh = new Mesh(data, material, shader);
+			var mesh:Mesh = new Mesh(data, material);
 			GlobalMethods.root.addChild(mesh);
 			
 			GlobalMethods.camera.position.z = -200;

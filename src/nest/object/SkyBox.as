@@ -7,7 +7,6 @@ package nest.object
 	import nest.object.geom.Vertex;
 	import nest.view.materials.IMaterial;
 	import nest.view.materials.SkyBoxMaterial;
-	import nest.view.Shader3D;
 	
 	/**
 	 * SkyBox
@@ -61,11 +60,7 @@ package nest.object
 			MeshData.calculateNormal(vertices, triangles);
 			var data:MeshData = new MeshData(vertices, triangles);
 			
-			var shader:Shader3D = new Shader3D();
-			shader.setFromString("m44 op, va0, vc0\nmov v0, va0\n", 
-								"tex oc, v0, fs0 <cube,linear,miplinear>\n", false);
-			
-			super(data, material, shader);
+			super(data, material);
 		}
 		
 		override public function clone():IMesh {

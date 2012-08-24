@@ -3,7 +3,6 @@ package
 	import flash.geom.Vector3D;
 	
 	import nest.control.factories.PrimitiveFactory;
-	import nest.control.factories.ShaderFactory;
 	import nest.object.data.*;
 	import nest.object.geom.AABB;
 	import nest.object.geom.BSphere;
@@ -24,24 +23,27 @@ package
 		
 		private var box:Mesh;
 		private var sphere:Mesh;
-		private var hit:ColorMaterial = new ColorMaterial(0xffff00);
-		private var free:ColorMaterial = new ColorMaterial(0x00ff00);
+		private var hit:ColorMaterial;
+		private var free:ColorMaterial;
 		
 		override public function init():void {
 			var light:AmbientLight = new AmbientLight(0x333333);
 			light.next = new PointLight(0xffffff, 200, 0, 0, 0);
 			
-			free.light = hit.light = light;
+			hit = new ColorMaterial(0xffff00);
+			hit.light = light;
+			hit.update();
 			
-			var shader:Shader3D = new Shader3D();
-			ShaderFactory.create(shader, free);
+			free = new ColorMaterial(0x00ff00);
+			free.light = light;
+			free.update();
 			
-			box = new Mesh(PrimitiveFactory.createBox(10, 10, 10), free, shader);
+			box = new Mesh(PrimitiveFactory.createBox(10, 10, 10), free);
 			box.position.z = 40;
 			box.changed = true;
 			scene.addChild(box);
 			
-			sphere = new Mesh(PrimitiveFactory.createSphere(10, 20, 20), free, shader, new BSphere());
+			sphere = new Mesh(PrimitiveFactory.createSphere(10, 20, 20), free, new BSphere());
 			sphere.position.x = -20;
 			sphere.position.z = 40;
 			sphere.changed = true;

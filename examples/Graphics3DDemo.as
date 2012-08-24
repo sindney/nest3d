@@ -1,14 +1,6 @@
 package  
 {
-	import nest.control.factories.PrimitiveFactory;
-	import nest.control.factories.ShaderFactory;
-	import nest.object.data.MeshData;
 	import nest.object.Graphics3D;
-	import nest.object.Mesh;
-	import nest.view.lights.AmbientLight;
-	import nest.view.lights.PointLight;
-	import nest.view.materials.ColorMaterial;
-	import nest.view.Shader3D;
 	
 	/**
 	 * Graphics3DDemo

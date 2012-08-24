@@ -19,7 +19,7 @@ package nest.view.materials
 		}
 		
 		public function upload():void {
-			if (!_texture || !_data) return;
+			if (!_texture) return;
 			TextureResource.uploadWithMipmaps(_texture, _data[0], 0);
 			TextureResource.uploadWithMipmaps(_texture, _data[1], 1);
 			TextureResource.uploadWithMipmaps(_texture, _data[2], 2);

@@ -8,7 +8,6 @@ package
 	import flash.events.MouseEvent;
 	
 	import nest.control.factories.PrimitiveFactory;
-	import nest.control.factories.ShaderFactory;
 	import nest.control.CameraController;
 	import nest.control.GlobalMethods;
 	import nest.object.data.MeshData;
@@ -17,7 +16,6 @@ package
 	import nest.view.managers.AlphaManager;
 	import nest.view.materials.TextureMaterial;
 	import nest.view.Camera3D;
-	import nest.view.Shader3D;
 	import nest.view.ViewPort;
 	
 	/**
@@ -40,10 +38,9 @@ package
 			
 			var data:MeshData = PrimitiveFactory.createSphere(10);
 			var material:TextureMaterial = new TextureMaterial(new diffuse().bitmapData);
-			var shader:Shader3D = new Shader3D();
-			ShaderFactory.create(shader, material);
-			
+			material.update();
 			var material1:TextureMaterial = new TextureMaterial(new diffuse1().bitmapData);
+			material1.update();
 			
 			var mesh:Mesh;
 			var i:int, j:int, k:int;
@@ -51,13 +48,13 @@ package
 				for (j = 0; j < 10; j++) {
 					for (k = 0; k < 10; k++) {
 						if (k < 5) {
-							mesh = new Mesh(data, material, shader);
+							mesh = new Mesh(data, material);
 							mesh.culling = Context3DTriangleFace.NONE;
 							mesh.blendMode.source = Context3DBlendFactor.SOURCE_ALPHA;
 							mesh.blendMode.dest = Context3DBlendFactor.ONE_MINUS_SOURCE_ALPHA;
 							mesh.alphaTest = true;
 						} else {
-							mesh = new Mesh(data, material1, shader);
+							mesh = new Mesh(data, material1);
 						}
 						mesh.position.setTo(i * 40, j * 40, k * 40);
 						mesh.changed = true;

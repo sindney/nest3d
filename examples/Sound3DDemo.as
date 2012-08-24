@@ -3,7 +3,7 @@ package
 	import flash.display.BitmapData;
 	import flash.media.Sound;
 	
-	import nest.control.factories.*;
+	import nest.control.factories.PrimitiveFactory;
 	import nest.object.data.MeshData;
 	import nest.object.Mesh;
 	import nest.object.Sound3D;
@@ -13,7 +13,6 @@ package
 	import nest.view.materials.ColorMaterial;
 	import nest.view.materials.SkyBoxMaterial;
 	import nest.view.materials.EnvMapMaterial;
-	import nest.view.Shader3D;
 	
 	/**
 	 * Sound3DDemo
@@ -54,20 +53,19 @@ package
 			cubicmap[4] = new front().bitmapData;
 			cubicmap[5] = new back().bitmapData;
 			
-			var shader:Shader3D = new Shader3D();
-			var mesh:Mesh = new Mesh(PrimitiveFactory.createPlane(100, 100, 4, 4), new EnvMapMaterial(cubicmap, 1, new BitmapData(1, 1, false)), shader);
-			ShaderFactory.create(shader, mesh.material);
+			var mesh:Mesh = new Mesh(PrimitiveFactory.createPlane(100, 100, 4, 4), new EnvMapMaterial(cubicmap, 1, new BitmapData(1, 1, false)));
+			mesh.material.update();
 			scene.addChild(mesh);
 			
-			shader = new Shader3D();
-			mesh = new Mesh(PrimitiveFactory.createPlane(10, 10, 1, 1), new ColorMaterial(), shader);
-			ShaderFactory.create(shader, mesh.material);
+			mesh = new Mesh(PrimitiveFactory.createPlane(10, 10, 1, 1), new ColorMaterial());
+			mesh.material.update();
 			mesh.position.setTo(50, 5, 50);
 			mesh.rotation.setTo(Math.PI / 2, -Math.PI * 0.75, 0);
 			mesh.changed = true;
 			scene.addChild(mesh);
 			
 			var skyBox:SkyBox = new SkyBox(1000, new SkyBoxMaterial(cubicmap));
+			skyBox.material.update();
 			scene.addChild(skyBox);
 			
 			var sound:Sound3D = new Sound3D(new rain() as Sound);

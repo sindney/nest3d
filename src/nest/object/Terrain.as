@@ -8,7 +8,6 @@ package nest.object
 	import nest.object.geom.IBound;
 	import nest.object.geom.BSphere;
 	import nest.view.materials.IMaterial;
-	import nest.view.Shader3D;
 	
 	/**
 	 * Terrain
@@ -23,8 +22,8 @@ package nest.object
 		public var segmentsH:int;
 		public var magnitude:Number;
 		
-		public function Terrain(data:MeshData, material:IMaterial, shader:Shader3D, bound:IBound = null) {
-			super(data, material, shader, bound);
+		public function Terrain(data:MeshData, material:IMaterial, bound:IBound = null) {
+			super(data, material, bound);
 		}
 		
 		/**
@@ -67,7 +66,7 @@ package nest.object
 		override public function clone():IMesh {
 			var bound:IBound;
 			if (_bound is BSphere) bound = new BSphere(); 
-			var result:Terrain = new Terrain(_data, _material, _shader, bound);
+			var result:Terrain = new Terrain(_data, _material, bound);
 			result.heightMap = heightMap;
 			result.width = width;
 			result.height = height;

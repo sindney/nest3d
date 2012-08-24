@@ -1,11 +1,10 @@
 package  
 {
-	import nest.control.factories.*;
+	import nest.control.factories.PrimitiveFactory;
 	import nest.object.data.MeshData;
 	import nest.object.LODMesh;
 	import nest.view.materials.ColorMaterial;
 	import nest.view.materials.IMaterial;
-	import nest.view.Shader3D;
 	
 	/**
 	 * LODDemo
@@ -33,10 +32,11 @@ package
 			materialList.push(new ColorMaterial(0x333333));
 			distantList.push(300);
 			
-			var shader:Shader3D = new Shader3D();
-			ShaderFactory.create(shader, materialList[0]);
+			materialList[0].update();
+			materialList[1].update();
+			materialList[2].update();
 			
-			var mesh:LODMesh = new LODMesh(dataList, materialList, distantList, shader);
+			var mesh:LODMesh = new LODMesh(dataList, materialList, distantList);
 			scene.addChild(mesh);
 			
 			camera.position.y = 5;

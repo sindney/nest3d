@@ -1,6 +1,5 @@
 package  
 {
-	import nest.control.factories.ShaderFactory;
 	import nest.control.parsers.ParserOBJ;
 	import nest.object.data.MeshData;
 	import nest.object.Mesh;
@@ -35,12 +34,11 @@ package
 			var parser:ParserOBJ = new ParserOBJ();
 			
 			var data:MeshData = parser.parse(new model(), 10);
-			var texture:TextureMaterial = new TextureMaterial(new diffuse().bitmapData, new specular().bitmapData, 40, new normals().bitmapData, true);
+			var texture:TextureMaterial = new TextureMaterial(new diffuse().bitmapData, new specular().bitmapData, 40, new normals().bitmapData);
 			texture.light = new AmbientLight(0x000000);
 			texture.light.next = new DirectionalLight(0xffffff, 0, 0, -1);
-			var shader:Shader3D = new Shader3D();
-			ShaderFactory.create(shader, texture);
-			mesh = new Mesh(data, texture, shader);
+			texture.update();
+			mesh = new Mesh(data, texture);
 			scene.addChild(mesh);
 			
 			camera.position.z = 120;

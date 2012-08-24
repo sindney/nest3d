@@ -4,12 +4,10 @@ package
 	import flash.geom.Vector3D;
 	
 	import nest.control.factories.PrimitiveFactory;
-	import nest.control.factories.ShaderFactory;
 	import nest.object.data.*;
 	import nest.object.Mesh;
 	import nest.view.lights.*;
 	import nest.view.materials.*;
-	import nest.view.Shader3D;
 	
 	/**
 	 * BasicDemo
@@ -33,18 +31,17 @@ package
 			
 			colorMat = new ColorMaterial(0xff0000);
 			colorMat.light = light;
+			colorMat.update();
 			colorMat1 = new ColorMaterial(0x00ff00);
 			colorMat1.light = light;
-			
-			var shader:Shader3D = new Shader3D();
-			ShaderFactory.create(shader, colorMat);
+			colorMat1.update();
 			
 			var cube:Mesh;
 			var i:int, j:int, k:int = 0;
 			for (i = 0; i < 10; i++) {
 				for (j = 0; j < 10; j++) {
 					for (k = 0; k < 10; k++) {
-						cube = new Mesh(data, k > 4 ? colorMat : colorMat1, shader);
+						cube = new Mesh(data, k > 4 ? colorMat : colorMat1);
 						cube.position.setTo(i * 40, j * 40, k * 40);
 						cube.changed = true;
 						scene.addChild(cube);

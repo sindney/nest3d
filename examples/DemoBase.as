@@ -10,6 +10,7 @@ package
 	import nest.control.CameraController;
 	import nest.control.GlobalMethods;
 	import nest.object.Container3D;
+	import nest.view.culls.BasicCulling;
 	import nest.view.managers.BasicManager;
 	import nest.view.managers.ISceneManager;
 	import nest.view.Camera3D;
@@ -54,6 +55,7 @@ package
 			GlobalMethods.root = scene = new Container3D();
 			GlobalMethods.manager = manager = new BasicManager();
 			GlobalMethods.view = view = new ViewPort(800, 600);
+			GlobalMethods.view.culling = new BasicCulling();
 			addChild(view.diagram);
 			
 			controller = new CameraController();

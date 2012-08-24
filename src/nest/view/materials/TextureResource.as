@@ -44,8 +44,11 @@ package nest.view.materials
 			
 		}
 		
+		/**
+		 * Call this when you redraw your data but didn't change it's size.
+		 */
 		public function upload():void {
-			if (!_texture || !_data) return;
+			if (!_texture) return;
 			_mipmapping ? uploadWithMipmaps(_texture, _data) : _texture.uploadFromBitmapData(_data);
 		}
 		

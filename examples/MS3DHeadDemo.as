@@ -1,12 +1,10 @@
 package  
 {
-	import nest.control.factories.ShaderFactory;
 	import nest.control.parsers.ParserMS3D;
 	import nest.object.data.MeshData;
 	import nest.object.Mesh;
 	import nest.view.lights.*;
 	import nest.view.materials.*;
-	import nest.view.Shader3D;
 	
 	/**
 	 * MS3DHeadDemo
@@ -40,12 +38,10 @@ package
 			
 			var texture:TextureMaterial = new TextureMaterial(new diffuse().bitmapData, new specular().bitmapData, 40, new normals().bitmapData);
 			texture.light = light;
-			var shader:Shader3D = new Shader3D();
-			ShaderFactory.create(shader, texture);
+			texture.update();
 			
 			mesh = parser.getObjectByName("g0");
 			mesh.material = texture;
-			mesh.shader = shader;
 			scene.addChild(mesh);
 			
 			camera.position.z = 120;

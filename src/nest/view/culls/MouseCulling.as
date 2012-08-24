@@ -13,7 +13,16 @@ package nest.view.culls
 		}
 		
 		public function classifyMesh(mesh:IMesh):Boolean {
-			return mesh.mouseEnabled;
+			var result:Boolean = mesh.mouseEnabled;
+			if (result) {
+				var parent:IContainer3D = mesh.parent;
+				while (parent) {
+					result = parent.mouseEnabled;
+					if (!result) return false;
+					parent = parent.parent;
+				}
+			}
+			return result;
 		}
 		
 		public function classifyContainer(container:IContainer3D):Boolean {

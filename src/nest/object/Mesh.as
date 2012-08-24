@@ -22,8 +22,6 @@ package nest.object
 		
 		protected var _data:MeshData;
 		
-		protected var _shader:Shader3D;
-		
 		protected var _bound:IBound;
 		
 		protected var _blendMode:BlendMode3D;
@@ -37,9 +35,8 @@ package nest.object
 		
 		protected var _id:uint;
 		
-		public function Mesh(data:MeshData, material:IMaterial, shader:Shader3D, bound:IBound = null) {
+		public function Mesh(data:MeshData, material:IMaterial, bound:IBound = null) {
 			super();
-			_shader = shader;
 			_material = material;
 			_blendMode = new BlendMode3D();
 			
@@ -55,7 +52,7 @@ package nest.object
 		public function clone():IMesh {
 			var bound:IBound;
 			if (_bound is BSphere) bound = new BSphere();
-			var result:Mesh = new Mesh(_data, _material, _shader, bound);
+			var result:Mesh = new Mesh(_data, _material, bound);
 			result.blendMode.source = _blendMode.source;
 			result.blendMode.dest = _blendMode.dest;
 			result.blendMode.depthMask = _blendMode.depthMask;
@@ -140,14 +137,6 @@ package nest.object
 		
 		public function get blendMode():BlendMode3D {
 			return _blendMode;
-		}
-		
-		public function get shader():Shader3D {
-			return _shader;
-		}
-		
-		public function set shader(value:Shader3D):void {
-			if (_shader != value)_shader = value;
 		}
 		
 		public function get alphaTest():Boolean {

@@ -1,14 +1,11 @@
 package  
 {
 	import nest.control.factories.PrimitiveFactory;
-	import nest.control.factories.ShaderFactory;
 	import nest.object.data.MeshData;
 	import nest.object.Mesh;
 	import nest.view.lights.AmbientLight;
 	import nest.view.lights.DirectionalLight;
-	import nest.view.materials.ColorMaterial;
 	import nest.view.materials.TextureMaterial;
-	import nest.view.Shader3D;
 	
 	/**
 	 * SphereDemo
@@ -29,19 +26,17 @@ package
 			
 			var material:TextureMaterial = new TextureMaterial(new bitmap().bitmapData);
 			material.light = light;
+			material.update();
 			
-			var shader:Shader3D = new Shader3D();
-			ShaderFactory.create(shader, material);
-			
-			var mesh:Mesh = new Mesh(PrimitiveFactory.createSphere(5, 8, 6), material, shader);
+			var mesh:Mesh = new Mesh(PrimitiveFactory.createSphere(5, 8, 6), material);
 			scene.addChild(mesh);
 			
-			mesh = new Mesh(PrimitiveFactory.createBox(10, 10, 10), material, shader);
+			mesh = new Mesh(PrimitiveFactory.createBox(10, 10, 10), material);
 			mesh.position.x = 10;
 			mesh.changed = true;
 			scene.addChild(mesh);
 			
-			mesh = new Mesh(PrimitiveFactory.createPlane(10, 10), material, shader);
+			mesh = new Mesh(PrimitiveFactory.createPlane(10, 10), material);
 			mesh.position.x = -10;
 			mesh.changed = true;
 			scene.addChild(mesh);

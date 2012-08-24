@@ -15,12 +15,12 @@ package nest.view.processes
 	public class UVProcess implements IProcess {
 		
 		private var draw:Matrix3D;
-		private var uvShader:Shader3D;
+		private var shader:Shader3D;
 		
 		public function UVProcess() {
 			draw = new Matrix3D();
-			uvShader = new Shader3D();
-			uvShader.setFromString("m44 op, va0, vc0\nmov v0, va1" , "mov oc, v0", false);
+			shader = new Shader3D();
+			shader.setFromString("m44 op, va0, vc0\nmov v0, va1" , "mov oc, v0", false);
 		}
 		
 		public function doMesh(mesh:IMesh):void {
@@ -37,13 +37,7 @@ package nest.view.processes
 			
 			mesh.data.upload(context3d, true, false);
 			
-			if (uvShader.changed) {
-				uvShader.changed = false;
-				if (!uvShader.program) uvShader.program = context3d.createProgram();
-				uvShader.program.upload(uvShader.vertex, uvShader.fragment);
-			}
-			
-			context3d.setProgram(uvShader.program);
+			context3d.setProgram(shader.program);
 			context3d.drawTriangles(mesh.data.indexBuffer);
 			
 			mesh.data.unload(context3d);

@@ -20,8 +20,8 @@ package nest.object
 		
 		private var _index:int = 0;
 		
-		public function LODMesh(dataList:Vector.<MeshData>, materialList:Vector.<IMaterial>, distantList:Vector.<Number>, shader:Shader3D, bound:IBound = null) {
-			super(null, null, shader, bound);
+		public function LODMesh(dataList:Vector.<MeshData>, materialList:Vector.<IMaterial>, distantList:Vector.<Number>, bound:IBound = null) {
+			super(null, null, bound);
 			_dataList = dataList;
 			_materialList = materialList;
 			_distantList = distantList;
@@ -49,7 +49,7 @@ package nest.object
 		override public function clone():IMesh {
 			var bound:IBound;
 			if (_bound is BSphere) bound = new BSphere(); 
-			var result:LODMesh = new LODMesh(_dataList, _materialList, _distantList, _shader, bound);
+			var result:LODMesh = new LODMesh(_dataList, _materialList, _distantList, bound);
 			result.blendMode.source = _blendMode.source;
 			result.blendMode.dest = _blendMode.dest;
 			result.blendMode.depthMask = _blendMode.depthMask;

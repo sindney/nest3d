@@ -3,7 +3,6 @@ package
 	import flash.geom.Vector3D;
 	
 	import nest.control.factories.PrimitiveFactory;
-	import nest.control.factories.ShaderFactory;
 	import nest.object.data.*;
 	import nest.object.geom.AABB;
 	import nest.object.geom.BSphere;
@@ -11,7 +10,6 @@ package
 	import nest.object.Mesh;
 	import nest.view.lights.*;
 	import nest.view.materials.*;
-	import nest.view.Shader3D;
 	
 	public class RayInterectionDemo extends DemoBase {
 		
@@ -30,19 +28,18 @@ package
 			
 			var colorMat:ColorMaterial = new ColorMaterial(0xff0000);
 			colorMat.light = light;
+			colorMat.update();
 			
-			var shader:Shader3D = new Shader3D();
-			ShaderFactory.create(shader, colorMat);
-			
-			box = new Mesh(data, colorMat, shader);
+			box = new Mesh(data, colorMat);
 			scene.addChild(box);
 			
 			data = PrimitiveFactory.createSphere(1, 8, 8);
 			
 			colorMat = new ColorMaterial(0xffffff);
 			colorMat.light = light;
+			colorMat.update();
 			
-			spot = new Mesh(data, colorMat, shader);
+			spot = new Mesh(data, colorMat);
 			scene.addChild(spot);
 			
 			controller.speed = 1;

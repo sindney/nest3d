@@ -4,14 +4,12 @@ package
 	import flash.geom.Vector3D;
 	
 	import nest.control.factories.PrimitiveFactory;
-	import nest.control.factories.ShaderFactory;
 	import nest.control.mouse.MouseManager;
 	import nest.control.mouse.MouseEvent3D;
 	import nest.object.data.*;
 	import nest.object.Mesh;
 	import nest.view.lights.*;
 	import nest.view.materials.*;
-	import nest.view.Shader3D;
 	
 	/**
 	 * Mouse3DDemo
@@ -36,20 +34,20 @@ package
 			
 			colorMat = new ColorMaterial(0xffffff);
 			colorMat.light = light;
+			colorMat.update();
 			colorMat1 = new ColorMaterial(0x0066ff);
 			colorMat1.light = light;
+			colorMat1.update();
 			colorMat2 = new ColorMaterial(0xff0000);
 			colorMat2.light = light;
-			
-			var shader:Shader3D = new Shader3D();
-			ShaderFactory.create(shader, colorMat);
+			colorMat2.update();
 			
 			var cube:Mesh;
 			var i:int, j:int, k:int = 0;
 			for (i = 0; i < 10; i++) {
 				for (j = 0; j < 10; j++) {
 					for (k = 0; k < 10; k++) {
-						cube = new Mesh(data, colorMat, shader);
+						cube = new Mesh(data, colorMat);
 						cube.position.setTo(i * 40, j * 40, k * 40);
 						cube.changed = true;
 						cube.mouseEnabled = true;

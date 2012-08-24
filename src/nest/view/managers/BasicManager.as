@@ -73,15 +73,10 @@ package nest.view.managers
 			
 			if (mesh.material is EnvMapMaterial) context3d.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 10, mesh.matrix, true);
 			
-			mesh.data.upload(context3d, mesh.material.uv, mesh.shader.normal);
+			mesh.data.upload(context3d, mesh.material.uv, mesh.material.shader.normal);
 			mesh.material.upload(context3d);
-			if (mesh.shader.changed) {
-				mesh.shader.changed = false;
-				if (!mesh.shader.program) mesh.shader.program = context3d.createProgram();
-				mesh.shader.program.upload(mesh.shader.vertex, mesh.shader.fragment);
-			}
 			
-			context3d.setProgram(mesh.shader.program);
+			context3d.setProgram(mesh.material.shader.program);
 			context3d.drawTriangles(mesh.data.indexBuffer);
 			
 			mesh.data.unload(context3d);

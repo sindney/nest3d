@@ -1,14 +1,11 @@
 package  
 {
-	import flash.ui.Keyboard;
-	import nest.control.factories.ShaderFactory;
 	import nest.control.parsers.ParserOBJ;
 	import nest.object.data.MeshData;
 	import nest.object.Mesh;
 	import nest.view.effects.*;
 	import nest.view.lights.*;
 	import nest.view.materials.ColorMaterial;
-	import nest.view.Shader3D;
 	
 	/**
 	 * PostEffectDemo
@@ -36,10 +33,9 @@ package
 			texture.light = new AmbientLight(0x333333);
 			texture.light.next = new DirectionalLight(0xffffff, 1, -1);
 			(texture.light.next as DirectionalLight).normalize();
-			var shader:Shader3D = new Shader3D();
-			ShaderFactory.create(shader, texture);
+			texture.update();
 			
-			mesh = new Mesh(data, texture, shader);
+			mesh = new Mesh(data, texture);
 			scene.addChild(mesh);
 			
 			camera.position.setTo(0, 50, 250);

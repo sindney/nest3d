@@ -37,12 +37,6 @@ package nest.view.processes
 			
 			mesh.data.upload(context3d, false, false);
 			
-			if (shader.changed) {
-				shader.changed = false;
-				if (!shader.program) shader.program = context3d.createProgram();
-				shader.program.upload(shader.vertex, shader.fragment);
-			}
-			
 			context3d.setProgram(shader.program);
 			context3d.drawTriangles(mesh.data.indexBuffer);
 			

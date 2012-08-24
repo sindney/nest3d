@@ -1,12 +1,10 @@
 package  
 {
 	import flash.display.BitmapData;
-	import nest.control.factories.ShaderFactory;
 	import nest.control.parsers.ParserOBJ;
 	import nest.object.data.MeshData;
 	import nest.object.Mesh;
 	import nest.view.materials.*;
-	import nest.view.Shader3D;
 	
 	/**
 	 * EnvMapDemo
@@ -54,10 +52,9 @@ package
 			
 			var data:MeshData = parser.parse(new model(), 10);
 			var texture:EnvMapMaterial = new EnvMapMaterial(cubicmap, 0.4, new diffuse().bitmapData);
-			var shader:Shader3D = new Shader3D();
-			ShaderFactory.create(shader, null, true, false, false, false, true, false);
+			texture.update();
 			
-			var mesh:Mesh = new Mesh(data, texture, shader);
+			var mesh:Mesh = new Mesh(data, texture);
 			scene.addChild(mesh);
 			
 			camera.position.z = 120;

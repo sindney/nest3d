@@ -4,6 +4,7 @@ package nest.view.materials
 	import flash.display3D.Context3DProgramType;
 	
 	import nest.view.lights.*;
+	import nest.view.Shader3D;
 	
 	/**
 	 * ColorMaterial
@@ -15,8 +16,11 @@ package nest.view.materials
 		
 		protected var _light:AmbientLight;
 		
+		protected var _shader:Shader3D;
+		
 		public function ColorMaterial(color:uint = 0xffffff, alpha:Number = 1) {
 			_rgba = new Vector.<Number>(4, true);
+			_shader = new Shader3D();
 			this.color = color;
 			this.alpha = alpha;
 		}
@@ -50,6 +54,25 @@ package nest.view.materials
 		
 		public function unload(context3d:Context3D):void {
 			
+		}
+		
+		public function update():void {
+			var vertex:String = "m44 op, va0, vc0\n" + 
+								"mov v0, va0\n" + 
+								// cameraPos
+								"mov vt0, vc8\n" + 
+								// cameraPos to object space
+								"m44 vt1, vt0, vc4\n" + 
+								// v6 = cameraDir
+								"nrm vt7.xyz, vt1\n" + 
+								"mov v6, vt7.xyz\n";
+			if (_light) vertex += "mov v2, va2\n";
+			
+			var fragment:String = "mov ft7, fc27\n";
+			fragment += Shader3D.createLight(_light);
+			fragment += "mov oc, ft0\n";
+			
+			_shader.setFromString(vertex, fragment, _light != null);
 		}
 		
 		///////////////////////////////////
@@ -98,6 +121,10 @@ package nest.view.materials
 		
 		public function get uv():Boolean {
 			return false;
+		}
+		
+		public function get shader():Shader3D {
+			return _shader;
 		}
 		
 	}

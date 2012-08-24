@@ -12,9 +12,9 @@ package nest.object
 	 */
 	public class Graphics3D extends Object3D {
 		
-		public static const MOVE_TO : int = 1;
-		public static const LINE_TO : int = 2;
-		public static const CURVE_TO : int = 3;
+		public static const MOVE_TO:int = 1;
+		public static const LINE_TO:int = 2;
+		public static const CURVE_TO:int = 3;
 		public static const DRAW_RECT:int = 4;
 		public static const DRAW_CIRCLE:int = 5;
 		public static const DRAW_ELLIPSE:int = 6;

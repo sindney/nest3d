@@ -1,10 +1,10 @@
 package  
 {
+	import flash.display.Bitmap;
 	import flash.display.BitmapData;
 	import flash.geom.Vector3D;
 	
 	import nest.control.factories.PrimitiveFactory;
-	import nest.control.factories.ShaderFactory;
 	import nest.object.Mesh;
 	import nest.object.SkyBox;
 	import nest.object.Terrain;
@@ -13,7 +13,6 @@ package
 	import nest.view.materials.EnvMapMaterial;
 	import nest.view.materials.SkyBoxMaterial;
 	import nest.view.materials.TextureMaterial;
-	import nest.view.Shader3D;
 	
 	/**
 	 * TerrainDemo
@@ -64,11 +63,10 @@ package
 			
 			var hm:BitmapData = new heightmap().bitmapData;
 			
-			var material:TextureMaterial = new TextureMaterial(new diffuse().bitmapData, null, 10, null, true);
+			var material:TextureMaterial = new TextureMaterial(new diffuse().bitmapData);
 			material.light = light;
-			
-			var shader:Shader3D = new Shader3D();
-			ShaderFactory.create(shader, material);
+			material.diffuse.mipmapping = true;
+			material.update();
 			
 			var cubicmap:Vector.<BitmapData> = new Vector.<BitmapData>();
 			cubicmap[0] = new right().bitmapData;
@@ -78,7 +76,7 @@ package
 			cubicmap[4] = new front().bitmapData;
 			cubicmap[5] = new back().bitmapData;
 			
-			terrain = new Terrain(PrimitiveFactory.createPlane(1000, 1000, 100, 100), material, shader);
+			terrain = new Terrain(PrimitiveFactory.createPlane(1000, 1000, 100, 100), material);
 			terrain.heightMap = hm;
 			terrain.width = 1000;
 			terrain.height = 1000;
@@ -89,11 +87,11 @@ package
 			scene.addChild(terrain);
 			
 			var skybox:SkyBox = new SkyBox(2000, new SkyBoxMaterial(cubicmap));
+			skybox.material.update();
 			scene.addChild(skybox);
 			
-			shader = new Shader3D();
-			var water:Mesh = new Mesh(PrimitiveFactory.createPlane(1000, 1000, 100, 100), new EnvMapMaterial(cubicmap, 0.8, new BitmapData(1, 1, false, 0x32328b)), shader);
-			ShaderFactory.create(shader, water.material);
+			var water:Mesh = new Mesh(PrimitiveFactory.createPlane(1000, 1000, 100, 100), new EnvMapMaterial(cubicmap, 0.8, new BitmapData(1, 1, false, 0x32328b)));
+			water.material.update();
 			water.position.y = -50;
 			water.changed = true;
 			scene.addChild(water);

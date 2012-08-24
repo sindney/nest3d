@@ -8,7 +8,6 @@ package nest.object
 	import nest.object.geom.IBound;
 	import nest.view.materials.IMaterial;
 	import nest.view.BlendMode3D;
-	import nest.view.Shader3D;
 	
 	/**
 	 * Mesh Interface
@@ -22,9 +21,6 @@ package nest.object
 		
 		function get material():IMaterial;
 		function set material(value:IMaterial):void;
-		
-		function get shader():Shader3D;
-		function set shader(value:Shader3D):void;
 		
 		function get bound():IBound;
 		function set bound(value:IBound):void;
