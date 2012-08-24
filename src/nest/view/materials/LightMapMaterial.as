@@ -56,7 +56,7 @@ package nest.view.materials
 				context3d.setProgramConstantsFromVector(Context3DProgramType.VERTEX, 9, _vertData);
 			}
 			if (_lightmap.texture) context3d.setTextureAt(3, _lightmap.texture);
-			if (kill || j == 1) context3d.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, 22, _fragData, 2);
+			if (kill || j == 1) context3d.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, 23, _fragData);
 		}
 		
 		override public function unload(context3d:Context3D):void {
@@ -109,7 +109,7 @@ package nest.view.materials
 			if (normalmap) {
 				fragment += "tex ft5, v1, fs2 <2d,linear," + (_normalmap.mipmapping ? "miplinear" : "mipnone") + ">\n" + 
 							"add ft5, ft5, ft5\n" + 
-							"sub ft5, ft5, fc22.y\n" + 
+							"sub ft5, ft5, fc23.y\n" + 
 							"mul ft0, v4, ft5.x\n" + 
 							"mul ft1, v3, ft5.y\n" + 
 							"add ft0, ft0, ft1\n" + 
@@ -120,7 +120,7 @@ package nest.view.materials
 			if (specular) fragment += "tex ft6, v1, fs1 <2d,linear," + (_specular.mipmapping ? "miplinear" : "mipnone") + ">\n";
 			fragment += Shader3D.createLight(_light, specular, normalmap);
 			fragment += "mov oc, ft0\n";
-			if (kill) fragment += "sub ft0.w, ft0.w, fc23.w\nkil ft0.w\n";
+			if (kill) fragment += "sub ft0.w, ft0.w, fc23.y\nkil ft0.w\n";
 			
 			_shader.setFromString(vertex, fragment, normal);
 		}

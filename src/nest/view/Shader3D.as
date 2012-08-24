@@ -42,7 +42,7 @@ package nest.view
 										"sqt ft3, ft3\n" + 
 										"div ft1, ft1, ft3\n" + 
 										"dp3 ft1, ft1, ft5\n" + 
-										"pow ft1, ft1, fc22.x\n" + 
+										"pow ft1, ft1, fc23.x\n" + 
 										"mul ft1, ft1, ft4\n" + 
 										"sat ft1, ft1\n" + 
 										"mul ft1, ft1, ft6\n" + 
@@ -75,7 +75,7 @@ package nest.view
 										"sqt ft3, ft3\n" + 
 										"div ft1, ft1, ft3\n" + 
 										"dp3 ft1, ft1, ft5\n" + 
-										"pow ft1, ft1, fc22.x\n" + 
+										"pow ft1, ft1, fc23.x\n" + 
 										"dp3 ft3, ft2, ft5\n" + 
 										"sat ft3, ft3\n" + 
 										"mul ft1, ft1, ft3\n" + 
@@ -120,7 +120,7 @@ package nest.view
 										"sqt ft3, ft3\n" + 
 										"div ft1, ft1, ft3\n" + 
 										"dp3 ft1, ft1, ft5\n" + 
-										"pow ft1, ft1, fc22.x\n" + 
+										"pow ft1, ft1, fc23.x\n" + 
 										"dp3 ft3, ft2, ft5\n" + 
 										"sat ft3, ft3\n" + 
 										"mul ft1, ft1, ft3\n" + 

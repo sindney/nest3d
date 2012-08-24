@@ -22,16 +22,18 @@ package nest.view.materials
 		protected var _light:AmbientLight;
 		protected var _shader:Shader3D;
 		
+		/**
+		 * Kill all pixels he who has an alpha value lower than 1.
+		 */
 		public var kill:Boolean = false;
 		
 		public function TextureMaterial(diffuse:BitmapData, specular:BitmapData = null, glossiness:int = 10, normalmap:BitmapData = null) {
 			_vertData = new Vector.<Number>(4, true);
 			_vertData[0] = _vertData[2] = _vertData[3] = 0;
 			_vertData[1] = 1;
-			_fragData = new Vector.<Number>(8, true);
+			_fragData = new Vector.<Number>(4, true);
 			_fragData[0] = glossiness;
 			_fragData[1] = 1;
-			_fragData[7] = 0.1;
 			_shader = new Shader3D();
 			_diffuse = new TextureResource();
 			_diffuse.data = diffuse;
@@ -76,7 +78,7 @@ package nest.view.materials
 				context3d.setTextureAt(2, _normalmap.texture);
 				context3d.setProgramConstantsFromVector(Context3DProgramType.VERTEX, 9, _vertData);
 			}
-			if (kill || j == 1) context3d.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, 22, _fragData, 2);
+			if (kill || j == 1) context3d.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, 23, _fragData);
 		}
 		
 		public function unload(context3d:Context3D):void {
@@ -128,7 +130,7 @@ package nest.view.materials
 			if (normalmap) {
 				fragment += "tex ft5, v1, fs2 <2d,linear," + (_normalmap.mipmapping ? "miplinear" : "mipnone") + ">\n" + 
 							"add ft5, ft5, ft5\n" + 
-							"sub ft5, ft5, fc22.y\n" + 
+							"sub ft5, ft5, fc23.y\n" + 
 							"mul ft0, v4, ft5.x\n" + 
 							"mul ft1, v3, ft5.y\n" + 
 							"add ft0, ft0, ft1\n" + 
@@ -138,7 +140,7 @@ package nest.view.materials
 			if (specular) fragment += "tex ft6, v1, fs1 <2d,linear," + (_specular.mipmapping ? "miplinear" : "mipnone") + ">\n";
 			fragment += Shader3D.createLight(_light, specular, normalmap);
 			fragment += "mov oc, ft0\n";
-			if (kill) fragment += "sub ft0.w, ft0.w, fc23.w\nkil ft0.w\n";
+			if (kill) fragment += "sub ft0.w, ft0.w, fc23.y\nkil ft0.w\n";
 			
 			_shader.setFromString(vertex, fragment, normal);
 		}
@@ -163,7 +165,7 @@ package nest.view.materials
 		/**
 		 * Root light is an AmbientLight.
 		 * <p>Link new light source to light.next.</p>
-		 * <p>There's 22 empty fc left.</p>
+		 * <p>There's 23 empty fc left.</p>
 		 * <p>Ambient light absorbs 1 fc.</p>
 		 * <p>Directional light takes 2.</p>
 		 * <p>PointLight light takes 3.</p>
