@@ -142,16 +142,16 @@ package nest.control.mouse
 		// getter/setters
 		///////////////////////////////////
 		
-		public function get type():String {
-			return _type;
-		}
-		
 		public function get dataProcess():IProcess {
 			return _dataProcess;
 		}
 		
 		public function set dataProcess(value:IProcess):void {
 			_dataProcess = value;
+		}
+		
+		public function get type():String {
+			return _type;
 		}
 		
 	}

@@ -96,6 +96,8 @@ package
 			water.changed = true;
 			scene.addChild(water);
 			
+			view.effect = new Bloom(16, 16, 0.25);
+			
 			camera.position.z = -10;
 			camera.position.y = 10;
 			camera.changed = true;

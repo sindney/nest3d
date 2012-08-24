@@ -70,6 +70,7 @@ package nest.view.effects
 			vertexBuffer.dispose();
 			uvBuffer.dispose();
 			indexBuffer.dispose();
+			program.dispose();
 			data = null;
 		}
 		

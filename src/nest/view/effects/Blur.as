@@ -17,8 +17,6 @@ package nest.view.effects
 	 */
 	public class Blur extends PostEffect {
 		
-		private const maxIteration:int = 6;
-		
 		private var program:Program3D;
 		private var vertexBuffer:VertexBuffer3D;
 		private var uvBuffer:VertexBuffer3D;
@@ -28,6 +26,7 @@ package nest.view.effects
 		private var stepX:Number;
 		private var stepY:Number;
 		
+		private var _maxIteration:int = 6;
 		private var _blurX:Number;
 		private var _blurY:Number;
 		
@@ -76,6 +75,7 @@ package nest.view.effects
 			vertexBuffer.dispose();
 			uvBuffer.dispose();
 			indexBuffer.dispose();
+			program.dispose();
 			data = null;
 		}
 		
@@ -83,14 +83,14 @@ package nest.view.effects
 			var invW:Number = 1 / GlobalMethods.view.width;
 			var invH:Number = 1 / GlobalMethods.view.height;
 			
-			if (_blurX > maxIteration) {
-				stepX = _blurX / maxIteration;
+			if (_blurX > _maxIteration) {
+				stepX = _blurX / _maxIteration;
 			}else {
 				stepX = 1;
 			}
 			
-			if (_blurY > maxIteration) {
-				stepY = _blurY / maxIteration;
+			if (_blurY > _maxIteration) {
+				stepY = _blurY / _maxIteration;
 			}else {
 				stepY = 1;
 			}
@@ -150,6 +150,15 @@ package nest.view.effects
 		
 		public function set blurY(value:Number):void {
 			_blurY = value;
+			update();
+		}
+		
+		public function get maxIteration():int {
+			return _maxIteration;
+		}
+		
+		public function set maxIteration(value:int):void {
+			_maxIteration = value;
 			update();
 		}
 		
