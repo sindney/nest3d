@@ -66,22 +66,17 @@ package nest.object
 			pm[9] = h_2;
 			GlobalMethods.camera.pm.copyRawDataFrom(pm);
 			
+			var i:int;
+			var j:int = _data.bNumVts;
+			var verticesOut:Vector.<Number> = new Vector.<Number>(j);
 			draw.append(GlobalMethods.camera.pm);
-			var a:int = _data.vertices.length;
-			var verticesIn:Vector.<Number> = new Vector.<Number>(a * 3, true);
-			for (var i:int = 0; i < a; i++) {
-				verticesIn[i * 3] = _data.vertices[i].x;
-				verticesIn[i * 3 + 1] = _data.vertices[i].y;
-				verticesIn[i * 3 + 2] = _data.vertices[i].z;
-			}
-			var verticesOut:Vector.<Number> = new Vector.<Number>(a * 3);
-			draw.transformVectors(verticesIn, verticesOut);
-			var vertices:Vector.<Number> = new Vector.<Number>(a * 2);
+			draw.transformVectors(_data.rawVertices, verticesOut);
 			
-			for (i = 0; i < a;i++) {
+			var vertices:Vector.<Number> = new Vector.<Number>(j * 1.5);
+			for (i = 0; i < j; i++) {
 				vertices[i * 2] = verticesOut[i * 3] / verticesOut[i * 3 + 2];
 				vertices[i * 2 + 1] = verticesOut[i * 3 + 1] / verticesOut[i * 3 + 2];
-				if (verticesOut[i * 3 + 2]<0) {
+				if (verticesOut[i * 3 + 2] < 0) {
 					vertices[i * 2] = vertices[i * 2 + 1] = 10000;
 				}
 			}
