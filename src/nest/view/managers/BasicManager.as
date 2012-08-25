@@ -4,6 +4,8 @@ package nest.view.managers
 	import flash.display3D.Context3DProgramType;
 	import flash.display3D.Context3DCompareMode;
 	import flash.geom.Matrix3D;
+	import flash.geom.Vector3D;
+	import nest.object.Sprite3D;
 	
 	import nest.control.GlobalMethods;
 	import nest.object.Graphics3D;
@@ -62,6 +64,12 @@ package nest.view.managers
 			
 			draw.copyFrom(mesh.matrix);
 			draw.append(GlobalMethods.camera.invertMatrix);
+			if (mesh is Sprite3D) {
+				var comps:Vector.<Vector3D> = draw.decompose();
+				var rot:Vector3D = comps[1];
+				rot.x = rot.y = rot.z = 0;
+				draw.recompose(comps);
+			}
 			draw.append(GlobalMethods.camera.pm);
 			
 			context3d.setCulling(mesh.culling);

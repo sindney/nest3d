@@ -1,8 +1,11 @@
 package nest.view.materials 
 {
 	import flash.display.BitmapData;
+	import flash.display.MovieClip;
 	import flash.display3D.Context3D;
 	import flash.display3D.Context3DProgramType;
+	import flash.geom.Point;
+	import flash.geom.Rectangle;
 	
 	import nest.view.lights.*;
 	import nest.view.Shader3D;
@@ -109,6 +112,53 @@ package nest.view.materials
 			_light = null;
 			_vertData = null;
 			_fragData = null;
+		}
+		
+		public static function getFramesFromMovieClip(source:MovieClip,width:Number=100,height:Number=100):Vector.<BitmapData> {
+			var bitmapData:BitmapData;
+			var totalFrames:uint = source.totalFrames;
+			var bitmapDatas:Vector.<BitmapData> = new Vector.<BitmapData>(totalFrames);
+			var size:Number=1;
+			while (size < source.width||size<source.height ) {
+				size *= 2;
+			}
+			for (var i:int = 0; i < totalFrames;i++ ) {
+				bitmapData = new BitmapData(width, height, true, 0);
+				bitmapData.lock();
+				source.gotoAndStop(i);
+				bitmapData.draw(source);
+				bitmapData.unlock();
+				bitmapDatas[i] = bitmapData;
+			}
+			return bitmapDatas;
+		}
+		
+		public static function getFramesFromSpriteSheet(source:BitmapData, tileWidth:Number = 100, tileHeight:Number = 100, startIndex:int = 0,endIndex:int=int.MAX_VALUE ):Vector.<BitmapData> {
+			var bitmapData:BitmapData;
+			var w:int = Math.ceil(source.width / tileWidth);
+			var h:int = Math.ceil(source.height / tileHeight);
+			var xIndex:int;
+			var yIndex:int;
+			endIndex = Math.min(endIndex, w * h);
+			var offsets:Point = new Point();
+			var rectangle:Rectangle = new Rectangle(0, 0, tileWidth, tileHeight);
+			var bitmapDatas:Vector.<BitmapData> = new Vector.<BitmapData>(endIndex - startIndex + 1);
+			var size:Number=1;
+			while (size < tileWidth||size<tileHeight ) {
+				size *= 2;
+			}
+			for (var i:int = startIndex; i <=endIndex;i++ ) {
+				bitmapData = new BitmapData(size, size, true, 0);
+				bitmapData.lock();
+				xIndex = i % w;
+				yIndex = Math.floor(i / w);
+				rectangle.x = xIndex * tileWidth;
+				rectangle.y = yIndex * tileHeight;
+				bitmapData.copyPixels(source, rectangle, offsets);
+				bitmapData.unlock();
+				bitmapDatas[i-startIndex] = bitmapData;
+			}
+			return bitmapDatas;
 		}
 		
 		///////////////////////////////////
