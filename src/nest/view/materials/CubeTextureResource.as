@@ -52,9 +52,10 @@ package nest.view.materials
 		
 		public function set data(value:Vector.<BitmapData>):void {
 			if (_data != value) {
-				_data = value;
 				if (value) {
-					_texture = GlobalMethods.context3d.createCubeTexture(value[0].width, Context3DTextureFormat.BGRA, false);
+					if (!_data || data[0].width != value[0].width || data[0].height != value[0].height) {
+						_texture = GlobalMethods.context3d.createCubeTexture(value[0].width, Context3DTextureFormat.BGRA, false);
+					}
 					TextureResource.uploadWithMipmaps(_texture, value[0], 0);
 					TextureResource.uploadWithMipmaps(_texture, value[1], 1);
 					TextureResource.uploadWithMipmaps(_texture, value[2], 2);
@@ -65,6 +66,7 @@ package nest.view.materials
 					if (_texture) _texture.dispose();
 					_texture = null;
 				}
+				_data = value;
 			}
 		}
 		

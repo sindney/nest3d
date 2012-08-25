@@ -1,12 +1,9 @@
 package  
 {
-	import flash.display3D.Context3DBlendFactor;
-	import flash.display3D.Context3DTriangleFace;
 	import flash.display.StageAlign;
 	import flash.display.StageScaleMode;
 	import flash.events.Event;
 	import flash.events.MouseEvent;
-	import nest.view.managers.BasicManager;
 	
 	import nest.control.factories.PrimitiveFactory;
 	import nest.control.CameraController;
@@ -14,6 +11,7 @@ package
 	import nest.object.data.MeshData;
 	import nest.object.Container3D;
 	import nest.object.Mesh;
+	import nest.view.managers.BasicManager;
 	import nest.view.materials.TextureMaterial;
 	import nest.view.Camera3D;
 	import nest.view.ViewPort;
@@ -37,6 +35,7 @@ package
 			GlobalMethods.manager = manager = new BasicManager(); 
 			var data:MeshData = PrimitiveFactory.createSphere(10);
 			var material:TextureMaterial = new TextureMaterial(new diffuse().bitmapData);
+			material.kill = true;
 			material.update();
 			var material1:TextureMaterial = new TextureMaterial(new diffuse1().bitmapData);
 			material1.update();
@@ -48,10 +47,6 @@ package
 					for (k = 0; k < 10; k++) {
 						if (k < 5) {
 							mesh = new Mesh(data, material);
-							mesh.culling = Context3DTriangleFace.NONE;
-							mesh.blendMode.source = Context3DBlendFactor.SOURCE_ALPHA;
-							mesh.blendMode.dest = Context3DBlendFactor.ONE_MINUS_SOURCE_ALPHA;
-							mesh.alphaTest = true;
 						} else {
 							mesh = new Mesh(data, material1);
 						}

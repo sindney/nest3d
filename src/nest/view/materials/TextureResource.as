@@ -69,14 +69,16 @@ package nest.view.materials
 		
 		public function set data(value:BitmapData):void {
 			if (_data != value) {
-				_data = value;
 				if (value) {
-					_texture = GlobalMethods.context3d.createTexture(value.width, value.height, Context3DTextureFormat.BGRA, false);
+					if (!_data || _data.width != value.width || _data.height != value.height) {
+						_texture = GlobalMethods.context3d.createTexture(value.width, value.height, Context3DTextureFormat.BGRA, false);
+					}
 					_mipmapping ? uploadWithMipmaps(_texture, value) : _texture.uploadFromBitmapData(value);
 				} else {
 					if(_texture) _texture.dispose();
 					_texture = null;
 				}
+				_data = value;
 			}
 		}
 		

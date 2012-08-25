@@ -107,8 +107,6 @@ package nest.control.factories
 			
 			var p1:int, p2:int, p3:int, p4:int;
 			var i:int, j:int, k:int, l:int = 0;
-			var n1:Vector3D = new Vector3D();
-			var n2:Vector3D = new Vector3D();
 			var vertices:Vector.<Vertex> = new Vector.<Vertex>(s, true);
 			var triangles:Vector.<Triangle> = new Vector.<Triangle>(segmentsW * segmentsH * 2, true);
 			
@@ -124,18 +122,17 @@ package nest.control.factories
 					triangles[l] = new Triangle(p1, p4, p3);
 					triangles[l + 1] = new Triangle(p1, p2, p4);
 					
-					if (!vertices[p1]) vertices[p1] = new Vertex(i * dw - w2,       0, j * dh - h2,       i * du,       (j + 1) * dv);
-					if (!vertices[p2]) vertices[p2] = new Vertex(i * dw - w2,       0, (j + 1) * dh - h2, i * du,       j * dv      );
-					if (!vertices[p3]) vertices[p3] = new Vertex((i + 1) * dw - w2, 0, j * dh - h2,       (i + 1) * du, (j + 1) * dv);
-					if (!vertices[p4]) vertices[p4] = new Vertex((i + 1) * dw - w2, 0, (j + 1) * dh - h2, (i + 1) * du, j * dv      );
+					if (!vertices[p1]) vertices[p1] = new Vertex(i * dw - w2,       0, j * dh - h2,       i * du,       j * dv      );
+					if (!vertices[p2]) vertices[p2] = new Vertex(i * dw - w2,       0, (j + 1) * dh - h2, i * du,       (j + 1) * dv);
+					if (!vertices[p3]) vertices[p3] = new Vertex((i + 1) * dw - w2, 0, j * dh - h2,       (i + 1) * du, j * dv      );
+					if (!vertices[p4]) vertices[p4] = new Vertex((i + 1) * dw - w2, 0, (j + 1) * dh - h2, (i + 1) * du, (j + 1) * dv);
 					
-					triangles[l].u0 = vertices[p1].u;
-					triangles[l].v0 = vertices[p1].v;
-					triangles[l].u1 = vertices[p4].u;
-					triangles[l].v1 = vertices[p4].v;
 					triangles[l].u2 = vertices[p3].u;
 					triangles[l].v2 = vertices[p3].v;
-					
+					triangles[l].u1 = vertices[p4].u;
+					triangles[l].v1 = vertices[p4].v;
+					triangles[l].u0 = vertices[p1].u;
+					triangles[l].v0 = vertices[p1].v;
 					triangles[l + 1].u0 = vertices[p1].u;
 					triangles[l + 1].v0 = vertices[p1].v;
 					triangles[l + 1].u1 = vertices[p2].u;
