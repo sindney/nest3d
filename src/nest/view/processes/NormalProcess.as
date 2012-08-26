@@ -22,7 +22,7 @@ package nest.view.processes
 		public function NormalProcess() {
 			draw = new Matrix3D();
 			shader = new Shader3D();
-			shader.setFromString("m44 op, va0, vc0\nmov va2, v0" , "mov oc, v0", false);
+			shader.setFromString("m44 op, va0, vc0\nmov v0, va2" , "mov oc, v0", false);
 		}
 		
 		public function doMesh(mesh:IMesh):void {
