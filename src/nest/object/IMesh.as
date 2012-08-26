@@ -19,13 +19,10 @@ package nest.object
 		function clone():IMesh;
 		
 		function get data():MeshData;
-		function set data(value:MeshData):void;
 		
 		function get material():IMaterial;
-		function set material(value:IMaterial):void;
 		
 		function get bound():IBound;
-		function set bound(value:IBound):void;
 		
 		function get cliping():Boolean;
 		function set cliping(value:Boolean):void;

@@ -22,11 +22,6 @@ package nest.view.materials
 		protected var _light:AmbientLight;
 		protected var _shader:Shader3D;
 		
-		/**
-		 * Kill all pixels he who has an alpha value lower than 1.
-		 */
-		public var kill:Boolean = false;
-		
 		public function TextureMaterial(diffuse:BitmapData, specular:BitmapData = null, glossiness:int = 10, normalmap:BitmapData = null) {
 			_vertData = new Vector.<Number>(4, true);
 			_vertData[0] = _vertData[2] = _vertData[3] = 0;
@@ -34,6 +29,7 @@ package nest.view.materials
 			_fragData = new Vector.<Number>(4, true);
 			_fragData[0] = glossiness;
 			_fragData[1] = 1;
+			_fragData[2] = 1;
 			_shader = new Shader3D();
 			_diffuse = new TextureResource();
 			_diffuse.data = diffuse;
@@ -67,18 +63,13 @@ package nest.view.materials
 				}
 				light = light.next;
 			}
-			j = 0;
 			context3d.setTextureAt(0, _diffuse.texture);
-			if (_specular.texture) {
-				j = 1;
-				context3d.setTextureAt(1, _specular.texture);
-			}
+			if (_specular.texture) context3d.setTextureAt(1, _specular.texture);
 			if (_normalmap.texture) {
-				j = 1;
 				context3d.setTextureAt(2, _normalmap.texture);
 				context3d.setProgramConstantsFromVector(Context3DProgramType.VERTEX, 9, _vertData);
 			}
-			if (kill || j == 1) context3d.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, 23, _fragData);
+			context3d.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, 23, _fragData);
 		}
 		
 		public function unload(context3d:Context3D):void {
@@ -139,8 +130,8 @@ package nest.view.materials
 			}
 			if (specular) fragment += "tex ft6, v1, fs1 <2d,linear," + (_specular.mipmapping ? "miplinear" : "mipnone") + ">\n";
 			fragment += Shader3D.createLight(_light, specular, normalmap);
+			fragment += "sub ft0.w, ft0.w, fc23.z\nkil ft0.w\n";
 			fragment += "mov oc, ft0\n";
-			if (kill) fragment += "sub ft0.w, ft0.w, fc23.y\nkil ft0.w\n";
 			
 			_shader.setFromString(vertex, fragment, normal);
 		}
@@ -185,6 +176,14 @@ package nest.view.materials
 		
 		public function set glossiness(value:int):void {
 			_fragData[0] = value;
+		}
+		
+		public function get kill():Number {
+			return _fragData[2];
+		}
+		
+		public function set kill(value:Number):void {
+			_fragData[2] = value;
 		}
 		
 		public function get uv():Boolean {

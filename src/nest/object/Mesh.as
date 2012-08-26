@@ -7,7 +7,7 @@ package nest.object
 	import flash.geom.Matrix3D;
 	import flash.geom.Vector3D;
 	
-	import nest.control.GlobalMethods;
+	import nest.control.EngineBase;
 	import nest.object.data.MeshData;
 	import nest.object.geom.AABB;
 	import nest.object.geom.BSphere;
@@ -56,20 +56,20 @@ package nest.object
 		public function draw(g:Graphics, thickness:Number = 0, color:uint = 0xff0000, alpha:Number = 1.0):void {
 			var draw:Matrix3D = new Matrix3D();
 			draw.copyFrom(_matrix);
-			draw.append(GlobalMethods.camera.invertMatrix);
-			var pm:Vector.<Number> = GlobalMethods.camera.pm.rawData;
-			var w_2:Number = GlobalMethods.view.width / 2;
-			var h_2:Number = GlobalMethods.view.height / 2;
+			draw.append(EngineBase.camera.invertMatrix);
+			var pm:Vector.<Number> = EngineBase.camera.pm.rawData;
+			var w_2:Number = EngineBase.view.width / 2;
+			var h_2:Number = EngineBase.view.height / 2;
 			pm[0] *= w_2;
 			pm[5] *= -h_2;
 			pm[8] = w_2;
 			pm[9] = h_2;
-			GlobalMethods.camera.pm.copyRawDataFrom(pm);
+			EngineBase.camera.pm.copyRawDataFrom(pm);
 			
 			var i:int;
 			var j:int = _data.bNumVts;
 			var verticesOut:Vector.<Number> = new Vector.<Number>(j);
-			draw.append(GlobalMethods.camera.pm);
+			draw.append(EngineBase.camera.pm);
 			draw.transformVectors(_data.rawVertices, verticesOut);
 			
 			var vertices:Vector.<Number> = new Vector.<Number>(j * 1.5);
@@ -84,7 +84,7 @@ package nest.object
 			pm[5] /= -h_2;
 			pm[8] = 0;
 			pm[9] = 0;
-			GlobalMethods.camera.pm.copyRawDataFrom(pm);
+			EngineBase.camera.pm.copyRawDataFrom(pm);
 			g.clear();
 			g.lineStyle(thickness, color, alpha);
 			g.drawTriangles(vertices, Vector.<int>(_data.indices), null, TriangleCulling.NEGATIVE);

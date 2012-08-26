@@ -5,15 +5,15 @@ package nest.view.managers
 	import flash.display3D.Context3DCompareMode;
 	import flash.geom.Matrix3D;
 	import flash.geom.Vector3D;
-	import nest.object.Sprite3D;
 	
-	import nest.control.GlobalMethods;
+	import nest.control.EngineBase;
 	import nest.object.Graphics3D;
 	import nest.object.IContainer3D;
 	import nest.object.IMesh;
 	import nest.object.IObject3D;
 	import nest.object.LODMesh;
 	import nest.object.Sound3D;
+	import nest.object.Sprite3D;
 	import nest.view.culls.ICulling;
 	import nest.view.materials.EnvMapMaterial;
 	import nest.view.processes.IProcess;
@@ -45,7 +45,7 @@ package nest.view.managers
 				_numTriangles = 0;
 				_numObjects = 0;
 				_objects = new Vector.<IMesh>();
-				doContainer(GlobalMethods.root, null, GlobalMethods.root.changed);
+				doContainer(EngineBase.root, null, EngineBase.root.changed);
 			} else {
 				if (!_objects) return;
 				var mesh:IMesh;
@@ -60,17 +60,16 @@ package nest.view.managers
 		}
 		
 		protected function doMesh(mesh:IMesh):void {
-			var context3d:Context3D = GlobalMethods.context3d;
+			var context3d:Context3D = EngineBase.context3d;
 			
 			draw.copyFrom(mesh.matrix);
-			draw.append(GlobalMethods.camera.invertMatrix);
+			draw.append(EngineBase.camera.invertMatrix);
 			if (mesh is Sprite3D) {
 				var comps:Vector.<Vector3D> = draw.decompose();
-				var rot:Vector3D = comps[1];
-				rot.x = rot.y = rot.z = 0;
+				comps[1].setTo(0, 0, 0);
 				draw.recompose(comps);
 			}
-			draw.append(GlobalMethods.camera.pm);
+			draw.append(EngineBase.camera.pm);
 			
 			context3d.setCulling(mesh.culling);
 			context3d.setBlendFactors(mesh.blendMode.source, mesh.blendMode.dest);

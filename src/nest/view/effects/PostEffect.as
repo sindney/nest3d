@@ -5,7 +5,7 @@ package nest.view.effects
 	import flash.display3D.textures.TextureBase;
 	import flash.events.Event;
 	
-	import nest.control.GlobalMethods;
+	import nest.control.EngineBase;
 	
 	/**
 	 * PostEffect
@@ -18,7 +18,7 @@ package nest.view.effects
 		
 		public function PostEffect() {
 			onViewResized(null);
-			GlobalMethods.view.addEventListener(Event.RESIZE, onViewResized);
+			EngineBase.view.addEventListener(Event.RESIZE, onViewResized);
 		}
 		
 		public function calculate():void {
@@ -35,15 +35,15 @@ package nest.view.effects
 		
 		protected function onViewResized(e:Event):void {
 			var w:Number = 2;
-			while (GlobalMethods.view.width > w) w *= 2;
+			while (EngineBase.view.width > w) w *= 2;
 			var h:Number = 2;
-			while (GlobalMethods.view.height > h) h *= 2;
+			while (EngineBase.view.height > h) h *= 2;
 			var i:int, j:int = _textures.length;
 			var texture:TextureBase;
 			for (i = 0; i < j; i++) {
 				texture = _textures[i];
 				if (texture) texture.dispose();
-				texture = GlobalMethods.context3d.createTexture(w, h, Context3DTextureFormat.BGRA, true);
+				texture = EngineBase.context3d.createTexture(w, h, Context3DTextureFormat.BGRA, true);
 				_textures[i] = texture;
 			}
 		}

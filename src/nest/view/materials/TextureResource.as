@@ -7,7 +7,7 @@ package nest.view.materials
 	import flash.display3D.textures.TextureBase;
 	import flash.geom.Matrix;
 	
-	import nest.control.GlobalMethods;
+	import nest.control.EngineBase;
 	
 	/**
 	 * TextureResource
@@ -71,7 +71,7 @@ package nest.view.materials
 			if (_data != value) {
 				if (value) {
 					if (!_data || _data.width != value.width || _data.height != value.height) {
-						_texture = GlobalMethods.context3d.createTexture(value.width, value.height, Context3DTextureFormat.BGRA, false);
+						_texture = EngineBase.context3d.createTexture(value.width, value.height, Context3DTextureFormat.BGRA, false);
 					}
 					_mipmapping ? uploadWithMipmaps(_texture, value) : _texture.uploadFromBitmapData(value);
 				} else {

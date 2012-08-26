@@ -9,7 +9,7 @@ package nest.view.effects
 	import flash.display3D.Program3D;
 	import flash.display3D.VertexBuffer3D;
 	
-	import nest.control.GlobalMethods;
+	import nest.control.EngineBase;
 	import nest.view.Shader3D;
 	
 	/**
@@ -31,7 +31,7 @@ package nest.view.effects
 		private var _blurY:Number;
 		
 		public function Blur(blurX:Number = 3, blurY:Number = 3) {
-			var context3d:Context3D = GlobalMethods.context3d;
+			var context3d:Context3D = EngineBase.context3d;
 			var vertexData:Vector.<Number> = Vector.<Number>([-1, 1, 0, -1, -1, 0, 1, -1, 0, 1, 1, 0]);
 			var uvData:Vector.<Number> = Vector.<Number>([0, 0, 0, 1, 1, 1, 1, 0]);
 			var indexData:Vector.<uint> = Vector.<uint>([0, 3, 2, 2, 1, 0]);
@@ -52,7 +52,7 @@ package nest.view.effects
 		}
 		
 		override public function calculate():void {
-			var context3d:Context3D = GlobalMethods.context3d;
+			var context3d:Context3D = EngineBase.context3d;
 			if (_next) {
 				context3d.setRenderToTexture(_next.textures[0], _next.enableDepthAndStencil, _next.antiAlias);
 			} else {
@@ -80,8 +80,8 @@ package nest.view.effects
 		}
 		
 		private function update():void {
-			var invW:Number = 1 / GlobalMethods.view.width;
-			var invH:Number = 1 / GlobalMethods.view.height;
+			var invW:Number = 1 / EngineBase.view.width;
+			var invH:Number = 1 / EngineBase.view.height;
 			
 			if (_blurX > _maxIteration) {
 				stepX = _blurX / _maxIteration;

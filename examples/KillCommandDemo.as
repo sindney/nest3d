@@ -7,7 +7,7 @@ package
 	
 	import nest.control.factories.PrimitiveFactory;
 	import nest.control.CameraController;
-	import nest.control.GlobalMethods;
+	import nest.control.EngineBase;
 	import nest.object.data.MeshData;
 	import nest.object.Container3D;
 	import nest.object.Mesh;
@@ -17,9 +17,9 @@ package
 	import nest.view.ViewPort;
 	
 	/**
-	 * AlphaTestDemo
+	 * KillCommandDemo
 	 */
-	public class AlphaTestDemo extends DemoBase {
+	public class KillCommandDemo extends DemoBase {
 		
 		[Embed(source = "assets/box.jpg")]
 		private const diffuse1:Class;
@@ -27,13 +27,16 @@ package
 		[Embed(source = "assets/leaves.png")]
 		private const diffuse:Class;
 		
-		public function AlphaTestDemo() {
+		public function KillCommandDemo() {
 			super();
 		}
 		
 		override public function init():void {
-			GlobalMethods.manager = manager = new BasicManager(); 
-			var data:MeshData = PrimitiveFactory.createSphere(10);
+			EngineBase.manager = manager = new BasicManager();
+			
+			var factory:PrimitiveFactory = new PrimitiveFactory();
+			var data:MeshData = factory.createSphere(10);
+			
 			var material:TextureMaterial = new TextureMaterial(new diffuse().bitmapData);
 			material.kill = true;
 			material.update();

@@ -64,7 +64,7 @@ package nest.object
 		}
 		
 		override public function clone():IMesh {
-			var result:SkyBox = new SkyBox(size, material as SkyBoxMaterial);
+			var result:SkyBox = new SkyBox(size, _material as SkyBoxMaterial);
 			result.blendMode.source = _blendMode.source;
 			result.blendMode.dest = _blendMode.dest;
 			result.blendMode.depthMask = _blendMode.depthMask;

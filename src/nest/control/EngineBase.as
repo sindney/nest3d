@@ -10,9 +10,9 @@ package nest.control
 	import nest.view.ViewPort;
 	
 	/**
-	 * GlobalMethods
+	 * EngineBase
 	 */
-	public class GlobalMethods {
+	public class EngineBase {
 		
 		public static var index:int = 0;
 		public static var stage:Stage;

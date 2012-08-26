@@ -6,7 +6,7 @@ package nest.object
 	import flash.media.SoundChannel;
 	import flash.media.SoundTransform;
 	
-	import nest.control.GlobalMethods;
+	import nest.control.EngineBase;
 	
 	/**
 	 * Sound3D
@@ -36,7 +36,7 @@ package nest.object
 		
 		public function calculate():void {
 			if (_stopped) return;
-			var camera:Matrix3D = GlobalMethods.camera.invertMatrix;
+			var camera:Matrix3D = EngineBase.camera.invertMatrix;
 			var container:Matrix3D = parent.matrix;
 			
 			v0.copyFrom(_components[0]);

@@ -6,7 +6,7 @@ package nest.view
 	import flash.display3D.Program3D;
 	import flash.utils.ByteArray;
 	
-	import nest.control.GlobalMethods;
+	import nest.control.EngineBase;
 	import nest.view.lights.*;
 	
 	/**
@@ -146,7 +146,7 @@ package nest.view
 		public var normal:Boolean;
 		
 		public function Shader3D() {
-			program = GlobalMethods.context3d.createProgram();
+			program = EngineBase.context3d.createProgram();
 		}
 		
 		public function setFromString(vertex:String, fragment:String, normal:Boolean):void {

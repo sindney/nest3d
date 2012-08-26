@@ -9,7 +9,7 @@ package nest.view
 	import flash.geom.Vector3D;
 	
 	import nest.control.mouse.MouseManager;
-	import nest.control.GlobalMethods;
+	import nest.control.EngineBase;
 	import nest.view.culls.ICulling;
 	import nest.view.effects.IPostEffect;
 	import nest.view.managers.ISceneManager;
@@ -49,8 +49,8 @@ package nest.view
 			_height = height;
 			
 			// setup scene
-			GlobalMethods.stage3d.addEventListener(Event.CONTEXT3D_CREATE, init);
-			GlobalMethods.stage3d.requestContext3D();
+			EngineBase.stage3d.addEventListener(Event.CONTEXT3D_CREATE, init);
+			EngineBase.stage3d.requestContext3D();
 		}
 		
 		/**
@@ -60,7 +60,7 @@ package nest.view
 		public function projectVector(p:Vector3D):Vector3D {
 			const vx:Number = _width * 0.5;
 			const vy:Number = _height * 0.5;
-			var result:Vector3D = Utils3D.projectVector(GlobalMethods.camera.pm, GlobalMethods.camera.invertMatrix.transformVector(p));
+			var result:Vector3D = Utils3D.projectVector(EngineBase.camera.pm, EngineBase.camera.invertMatrix.transformVector(p));
 			result.x = result.x * vx + vx;
 			result.y = vy - result.y * vy;
 			return result;
@@ -70,9 +70,9 @@ package nest.view
 		 * Put this into a loop to draw your scene on stage3d.
 		 */
 		public function calculate(bitmapData:BitmapData = null):void {
-			var context3d:Context3D = GlobalMethods.context3d;
-			var camera:Camera3D = GlobalMethods.camera;
-			var manager:ISceneManager = GlobalMethods.manager;
+			var context3d:Context3D = EngineBase.context3d;
+			var camera:Camera3D = EngineBase.camera;
+			var manager:ISceneManager = EngineBase.manager;
 			
 			if (_mouseManager && _mouseManager.type) _mouseManager.calculate();
 			
@@ -105,10 +105,10 @@ package nest.view
 		}
 		
 		private function init(e:Event):void {
-			GlobalMethods.context3d = GlobalMethods.stage3d.context3D;
-			GlobalMethods.context3d.enableErrorChecking = true;
-			GlobalMethods.context3d.configureBackBuffer(_width, _height, _antiAlias, true);
-			GlobalMethods.camera.aspect = _width / _height;
+			EngineBase.context3d = EngineBase.stage3d.context3D;
+			EngineBase.context3d.enableErrorChecking = true;
+			EngineBase.context3d.configureBackBuffer(_width, _height, _antiAlias, true);
+			EngineBase.camera.aspect = _width / _height;
 			dispatchEvent(new Event(Event.CONTEXT3D_CREATE));
 		}
 		
@@ -122,10 +122,10 @@ package nest.view
 		
 		public function set width(value:Number):void {
 			if (_width != value) {
-				if (GlobalMethods.context3d) {
+				if (EngineBase.context3d) {
 					_width = value;
-					GlobalMethods.context3d.configureBackBuffer(_width, _height, _antiAlias, true);
-					GlobalMethods.camera.aspect = _width / _height;
+					EngineBase.context3d.configureBackBuffer(_width, _height, _antiAlias, true);
+					EngineBase.camera.aspect = _width / _height;
 					dispatchEvent(new Event(Event.RESIZE));
 				}
 			}
@@ -137,10 +137,10 @@ package nest.view
 		
 		public function set height(value:Number):void {
 			if (_height != value) {
-				if (GlobalMethods.context3d) {
+				if (EngineBase.context3d) {
 					_height = value;
-					GlobalMethods.context3d.configureBackBuffer(_width, _height, _antiAlias, true);
-					GlobalMethods.camera.aspect = _width / _height;
+					EngineBase.context3d.configureBackBuffer(_width, _height, _antiAlias, true);
+					EngineBase.camera.aspect = _width / _height;
 					dispatchEvent(new Event(Event.RESIZE));
 				}
 			}
@@ -175,7 +175,7 @@ package nest.view
 		public function set antiAlias(value:int):void {
 			if (_antiAlias != value) {
 				_antiAlias = value;
-				if (GlobalMethods.context3d) GlobalMethods.context3d.configureBackBuffer(_width, _height, _antiAlias, true);
+				if (EngineBase.context3d) EngineBase.context3d.configureBackBuffer(_width, _height, _antiAlias, true);
 			}
 		}
 		

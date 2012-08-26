@@ -2,7 +2,7 @@ package nest.view.culls
 {
 	import flash.geom.Vector3D;
 	
-	import nest.control.GlobalMethods;
+	import nest.control.EngineBase;
 	import nest.object.geom.AABB;
 	import nest.object.geom.BSphere;
 	import nest.object.IContainer3D;
@@ -30,7 +30,7 @@ package nest.view.culls
 		}
 		
 		public function classifyMesh(mesh:IMesh):Boolean {
-			var camera:Camera3D = GlobalMethods.camera;
+			var camera:Camera3D = EngineBase.camera;
 			var i:int;
 			var v:Vector3D = new Vector3D();
 			if (mesh.bound is AABB) {

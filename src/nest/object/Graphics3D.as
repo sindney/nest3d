@@ -4,7 +4,7 @@ package nest.object
 	import flash.geom.Matrix3D;
 	import flash.geom.Vector3D;
 	
-	import nest.control.GlobalMethods;
+	import nest.control.EngineBase;
 	import nest.view.Camera3D;
 	
 	/**
@@ -164,7 +164,7 @@ package nest.object
 			
 			_mask.graphics.clear();
 			_mask.graphics.beginFill(0, 0);
-			_mask.graphics.drawRect(0, 0, GlobalMethods.view.width, GlobalMethods.view.height);
+			_mask.graphics.drawRect(0, 0, EngineBase.view.width, EngineBase.view.height);
 			_mask.graphics.endFill();
 			
 			var a:int = _commands.length;
@@ -180,14 +180,14 @@ package nest.object
 			var py2:Number;
 			
 			_draw.copyFrom(matrix);
-			_draw.append(GlobalMethods.camera.invertMatrix);
-			_draw.append(GlobalMethods.camera.pm);
+			_draw.append(EngineBase.camera.invertMatrix);
+			_draw.append(EngineBase.camera.pm);
 			_transform.identity();
 			
 			var inputVector:Vector3D = new Vector3D(0, 0, 0, 1);
 			var outputVector:Vector3D;
-			var w_2:Number = GlobalMethods.view.width / 2;
-			var h_2:Number = GlobalMethods.view.height / 2;
+			var w_2:Number = EngineBase.view.width / 2;
+			var h_2:Number = EngineBase.view.height / 2;
 			for (var i:int = 0; i < a;i++ ) {
 				switch(_commands[i]) {
 					case MOVE_TO://3 params
@@ -352,8 +352,8 @@ package nest.object
 						_transform.appendTranslation(_params[j], _params[j + 1], _params[j + 2]);
 						_draw.copyFrom(_transform);
 						_draw.append(matrix);
-						_draw.append(GlobalMethods.camera.invertMatrix);
-						_draw.append(GlobalMethods.camera.pm);
+						_draw.append(EngineBase.camera.invertMatrix);
+						_draw.append(EngineBase.camera.pm);
 						j += 3;
 						break;
 					case ROTATE:
@@ -362,23 +362,23 @@ package nest.object
 						_transform.appendRotation(_params[j + 2], Vector3D.Z_AXIS);
 						_draw.copyFrom(_transform);
 						_draw.append(matrix);
-						_draw.append(GlobalMethods.camera.invertMatrix);
-						_draw.append(GlobalMethods.camera.pm);
+						_draw.append(EngineBase.camera.invertMatrix);
+						_draw.append(EngineBase.camera.pm);
 						j += 3;
 						break;
 					case SCALE:
 						_transform.appendScale(_params[j], _params[j + 1], _params[j + 2]);
 						_draw.copyFrom(_transform);
 						_draw.append(matrix);
-						_draw.append(GlobalMethods.camera.invertMatrix);
-						_draw.append(GlobalMethods.camera.pm);
+						_draw.append(EngineBase.camera.invertMatrix);
+						_draw.append(EngineBase.camera.pm);
 						j += 3;
 						break;
 					case CLEAR:
 						_transform.identity();
 						_draw.copyFrom(matrix);
-						_draw.append(GlobalMethods.camera.invertMatrix);
-						_draw.append(GlobalMethods.camera.pm);
+						_draw.append(EngineBase.camera.invertMatrix);
+						_draw.append(EngineBase.camera.pm);
 						break;
 				}
 			}

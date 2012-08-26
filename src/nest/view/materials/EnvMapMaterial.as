@@ -45,22 +45,14 @@ package nest.view.materials
 				}
 				light = light.next;
 			}
-			j = 0;
 			context3d.setTextureAt(0, _diffuse.texture);
-			if (_specular.texture) {
-				j = 1;
-				context3d.setTextureAt(1, _specular.texture);
-			}
+			if (_specular.texture) context3d.setTextureAt(1, _specular.texture);
 			if (_normalmap.texture) {
-				j = 1;
 				context3d.setTextureAt(2, _normalmap.texture);
 				context3d.setProgramConstantsFromVector(Context3DProgramType.VERTEX, 9, _vertData);
 			}
-			if (_cubicmap.texture) {
-				j = 1;
-				context3d.setTextureAt(3, _cubicmap.texture);
-			}
-			if (kill || j == 1) context3d.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, 23, _fragData);
+			if (_cubicmap.texture) context3d.setTextureAt(3, _cubicmap.texture);
+			context3d.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, 23, _fragData);
 		}
 		
 		override public function unload(context3d:Context3D):void {
@@ -135,12 +127,14 @@ package nest.view.materials
 			fragment += Shader3D.createLight(_light, specular, normalmap);
 			
 			fragment += "tex ft1, v5, fs3 <cube,linear,miplinear>\n" + 
-						"mul ft1, ft1, fc23.z\n" + 
-						"mul ft0, ft0, fc23.w\n" + 
+						"mul ft1, ft1, fc23.w\n" + 
+						"mov ft2, fc23.y\n" + 
+						"sub ft2, ft2, fc23.w\n" + 
+						"mul ft0, ft0, ft2\n" + 
 						"add ft0, ft0, ft1\n" + 
+						"sub ft0.w, ft0.w, fc23.z\n" + 
+						"kil ft0.w\n" + 
 						"mov oc, ft0\n";
-			
-			if (kill) fragment += "sub ft0.w, ft0.w, fc23.y\nkil ft0.w\n";
 			
 			_shader.setFromString(vertex, fragment, true);
 		}
@@ -164,8 +158,7 @@ package nest.view.materials
 		}
 		
 		public function set reflectivity(value:Number):void {
-			_fragData[2] = value;
-			_fragData[3] = 1 - value;
+			_fragData[3] = value;
 		}
 		
 	}

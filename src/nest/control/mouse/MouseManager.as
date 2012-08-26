@@ -4,7 +4,7 @@ package nest.control.mouse
 	import flash.display3D.Context3D;
 	import flash.events.MouseEvent;
 	
-	import nest.control.GlobalMethods;
+	import nest.control.EngineBase;
 	import nest.object.IMesh;
 	import nest.view.culls.MouseCulling;
 	import nest.view.managers.ISceneManager;
@@ -36,29 +36,29 @@ package nest.control.mouse
 		}
 		
 		public function init():void {
-			GlobalMethods.stage.addEventListener(MouseEvent.MOUSE_MOVE, onMouseEvent);
-			GlobalMethods.stage.addEventListener(MouseEvent.MOUSE_DOWN, onMouseEvent);
-			GlobalMethods.stage.addEventListener(MouseEvent.CLICK, onMouseEvent);
-			GlobalMethods.stage.addEventListener(MouseEvent.DOUBLE_CLICK, onMouseEvent);
-			GlobalMethods.stage.addEventListener(MouseEvent.RIGHT_CLICK, onMouseEvent);
-			GlobalMethods.stage.addEventListener(MouseEvent.RIGHT_MOUSE_DOWN, onMouseEvent);
+			EngineBase.stage.addEventListener(MouseEvent.MOUSE_MOVE, onMouseEvent);
+			EngineBase.stage.addEventListener(MouseEvent.MOUSE_DOWN, onMouseEvent);
+			EngineBase.stage.addEventListener(MouseEvent.CLICK, onMouseEvent);
+			EngineBase.stage.addEventListener(MouseEvent.DOUBLE_CLICK, onMouseEvent);
+			EngineBase.stage.addEventListener(MouseEvent.RIGHT_CLICK, onMouseEvent);
+			EngineBase.stage.addEventListener(MouseEvent.RIGHT_MOUSE_DOWN, onMouseEvent);
 		}
 		
 		public function dispose():void {
-			GlobalMethods.stage.removeEventListener(MouseEvent.MOUSE_MOVE, onMouseEvent);
-			GlobalMethods.stage.removeEventListener(MouseEvent.MOUSE_DOWN, onMouseEvent);
-			GlobalMethods.stage.removeEventListener(MouseEvent.CLICK, onMouseEvent);
-			GlobalMethods.stage.removeEventListener(MouseEvent.DOUBLE_CLICK, onMouseEvent);
-			GlobalMethods.stage.removeEventListener(MouseEvent.RIGHT_CLICK, onMouseEvent);
-			GlobalMethods.stage.removeEventListener(MouseEvent.RIGHT_MOUSE_DOWN, onMouseEvent);
+			EngineBase.stage.removeEventListener(MouseEvent.MOUSE_MOVE, onMouseEvent);
+			EngineBase.stage.removeEventListener(MouseEvent.MOUSE_DOWN, onMouseEvent);
+			EngineBase.stage.removeEventListener(MouseEvent.CLICK, onMouseEvent);
+			EngineBase.stage.removeEventListener(MouseEvent.DOUBLE_CLICK, onMouseEvent);
+			EngineBase.stage.removeEventListener(MouseEvent.RIGHT_CLICK, onMouseEvent);
+			EngineBase.stage.removeEventListener(MouseEvent.RIGHT_MOUSE_DOWN, onMouseEvent);
 		}
 		
 		public function calculate():void {
-			var camera:Camera3D = GlobalMethods.camera;
-			var context3d:Context3D = GlobalMethods.context3d;
-			var manager:ISceneManager = GlobalMethods.manager;
-			var width:Number = GlobalMethods.view.width;
-			var height:Number = GlobalMethods.view.height;
+			var camera:Camera3D = EngineBase.camera;
+			var context3d:Context3D = EngineBase.context3d;
+			var manager:ISceneManager = EngineBase.manager;
+			var width:Number = EngineBase.view.width;
+			var height:Number = EngineBase.view.height;
 			
 			if (context3d && mouseX <= width && mouseY <= height) {
 				var pm:Vector.<Number> = camera.pm.rawData.concat();
@@ -79,7 +79,7 @@ package nest.control.mouse
 				if (id != 0) {
 					var mesh:IMesh;
 					var event:MouseEvent3D;
-					var objects:Vector.<IMesh> = GlobalMethods.manager.objects;
+					var objects:Vector.<IMesh> = EngineBase.manager.objects;
 					for each(mesh in objects) {
 						if (mesh.id == id) {
 							if (target != mesh) {
@@ -114,8 +114,8 @@ package nest.control.mouse
 		}
 		
 		private function onMouseEvent(e:MouseEvent):void {
-			mouseX = GlobalMethods.stage.mouseX;
-			mouseY = GlobalMethods.stage.mouseY;
+			mouseX = EngineBase.stage.mouseX;
+			mouseY = EngineBase.stage.mouseY;
 			switch(e.type) {
 				case MouseEvent.MOUSE_MOVE:
 					_type = MouseEvent3D.MOUSE_MOVE;

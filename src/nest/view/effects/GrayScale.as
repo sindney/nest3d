@@ -9,7 +9,7 @@ package nest.view.effects
 	import flash.display3D.Program3D;
 	import flash.display3D.VertexBuffer3D;
 	
-	import nest.control.GlobalMethods;
+	import nest.control.EngineBase;
 	import nest.view.Shader3D;
 	
 	/**
@@ -25,7 +25,7 @@ package nest.view.effects
 		private var data:Vector.<Number>;
 		
 		public function GrayScale() {
-			var context3d:Context3D = GlobalMethods.context3d;
+			var context3d:Context3D = EngineBase.context3d;
 			var vertexShader:String = "mov op, va0\nmov v0, va1\n";
 			var fragmentShader:String = "tex ft0, v0, fs0 <2d,linear,mipnone>\ndp3 ft1.rgb, ft0.rgb, fc0.rgb\nmov oc.rgb, ft1.rgb";
 			var vertexData:Vector.<Number> = Vector.<Number>([-1, 1, 0, -1, -1, 0, 1, -1, 0, 1, 1, 0]);
@@ -47,7 +47,7 @@ package nest.view.effects
 		}
 		
 		override public function calculate():void {
-			var context3d:Context3D = GlobalMethods.context3d;
+			var context3d:Context3D = EngineBase.context3d;
 			if (_next) {
 				context3d.setRenderToTexture(_next.textures[0], _next.enableDepthAndStencil, _next.antiAlias);
 			} else {

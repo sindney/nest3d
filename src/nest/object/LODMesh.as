@@ -2,7 +2,7 @@ package nest.object
 {
 	import flash.geom.Vector3D;
 	
-	import nest.control.GlobalMethods;
+	import nest.control.EngineBase;
 	import nest.object.data.MeshData;
 	import nest.object.geom.BSphere;
 	import nest.object.geom.IBound;
@@ -29,7 +29,7 @@ package nest.object
 		}
 		
 		public function update():void {
-			const camera:Vector3D = GlobalMethods.camera.position;
+			const camera:Vector3D = EngineBase.camera.position;
 			const dx:Number = position.x - camera.x;
 			const dy:Number = position.y - camera.y;
 			const dz:Number = position.z - camera.z;

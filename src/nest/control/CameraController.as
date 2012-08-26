@@ -4,7 +4,7 @@ package nest.control
 	import flash.events.MouseEvent;
 	import flash.geom.Vector3D;
 	
-	import nest.control.GlobalMethods;
+	import nest.control.EngineBase;
 	import nest.view.Camera3D;
 	
 	/**
@@ -30,7 +30,7 @@ package nest.control
 		}
 		
 		public function update():void {
-			var camera:Camera3D = GlobalMethods.camera;
+			var camera:Camera3D = EngineBase.camera;
 			if (_keyboardEnabled && camera) {
 				if (_keys[87]) camera.translate(Vector3D.Z_AXIS, speed);
 				if (_keys[83]) camera.translate(Vector3D.Z_AXIS, -speed);
@@ -50,7 +50,7 @@ package nest.control
 		}
 		
 		private function onMouseMove(e:MouseEvent):void {
-			var camera:Camera3D = GlobalMethods.camera;
+			var camera:Camera3D = EngineBase.camera;
 			if (moving && camera) {
 				camera.rotation.y -= (oldX - e.stageX) * sensitive;
 				camera.rotation.x -= (oldY - e.stageY) * sensitive;
@@ -82,14 +82,14 @@ package nest.control
 			if (_mouseEnabled != value) {
 				_mouseEnabled = value;
 				if (_mouseEnabled) {
-					GlobalMethods.stage.addEventListener(MouseEvent.MOUSE_DOWN, onMouseDown);
-					GlobalMethods.stage.addEventListener(MouseEvent.MOUSE_MOVE, onMouseMove);
-					GlobalMethods.stage.addEventListener(MouseEvent.MOUSE_UP, onMouseUp);
+					EngineBase.stage.addEventListener(MouseEvent.MOUSE_DOWN, onMouseDown);
+					EngineBase.stage.addEventListener(MouseEvent.MOUSE_MOVE, onMouseMove);
+					EngineBase.stage.addEventListener(MouseEvent.MOUSE_UP, onMouseUp);
 					moving = false;
 				} else {
-					GlobalMethods.stage.removeEventListener(MouseEvent.MOUSE_DOWN, onMouseDown);
-					GlobalMethods.stage.removeEventListener(MouseEvent.MOUSE_MOVE, onMouseMove);
-					GlobalMethods.stage.removeEventListener(MouseEvent.MOUSE_UP, onMouseUp);
+					EngineBase.stage.removeEventListener(MouseEvent.MOUSE_DOWN, onMouseDown);
+					EngineBase.stage.removeEventListener(MouseEvent.MOUSE_MOVE, onMouseMove);
+					EngineBase.stage.removeEventListener(MouseEvent.MOUSE_UP, onMouseUp);
 					moving = false;
 				}
 			}
@@ -103,11 +103,11 @@ package nest.control
 			if (_keyboardEnabled != value) {
 				_keyboardEnabled = value;
 				if (_keyboardEnabled) {
-					GlobalMethods.stage.addEventListener(KeyboardEvent.KEY_UP, onKeyUp);
-					GlobalMethods.stage.addEventListener(KeyboardEvent.KEY_DOWN, onKeyDown);
+					EngineBase.stage.addEventListener(KeyboardEvent.KEY_UP, onKeyUp);
+					EngineBase.stage.addEventListener(KeyboardEvent.KEY_DOWN, onKeyDown);
 				} else {
-					GlobalMethods.stage.removeEventListener(KeyboardEvent.KEY_UP, onKeyUp);
-					GlobalMethods.stage.removeEventListener(KeyboardEvent.KEY_DOWN, onKeyDown);
+					EngineBase.stage.removeEventListener(KeyboardEvent.KEY_UP, onKeyUp);
+					EngineBase.stage.removeEventListener(KeyboardEvent.KEY_DOWN, onKeyDown);
 				}
 			}
 		}

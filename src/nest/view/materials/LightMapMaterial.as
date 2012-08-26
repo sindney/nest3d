@@ -44,19 +44,14 @@ package nest.view.materials
 				}
 				light = light.next;
 			}
-			j = 0;
 			context3d.setTextureAt(0, _diffuse.texture);
-			if (_specular.texture) {
-				j = 1;
-				context3d.setTextureAt(1, _specular.texture);
-			}
+			if (_specular.texture) context3d.setTextureAt(1, _specular.texture);
 			if (_normalmap.texture) {
-				j = 1;
 				context3d.setTextureAt(2, _normalmap.texture);
 				context3d.setProgramConstantsFromVector(Context3DProgramType.VERTEX, 9, _vertData);
 			}
 			if (_lightmap.texture) context3d.setTextureAt(3, _lightmap.texture);
-			if (kill || j == 1) context3d.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, 23, _fragData);
+			context3d.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, 23, _fragData);
 		}
 		
 		override public function unload(context3d:Context3D):void {
@@ -119,8 +114,8 @@ package nest.view.materials
 			fragment += "tex ft6, v1, fs3 <2d,linear," + (_lightmap.mipmapping ? "miplinear" : "mipnone") + ">\nmul ft7, ft7, ft6\nsat ft7, ft7\n";
 			if (specular) fragment += "tex ft6, v1, fs1 <2d,linear," + (_specular.mipmapping ? "miplinear" : "mipnone") + ">\n";
 			fragment += Shader3D.createLight(_light, specular, normalmap);
+			fragment += "sub ft0.w, ft0.w, fc23.z\nkil ft0.w\n";
 			fragment += "mov oc, ft0\n";
-			if (kill) fragment += "sub ft0.w, ft0.w, fc23.y\nkil ft0.w\n";
 			
 			_shader.setFromString(vertex, fragment, normal);
 		}

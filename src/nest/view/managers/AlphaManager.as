@@ -1,6 +1,6 @@
 package nest.view.managers 
 {
-	import nest.control.GlobalMethods;
+	import nest.control.EngineBase;
 	import nest.object.IMesh;
 	import nest.view.Camera3D;
 	
@@ -28,7 +28,7 @@ package nest.view.managers
 				_objects = new Vector.<IMesh>();
 				_alphaObjects = new Vector.<IMesh>();
 				distance = new Vector.<Number>();
-				doContainer(GlobalMethods.root, null, GlobalMethods.root.changed);
+				doContainer(EngineBase.root, null, EngineBase.root.changed);
 				
 				j = distance.length - 1;
 				if (j > 1) quickSort(distance, 0, j);
@@ -63,7 +63,7 @@ package nest.view.managers
 		
 		override protected function doMesh(mesh:IMesh):void {
 			if (mesh.alphaTest) {
-				var camera:Camera3D = GlobalMethods.camera;
+				var camera:Camera3D = EngineBase.camera;
 				var dx:Number = mesh.position.x - camera.position.x;
 				var dy:Number = mesh.position.y - camera.position.y;
 				var dz:Number = mesh.position.z - camera.position.z;

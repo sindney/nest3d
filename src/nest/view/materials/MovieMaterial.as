@@ -15,6 +15,53 @@ package nest.view.materials
 	 */
 	public class MovieMaterial implements IMaterial {
 		
+		public static function getFramesFromMovieClip(source:MovieClip, width:Number = 100, height:Number = 100):Vector.<BitmapData> {
+			var bitmapData:BitmapData;
+			var totalFrames:uint = source.totalFrames;
+			var bitmapDatas:Vector.<BitmapData> = new Vector.<BitmapData>(totalFrames);
+			var size:Number = 1;
+			while (size < source.width || size < source.height ) {
+				size *= 2;
+			}
+			for (var i:int = 0; i < totalFrames; i++) {
+				bitmapData = new BitmapData(width, height, true, 0);
+				bitmapData.lock();
+				source.gotoAndStop(i);
+				bitmapData.draw(source);
+				bitmapData.unlock();
+				bitmapDatas[i] = bitmapData;
+			}
+			return bitmapDatas;
+		}
+		
+		public static function getFramesFromSpriteSheet(source:BitmapData, tileWidth:Number = 100, tileHeight:Number = 100, startIndex:int = 0, endIndex:int = int.MAX_VALUE):Vector.<BitmapData> {
+			var bitmapData:BitmapData;
+			var w:int = Math.ceil(source.width / tileWidth);
+			var h:int = Math.ceil(source.height / tileHeight);
+			var xIndex:int;
+			var yIndex:int;
+			endIndex = Math.min(endIndex, w * h);
+			var offsets:Point = new Point();
+			var rectangle:Rectangle = new Rectangle(0, 0, tileWidth, tileHeight);
+			var bitmapDatas:Vector.<BitmapData> = new Vector.<BitmapData>(endIndex - startIndex + 1);
+			var size:Number = 1;
+			while (size < tileWidth || size < tileHeight) {
+				size *= 2;
+			}
+			for (var i:int = startIndex; i <= endIndex; i++) {
+				bitmapData = new BitmapData(size, size, true, 0);
+				bitmapData.lock();
+				xIndex = i % w;
+				yIndex = Math.floor(i / w);
+				rectangle.x = xIndex * tileWidth;
+				rectangle.y = yIndex * tileHeight;
+				bitmapData.copyPixels(source, rectangle, offsets);
+				bitmapData.unlock();
+				bitmapDatas[i-startIndex] = bitmapData;
+			}
+			return bitmapDatas;
+		}
+		
 		protected var _diffuse:TextureResource;
 		protected var _specular:TextureResource;
 		
@@ -34,6 +81,7 @@ package nest.view.materials
 			_fragData = new Vector.<Number>(4, true);
 			_fragData[0] = glossiness;
 			_fragData[1] = 1;
+			_fragData[2] = 1;
 			_shader = new Shader3D();
 			_diffuse = new TextureResource();
 			_specular = new TextureResource();
@@ -67,11 +115,8 @@ package nest.view.materials
 			}
 			j = 0;
 			context3d.setTextureAt(0, _diffuse.texture);
-			if (_specular.texture) {
-				j = 1;
-				context3d.setTextureAt(1, _specular.texture);
-			}
-			if (j == 1) context3d.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, 23, _fragData);
+			if (_specular.texture) context3d.setTextureAt(1, _specular.texture);
+			context3d.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, 23, _fragData);
 		}
 		
 		public function unload(context3d:Context3D):void {
@@ -97,12 +142,18 @@ package nest.view.materials
 			var fragment:String = "tex ft7, v1, fs0 <2d,linear," + (_diffuse.mipmapping ? "miplinear" : "mipnone") + ">\n";
 			if (specular) fragment += "tex ft6, v1, fs1 <2d,linear," + (_specular.mipmapping ? "miplinear" : "mipnone") + ">\n";
 			fragment += Shader3D.createLight(_light, specular, false);
+			fragment += "sub ft0.w, ft0.w, fc23.z\nkil ft0.w\n";
 			fragment += "mov oc, ft0\n";
 			
 			_shader.setFromString(vertex, fragment, normal);
 		}
 		
 		public function dispose():void {
+			if (_frames) {
+				for each(var bmd:BitmapData in _frames) {
+					bmd.dispose();
+				}
+			}
 			_shader.program.dispose();
 			_diffuse.dispose();
 			_specular.dispose();
@@ -112,53 +163,6 @@ package nest.view.materials
 			_light = null;
 			_vertData = null;
 			_fragData = null;
-		}
-		
-		public static function getFramesFromMovieClip(source:MovieClip,width:Number=100,height:Number=100):Vector.<BitmapData> {
-			var bitmapData:BitmapData;
-			var totalFrames:uint = source.totalFrames;
-			var bitmapDatas:Vector.<BitmapData> = new Vector.<BitmapData>(totalFrames);
-			var size:Number=1;
-			while (size < source.width||size<source.height ) {
-				size *= 2;
-			}
-			for (var i:int = 0; i < totalFrames;i++ ) {
-				bitmapData = new BitmapData(width, height, true, 0);
-				bitmapData.lock();
-				source.gotoAndStop(i);
-				bitmapData.draw(source);
-				bitmapData.unlock();
-				bitmapDatas[i] = bitmapData;
-			}
-			return bitmapDatas;
-		}
-		
-		public static function getFramesFromSpriteSheet(source:BitmapData, tileWidth:Number = 100, tileHeight:Number = 100, startIndex:int = 0,endIndex:int=int.MAX_VALUE ):Vector.<BitmapData> {
-			var bitmapData:BitmapData;
-			var w:int = Math.ceil(source.width / tileWidth);
-			var h:int = Math.ceil(source.height / tileHeight);
-			var xIndex:int;
-			var yIndex:int;
-			endIndex = Math.min(endIndex, w * h);
-			var offsets:Point = new Point();
-			var rectangle:Rectangle = new Rectangle(0, 0, tileWidth, tileHeight);
-			var bitmapDatas:Vector.<BitmapData> = new Vector.<BitmapData>(endIndex - startIndex + 1);
-			var size:Number=1;
-			while (size < tileWidth||size<tileHeight ) {
-				size *= 2;
-			}
-			for (var i:int = startIndex; i <=endIndex;i++ ) {
-				bitmapData = new BitmapData(size, size, true, 0);
-				bitmapData.lock();
-				xIndex = i % w;
-				yIndex = Math.floor(i / w);
-				rectangle.x = xIndex * tileWidth;
-				rectangle.y = yIndex * tileHeight;
-				bitmapData.copyPixels(source, rectangle, offsets);
-				bitmapData.unlock();
-				bitmapDatas[i-startIndex] = bitmapData;
-			}
-			return bitmapDatas;
 		}
 		
 		///////////////////////////////////
@@ -188,6 +192,14 @@ package nest.view.materials
 		
 		public function set glossiness(value:int):void {
 			_fragData[0] = value;
+		}
+		
+		public function get kill():Number {
+			return _fragData[2];
+		}
+		
+		public function set kill(value:Number):void {
+			_fragData[2] = value;
 		}
 		
 		public function get uv():Boolean {

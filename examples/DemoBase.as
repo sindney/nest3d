@@ -8,7 +8,7 @@ package
 	import flash.geom.Vector3D;
 	
 	import nest.control.CameraController;
-	import nest.control.GlobalMethods;
+	import nest.control.EngineBase;
 	import nest.object.Container3D;
 	import nest.view.culls.BasicCulling;
 	import nest.view.managers.BasicManager;
@@ -49,13 +49,13 @@ package
 			stage.frameRate = 60;
 			stage.addEventListener(MouseEvent.RIGHT_CLICK, onRightClick);
 			
-			GlobalMethods.stage = stage;
-			GlobalMethods.stage3d = stage.stage3Ds[0];
-			GlobalMethods.camera = camera = new Camera3D();
-			GlobalMethods.root = scene = new Container3D();
-			GlobalMethods.manager = manager = new BasicManager();
-			GlobalMethods.view = view = new ViewPort(800, 600);
-			GlobalMethods.view.culling = new BasicCulling();
+			EngineBase.stage = stage;
+			EngineBase.stage3d = stage.stage3Ds[0];
+			EngineBase.camera = camera = new Camera3D();
+			EngineBase.root = scene = new Container3D();
+			EngineBase.manager = manager = new BasicManager();
+			EngineBase.view = view = new ViewPort(800, 600);
+			EngineBase.view.culling = new BasicCulling();
 			addChild(view.diagram);
 			
 			controller = new CameraController();

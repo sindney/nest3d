@@ -10,7 +10,7 @@ package nest.view.effects
 	import flash.display3D.Program3D;
 	import flash.display3D.VertexBuffer3D;
 	
-	import nest.control.GlobalMethods;
+	import nest.control.EngineBase;
 	import nest.view.Shader3D;
 	
 	/**
@@ -35,7 +35,7 @@ package nest.view.effects
 		private var _blurY:Number;
 		
 		public function Bloom(blurX:Number = 4, blurY:Number = 4, threshold:Number = 0.75) {
-			var context3d:Context3D = GlobalMethods.context3d;
+			var context3d:Context3D = EngineBase.context3d;
 			var vertexData:Vector.<Number> = Vector.<Number>([-1, 1, 0, -1, -1, 0, 1, -1, 0, 1, 1, 0]);
 			var uvData:Vector.<Number> = Vector.<Number>([0, 0, 0, 1, 1, 1, 1, 0]);
 			var indexData:Vector.<uint> = Vector.<uint>([0, 3, 2, 2, 1, 0]);
@@ -58,7 +58,7 @@ package nest.view.effects
 		}
 		
 		override public function calculate():void {
-			var context3d:Context3D = GlobalMethods.context3d;
+			var context3d:Context3D = EngineBase.context3d;
 			context3d.setRenderToTexture(_textures[1]);
 			context3d.clear();
 			context3d.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, 0, thresholds);

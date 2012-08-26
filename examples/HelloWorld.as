@@ -7,7 +7,7 @@ package
 	
 	import nest.control.factories.PrimitiveFactory;
 	import nest.control.CameraController;
-	import nest.control.GlobalMethods;
+	import nest.control.EngineBase;
 	import nest.object.Container3D;
 	import nest.object.data.MeshData;
 	import nest.object.Mesh;
@@ -31,21 +31,21 @@ package
 			stage.align = StageAlign.TOP_LEFT;
 			stage.frameRate = 60;
 			
-			GlobalMethods.stage = stage;
-			GlobalMethods.stage3d = stage.stage3Ds[0];
-			GlobalMethods.camera = new Camera3D();
-			GlobalMethods.root = new Container3D();
-			GlobalMethods.manager = new BasicManager();
-			GlobalMethods.view = new ViewPort(800, 600);
-			GlobalMethods.view.culling = new BasicCulling();
-			addChild(GlobalMethods.view.diagram);
+			EngineBase.stage = stage;
+			EngineBase.stage3d = stage.stage3Ds[0];
+			EngineBase.camera = new Camera3D();
+			EngineBase.root = new Container3D();
+			EngineBase.manager = new BasicManager();
+			EngineBase.view = new ViewPort(800, 600);
+			EngineBase.view.culling = new BasicCulling();
+			addChild(EngineBase.view.diagram);
 			
 			controller = new CameraController();
 			controller.mouseEnabled = true;
 			controller.keyboardEnabled = true;
 			controller.speed = 10;
 			
-			GlobalMethods.view.addEventListener(Event.CONTEXT3D_CREATE, onContext3DCreated);
+			EngineBase.view.addEventListener(Event.CONTEXT3D_CREATE, onContext3DCreated);
 		}
 		
 		private function onContext3DCreated(e:Event):void {
@@ -59,20 +59,20 @@ package
 			material.update();
 			
 			var mesh:Mesh = new Mesh(data, material);
-			GlobalMethods.root.addChild(mesh);
+			EngineBase.root.addChild(mesh);
 			
-			GlobalMethods.camera.position.z = -200;
-			GlobalMethods.camera.changed = true;
+			EngineBase.camera.position.z = -200;
+			EngineBase.camera.changed = true;
 		}
 		
 		private function onResize(e:Event):void {
-			GlobalMethods.view.width = stage.stageWidth;
-			GlobalMethods.view.height = stage.stageHeight;
+			EngineBase.view.width = stage.stageWidth;
+			EngineBase.view.height = stage.stageHeight;
 		}
 		
 		private function onEnterFrame(e:Event):void {
 			controller.update();
-			GlobalMethods.view.calculate();
+			EngineBase.view.calculate();
 		}
 		
 	}
