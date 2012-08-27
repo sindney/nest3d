@@ -52,6 +52,36 @@ package nest.object
 			return _invertWorldMatrix.transformVector(v);
 		}
 		
+		public function lookAt(target:Vector3D, upAxis:Vector3D=null):void {
+			if (!upAxis) {
+				upAxis = Vector3D.Y_AXIS;
+			}
+			var zAxis:Vector3D = target.subtract(position);
+			zAxis.normalize();
+			var xAxis:Vector3D = zAxis.crossProduct(upAxis);
+			xAxis.normalize();
+			var yAxis:Vector3D = zAxis.crossProduct(xAxis);
+			yAxis.normalize();
+			
+			var scale:Vector3D = _matrix.decompose()[2];
+			var rawData:Vector.<Number> = Vector.<Number>([scale.x * xAxis.x, scale.x * xAxis.y, scale.x * xAxis.z, 0,
+														   scale.y * yAxis.x, scale.y * yAxis.y, scale.y * yAxis.z, 0,
+														   scale.z * zAxis.x, scale.z * zAxis.y, scale.z * zAxis.z, 0,
+														   position.x, position.y, position.z, 1]);
+			_matrix.copyRawDataFrom(rawData);
+			_invertMatrix.copyFrom(_matrix);
+			_invertMatrix.invert();
+			_components = _matrix.decompose(_orientation);
+			if (zAxis.z < 0) {
+				var rot:Vector3D = _components[1].clone();
+				_components[1].setTo(rot.x - Math.PI, Math.PI-rot.y , rot.z - Math.PI);
+				_matrix.recompose(_components, _orientation);
+				_invertMatrix.copyFrom(_matrix);
+				_invertMatrix.invert();
+			}
+			
+		}
+		
 		public function decompose():void {
 			_components = _matrix.decompose(_orientation);
 			_invertMatrix.copyFrom(_matrix);

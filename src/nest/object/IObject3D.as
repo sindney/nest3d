@@ -17,6 +17,8 @@ package nest.object
 		function localToGlobal(v:Vector3D):Vector3D;
 		function globalToLocal(v:Vector3D):Vector3D;
 		
+		function lookAt(target:Vector3D, upAxis:Vector3D=null):void;
+		
 		function get parent():IContainer3D;
 		function set parent(value:IContainer3D):void;
 		

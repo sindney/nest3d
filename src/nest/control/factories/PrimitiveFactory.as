@@ -1,5 +1,6 @@
 package nest.control.factories
 {
+	import flash.geom.Point;
 	import flash.geom.Vector3D;
 	
 	import nest.object.data.MeshData;
@@ -205,6 +206,166 @@ package nest.control.factories
 			return new MeshData(vertices, triangles);
 		}
 		
+		public static function createPrimitiveByRevolution(samples:Vector.<Point>,segmentsW:uint=10, startRadian:Number=0,endRadian:Number=Math.PI*2):MeshData {
+			const segmentsH:uint = samples.length-1;
+			const radian:Number = endRadian - startRadian;
+			const du:Number = 1 / Math.PI / 2 * radian / segmentsW;
+			const dv:Number = 1 / segmentsH;
+			
+			const db:Number = radian / segmentsW;
+			const s:int = (segmentsW + 1) * (segmentsH + 1);
+			
+			var b:Number = startRadian;
+			var radius1:Number;
+			var radius2:Number;
+			var i:int, j:int, k:int, l:int = 0;
+			var p1:int, p2:int, p3:int, p4:int;
+			var vertices:Vector.<Vertex> = new Vector.<Vertex>(s, true);
+			var triangles:Vector.<Triangle> = new Vector.<Triangle>(segmentsW * segmentsH * 2, true);
+			
+			for (i = 0; i < segmentsW; i++ ) {
+				for (j = 0; j < segmentsH; j++) {
+					k = i * (segmentsH + 1) + j;
+					
+					p1 = k;
+					p2 = k + 1;
+					p3 = k + segmentsH + 1;
+					p4 = k + segmentsH + 2;
+					
+					triangles[l] = new Triangle(p1, p3, p4);
+					triangles[l + 1] = new Triangle(p1, p4, p2);
+					
+					radius1 = samples[j].x;
+					radius2 = samples[j + 1].x;
+					
+					
+					if (!vertices[p1]) vertices[p1] = new Vertex(radius1*Math.cos(b), samples[j].y, radius1 * Math.sin(b), i * du, j * dv);
+					if (!vertices[p2]) vertices[p2] = new Vertex(radius2*Math.cos(b), samples[j+1].y, radius2 * Math.sin(b), i * du, (j + 1) * dv);
+					if (!vertices[p3]) vertices[p3] = new Vertex(radius1*Math.cos(b+db), samples[j].y, radius1 * Math.sin(b+db), (i + 1) * du, j * dv);
+					if (!vertices[p4]) vertices[p4] = new Vertex(radius2*Math.cos(b+db), samples[j+1].y, radius2 * Math.sin(b+db), (i + 1) * du, (j + 1) * dv);
+					
+					triangles[l].u0 = vertices[p1].u;
+					triangles[l].v0 = vertices[p1].v;
+					triangles[l].u1 = vertices[p3].u;
+					triangles[l].v1 = vertices[p3].v;
+					triangles[l].u2 = vertices[p4].u;
+					triangles[l].v2 = vertices[p4].v;
+					
+					triangles[l + 1].u0 = vertices[p1].u;
+					triangles[l + 1].v0 = vertices[p1].v;
+					triangles[l + 1].u1 = vertices[p4].u;
+					triangles[l + 1].v1 = vertices[p4].v;
+					triangles[l + 1].u2 = vertices[p2].u;
+					triangles[l + 1].v2 = vertices[p2].v;
+					
+					l += 2;
+				}
+				
+				b += db;
+			}
+			
+			MeshData.calculateNormal(vertices, triangles);
+			return new MeshData(vertices, triangles);
+		}
+		
+		public static function createPrimitiveByLoft(samples:Vector.<Point>, path:Vector.<Vertex>,topCover:Boolean=false,bottomCover:Boolean=false):MeshData {
+			const segmentsW:uint = samples.length - 1;
+			const segmentsH:uint = path.length - 1;
+			const du:Number = 1 / segmentsW;
+			const dv:Number = 1 / segmentsH;
+			
+			const s:int = (segmentsW + 1) * (segmentsH + 1);
+			const ts:int = segmentsW * segmentsH * 2;
+			
+			var i:int, j:int, k:int, l:int = 0;
+			var p1:int, p2:int, p3:int, p4:int;
+			
+			var vertices:Vector.<Vertex> = new Vector.<Vertex>(s, true);
+			var triangles:Vector.<Triangle> = new Vector.<Triangle>(segmentsW * segmentsH * 2, true);
+			
+			for (i = 0; i < segmentsW; i++ ) {
+				for (j = 0; j < segmentsH; j++) {
+					k = i * (segmentsH + 1) + j;
+					
+					p1 = k;
+					p2 = k + 1;
+					p3 = k + segmentsH + 1;
+					p4 = k + segmentsH + 2;
+					
+					triangles[l] = new Triangle(p1, p3, p4);
+					triangles[l + 1] = new Triangle(p1, p4, p2);
+					
+					if (!vertices[p1]) vertices[p1] = new Vertex(samples[i].x+path[j].x, path[j].y, samples[i].y+path[j].z, i * du, j * dv);
+					if (!vertices[p2]) vertices[p2] = new Vertex(samples[i].x+path[j+1].x, path[j+1].y, samples[i].y+path[j+1].z, i * du, (j + 1) * dv);
+					if (!vertices[p3]) vertices[p3] = new Vertex(samples[i+1].x+path[j].x, path[j].y, samples[i+1].y+path[j].z, (i + 1) * du, j * dv);
+					if (!vertices[p4]) vertices[p4] = new Vertex(samples[i+1].x+path[j+1].x, path[j+1].y, samples[i+1].y+path[j+1].z, (i + 1) * du, (j + 1) * dv);
+					
+					triangles[l].u0 = vertices[p1].u;
+					triangles[l].v0 = vertices[p1].v;
+					triangles[l].u1 = vertices[p3].u;
+					triangles[l].v1 = vertices[p3].v;
+					triangles[l].u2 = vertices[p4].u;
+					triangles[l].v2 = vertices[p4].v;
+					
+					triangles[l + 1].u0 = vertices[p1].u;
+					triangles[l + 1].v0 = vertices[p1].v;
+					triangles[l + 1].u1 = vertices[p4].u;
+					triangles[l + 1].v1 = vertices[p4].v;
+					triangles[l + 1].u2 = vertices[p2].u;
+					triangles[l + 1].v2 = vertices[p2].v;
+					
+					l += 2;
+				}
+			}
+			vertices.fixed = triangles.fixed = false;
+			
+			if (topCover) {
+				l = ts;
+				p1 = s;
+				p2 = segmentsH + 1;
+				p3 = 0;
+				vertices[p1] = new Vertex(path[0].x, path[0].y, path[0].z, 0, 0);
+				for (i = 0; i < segmentsW; i++ ) {
+					triangles[l] = new Triangle(p1, p2, p3);
+					
+					triangles[l].u0 = vertices[p1].u;
+					triangles[l].v0 = vertices[p1].v;
+					triangles[l].u1 = vertices[p2].u;
+					triangles[l].v1 = vertices[p2].v;
+					triangles[l].u2 = vertices[p3].u;
+					triangles[l].v2 = vertices[p3].v;
+					
+					p2 += (segmentsH + 1);
+					p3 += (segmentsH + 1);
+					l++;
+				}
+			}
+			if (bottomCover) {
+				l = triangles.length;
+				p1 = vertices.length;
+				p2 = segmentsH;
+				p3 = 2*segmentsH + 1;
+				vertices[p1] = new Vertex(path[segmentsH].x, path[segmentsH].y, path[segmentsH].z, 1, 1);
+				for (i = 0; i < segmentsW;i++ ) {
+					triangles[l] = new Triangle(p1, p2, p3);
+					
+					triangles[l].u0 = vertices[p1].u;
+					triangles[l].v0 = vertices[p1].v;
+					triangles[l].u1 = vertices[p2].u;
+					triangles[l].v1 = vertices[p2].v;
+					triangles[l].u2 = vertices[p3].u;
+					triangles[l].v2 = vertices[p3].v;
+					
+					p2 += (segmentsH + 1);
+					p3 += (segmentsH + 1);
+					l++;
+				}
+			}
+			vertices.fixed = triangles.fixed = true;
+			
+			MeshData.calculateNormal(vertices, triangles);
+			return new MeshData(vertices, triangles);
+		}
 	}
 
 }
