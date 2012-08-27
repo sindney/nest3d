@@ -55,7 +55,7 @@ package
 			EngineBase.root = scene = new Container3D();
 			EngineBase.manager = manager = new BasicManager();
 			EngineBase.view = view = new ViewPort(800, 600);
-			EngineBase.view.culling = new BasicCulling();
+			view.culling = new BasicCulling();
 			addChild(view.diagram);
 			
 			controller = new CameraController();

@@ -36,7 +36,7 @@ package nest.view.culls
 			if (mesh.bound is AABB) {
 				for (i = 0; i < 8; i++) {
 					v.copyFrom((mesh.bound as AABB).vertices[i]);
-					v.copyFrom(camera.invertMatrix.transformVector(mesh.matrix.transformVector(v)));
+					v.copyFrom(camera.invertMatrix.transformVector(mesh.worldMatrix.transformVector(v)));
 					vertices[i].copyFrom(v);
 				}
 				return camera.frustum.classifyAABB(vertices);
@@ -45,7 +45,7 @@ package nest.view.culls
 			// BoundingShpere
 			i = mesh.scale.x > mesh.scale.y ? mesh.scale.x : mesh.scale.y;
 			if (mesh.scale.z > i) i = mesh.scale.z;
-			v.copyFrom(camera.invertMatrix.transformVector(mesh.matrix.transformVector(mesh.bound.center)));
+			v.copyFrom(camera.invertMatrix.transformVector(mesh.worldMatrix.transformVector(mesh.bound.center)));
 			return camera.frustum.classifyBSphere(v, (mesh.bound as BSphere).radius * i);
 		}
 		

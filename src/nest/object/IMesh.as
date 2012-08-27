@@ -24,6 +24,8 @@ package nest.object
 		
 		function get bound():IBound;
 		
+		function get scale():Vector3D;
+		
 		function get cliping():Boolean;
 		function set cliping(value:Boolean):void;
 		
@@ -37,8 +39,6 @@ package nest.object
 		function set alphaTest(value:Boolean):void;
 		
 		function get blendMode():BlendMode3D;
-		
-		function get scale():Vector3D;
 		
 		function get id():uint;
 		function set id(value:uint):void;

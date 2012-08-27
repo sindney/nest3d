@@ -60,106 +60,90 @@ package nest.object
 			_commands.splice(0, _commands.length);
 			_params.splice(0, _params.length);
 			_canvas.graphics.clear();
-			_changed = false;
 		}
 		
 		public function copyFrom(g:Graphics3D):void {
 			clear();
 			var a:int = g.commands.length;
-			for (var i:int = 0; i < a;i++ ) {
+			for (var i:int = 0; i < a; i++) {
 				_commands.push(g.commands[i]);
 			}
 			a = g.params.length;
-			for (i = 0; i < a;i++ ) {
+			for (i = 0; i < a; i++) { ;
 				_params.push(g.params[i]);
 			}
-			_changed = true;
 		}
 		
 		public function curveTo(controlX:Number, controlY:Number, controlZ:Number, anchorX:Number, anchorY:Number, anchorZ:Number):void {
 			_commands.push(CURVE_TO);
 			_params.push(controlX, controlY, controlZ, anchorX, anchorY, anchorZ);
-			_changed = true;
 		}
 		
 		public function drawCircle(x:Number, y:Number, z:Number, radius:Number):void {
 			_commands.push(DRAW_CIRCLE);
 			_params.push(x, y, z, radius);
-			_changed = true;
 		}
 		
 		public function drawEllipse(x:Number, y:Number, z:Number, width:Number, height:Number):void {
 			_commands.push(DRAW_ELLIPSE);
 			_params.push(x, y, z, width, height);
-			_changed = true;
 		}
 		
 		public function drawPath(commands:Vector.<int>, data:Array):void {
 			var a:int = commands.length;
-			for (var i:int = 0; i < a;i++ ) {
+			for (var i:int = 0; i < a; i++) {
 				_commands.push(commands[i]);
 			}
 			a = data.length;
 			for (i = 0; i < a; i++) {
 				_params.push(data[i]);
 			}
-			_changed = true;
 		}
 		
 		public function drawRect(x:Number, y:Number,z:Number, width:Number, height:Number):void {
 			_commands.push(DRAW_RECT);
 			_params.push(x, y, z, width, height);
-			_changed = true;
 		}
 		
 		public function endFill():void {
 			_commands.push(END_FILL);
-			_changed = true;
 		}
 		
 		public function lineStyle(thickness:Number = NaN, color:uint = 0, alpha:Number = 1.0, pixelHinting:Boolean = false, scaleMode:String = "normal", caps:String = null, joints:String = null, miterLimit:Number = 3):void {
 			_commands.push(LINE_STYLE);
 			_params.push(thickness, color, alpha, pixelHinting, scaleMode, caps, joints, miterLimit);
-			_changed = true;
 		}
 		
 		public function lineTo(x:Number, y:Number,z:Number):void {
 			_commands.push(LINE_TO);
 			_params.push(x, y, z);
-			_changed = true;
 		}
 		
 		public function moveTo(x:Number, y:Number,z:Number):void {
 			_commands.push(MOVE_TO);
 			_params.push(x, y, z);
-			_changed = true;
 		}
 		
 		public function translateGraphics(tx:Number, ty:Number, tz:Number):void {
 			_commands.push(TRANSLATE);
 			_params.push(tx, ty, tz);
-			_changed = true;
 		}
 		
 		public function rotateGraphics(rx:Number, ry:Number, rz:Number):void {
 			_commands.push(ROTATE);
 			_params.push(rx, ry, rz);
-			_changed = true;
 		}
 		
 		public function scaleGraphics(sx:Number, sy:Number, sz:Number):void {
 			_commands.push(SCALE);
 			_params.push(sx, sy, sz);
-			_changed = true;
 		}
 		
 		public function clearGraphics():void {
 			_commands.push(CLEAR);
-			_changed = true;
 		}
 		
 		public function calculate():void {
-			_changed = false;
 			_canvas.graphics.clear();
 			
 			_mask.graphics.clear();
@@ -179,7 +163,7 @@ package nest.object
 			var px2:Number;
 			var py2:Number;
 			
-			_draw.copyFrom(matrix);
+			_draw.copyFrom(worldMatrix);
 			_draw.append(EngineBase.camera.invertMatrix);
 			_draw.append(EngineBase.camera.pm);
 			_transform.identity();
@@ -193,7 +177,7 @@ package nest.object
 					case MOVE_TO://3 params
 						inputVector.setTo(_params[j], _params[j + 1], _params[j + 2]);
 						outputVector = _draw.transformVector(inputVector);
-						px1 =(outputVector.x/outputVector.w+1)*w_2;
+						px1 = (outputVector.x / outputVector.w + 1) * w_2;
 						py1 = (1 - outputVector.y / outputVector.w) * h_2;
 						_lastZ = outputVector.z / outputVector.w;
 						_canvas.graphics.moveTo(px1, py1);
@@ -202,11 +186,11 @@ package nest.object
 					case LINE_TO://3 params
 						inputVector.setTo(_params[j], _params[j + 1], _params[j + 2]);
 						outputVector = _draw.transformVector(inputVector);
-						px1 =(outputVector.x/outputVector.w+1)*w_2;
+						px1 = (outputVector.x / outputVector.w + 1) * w_2;
 						py1 = (1 - outputVector.y / outputVector.w) * h_2;
-						if (_lastZ>0&&_lastZ<1) {
+						if (_lastZ > 0 && _lastZ < 1) {
 							_canvas.graphics.lineTo(px1, py1);
-						}else {
+						} else {
 							_canvas.graphics.moveTo(px1, py1);
 						}
 						_lastZ = outputVector.z / outputVector.w;
@@ -215,16 +199,16 @@ package nest.object
 					case CURVE_TO://6 params
 						inputVector.setTo(_params[j], _params[j + 1], _params[j + 2]);
 						outputVector = _draw.transformVector(inputVector);
-						px1 =(outputVector.x/outputVector.w+1)*w_2;
-						py1 =(1-outputVector.y/outputVector.w)*h_2;
+						px1 = (outputVector.x / outputVector.w + 1) * w_2;
+						py1 = (1 - outputVector.y / outputVector.w) * h_2;
 						
 						inputVector.setTo(_params[j+3], _params[j + 4], _params[j + 5]);
 						outputVector = _draw.transformVector(inputVector);
-						px2 =(outputVector.x/outputVector.w+1)*w_2;
+						px2 = (outputVector.x / outputVector.w + 1) * w_2;
 						py2 = (1 - outputVector.y / outputVector.w) * h_2;
-						if (_lastZ>0&&_lastZ<1) {
+						if (_lastZ > 0 && _lastZ < 1) {
 							_canvas.graphics.curveTo(px1, py1, px2, py2);
-						}else {
+						} else {
 							_canvas.graphics.moveTo(px2, py2);
 						}
 						_lastZ = outputVector.z / outputVector.w;
@@ -233,51 +217,51 @@ package nest.object
 					case DRAW_RECT://5 params
 						inputVector.setTo(_params[j], _params[j + 1], _params[j + 2]);
 						outputVector = _draw.transformVector(inputVector);
-						px1 =(outputVector.x/outputVector.w+1)*w_2;
-						py1 =(1-outputVector.y/outputVector.w)*h_2;
+						px1 = (outputVector.x / outputVector.w + 1) * w_2;
+						py1 = (1 - outputVector.y / outputVector.w) * h_2;
 						_canvas.graphics.moveTo(px1, py1);
 						_lastZ = outputVector.z / outputVector.w;
 						
-						inputVector.setTo(_params[j]+_params[j+3], _params[j + 1], _params[j + 2]);
+						inputVector.setTo(_params[j] + _params[j + 3], _params[j + 1], _params[j + 2]);
 						outputVector = _draw.transformVector(inputVector);
-						px1 =(outputVector.x/outputVector.w+1)*w_2;
+						px1 = (outputVector.x / outputVector.w + 1) * w_2;
 						py1 = (1 - outputVector.y / outputVector.w) * h_2;
-						if (_lastZ>0&&_lastZ<1) {
+						if (_lastZ > 0 && _lastZ < 1) {
 							_canvas.graphics.lineTo(px1, py1);
-						}else {
+						} else {
 							_canvas.graphics.moveTo(px1, py1);
 						}
 						_lastZ = outputVector.z / outputVector.w;
 						
-						inputVector.setTo(_params[j]+_params[j+3], _params[j + 1]+_params[j+4], _params[j + 2]);
+						inputVector.setTo(_params[j] + _params[j + 3], _params[j + 1] + _params[j + 4], _params[j + 2]);
 						outputVector = _draw.transformVector(inputVector);
-						px1 =(outputVector.x/outputVector.w+1)*w_2;
-						py1 =(1-outputVector.y/outputVector.w)*h_2;
-						if (_lastZ>0&&_lastZ<1) {
+						px1 = (outputVector.x / outputVector.w + 1) * w_2;
+						py1 = (1 - outputVector.y / outputVector.w) * h_2;
+						if (_lastZ > 0 && _lastZ < 1) {
 							_canvas.graphics.lineTo(px1, py1);
-						}else {
+						} else {
 							_canvas.graphics.moveTo(px1, py1);
 						}
 						_lastZ = outputVector.z / outputVector.w;
 						
-						inputVector.setTo(_params[j], _params[j + 1]+_params[j+4], _params[j + 2]);
+						inputVector.setTo(_params[j], _params[j + 1] + _params[j + 4], _params[j + 2]);
 						outputVector = _draw.transformVector(inputVector);
-						px1 =(outputVector.x/outputVector.w+1)*w_2;
-						py1 =(1-outputVector.y/outputVector.w)*h_2;
-						if (_lastZ>0&&_lastZ<1) {
+						px1 = (outputVector.x / outputVector.w + 1) * w_2;
+						py1 = (1 - outputVector.y / outputVector.w) * h_2;
+						if (_lastZ > 0 && _lastZ < 1) {
 							_canvas.graphics.lineTo(px1, py1);
-						}else {
+						} else {
 							_canvas.graphics.moveTo(px1, py1);
 						}
 						_lastZ = outputVector.z / outputVector.w;
 						
 						inputVector.setTo(_params[j], _params[j + 1], _params[j + 2]);
 						outputVector = _draw.transformVector(inputVector);
-						px1 =(outputVector.x/outputVector.w+1)*w_2;
-						py1 =(1-outputVector.y/outputVector.w)*h_2;
-						if (_lastZ>0&&_lastZ<1) {
+						px1 = (outputVector.x / outputVector.w + 1) * w_2;
+						py1 = (1 - outputVector.y / outputVector.w) * h_2;
+						if (_lastZ > 0 && _lastZ < 1) {
 							_canvas.graphics.lineTo(px1, py1);
-						}else {
+						} else {
 							_canvas.graphics.moveTo(px1, py1);
 						}
 						_lastZ = outputVector.z / outputVector.w;
@@ -291,18 +275,18 @@ package nest.object
 						
 						inputVector.setTo(x+r, y, z);
 						outputVector = _draw.transformVector(inputVector);
-						px1 =(outputVector.x/outputVector.w+1)*w_2;
-						py1 =(1-outputVector.y/outputVector.w)*h_2;
+						px1 = (outputVector.x / outputVector.w + 1) * w_2;
+						py1 = (1 - outputVector.y / outputVector.w) * h_2;
 						_canvas.graphics.moveTo(px1, py1);
 						_lastZ = outputVector.z / outputVector.w;
-						for (k = 0; k < 100;k++ ) {
-							inputVector.setTo(x+r*Math.cos(k/50*Math.PI), y+r*Math.sin(k/50*Math.PI), z);
+						for (k = 0; k < 100; k++ ) {
+							inputVector.setTo(x + r * Math.cos(k / 50 * Math.PI), y + r * Math.sin(k / 50 * Math.PI), z);
 							outputVector = _draw.transformVector(inputVector);
-							px1 =(outputVector.x/outputVector.w+1)*w_2;
-							py1 =(1-outputVector.y/outputVector.w)*h_2;
-							if (_lastZ>0&&_lastZ<1) {
+							px1 = (outputVector.x / outputVector.w + 1) * w_2;
+							py1 = (1 - outputVector.y / outputVector.w) * h_2;
+							if (_lastZ > 0 && _lastZ < 1) {
 								_canvas.graphics.lineTo(px1, py1);
-							}else {
+							} else {
 								_canvas.graphics.moveTo(px1, py1);
 							}
 							_lastZ = outputVector.z / outputVector.w;
@@ -316,18 +300,18 @@ package nest.object
 						px2 = _params[j + 3];
 						py2 = _params[j + 4];
 						
-						inputVector.setTo(x+px2, y, z);
+						inputVector.setTo(x + px2, y, z);
 						outputVector = _draw.transformVector(inputVector);
-						px1 =(outputVector.x/outputVector.w+1)*w_2;
-						py1 =(1-outputVector.y/outputVector.w)*h_2;
+						px1 = (outputVector.x / outputVector.w + 1) * w_2;
+						py1 = (1 - outputVector.y / outputVector.w) * h_2;
 						_canvas.graphics.moveTo(px1, py1);
 						_lastZ = outputVector.z / outputVector.w;
-						for (k = 0; k < 100;k++ ) {
-							inputVector.setTo(x+px2*Math.cos(k/50*Math.PI), y+py2*Math.sin(k/50*Math.PI), z);
+						for (k = 0; k < 100; k++) {
+							inputVector.setTo(x + px2 * Math.cos(k / 50 * Math.PI), y + py2 * Math.sin(k / 50 * Math.PI), z);
 							outputVector = _draw.transformVector(inputVector);
-							px1 =(outputVector.x/outputVector.w+1)*w_2;
-							py1 =(1-outputVector.y/outputVector.w)*h_2;
-							if (_lastZ>0&&_lastZ<1) {
+							px1 = (outputVector.x / outputVector.w + 1) * w_2;
+							py1 = (1 - outputVector.y / outputVector.w) * h_2;
+							if (_lastZ > 0 && _lastZ < 1) {
 								_canvas.graphics.lineTo(px1, py1);
 							}else {
 								_canvas.graphics.moveTo(px1, py1);
@@ -351,7 +335,7 @@ package nest.object
 					case TRANSLATE:
 						_transform.appendTranslation(_params[j], _params[j + 1], _params[j + 2]);
 						_draw.copyFrom(_transform);
-						_draw.append(matrix);
+						_draw.append(worldMatrix);
 						_draw.append(EngineBase.camera.invertMatrix);
 						_draw.append(EngineBase.camera.pm);
 						j += 3;
@@ -361,7 +345,7 @@ package nest.object
 						_transform.appendRotation(_params[j + 1], Vector3D.Y_AXIS);
 						_transform.appendRotation(_params[j + 2], Vector3D.Z_AXIS);
 						_draw.copyFrom(_transform);
-						_draw.append(matrix);
+						_draw.append(worldMatrix);
 						_draw.append(EngineBase.camera.invertMatrix);
 						_draw.append(EngineBase.camera.pm);
 						j += 3;
@@ -369,14 +353,14 @@ package nest.object
 					case SCALE:
 						_transform.appendScale(_params[j], _params[j + 1], _params[j + 2]);
 						_draw.copyFrom(_transform);
-						_draw.append(matrix);
+						_draw.append(worldMatrix);
 						_draw.append(EngineBase.camera.invertMatrix);
 						_draw.append(EngineBase.camera.pm);
 						j += 3;
 						break;
 					case CLEAR:
 						_transform.identity();
-						_draw.copyFrom(matrix);
+						_draw.copyFrom(worldMatrix);
 						_draw.append(EngineBase.camera.invertMatrix);
 						_draw.append(EngineBase.camera.pm);
 						break;

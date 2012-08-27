@@ -76,14 +76,13 @@ package nest.view.materials
 								"mov v6, vt7.xyz\n";
 			// envmap
 			// v5 = I - 2*N*dot(N,I)
-			vertex += "m44 vt1, va2, vc10\n" + 
-						"nrm vt1.xyz, vt1\n" + 
-						"m44 vt2, va0, vc10\n" + 
-						"sub vt2, vt2, vc8\n" + 
-						"dp3 vt3, vt1, vt2\n" + 
-						"add vt1, vt1, vt1\n" + 
-						"mul vt3, vt3, vt1\n" + 
+			vertex += "sub vt2, va0, vt1\n" + 
+						"nrm vt2.xyz, vt2\n" + 
+						"dp3 vt3, va2, vt2\n" + 
+						"add vt4, va2, va2\n" + 
+						"mul vt3, vt3, vt4\n" + 
 						"sub vt2, vt2, vt3\n" + 
+						"m44 vt2, vt2, vc10\n" + 
 						"nrm vt2.xyz, vt2\n" + 
 						"mov v5, vt2\n" + 
 						"mov v1, va1\n" + 

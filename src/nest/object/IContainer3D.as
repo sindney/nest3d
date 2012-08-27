@@ -1,6 +1,5 @@
 package nest.object 
 {
-	import flash.geom.Matrix3D;
 	
 	/**
 	 * Container3D Interface

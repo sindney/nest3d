@@ -17,11 +17,11 @@ package nest.object
 		function get parent():IContainer3D;
 		function set parent(value:IContainer3D):void;
 		
-		function get changed():Boolean;
-		function set changed(value:Boolean):void;
-		
 		function get orientation():String;
 		function set orientation(value:String):void;
+		
+		function get changed():Boolean;
+		function set changed(value:Boolean):void;
 		
 		function get rotation():Vector3D;
 		
@@ -30,6 +30,10 @@ package nest.object
 		function get matrix():Matrix3D;
 		
 		function get invertMatrix():Matrix3D;
+		
+		function get worldMatrix():Matrix3D;
+		
+		function get invertWorldMatrix():Matrix3D;
 		
 	}
 	

@@ -5,7 +5,7 @@ package nest.object
 	 * Container3D
 	 */
 	public class Container3D extends Object3D implements IContainer3D {
-
+		
 		protected var _visible:Boolean = true;
 		protected var _mouseEnabled:Boolean = false;
 		

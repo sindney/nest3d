@@ -31,7 +31,7 @@ package nest.view.processes
 			var context3d:Context3D = EngineBase.context3d;
 			
 			mesh.id = ++id;
-			draw.copyFrom(mesh.matrix);
+			draw.copyFrom(mesh.worldMatrix);
 			draw.append(EngineBase.camera.invertMatrix);
 			if (mesh is Sprite3D) {
 				var comps:Vector.<Vector3D> = draw.decompose();

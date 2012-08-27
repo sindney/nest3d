@@ -33,12 +33,14 @@ package
 		override public function init():void {
 			var parser:ParserOBJ = new ParserOBJ();
 			
-			var data:MeshData = parser.parse(new model(), 10);
+			var data:MeshData = parser.parse(new model(), 1);
 			var texture:TextureMaterial = new TextureMaterial(new diffuse().bitmapData, new specular().bitmapData, 40, new normals().bitmapData);
 			texture.light = new AmbientLight(0x000000);
 			texture.light.next = new DirectionalLight(0xffffff, 0, 0, -1);
 			texture.update();
+			
 			mesh = new Mesh(data, texture);
+			mesh.scale.setTo(10, 10, 10);
 			scene.addChild(mesh);
 			
 			camera.position.z = 120;

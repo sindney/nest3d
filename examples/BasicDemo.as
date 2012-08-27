@@ -27,7 +27,7 @@ package
 			var light:AmbientLight = new AmbientLight(0x333333);
 			light.next = pointLight = new PointLight(0xffffff, 200, 0, 0, 0);
 			
-			var data:MeshData = PrimitiveFactory.createBox(10, 10, 10);
+			var data:MeshData = PrimitiveFactory.createBox(1, 1, 1);
 			
 			colorMat = new ColorMaterial(0xff0000);
 			colorMat.light = light;
@@ -43,6 +43,7 @@ package
 					for (k = 0; k < 10; k++) {
 						cube = new Mesh(data, k > 4 ? colorMat : colorMat1);
 						cube.position.setTo(i * 40, j * 40, k * 40);
+						cube.scale.setTo(10, 10, 10);
 						cube.changed = true;
 						scene.addChild(cube);
 					}

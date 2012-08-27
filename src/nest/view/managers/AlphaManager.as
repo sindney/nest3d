@@ -28,7 +28,7 @@ package nest.view.managers
 				_objects = new Vector.<IMesh>();
 				_alphaObjects = new Vector.<IMesh>();
 				distance = new Vector.<Number>();
-				doContainer(EngineBase.root, null, EngineBase.root.changed);
+				doContainer(EngineBase.root, null);
 				
 				j = distance.length - 1;
 				if (j > 1) quickSort(distance, 0, j);

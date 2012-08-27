@@ -104,22 +104,6 @@ package nest.object
 			return result;
 		}
 		
-		override public function decompose():void {
-			_components = _matrix.decompose(_orientation);
-			_invertMatrix.copyFrom(_matrix);
-			_invertMatrix.appendScale(1 / _components[2].x, 1 / _components[2].y, 1 / _components[2].z);
-			_invertMatrix.invert();
-			_changed = false;
-		}
-		
-		override public function recompose():void {
-			_matrix.recompose(_components, _orientation);
-			_invertMatrix.copyFrom(_matrix);
-			_invertMatrix.appendScale(1 / _components[2].x, 1 / _components[2].y, 1 / _components[2].z);
-			_invertMatrix.invert();
-			_changed = false;
-		}
-		
 		///////////////////////////////////
 		// getter/setters
 		///////////////////////////////////
@@ -160,6 +144,10 @@ package nest.object
 			if (_data && _bound) _bound.update(_data.vertices);
 		}
 		
+		public function get scale():Vector3D {
+			return _components[2];
+		}
+		
 		public function get cliping():Boolean {
 			return _cliping;
 		}
@@ -186,10 +174,6 @@ package nest.object
 		
 		public function set alphaTest(value:Boolean):void {
 			_alphaTest = value;
-		}
-		
-		public function get scale():Vector3D {
-			return _components[2];
 		}
 		
 		public function get mouseEnabled():Boolean {

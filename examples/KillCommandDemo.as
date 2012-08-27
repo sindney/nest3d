@@ -34,11 +34,9 @@ package
 		override public function init():void {
 			EngineBase.manager = manager = new BasicManager();
 			
-			var factory:PrimitiveFactory = new PrimitiveFactory();
-			var data:MeshData = factory.createSphere(10);
+			var data:MeshData = PrimitiveFactory.createSphere(10);
 			
 			var material:TextureMaterial = new TextureMaterial(new diffuse().bitmapData);
-			material.kill = true;
 			material.update();
 			var material1:TextureMaterial = new TextureMaterial(new diffuse1().bitmapData);
 			material1.update();

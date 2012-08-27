@@ -1,14 +1,21 @@
 package nest.view 
 {
+	import flash.events.EventDispatcher;
 	import flash.geom.Matrix3D;
+	import flash.geom.Orientation3D;
 	import flash.geom.Vector3D;
-	
-	import nest.object.Object3D;
 	
 	/**
 	 * Camera3D
 	 */
-	public class Camera3D extends Object3D {
+	public class Camera3D extends EventDispatcher {
+		
+		protected var _orientation:String = Orientation3D.EULER_ANGLES;
+		
+		protected var _components:Vector.<Vector3D>;
+		
+		protected var _matrix:Matrix3D;
+		protected var _invertMatrix:Matrix3D;
 		
 		protected var _pm:Matrix3D;
 		protected var _frustum:Frustum;
@@ -18,11 +25,43 @@ package nest.view
 		protected var _far:Number = 10000;
 		protected var _fov:Number = 45 * Math.PI / 180;
 		
+		protected var _changed:Boolean = false;
+		
 		public function Camera3D() {
 			super();
+			_components = new Vector.<Vector3D>(3, true);
+			_components[0] = new Vector3D();
+			_components[1] = new Vector3D();
+			_components[2] = new Vector3D(1, 1, 1, 1);
+			
+			_matrix = new Matrix3D();
+			_invertMatrix = new Matrix3D();
+			
 			_pm = new Matrix3D();
 			_frustum = new Frustum();
+			
 			update();
+		}
+		
+		public function translate(axis:Vector3D, value:Number):void {
+			var p:Vector3D = axis.clone();
+			p.scaleBy(value);
+			_components[0] = _matrix.transformVector(p);
+			_changed = true;
+		}
+		
+		public function decompose():void {
+			_components = _matrix.decompose(_orientation);
+			_invertMatrix.copyFrom(_matrix);
+			_invertMatrix.invert();
+			_changed = false;
+		}
+		
+		public function recompose():void {
+			_matrix.recompose(_components, _orientation);
+			_invertMatrix.copyFrom(_matrix);
+			_invertMatrix.invert();
+			_changed = false;
 		}
 		
 		protected function update():void {
@@ -93,6 +132,38 @@ package nest.view
 		
 		public function get frustum():Frustum {
 			return _frustum;
+		}
+		
+		public function get matrix():Matrix3D {
+			return _matrix;
+		}
+		
+		public function get invertMatrix():Matrix3D {
+			return _invertMatrix;
+		}
+		
+		public function get position():Vector3D {
+			return _components[0];
+		}
+		
+		public function get rotation():Vector3D {
+			return _components[1];
+		}
+		
+		public function get orientation():String {
+			return _orientation;
+		}
+		
+		public function set orientation(value:String):void {
+			_orientation = value;
+		}
+		
+		public function get changed():Boolean {
+			return _changed;
+		}
+		
+		public function set changed(value:Boolean):void {
+			_changed = value;
 		}
 		
 	}

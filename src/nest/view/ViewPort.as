@@ -79,7 +79,6 @@ package nest.view
 			if (_effect) context3d.setRenderToTexture(_effect.textures[0], _effect.enableDepthAndStencil, _effect.antiAlias);
 			context3d.clear(_rgba[0], _rgba[1], _rgba[2], _rgba[3]);
 			
-			_diagram.update();
 			if (camera.changed) camera.recompose();
 			_camPos[0] = camera.position.x;
 			_camPos[1] = camera.position.y;
@@ -99,6 +98,8 @@ package nest.view
 					effect = effect.next;
 				}
 			}
+			
+			_diagram.update();
 			
 			if (bitmapData) context3d.drawToBitmapData(bitmapData);
 			context3d.present();

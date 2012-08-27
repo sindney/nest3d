@@ -29,11 +29,10 @@ package
 		[Embed(source = "assets/skybox_back.jpg")]
 		private const back:Class;
 		
-		[Embed(source = "assets/head_diffuse.jpg")]
-		private const diffuse:Class;
-		
-		[Embed(source = "assets/head.obj", mimeType = "application/octet-stream")]
+		[Embed(source = "assets/teapot.obj", mimeType = "application/octet-stream")]
 		private const model:Class;
+		
+		private var mesh:Mesh;
 		
 		public function EnvMapDemo() {
 			super();
@@ -50,18 +49,23 @@ package
 			cubicmap[4] = new front().bitmapData;
 			cubicmap[5] = new back().bitmapData;
 			
-			var data:MeshData = parser.parse(new model(), 10);
-			var texture:EnvMapMaterial = new EnvMapMaterial(cubicmap, 0.4, new diffuse().bitmapData);
+			var data:MeshData = parser.parse(new model(), 5);
+			var texture:EnvMapMaterial = new EnvMapMaterial(cubicmap, 0.8, new BitmapData(1, 1, false, 0xffffff));
 			texture.update();
 			
-			var mesh:Mesh = new Mesh(data, texture);
+			mesh = new Mesh(data, texture);
+			mesh.position.z = 200;
+			mesh.changed = true;
 			scene.addChild(mesh);
 			
-			camera.position.z = 120;
-			camera.rotation.y = Math.PI;
+			camera.position.y = 20;
 			camera.changed = true;
 		}
 		
+		override public function loop():void {
+			mesh.rotation.y += 0.01;
+			mesh.changed = true;
+		}
 	}
 
 }

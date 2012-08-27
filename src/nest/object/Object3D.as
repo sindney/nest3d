@@ -14,14 +14,16 @@ package nest.object
 		
 		protected var _orientation:String = Orientation3D.EULER_ANGLES;
 		
-		protected var _changed:Boolean = false;
-		
 		protected var _components:Vector.<Vector3D>;
 		
 		protected var _matrix:Matrix3D;
 		protected var _invertMatrix:Matrix3D;
+		protected var _worldMatrix:Matrix3D;
+		protected var _invertWorldMatrix:Matrix3D;
 		
 		protected var _parent:IContainer3D;
+		
+		protected var _changed:Boolean = false;
 		
 		public function Object3D() {
 			_components = new Vector.<Vector3D>(3, true);
@@ -31,6 +33,8 @@ package nest.object
 			
 			_matrix = new Matrix3D();
 			_invertMatrix = new Matrix3D();
+			_worldMatrix = new Matrix3D();
+			_invertWorldMatrix = new Matrix3D();
 		}
 		
 		public function translate(axis:Vector3D, value:Number):void {
@@ -74,6 +78,14 @@ package nest.object
 			return _invertMatrix;
 		}
 		
+		public function get worldMatrix():Matrix3D {
+			return _worldMatrix;
+		}
+		
+		public function get invertWorldMatrix():Matrix3D {
+			return _invertWorldMatrix;
+		}
+		
 		public function get orientation():String {
 			return _orientation;
 		}
@@ -82,20 +94,20 @@ package nest.object
 			_orientation = value;
 		}
 		
-		public function get changed():Boolean {
-			return _changed;
-		}
-		
-		public function set changed(value:Boolean):void {
-			_changed = value;
-		}
-		
 		public function get parent():IContainer3D {
 			return _parent;
 		}
 		
 		public function set parent(value:IContainer3D):void {
 			_parent = value;
+		}
+		
+		public function get changed():Boolean {
+			return _changed;
+		}
+		
+		public function set changed(value:Boolean):void {
+			_changed = value;
 		}
 		
 	}

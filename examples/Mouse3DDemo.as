@@ -81,6 +81,7 @@ package
 		
 		private function onMouseDown(e:MouseEvent3D):void {
 			(e.target as Mesh).material = colorMat2;
+			view.diagram.message = e.data;
 		}
 		
 		override public function loop():void {

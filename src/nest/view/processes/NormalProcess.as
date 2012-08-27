@@ -28,7 +28,7 @@ package nest.view.processes
 		public function doMesh(mesh:IMesh):void {
 			var context3d:Context3D = EngineBase.context3d;
 			
-			draw.copyFrom(mesh.matrix);
+			draw.copyFrom(mesh.worldMatrix);
 			draw.append(EngineBase.camera.invertMatrix);
 			if (mesh is Sprite3D) {
 				var comps:Vector.<Vector3D> = draw.decompose();
