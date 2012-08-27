@@ -196,6 +196,49 @@ package nest.object.data
 			_changed = true;
 		}
 		
+		/**
+		 * Get the 3D position of a Point by its UV.
+		 */
+		public function getPositionByUV(u:Number, v:Number):Vertex {
+			var v0:Vertex;
+			var v1:Vertex;
+			var v2:Vertex;
+			var contains:Boolean = false;
+			var result:Vertex;
+			for each(var tri:Triangle in _triangles) {
+				if (tri.contains(u, v)) {
+					contains = true;
+					break;
+				}
+			}
+			if (contains) {
+				v0 = _vertices[tri.index0];
+				v1 = _vertices[tri.index1];
+				v2 = _vertices[tri.index2];
+				var du0:Number = tri.u0 - u;
+				var dv0:Number = tri.v0 - v;
+				var du1:Number = tri.u1 - u;
+				var dv1:Number = tri.v1 - v;
+				var du2:Number = tri.u2 - u;
+				var dv2:Number = tri.v2 - v;
+				
+				var cross1:Number = du0 * dv1 - du1 * dv0;
+				var cross2:Number = du1 * dv2 - du2 * dv1;
+				var cross3:Number = du2 * dv0 - du0 * dv2;
+				var invArea:Number = 1 / (cross1 + cross2 + cross3);
+				
+				var w0:Number = cross1 * invArea;
+				var w1:Number = cross2 * invArea;
+				var w2:Number = cross3 * invArea;
+				
+				result = new Vertex(v0.x * w0 + v1.x * w1 + v2.x * w2,
+									v0.y * w0 + v1.y * w1 + v2.y * w2,
+									v0.z * w0 + v1.z * w1 + v2.z * w2,
+									u, v);
+			}
+			return result;
+		}
+		
 		public function upload(context3d:Context3D, uv:Boolean, normal:Boolean):void {
 			if (_changed) {
 				_changed = false;

@@ -14,6 +14,9 @@ package nest.object
 		
 		function translate(axis:Vector3D, value:Number):void;
 		
+		function localToGlobal(v:Vector3D):Vector3D;
+		function globalToLocal(v:Vector3D):Vector3D;
+		
 		function get parent():IContainer3D;
 		function set parent(value:IContainer3D):void;
 		

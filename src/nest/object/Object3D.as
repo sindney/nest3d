@@ -44,6 +44,14 @@ package nest.object
 			_changed = true;
 		}
 		
+		public function localToGlobal(v:Vector3D):Vector3D {
+			return _worldMatrix.transformVector(v);
+		}
+		
+		public function globalToLocal(v:Vector3D):Vector3D {
+			return _invertWorldMatrix.transformVector(v);
+		}
+		
 		public function decompose():void {
 			_components = _matrix.decompose(_orientation);
 			_invertMatrix.copyFrom(_matrix);
