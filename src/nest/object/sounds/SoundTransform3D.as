@@ -23,19 +23,18 @@ package nest.object.sounds
 		
 		private var _stopped:Boolean = true;
 		
-		private var _headRelative:Boolean = false;
-		
+		public var headRelative:Boolean = false;
 		public var volumn:Number = 1;
-		public var rollOffFactor:Number = .1;
 		public var far:Number = 200;
 		public var near:Number = 40;
-		public var insideConeRadian:Number = Math.PI / 6;
-		public var outsideConeRadian:Number = Math.PI / 3;
+		public var insideConeRadian:Number = Math.PI / 8;
+		public var outsideConeRadian:Number = Math.PI / 2;
 		
 		public function SoundTransform3D() {
 			super();
 			_transform = new SoundTransform(0, 0);
-			v0 = new Vector3D();
+			v0 = new Vector3D(0,0,0,1);
+			v1 = new Vector3D(0,0,0,1);
 		}
 		
 		public function calculate():void {
@@ -43,17 +42,33 @@ package nest.object.sounds
 			var camera:Matrix3D = EngineBase.camera.invertMatrix;
 			var container:Matrix3D = parent.worldMatrix;
 			
-			v0.copyFrom(_components[0]);
-			v0 = camera.transformVector(container.transformVector(v0));
-			
+			recompose();
+			v0.setTo(0, 0, 0);
+			v0 = camera.transformVector(_worldMatrix.transformVector(v0));
 			const d:int = v0.length;
-			v0.y = 0;
+			
 			
 			if (d < near) {
 				_transform.volume = volumn;
 				_transform.pan = 0;
 			} else if (d <= far) {
 				_transform.volume = (1 -  d / far) * volumn;
+				if (headRelative) {
+					v1.setTo(0, 0, -1);
+					v1 = camera.transformVector(_worldMatrix.transformVector(v1));
+					v1.setTo(v1.x - v0.x, v1.y - v0.y, v1.z - v0.z);
+					v1.normalize();
+					var factor:Number = Math.abs(Vector3D.angleBetween(v1, v0));
+					if (factor< insideConeRadian) {
+						factor = 1;
+					}else if (factor<=outsideConeRadian) {
+						factor = 1-factor/outsideConeRadian;
+					}else {
+						factor = 0;
+					}
+					_transform.volume *= factor;
+				}
+				v0.y = 0;
 				_transform.pan = Vector3D.angleBetween(v0, Vector3D.Z_AXIS) * PI1;
 				if (Math.abs(_transform.pan) > 0.5) {
 					_transform.pan = 2 - _transform.pan * 2;
