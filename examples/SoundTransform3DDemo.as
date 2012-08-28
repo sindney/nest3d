@@ -8,7 +8,6 @@ package
 	import nest.control.factories.PrimitiveFactory;
 	import nest.object.data.MeshData;
 	import nest.object.Mesh;
-	import nest.object.Sound3D;
 	import nest.object.SkyBox;
 	import nest.view.materials.TextureMaterial;
 	import nest.view.materials.IMaterial;
@@ -78,11 +77,13 @@ package
 			rainChannel=rainSnd.play(0, 1000);
 			
 			soundTrans = new SoundTransform3D();
+			soundTrans.headRelative = true;
 			soundTrans.near = 10;
 			soundTrans.far = 100;
 			soundTrans.volumn = 1;
 			soundTrans.stopped = false;
-			soundTrans.position.setTo(50, 0, 50);
+			soundTrans.position.setTo(50, 10, 50);
+			soundTrans.rotation.setTo(0, -Math.PI * 0.75, 0);
 			scene.addChild(soundTrans);
 			rainChannel.soundTransform = soundTrans.transform;
 			controller.speed = 1;

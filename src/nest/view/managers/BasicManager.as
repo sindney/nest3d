@@ -13,7 +13,6 @@ package nest.view.managers
 	import nest.object.IMesh;
 	import nest.object.IObject3D;
 	import nest.object.LODMesh;
-	import nest.object.Sound3D;
 	import nest.object.Sprite3D;
 	import nest.view.culls.ICulling;
 	import nest.view.materials.EnvMapMaterial;
@@ -139,9 +138,7 @@ package nest.view.managers
 							_objects.push(mesh);
 						}
 					}
-				} else if (object is Sound3D) {
-					(object as Sound3D).calculate();
-				} else if (object is SoundTransform3D) {
+				}  else if (object is SoundTransform3D) {
 					(object as SoundTransform3D).calculate();
 				} else if (object is Graphics3D) {
 					(object as Graphics3D).calculate();
