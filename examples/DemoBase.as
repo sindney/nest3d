@@ -6,8 +6,8 @@ package
 	import flash.events.Event;
 	import flash.events.MouseEvent;
 	import flash.geom.Vector3D;
+	import nest.control.controllers.BasicController;
 	
-	import nest.control.CameraController;
 	import nest.control.EngineBase;
 	import nest.object.Container3D;
 	import nest.view.culls.BasicCulling;
@@ -39,7 +39,7 @@ package
 		protected var camera:Camera3D;
 		protected var scene:Container3D;
 		protected var manager:ISceneManager;
-		protected var controller:CameraController;
+		protected var controller:BasicController;
 		
 		protected var actived:Boolean = true;
 		
@@ -58,7 +58,7 @@ package
 			view.culling = new BasicCulling();
 			addChild(view.diagram);
 			
-			controller = new CameraController();
+			controller = new BasicController();
 			controller.mouseEnabled = true;
 			controller.keyboardEnabled = true;
 			controller.speed = 10;

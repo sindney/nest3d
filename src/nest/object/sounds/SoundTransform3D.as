@@ -41,7 +41,7 @@ package nest.object.sounds
 		public function calculate():void {
 			if (_stopped) return;
 			var camera:Matrix3D = EngineBase.camera.invertMatrix;
-			var container:Matrix3D = parent.matrix;
+			var container:Matrix3D = parent.worldMatrix;
 			
 			v0.copyFrom(_components[0]);
 			v0 = camera.transformVector(container.transformVector(v0));
