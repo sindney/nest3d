@@ -33,16 +33,14 @@ package nest.object.sounds
 		public function SoundTransform3D() {
 			super();
 			_transform = new SoundTransform(0, 0);
-			v0 = new Vector3D(0,0,0,1);
-			v1 = new Vector3D(0,0,0,1);
+			v0 = new Vector3D();
+			v1 = new Vector3D();
 		}
 		
 		public function calculate():void {
 			if (_stopped) return;
 			var camera:Matrix3D = EngineBase.camera.invertMatrix;
-			var container:Matrix3D = parent.worldMatrix;
 			
-			recompose();
 			v0.setTo(0, 0, 0);
 			v0 = camera.transformVector(_worldMatrix.transformVector(v0));
 			const d:int = v0.length;
@@ -68,7 +66,7 @@ package nest.object.sounds
 					}
 					_transform.volume *= factor;
 				}
-				v0.y = 0;
+				v0.y = 0; 
 				_transform.pan = Vector3D.angleBetween(v0, Vector3D.Z_AXIS) * PI1;
 				if (Math.abs(_transform.pan) > 0.5) {
 					_transform.pan = 2 - _transform.pan * 2;

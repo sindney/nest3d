@@ -5,6 +5,7 @@ package nest.view.managers
 	import flash.display3D.Context3DCompareMode;
 	import flash.geom.Matrix3D;
 	import flash.geom.Vector3D;
+	import nest.object.sounds.Sound3D;
 	import nest.object.sounds.SoundTransform3D;
 	
 	import nest.control.EngineBase;
@@ -138,8 +139,10 @@ package nest.view.managers
 							_objects.push(mesh);
 						}
 					}
-				}  else if (object is SoundTransform3D) {
+				} else if (object is SoundTransform3D) {
 					(object as SoundTransform3D).calculate();
+				} if (object is Sound3D) {
+					(object as Sound3D).calculate();
 				} else if (object is Graphics3D) {
 					(object as Graphics3D).calculate();
 				}
