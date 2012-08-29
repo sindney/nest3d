@@ -1,6 +1,7 @@
 package nest.object
 {
 	import flash.display.BitmapData;
+	import flash.geom.Matrix;
 	import flash.geom.Vector3D;
 	
 	import nest.object.data.MeshData;
@@ -30,8 +31,12 @@ package nest.object
 		 * Call this when you modified terrain's heightMap, meshData, width ... magnitude.
 		 */
 		public function update():void {
-			const dw:Number = heightMap.width / segmentsW;
-			const dh:Number = heightMap.height / segmentsH;
+			var sample:BitmapData = new BitmapData(segmentsW+1,segmentsH+1,false, 0);
+			var mat:Matrix = new Matrix();
+			mat.scale((segmentsW + 1) / heightMap.width, (segmentsH + 1) / heightMap.height);
+			sample.lock();
+			sample.draw(heightMap, mat);
+			sample.unlock();
 			
 			var p1:int, p2:int, p3:int, p4:int;
 			var i:int, j:int, k:int;
@@ -42,13 +47,13 @@ package nest.object
 					p2 = k + 1;
 					p3 = k + segmentsH + 1;
 					p4 = k + segmentsH + 2;
-					_data.vertices[p1].y = ((heightMap.getPixel(i * dw, j * dh) & 0xff) - 128) * magnitude;
-					_data.vertices[p2].y = ((heightMap.getPixel(i * dw, (j + 1) * dh) & 0xff) - 128) * magnitude;
-					_data.vertices[p3].y = ((heightMap.getPixel((i + 1) * dw, j * dh) & 0xff) - 128) * magnitude;
-					_data.vertices[p4].y = ((heightMap.getPixel((i + 1) * dw, (j + 1) * dh) & 0xff) - 128) * magnitude;
+					_data.vertices[p1].y = ((sample.getPixel(i,j) & 0xff) - 128) * magnitude;
+					_data.vertices[p2].y = ((sample.getPixel(i,j+1) & 0xff) - 128) * magnitude;
+					_data.vertices[p3].y = ((sample.getPixel(i+1,j) & 0xff) - 128) * magnitude;
+					_data.vertices[p4].y = ((sample.getPixel(i+1,j+1) & 0xff) - 128) * magnitude;
 				}
 			}
-			
+			sample.dispose();
 			MeshData.calculateNormal(_data.vertices, _data.triangles);
 			
 			_data.update();

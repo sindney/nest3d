@@ -52,7 +52,7 @@ package nest.object.sounds
 				_transform.volume = volumn;
 				_transform.pan = 0;
 			} else if (d <= far) {
-				_transform.volume = (1 -  d / far) * volumn;
+				_transform.volume = near / d * volumn;
 				if (headRelative) {
 					v1.setTo(0, 0, -1);
 					v1 = camera.transformVector(_worldMatrix.transformVector(v1));
@@ -62,7 +62,7 @@ package nest.object.sounds
 					if (factor< insideConeRadian) {
 						factor = 1;
 					}else if (factor<=outsideConeRadian) {
-						factor = 1-factor/outsideConeRadian;
+						factor = insideConeRadian/factor;
 					}else {
 						factor = 0;
 					}

@@ -6,7 +6,7 @@ package
 	import flash.events.Event;
 	
 	import nest.control.factories.PrimitiveFactory;
-	import nest.control.CameraController;
+	import nest.control.controllers.BasicController;
 	import nest.control.EngineBase;
 	import nest.object.Container3D;
 	import nest.object.data.MeshData;
@@ -24,7 +24,7 @@ package
 	 */
 	public class HelloWorld extends Sprite {
 		
-		private var controller:CameraController;
+		private var controller:BasicController;
 		
 		public function HelloWorld() {
 			stage.scaleMode = StageScaleMode.NO_SCALE;
