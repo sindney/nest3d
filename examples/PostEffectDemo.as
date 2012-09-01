@@ -24,7 +24,7 @@ package
 		}
 		
 		override public function init():void {
-			effects = Vector.<IPostEffect>([null, new TransformColor(TransformColor.NIGHT_VISION), new TransformColor(TransformColor.SEPIA), new GrayScale(), new InverseColor(), new Blur(10, 10),new Pixelation(20,20),new CellShader(4,4,4,4)]);
+			effects = Vector.<IPostEffect>([null, new TransformColor(TransformColor.NIGHT_VISION), new TransformColor(TransformColor.SEPIA), new GrayScale(), new InverseColor(), new Blur(10, 10),new Pixelation(20,20),new CellShader(4,4,4,4),new RedBlueMap(2)]);
 			
 			var parser:ParserOBJ = new ParserOBJ();
 			
