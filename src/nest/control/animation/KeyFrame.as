@@ -17,10 +17,10 @@ package nest.control.animation
 			
 		}
 		
-		public static function interpolate(k1:KeyFrame, k2:KeyFrame,w:Number):KeyFrame {
+		public static function interpolate(k1:KeyFrame, k2:KeyFrame, w1:Number, w2:Number):KeyFrame {
+			if (!k2) return k1.clone();
 			var result:KeyFrame = new KeyFrame();
-			result.time = k1.time * w + (1 - w) * k2.time;
-			result.next = k2;
+			result.time = k1.time * w1 + k2.time*w2;
 			return result;
 		}
 		

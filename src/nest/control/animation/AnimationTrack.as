@@ -20,20 +20,23 @@ package nest.control.animation
 		public function addFrame(frame:KeyFrame):void {
 			if (!frameList) {
 				frameList = lastFrame = frame;
-				length += frame.time;
+				length = frame.time;
 			}else {
 				lastFrame.next = frame;
 				lastFrame = frame;
-				length += frame.time;
+				length = frame.time;
 			}
+			frame.next = null;
 		}
 		
 		public function removeFrame(frame:KeyFrame):void {
 			if (frame==frameList) {
 				frameList = frameList.next;
-				length -= frame.time;
 				if (!frameList) {
 					lastFrame = null;
+					length = 0;
+				}else {
+					length = frameList.time;
 				}
 				return;
 			}
@@ -42,7 +45,7 @@ package nest.control.animation
 				if (cur.next==frame) {
 					cur.next = frame.next;
 					frame.next = null;
-					length -= frame.time;
+					length = cur.time;
 					if (lastFrame==frame) {
 						lastFrame = cur;
 					}

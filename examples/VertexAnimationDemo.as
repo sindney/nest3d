@@ -35,8 +35,11 @@ package
 			mesh.material = material;
 			
 			clip = mesh.clips[0];
-			clip.loops = 0;
-			clip.speed = 200;
+			//clip = clip.slice(1, 40);
+			clip.loops = int.MAX_VALUE;
+			clip.speed = 10;
+			clip.target = mesh;
+			mesh.clips[0] = clip;
 			clip.play();
 			
 			mesh.rotation.x = -Math.PI / 2;
