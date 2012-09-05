@@ -1,6 +1,9 @@
 package  
 {	
 	import flash.display.BitmapData;
+	import nest.control.animation.AnimationClip;
+	import nest.control.animation.AnimationTrack;
+	import nest.control.animation.TextureKeyFrame;
 	
 	import nest.control.factories.PrimitiveFactory;
 	import nest.object.data.*;
@@ -15,22 +18,25 @@ package
 		[Embed(source = "assets/sprite_sheet.png")]
 		private var SpriteSheet:Class;
 		
-		private var maxIteration:uint;
-		private var index:uint;
-		
 		public function Sprite3DDemo() {
 			super();
 		}
 		
-		private var movieMat:MovieMaterial;
+		private var movieMat:TextureMaterial;
+		private var clip:AnimationClip;
 		
 		override public function init():void {
-			maxIteration = 10;
+			var track:AnimationTrack = TextureKeyFrame.getFramesFromSpriteSheet(new SpriteSheet().bitmapData, 96, 128, 10, 19);
+			clip = new AnimationClip();
+			clip.speed = 20;
+			clip.loops = int.MAX_VALUE;
+			clip.addTrack(track);
 			
-			movieMat = new MovieMaterial(null);
-			var sheets:Vector.<BitmapData> = MovieMaterial.getFramesFromSpriteSheet(new SpriteSheet().bitmapData, 96, 128, 10, 19);
-			movieMat.frames = sheets;
+			movieMat = new TextureMaterial((clip.tracks[0].frameList as TextureKeyFrame).diffuse);
 			movieMat.update();
+			
+			clip.target = movieMat;
+			
 			
 			var sprite:Sprite3D;
 			var i:int, j:int, k:int = 0;
@@ -50,8 +56,7 @@ package
 		}
 		
 		override public function loop():void {
-			movieMat.frame = index;
-			index = (index + 1) % maxIteration;
+			clip.update();
 		}
 		
 	}

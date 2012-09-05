@@ -2,7 +2,7 @@ package
 {
 	import nest.control.animation.AnimationClip;
 	import nest.control.parsers.ParserMD2;
-	import nest.object.AnimatedMesh;
+	import nest.object.Mesh;
 	import nest.view.materials.TextureMaterial;
 	/**
 	 *
@@ -15,7 +15,7 @@ package
 		[Embed(source = "assets/Marvin.md2", mimeType = "application/octet-stream")]
 		private const model:Class;
 		
-		private var mesh:AnimatedMesh;
+		private var mesh:Mesh;
 		private var parser:ParserMD2;
 		
 		public function VertexAnimationDemo() 
@@ -55,7 +55,6 @@ package
 		
 		override public function loop():void {
 			clip.update();
-			mesh.changed = true;
 		}
 	}
 

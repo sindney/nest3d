@@ -2,11 +2,11 @@ package nest.control.parsers
 {
 	import flash.utils.ByteArray;
 	import flash.utils.Endian;
+	import nest.object.Mesh;
 	
 	import nest.control.animation.AnimationClip;
 	import nest.control.animation.AnimationTrack;
 	import nest.control.animation.VertexKeyFrame;
-	import nest.object.AnimatedMesh;
 	import nest.object.data.MeshData;
 	import nest.object.geom.Triangle;
 	import nest.object.geom.Vertex;
@@ -41,7 +41,7 @@ package nest.control.parsers
 		private var offset_glCommands:int;
 		private var offset_end:int;
 		
-		public function parse(model:ByteArray,scale:Number=1):AnimatedMesh {
+		public function parse(model:ByteArray,scale:Number=1):Mesh {
 			
 			model.position = 0;
 			model.endian = Endian.LITTLE_ENDIAN;
@@ -211,12 +211,7 @@ package nest.control.parsers
 			clips[0] = new AnimationClip();
 			clips[0].addTrack(vertexTrack);
 			
-			var testMat:ColorMaterial = new ColorMaterial();
-			var ambLight:AmbientLight = new AmbientLight();
-			ambLight.next = new DirectionalLight(0xffffff, 1, 1, 1);
-			testMat.light = ambLight;
-			testMat.update();
-			var aniMesh:AnimatedMesh = new AnimatedMesh(data, testMat);
+			var aniMesh:Mesh = new Mesh(data,null);
 			aniMesh.clips = clips;
 			return aniMesh;
 		}

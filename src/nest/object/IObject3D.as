@@ -3,6 +3,7 @@ package nest.object
 	import flash.events.IEventDispatcher;
 	import flash.geom.Matrix3D;
 	import flash.geom.Vector3D;
+	import nest.control.animation.AnimationClip;
 	
 	/**
 	 * Object3D Interface
@@ -39,6 +40,10 @@ package nest.object
 		function get worldMatrix():Matrix3D;
 		
 		function get invertWorldMatrix():Matrix3D;
+		
+		function get clips():Vector.<AnimationClip>;
+		
+		function set clips(value:Vector.<AnimationClip>):void;
 		
 	}
 	

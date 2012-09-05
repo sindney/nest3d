@@ -4,6 +4,7 @@ package nest.object
 	import flash.geom.Matrix3D;
 	import flash.geom.Orientation3D;
 	import flash.geom.Vector3D;
+	import nest.control.animation.AnimationClip;
 	
 	/**
 	 * Object3D
@@ -20,6 +21,8 @@ package nest.object
 		protected var _invertMatrix:Matrix3D;
 		protected var _worldMatrix:Matrix3D;
 		protected var _invertWorldMatrix:Matrix3D;
+		
+		protected var _clips:Vector.<AnimationClip>;
 		
 		protected var _parent:IContainer3D;
 		
@@ -146,6 +149,17 @@ package nest.object
 		
 		public function set changed(value:Boolean):void {
 			_changed = value;
+		}
+		
+		public function get clips():Vector.<AnimationClip> {
+			return _clips;
+		}
+		
+		public function set clips(value:Vector.<AnimationClip>):void {
+			for each(var clip:AnimationClip in value) {
+				if(clip) clip.target = this;
+			}
+			_clips = value;
 		}
 		
 	}

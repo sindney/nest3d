@@ -6,6 +6,7 @@ package nest.object
 	import flash.display3D.Context3DTriangleFace;
 	import flash.geom.Matrix3D;
 	import flash.geom.Vector3D;
+	import nest.control.animation.AnimationClip;
 	
 	import nest.control.EngineBase;
 	import nest.object.data.MeshData;
@@ -101,6 +102,15 @@ package nest.object
 			result.culling = _culling;
 			result.visible = _visible;
 			result.alphaTest = _alphaTest;
+			if (clips) {
+				var l:uint = clips.length;
+				var copyClips:Vector.<AnimationClip> = new Vector.<AnimationClip>(l);
+				for (var i:int = 0; i < l;i++ ) {
+					copyClips[i] = clips[i].clone();
+					copyClips[i].target = result;
+				}
+				result.clips = copyClips;
+			}
 			return result;
 		}
 		

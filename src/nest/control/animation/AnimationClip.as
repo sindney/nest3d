@@ -1,14 +1,20 @@
 package nest.control.animation 
 {
 	import flash.utils.getTimer;
-	import nest.object.AnimatedMesh;
+	import nest.object.IMesh;
+	import nest.object.Mesh;
+	import nest.object.Object3D;
+	
+	import nest.object.IObject3D;
+	import nest.view.materials.ColorMaterial;
+	import nest.view.materials.TextureMaterial;
 	
 	/**
 	 * AnimationClip
 	 */
 	public class AnimationClip 
 	{
-		public var target:AnimatedMesh;
+		public var target:*;
 		
 		public var tracks:Vector.<AnimationTrack>;
 		private var _paused:Boolean;
@@ -55,10 +61,12 @@ package nest.control.animation
 			var frame:KeyFrame;
 			var weight1:Number;
 			var weight2:Number;
-			var l:uint, i:int;
+			var l:uint, i:int, j:int;
+			
+			var mesh:IMesh;
 			for each(var track:AnimationTrack in tracks) {
 				frame = track.frameList;
-				while (t >=frame.time) {
+				while (frame&&t >=frame.time) {
 					offsetTime = frame.time;
 					frame = frame.next;
 				}
@@ -69,21 +77,75 @@ package nest.control.animation
 						weight1 = 1;
 						weight2 = 0;
 					}
-					if (frame is VertexKeyFrame) {
+					if (frame is VertexKeyFrame && target is IMesh) {
 						if (frame.next) {
+							mesh = target as IMesh;
 							var curVertices:Vector.<Number> = (frame as VertexKeyFrame).vertices;
 							var nextVertices:Vector.<Number> = (frame.next as VertexKeyFrame).vertices;
 							l = curVertices.length/3;
-							for (i = 0; i < l;i++ ) {
-								target.data.vertices[i].x = curVertices[i * 3] * weight1 + nextVertices[i * 3] * weight2;
-								target.data.vertices[i].y = curVertices[i * 3 + 1] * weight1 + nextVertices[i * 3 + 1] * weight2;
-								target.data.vertices[i].z = curVertices[i * 3 + 2] * weight1 + nextVertices[i * 3 + 2] * weight2;
+							for (i = 0,j=0; i < l;i++,j+=3 ) {
+								mesh.data.vertices[i].x = curVertices[j] * weight1 + nextVertices[j] * weight2;
+								mesh.data.vertices[i].y = curVertices[j + 1] * weight1 + nextVertices[j + 1] * weight2;
+								mesh.data.vertices[i].z = curVertices[j + 2] * weight1 + nextVertices[j + 2] * weight2;
 							}
+							mesh.data.update(true);
+						}
+					}else if (frame is UVKeyFrame && target is IMesh) {
+						if (frame.next) {
+							mesh = target as IMesh;
+							var curUVs:Vector.<Number> = (frame as UVKeyFrame).uvs;
+							var nextUVs:Vector.<Number> = (frame.next as UVKeyFrame).uvs;
+							l = curVertices.length/2;
+							for (i = 0; i < l; i++ ) {
+								mesh.data.vertices[i].u = curUVs[i << 1] * weight1 + nextUVs[i << 1] * weight2;
+								mesh.data.vertices[i].v = curUVs[(i << 1) + 1] * weight1 + nextUVs[(i << 1) + 1] * weight2;
+							}
+							mesh.data.update(true);
+						}
+					}else if (frame is TextureKeyFrame) {
+						var textureFrame:TextureKeyFrame = frame as TextureKeyFrame;
+						if (target is TextureMaterial) {
+							var textureMat:TextureMaterial = target as TextureMaterial;
+							
+							if(textureFrame.diffuse) textureMat.diffuse.data = textureFrame.diffuse;
+							if (textureFrame.specular) textureMat.specular.data = textureFrame.specular;
+							if (textureFrame.normalMap) textureMat.normalmap.data = textureFrame.normalMap;
+							
+						}else if (target is ColorMaterial&&target is ColorMaterial&&frame.next) {
+							var nextTextureFrame:TextureKeyFrame = frame.next as TextureKeyFrame;
+							var colorMat:ColorMaterial = target as ColorMaterial;
+							var r:uint = ((textureFrame.color >> 16) & 0xff) * weight1 + ((nextTextureFrame.color >> 16) & 0xff) * weight2;
+							var g:uint = ((textureFrame.color >> 8) & 0xff) * weight1 + ((nextTextureFrame.color >> 8) & 0xff) * weight2;
+							var b:uint = (textureFrame.color & 0xff) * weight1 + (nextTextureFrame.color & 0xff) * weight2;
+							
+							colorMat.color = (r << 16) | (g << 8) | b;
+							colorMat.alpha = textureFrame.alpha * weight1 + nextTextureFrame.alpha * weight2;
+						}
+					}else if (frame is TransformKeyFrame) {
+						if (frame.next) {
+							var curTrans:TransformKeyFrame = frame as TransformKeyFrame;
+							var nextTrans:TransformKeyFrame = frame.next as TransformKeyFrame;
+							
+							target.position.setTo(curTrans.position.x * weight1 + nextTrans.position.x * weight2,
+												  curTrans.position.y * weight1 + nextTrans.position.y * weight2,
+												  curTrans.position.z * weight1 + nextTrans.position.z * weight2);
+												  
+							target.rotation.setTo(curTrans.rotation.x * weight1 + nextTrans.rotation.x * weight2,
+												  curTrans.rotation.y * weight1 + nextTrans.rotation.y * weight2,
+												  curTrans.rotation.z * weight1 + nextTrans.rotation.z * weight2);
+							if (target is IMesh) {
+								(target as IMesh).scale.setTo(curTrans.scale.x * weight1 + nextTrans.scale.x * weight2,
+												  curTrans.scale.y * weight1 + nextTrans.scale.y * weight2,
+												  curTrans.scale.z * weight1 + nextTrans.scale.z * weight2);
+							}
+												  
+							//target.recompose();
+							target.changed = true;
 						}
 					}
 				}
 			}
-			target.data.update(true);
+			
 		}
 		
 		public function slice(startTime:Number = 0, endTime:Number = Number.MAX_VALUE):AnimationClip {
@@ -104,6 +166,18 @@ package nest.control.animation
 					var copy_frame:KeyFrame;
 					if (frame is VertexKeyFrame) {
 						copy_frame = VertexKeyFrame.interpolate(frame as VertexKeyFrame, frame.next as VertexKeyFrame, weight1, weight2);
+						copy_frame.time-= offsetTime;
+						copyTrack.addFrame(copy_frame);
+					}else if (frame is UVKeyFrame) {
+						copy_frame = UVKeyFrame.interpolate(frame as UVKeyFrame, frame.next as UVKeyFrame, weight1, weight2);
+						copy_frame.time-= offsetTime;
+						copyTrack.addFrame(copy_frame);
+					}else if (frame is TextureKeyFrame) {
+						copy_frame = TextureKeyFrame.interpolate(frame as TextureKeyFrame, frame.next as TextureKeyFrame, weight1, weight2);
+						copy_frame.time-= offsetTime;
+						copyTrack.addFrame(copy_frame);
+					}else if (frame is TransformKeyFrame) {
+						copy_frame = TransformKeyFrame.interpolate(frame as TransformKeyFrame, frame.next as TransformKeyFrame, weight1, weight2);
 						copy_frame.time-= offsetTime;
 						copyTrack.addFrame(copy_frame);
 					}
