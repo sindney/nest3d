@@ -5,9 +5,9 @@ package nest.object
 	import flash.geom.Matrix3D;
 	import flash.geom.Vector3D;
 	
-	import nest.object.data.MeshData;
+	import nest.object.geom.MeshData;
 	import nest.object.geom.IBound;
-	import nest.view.materials.IMaterial;
+	import nest.view.material.IMaterial;
 	import nest.view.BlendMode3D;
 	
 	/**

@@ -1,22 +1,22 @@
 package nest.control.animation 
 {
 	import flash.utils.getTimer;
+	
 	import nest.object.IMesh;
+	import nest.object.IObject3D;
 	import nest.object.Mesh;
 	import nest.object.Object3D;
-	
-	import nest.object.IObject3D;
-	import nest.view.materials.ColorMaterial;
-	import nest.view.materials.TextureMaterial;
+	import nest.view.material.ColorMaterial;
+	import nest.view.material.TextureMaterial;
 	
 	/**
 	 * AnimationClip
 	 */
-	public class AnimationClip 
-	{
-		public var target:*;
+	public class AnimationClip {
 		
+		public var target:*;
 		public var tracks:Vector.<AnimationTrack>;
+		
 		private var _paused:Boolean;
 		private var _time:Number = -1;
 		private var _lastTime:int = -1;
@@ -27,8 +27,7 @@ package nest.control.animation
 		public var speed:Number = 1;
 		public var loops:uint=0;
 		
-		public function AnimationClip() 
-		{
+		public function AnimationClip() {
 			tracks = new Vector.<AnimationTrack>();
 			time = 0;
 		}
@@ -44,7 +43,8 @@ package nest.control.animation
 		}
 		
 		public function update():void {
-			if (_paused||!target) return;
+			if (_paused || !target) return;
+			
 			var curTime:int = getTimer();
 			var dt:Number = (curTime-_lastTime)/1000;
 			_lastTime = curTime;
@@ -66,12 +66,12 @@ package nest.control.animation
 			var mesh:IMesh;
 			for each(var track:AnimationTrack in tracks) {
 				frame = track.frameList;
-				while (frame&&t >=frame.time) {
+				while (frame && t >= frame.time) {
 					offsetTime = frame.time;
 					frame = frame.next;
 				}
 				if (frame) {
-					weight2 = (t-offsetTime) / (frame.time-offsetTime);
+					weight2 = (t - offsetTime) / (frame.time-offsetTime);
 					weight1 = 1 - weight2;
 					if (!weight1) {
 						weight1 = 1;
@@ -83,14 +83,14 @@ package nest.control.animation
 							var curVertices:Vector.<Number> = (frame as VertexKeyFrame).vertices;
 							var nextVertices:Vector.<Number> = (frame.next as VertexKeyFrame).vertices;
 							l = curVertices.length/3;
-							for (i = 0,j=0; i < l;i++,j+=3 ) {
+							for (i = 0, j = 0; i < l; i++, j += 3) {
 								mesh.data.vertices[i].x = curVertices[j] * weight1 + nextVertices[j] * weight2;
 								mesh.data.vertices[i].y = curVertices[j + 1] * weight1 + nextVertices[j + 1] * weight2;
 								mesh.data.vertices[i].z = curVertices[j + 2] * weight1 + nextVertices[j + 2] * weight2;
 							}
-							mesh.data.update(true);
+							mesh.data.update(false);
 						}
-					}else if (frame is UVKeyFrame && target is IMesh) {
+					} else if (frame is UVKeyFrame && target is IMesh) {
 						if (frame.next) {
 							mesh = target as IMesh;
 							var curUVs:Vector.<Number> = (frame as UVKeyFrame).uvs;
@@ -100,9 +100,9 @@ package nest.control.animation
 								mesh.data.vertices[i].u = curUVs[i << 1] * weight1 + nextUVs[i << 1] * weight2;
 								mesh.data.vertices[i].v = curUVs[(i << 1) + 1] * weight1 + nextUVs[(i << 1) + 1] * weight2;
 							}
-							mesh.data.update(true);
+							mesh.data.update(false);
 						}
-					}else if (frame is TextureKeyFrame) {
+					} else if (frame is TextureKeyFrame) {
 						var textureFrame:TextureKeyFrame = frame as TextureKeyFrame;
 						if (target is TextureMaterial) {
 							var textureMat:TextureMaterial = target as TextureMaterial;
@@ -111,7 +111,7 @@ package nest.control.animation
 							if (textureFrame.specular) textureMat.specular.data = textureFrame.specular;
 							if (textureFrame.normalMap) textureMat.normalmap.data = textureFrame.normalMap;
 							
-						}else if (target is ColorMaterial&&target is ColorMaterial&&frame.next) {
+						} else if (target is ColorMaterial&&target is ColorMaterial&&frame.next) {
 							var nextTextureFrame:TextureKeyFrame = frame.next as TextureKeyFrame;
 							var colorMat:ColorMaterial = target as ColorMaterial;
 							var r:uint = ((textureFrame.color >> 16) & 0xff) * weight1 + ((nextTextureFrame.color >> 16) & 0xff) * weight2;
@@ -138,9 +138,7 @@ package nest.control.animation
 												  curTrans.scale.y * weight1 + nextTrans.scale.y * weight2,
 												  curTrans.scale.z * weight1 + nextTrans.scale.z * weight2);
 							}
-												  
-							//target.recompose();
-							target.changed = true;
+							target.recompose();
 						}
 					}
 				}

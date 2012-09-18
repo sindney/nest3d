@@ -4,11 +4,12 @@ package nest.control.animation
 	import flash.display.MovieClip;
 	import flash.geom.Point;
 	import flash.geom.Rectangle;
+	
 	/**
 	 * TextureKeyFrame
 	 */
-	public class TextureKeyFrame extends KeyFrame 
-	{
+	public class TextureKeyFrame extends KeyFrame {
+		
 		public static const DIFFUSE:String = "diffuse";
 		
 		public static const SPECULAR:String = "specular";
@@ -25,8 +26,7 @@ package nest.control.animation
 		
 		public var normalMap:BitmapData;
 		
-		public function TextureKeyFrame() 
-		{
+		public function TextureKeyFrame() {
 			
 		}
 		
@@ -45,7 +45,7 @@ package nest.control.animation
 			return result;
 		}
 		
-		public static function getFramesFromMovieClip(source:MovieClip, size:uint=128,type:String="diffuse"):AnimationTrack {
+		public static function getFramesFromMovieClip(source:MovieClip, size:uint = 128, type:String = "diffuse"):AnimationTrack {
 			var resultTrack:AnimationTrack = new AnimationTrack();
 			
 			var bitmapData:BitmapData;

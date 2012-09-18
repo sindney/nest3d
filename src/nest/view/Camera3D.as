@@ -25,8 +25,6 @@ package nest.view
 		protected var _far:Number = 10000;
 		protected var _fov:Number = 45 * Math.PI / 180;
 		
-		protected var _changed:Boolean = false;
-		
 		public function Camera3D() {
 			super();
 			_components = new Vector.<Vector3D>(3, true);
@@ -43,25 +41,16 @@ package nest.view
 			update();
 		}
 		
-		public function translate(axis:Vector3D, value:Number):void {
-			var p:Vector3D = axis.clone();
-			p.scaleBy(value);
-			_components[0] = _matrix.transformVector(p);
-			_changed = true;
-		}
-		
 		public function decompose():void {
 			_components = _matrix.decompose(_orientation);
 			_invertMatrix.copyFrom(_matrix);
 			_invertMatrix.invert();
-			_changed = false;
 		}
 		
 		public function recompose():void {
 			_matrix.recompose(_components, _orientation);
 			_invertMatrix.copyFrom(_matrix);
 			_invertMatrix.invert();
-			_changed = false;
 		}
 		
 		protected function update():void {
@@ -156,14 +145,6 @@ package nest.view
 		
 		public function set orientation(value:String):void {
 			_orientation = value;
-		}
-		
-		public function get changed():Boolean {
-			return _changed;
-		}
-		
-		public function set changed(value:Boolean):void {
-			_changed = value;
 		}
 		
 	}

@@ -13,7 +13,7 @@ package nest.control.animation
 		
 		public var lastFrame:KeyFrame;
 		
-		public function AnimationTrack(name:String="") {
+		public function AnimationTrack(name:String = "") {
 			this.name = name;
 		}
 		

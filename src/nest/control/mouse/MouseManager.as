@@ -6,10 +6,10 @@ package nest.control.mouse
 	
 	import nest.control.EngineBase;
 	import nest.object.IMesh;
-	import nest.view.culls.MouseCulling;
-	import nest.view.managers.ISceneManager;
-	import nest.view.processes.IDProcess;
-	import nest.view.processes.IProcess;
+	import nest.view.cull.MouseCulling;
+	import nest.view.manager.ISceneManager;
+	import nest.view.process.IDProcess;
+	import nest.view.process.IProcess;
 	import nest.view.Camera3D;
 	
 	/**

@@ -7,7 +7,7 @@ package nest.view
 	import flash.utils.ByteArray;
 	
 	import nest.control.EngineBase;
-	import nest.view.lights.*;
+	import nest.view.light.*;
 	
 	/**
 	 * Shader3D

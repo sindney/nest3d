@@ -10,10 +10,10 @@ package nest.view
 	
 	import nest.control.mouse.MouseManager;
 	import nest.control.EngineBase;
-	import nest.view.culls.ICulling;
-	import nest.view.effects.IPostEffect;
-	import nest.view.managers.ISceneManager;
-	import nest.view.processes.IProcess;
+	import nest.view.cull.ICulling;
+	import nest.view.effect.IPostEffect;
+	import nest.view.manager.ISceneManager;
+	import nest.view.process.IProcess;
 	
 	/** 
 	 * Dispatched when context3d is created.
@@ -79,7 +79,6 @@ package nest.view
 			if (_effect) context3d.setRenderToTexture(_effect.textures[0], _effect.enableDepthAndStencil, _effect.antiAlias);
 			context3d.clear(_rgba[0], _rgba[1], _rgba[2], _rgba[3]);
 			
-			if (camera.changed) camera.recompose();
 			_camPos[0] = camera.position.x;
 			_camPos[1] = camera.position.y;
 			_camPos[2] = camera.position.z;
@@ -188,6 +187,10 @@ package nest.view
 			return _mouseManager;
 		}
 		
+		/**
+		 * Value this if you need 3d mouse event.
+		 * <p>And don't forget to turn container&&mesh's mouseEnabled on.</p>
+		 */
 		public function set mouseManager(value:MouseManager):void {
 			if (_mouseManager) _mouseManager.dispose();
 			_mouseManager = value;
@@ -198,6 +201,12 @@ package nest.view
 			return _effect;
 		}
 		
+		/**
+		 * Link post effect here.
+		 * <p>You can have multi-effect by indicating effect's "next" method.</p>
+		 * <p>view.effect = new PE();</p>
+		 * <p>view.effect.next = new PE2();</p>
+		 */
 		public function set effect(value:IPostEffect):void {
 			_effect = value;
 		}

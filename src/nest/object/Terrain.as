@@ -4,11 +4,11 @@ package nest.object
 	import flash.geom.Matrix;
 	import flash.geom.Vector3D;
 	
-	import nest.object.data.MeshData;
+	import nest.object.geom.MeshData;
 	import nest.object.geom.Vertex;
 	import nest.object.geom.IBound;
 	import nest.object.geom.BSphere;
-	import nest.view.materials.IMaterial;
+	import nest.view.material.IMaterial;
 	
 	/**
 	 * Terrain
