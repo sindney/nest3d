@@ -1,4 +1,4 @@
-package nest.view.effects 
+package nest.view.effect 
 {
 	import flash.display3D.textures.TextureBase;
 	import flash.display3D.Context3D;
