@@ -3,15 +3,14 @@ package nest.control.animation
 	/**
 	 * UVKeyFrame
 	 */
-	public class UVKeyFrame extends KeyFrame 
-	{
+	public class UVKeyFrame extends KeyFrame {
+		
 		/**
 		 * Store the u,v in order.
 		 */
 		public var uvs:Vector.<Number>;
 		
-		public function UVKeyFrame() 
-		{
+		public function UVKeyFrame() {
 			
 		}
 		

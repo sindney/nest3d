@@ -2,11 +2,11 @@ package nest.object
 {
 	import flash.display.BitmapData;
 	
-	import nest.object.data.MeshData;
+	import nest.object.geom.MeshData;
 	import nest.object.geom.Triangle;
 	import nest.object.geom.Vertex;
-	import nest.view.materials.IMaterial;
-	import nest.view.materials.SkyBoxMaterial;
+	import nest.view.material.IMaterial;
+	import nest.view.material.SkyBoxMaterial;
 	
 	/**
 	 * SkyBox

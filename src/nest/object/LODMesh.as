@@ -3,16 +3,16 @@ package nest.object
 	import flash.geom.Vector3D;
 	
 	import nest.control.EngineBase;
-	import nest.object.data.MeshData;
+	import nest.object.geom.MeshData;
 	import nest.object.geom.BSphere;
 	import nest.object.geom.IBound;
-	import nest.view.materials.IMaterial;
+	import nest.view.material.IMaterial;
 	import nest.view.Shader3D;
 	
 	/**
 	 * LODMesh
 	 */
-	public class LODMesh extends Mesh {
+	public class LODMesh extends Mesh implements IUpdateable {
 		
 		private var _dataList:Vector.<MeshData>;
 		private var _materialList:Vector.<IMaterial>;

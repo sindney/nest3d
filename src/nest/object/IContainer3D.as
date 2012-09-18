@@ -1,5 +1,6 @@
 package nest.object 
 {
+	import nest.view.partition.IPTree;
 	
 	/**
 	 * Container3D Interface
@@ -13,6 +14,11 @@ package nest.object
 		function removeChildAt(index:int):IObject3D;
 		
 		function getChildAt(index:int):IObject3D;
+		
+		function get objects():Vector.<IObject3D>;
+		
+		function get partition():IPTree;
+		function set partition(value:IPTree):void;
 		
 		function get visible():Boolean;
 		function set visible(value:Boolean):void;

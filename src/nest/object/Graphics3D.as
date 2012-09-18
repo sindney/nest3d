@@ -10,7 +10,7 @@ package nest.object
 	/**
 	 * Graphics3D
 	 */
-	public class Graphics3D extends Object3D {
+	public class Graphics3D extends Object3D implements IUpdateable {
 		
 		public static const MOVE_TO:int = 1;
 		public static const LINE_TO:int = 2;
@@ -143,7 +143,7 @@ package nest.object
 			_commands.push(CLEAR);
 		}
 		
-		public function calculate():void {
+		public function update():void {
 			_canvas.graphics.clear();
 			
 			_mask.graphics.clear();

@@ -6,15 +6,15 @@ package nest.object
 	import flash.display3D.Context3DTriangleFace;
 	import flash.geom.Matrix3D;
 	import flash.geom.Vector3D;
-	import nest.control.animation.AnimationClip;
 	
+	import nest.control.animation.AnimationClip;
 	import nest.control.EngineBase;
-	import nest.object.data.MeshData;
+	import nest.object.geom.MeshData;
 	import nest.object.geom.AABB;
 	import nest.object.geom.BSphere;
 	import nest.object.geom.IBound;
 	import nest.object.geom.Vertex;
-	import nest.view.materials.IMaterial;
+	import nest.view.material.IMaterial;
 	import nest.view.BlendMode3D;
 	import nest.view.Shader3D;
 	

@@ -1,19 +1,19 @@
 package nest.control.animation 
 {
 	import flash.geom.Vector3D;
+	
 	/**
 	 * TransformKeyFrame
 	 */
-	public class TransformKeyFrame extends KeyFrame 
-	{
+	public class TransformKeyFrame extends KeyFrame {
+		
 		public var position:Vector3D;
 		
 		public var rotation:Vector3D;
 		
 		public var scale:Vector3D;
 		
-		public function TransformKeyFrame() 
-		{
+		public function TransformKeyFrame() {
 			position = new Vector3D();
 			rotation = new Vector3D();
 			scale = new Vector3D();
