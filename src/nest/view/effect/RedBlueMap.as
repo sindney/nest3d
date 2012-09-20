@@ -9,6 +9,7 @@ package nest.view.effect
 	import flash.display3D.Program3D;
 	import flash.display3D.VertexBuffer3D;
 	import flash.geom.Vector3D;
+	import nest.control.factory.AGAL;
 	
 	import nest.control.EngineBase;
 	import nest.view.manager.ISceneManager;
@@ -45,14 +46,22 @@ package nest.view.effect
 			_textures = new Vector.<TextureBase>(2, true);
 			
 			_eyePadding = eyePadding;
-			var code:String = "tex ft0, v0, fs0 <2d,nearest,clamp>\n" + 
-								"tex ft1, v0, fs1 <2d,nearest,clamp>\n" + 
-								"mul ft2, ft0, fc0\n" + 
-								"mul ft3, ft1, fc1\n" + 
-								"add oc, ft2, ft3";
 			
-			program.upload(Shader3D.assembler.assemble(Context3DProgramType.VERTEX, "mov op, va0\nmov v0, va1\n"), 
-							Shader3D.assembler.assemble(Context3DProgramType.FRAGMENT, code));
+			AGAL.clear();
+			AGAL.mov(AGAL.OP, AGAL.POS_ATTRIBUTE);
+			AGAL.mov("v0", AGAL.UV_ATTRIBUTE);
+			var vertexShader:String = AGAL.code;
+			
+			AGAL.clear();
+			AGAL.tex("ft0", "v0", "fs0");
+			AGAL.tex("ft1", "v0", "fs1");
+			AGAL.mul("ft2", "ft0", "fc0");
+			AGAL.mul("ft3", "ft1", "fc1");
+			AGAL.add(AGAL.OC, "ft2", "ft3");
+			var fragmentShader:String = AGAL.code;
+			
+			program.upload(Shader3D.assembler.assemble(Context3DProgramType.VERTEX, vertexShader), 
+							Shader3D.assembler.assemble(Context3DProgramType.FRAGMENT, fragmentShader));
 			super();
 		}
 		

@@ -8,6 +8,7 @@ package nest.view.effect
 	import flash.display3D.IndexBuffer3D;
 	import flash.display3D.Program3D;
 	import flash.display3D.VertexBuffer3D;
+	import nest.control.factory.AGAL;
 	
 	import nest.control.EngineBase;
 	import nest.view.Shader3D;
@@ -76,19 +77,26 @@ package nest.view.effect
 		public function update():void {
 			var j:uint = iteration;
 			
-			var code:String = "mov ft0, v0\n";
-			code += "tex ft3, ft0, fs0 <2d,nearest,clamp>\n";
+			AGAL.clear();
+			AGAL.mov(AGAL.OP, AGAL.POS_ATTRIBUTE);
+			AGAL.mov("v0", AGAL.UV_ATTRIBUTE);
+			var vertexShader:String = AGAL.code;
+			
+			AGAL.clear();
+			AGAL.mov("ft0", "v0");
+			AGAL.tex("ft3", "ft0", "fs0");
 			for (var i:int = 1; i < j;i++ ) {
-				code += "sub ft1.xy,fc0.zw,ft0.xy\n";
-				code += "mul ft1.xy,ft1.xy,fc0.xx\n";
-				code += "sub ft0.xy,ft0.xy,ft1.xy\n";
-				code += "tex ft2, ft0, fs0 <2d,nearest,clamp>\n";
-				code += "add ft3,ft3,ft2\n";
+				AGAL.sub("ft1.xy", "fc0.zw", "ft0.xy");
+				AGAL.mul("ft1.xy", "ft1.xy", "fc0.xx");
+				AGAL.sub("ft0.xy", "ft0.xy", "ft1.xy");
+				AGAL.tex("ft2", "ft0", "fs0");
+				AGAL.add("ft3", "ft3", "ft2");
 			}
-			code += "mul oc,ft3,fc0.y\n";
+			AGAL.mul(AGAL.OC, "ft3", "fc0.y");
+			var fragmentShader:String = AGAL.code;
 			
 			program.upload(Shader3D.assembler.assemble(Context3DProgramType.VERTEX, "mov op, va0\nmov v0, va1\n"), 
-							Shader3D.assembler.assemble(Context3DProgramType.FRAGMENT, code));
+							Shader3D.assembler.assemble(Context3DProgramType.FRAGMENT, fragmentShader));
 		}
 		
 		///////////////////////////////////

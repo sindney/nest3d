@@ -8,6 +8,7 @@ package nest.view.effect
 	import flash.display3D.IndexBuffer3D;
 	import flash.display3D.Program3D;
 	import flash.display3D.VertexBuffer3D;
+	import nest.control.factory.AGAL;
 	
 	import nest.control.EngineBase;
 	import nest.view.Shader3D;
@@ -111,24 +112,33 @@ package nest.view.effect
 			data[4] = stepX * invW;
 			data[5] = stepY * invH;
 			
-			var code:String = "mov ft0, v0\nsub ft0.y, v0.y, fc0.y\n";
+			AGAL.clear();
+			AGAL.mov(AGAL.OP, AGAL.POS_ATTRIBUTE);
+			AGAL.mov("v0", AGAL.UV_ATTRIBUTE);
+			var vertexShader:String = AGAL.code;
+			
+			AGAL.clear();
+			AGAL.mov("ft0", "v0");
+			AGAL.sub("ft0.y", "v0.y", "fc0.y");
 			for (y = 0; y < _blurY; y += stepY) {
-				if (y > 0) code += "sub ft0.x, v0.x, fc0.x\n";
+				if (y > 0) AGAL.sub("ft0.x", "v0.x", "fc0.x");
 				for (x = 0; x < _blurX; x += stepX) {
 					if (x == 0 && y == 0)
-						code += "tex ft1, ft0, fs0 <2d,nearest,clamp>\n";
-					else
-						code += "tex ft2, ft0, fs0 <2d,nearest,clamp>\n" +
-								"add ft1, ft1, ft2 \n";
+						AGAL.tex("ft1", "ft0", "fs0");
+					else{
+						AGAL.tex("ft2", "ft0", "fs0");
+						AGAL.add("ft1", "ft1", "ft2");
+					}
 					if (x < _blurX)
-						code += "add ft0.x, ft0.x, fc1.x\n";
+						AGAL.add("ft0.x", "ft0.x", "fc1.x");
 				}
-				if (y < _blurY) code += "add ft0.y, ft0.y, fc1.y\n";
+				if (y < _blurY) AGAL.add("ft0.y", "ft0.y", "fc1.y");
 			}
-			code += "mul oc, ft1, fc0.z";
+			AGAL.mul(AGAL.OC, "ft1", "fc0.z");
+			var fragmentShader2:String = AGAL.code;
 			
-			program.upload(Shader3D.assembler.assemble(Context3DProgramType.VERTEX, "mov op, va0\nmov v0, va1\n"), 
-							Shader3D.assembler.assemble(Context3DProgramType.FRAGMENT, code));
+			program.upload(Shader3D.assembler.assemble(Context3DProgramType.VERTEX, vertexShader), 
+							Shader3D.assembler.assemble(Context3DProgramType.FRAGMENT, fragmentShader2));
 		}
 		
 		///////////////////////////////////

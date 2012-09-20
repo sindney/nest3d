@@ -8,6 +8,7 @@ package nest.view.effect
 	import flash.display3D.IndexBuffer3D;
 	import flash.display3D.Program3D;
 	import flash.display3D.VertexBuffer3D;
+	import nest.control.factory.AGAL;
 	
 	import nest.control.EngineBase;
 	import nest.view.Shader3D;
@@ -43,14 +44,22 @@ package nest.view.effect
 			data[3] = alphaLevel;
 			
 			_textures = new Vector.<TextureBase>(1, true);
-			var code:String = "tex ft0, v0, fs0 <2d,nearest,clamp>\n"
-							 +"mul ft0,ft0,fc0\n"
-							 +"frc ft1,ft0\n"
-							 +"sub ft0,ft0,ft1\n"
-							 +"div oc,ft0,fc0\n";
 			
-			program.upload(Shader3D.assembler.assemble(Context3DProgramType.VERTEX, "mov op, va0\nmov v0, va1\n"), 
-							Shader3D.assembler.assemble(Context3DProgramType.FRAGMENT, code));
+			AGAL.clear();
+			AGAL.mov(AGAL.OP, AGAL.POS_ATTRIBUTE);
+			AGAL.mov("v0", AGAL.UV_ATTRIBUTE);
+			var vertexShader:String = AGAL.code;
+			
+			AGAL.clear();
+			AGAL.tex("ft0", "v0", "fs0");
+			AGAL.mul("ft0", "ft0", "fc0");
+			AGAL.frc("ft1", "ft0");
+			AGAL.sub("ft0", "ft0", "ft1");
+			AGAL.div(AGAL.OC, "ft0", "fc0");
+			var fragmentShader:String = AGAL.code;
+			
+			program.upload(Shader3D.assembler.assemble(Context3DProgramType.VERTEX, vertexShader), 
+							Shader3D.assembler.assemble(Context3DProgramType.FRAGMENT, fragmentShader));
 			super();
 		}
 		

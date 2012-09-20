@@ -9,6 +9,7 @@ package nest.view.effect
 	import flash.display3D.IndexBuffer3D;
 	import flash.display3D.Program3D;
 	import flash.display3D.VertexBuffer3D;
+	import nest.control.factory.AGAL;
 	
 	import nest.control.EngineBase;
 	import nest.view.Shader3D;
@@ -48,39 +49,64 @@ package nest.view.effect
 			}
 			_textures = new Vector.<TextureBase>(1, true);
 
-			var code:String = "mov ft0, v0\nsub ft0.xy, v0.xy, fc0.xy\n";
-			code += "tex ft1, ft0, fs0 <2d,nearest,clamp>\nmul ft2,ft1,fc0.w\n";
+			AGAL.clear();
+			AGAL.mov(AGAL.OP, AGAL.POS_ATTRIBUTE);
+			AGAL.mov("v0", AGAL.UV_ATTRIBUTE);
+			var vertexShader:String = AGAL.code;
 			
-			code += "add ft0.x,ft0.x,fc0.x\n";
-			code += "tex ft1, ft0, fs0 <2d,nearest,clamp>\nmul ft1,ft1,fc1.x\nadd ft2,ft2,ft1\n";
+			AGAL.clear();
+			AGAL.mov("ft0", "v0");
+			AGAL.sub("ft0.xy", "v0.xy", "fc0.xy");
+			AGAL.tex("ft1", "ft0", "fs0");
+			AGAL.mul("ft2", "ft1", "fc0.w");
 			
-			code += "add ft0.x,ft0.x,fc0.x\n";
-			code += "tex ft1, ft0, fs0 <2d,nearest,clamp>\nmul ft1,ft1,fc1.y\nadd ft2,ft2,ft1\n";
+			AGAL.add("ft0.x", "ft0.x", "fc0.x");
+			AGAL.tex("ft1", "ft0", "fs0");
+			AGAL.mul("ft1", "ft1", "fc1.x");
+			AGAL.add("ft2", "ft2", "ft1");
 			
-			code += "sub ft0.x, v0.x, fc0.x\n";
-			code += "add ft0.y,ft0.y,fc0.y\n";
-			code += "tex ft1, ft0, fs0 <2d,nearest,clamp>\nmul ft1,ft1,fc1.z\nadd ft2,ft2,ft1\n";
+			AGAL.add("ft0.x", "ft0.x", "fc0.x");
+			AGAL.tex("ft1", "ft0", "fs0");
+			AGAL.mul("ft1", "ft1", "fc1.y");
+			AGAL.add("ft2", "ft2", "ft1");
 			
-			code += "add ft0.x,ft0.x,fc0.x\n";
-			code += "tex ft1, ft0, fs0 <2d,nearest,clamp>\nmul ft1,ft1,fc1.w\nadd ft2,ft2,ft1\n";
+			AGAL.sub("ft0.x", "v0.x", "fc0.x");
+			AGAL.add("ft0.y", "ft0.y", "fc0.y");
+			AGAL.tex("ft1", "ft0", "fs0");
+			AGAL.mul("ft1", "ft1", "fc1.z");
+			AGAL.add("ft2", "ft2", "ft1");
 			
-			code += "add ft0.x,ft0.x,fc0.x\n";
-			code += "tex ft1, ft0, fs0 <2d,nearest,clamp>\nmul ft1,ft1,fc2.x\nadd ft2,ft2,ft1\n";
+			AGAL.add("ft0.x", "ft0.x", "fc0.x");
+			AGAL.tex("ft1", "ft0", "fs0");
+			AGAL.mul("ft1", "ft1", "fc1.w");
+			AGAL.add("ft2", "ft2", "ft1");
 			
-			code += "sub ft0.x, v0.x, fc0.x\n";
-			code += "add ft0.y,ft0.y,fc0.y\n";
-			code += "tex ft1, ft0, fs0 <2d,nearest,clamp>\nmul ft1,ft1,fc2.y\nadd ft2,ft2,ft1\n";
+			AGAL.add("ft0.x", "ft0.x", "fc0.x");
+			AGAL.tex("ft1", "ft0", "fs0");
+			AGAL.mul("ft1", "ft1", "fc2.x");
+			AGAL.add("ft2", "ft2", "ft1");
 			
-			code += "add ft0.x,ft0.x,fc0.x\n";
-			code += "tex ft1, ft0, fs0 <2d,nearest,clamp>\nmul ft1,ft1,fc2.z\nadd ft2,ft2,ft1\n";
+			AGAL.sub("ft0.x", "v0.x", "fc0.x");
+			AGAL.add("ft0.y", "ft0.y", "fc0.y");
+			AGAL.tex("ft1", "ft0", "fs0");
+			AGAL.mul("ft1", "ft1", "fc2.y");
+			AGAL.add("ft2", "ft2", "ft1");
 			
-			code += "add ft0.x,ft0.x,fc0.x\n";
-			code += "tex ft1, ft0, fs0 <2d,nearest,clamp>\nmul ft1,ft1,fc2.w\nadd ft2,ft2,ft1\n";
+			AGAL.add("ft0.x", "ft0.x", "fc0.x");
+			AGAL.tex("ft1", "ft0", "fs0");
+			AGAL.mul("ft1", "ft1", "fc2.z");
+			AGAL.add("ft2", "ft2", "ft1");
 			
-			code += "mul oc,ft2,fc0.z";
+			AGAL.add("ft0.x", "ft0.x", "fc0.x");
+			AGAL.tex("ft1", "ft0", "fs0");
+			AGAL.mul("ft1", "ft1", "fc2.w");
+			AGAL.add("ft2", "ft2", "ft1");
 			
-			program.upload(Shader3D.assembler.assemble(Context3DProgramType.VERTEX, "mov op, va0\nmov v0, va1\n"), 
-							Shader3D.assembler.assemble(Context3DProgramType.FRAGMENT, code));
+			AGAL.mul(AGAL.OC, "ft2", "fc0.z");
+			var fragmentShader:String = AGAL.code;
+			
+			program.upload(Shader3D.assembler.assemble(Context3DProgramType.VERTEX, vertexShader), 
+							Shader3D.assembler.assemble(Context3DProgramType.FRAGMENT, fragmentShader));
 							
 			super();
 		}

@@ -7,6 +7,7 @@ package nest.view.effect
 	import flash.display3D.Program3D;
 	import flash.display3D.textures.TextureBase;
 	import flash.display3D.VertexBuffer3D;
+	import nest.control.factory.AGAL;
 	
 	import nest.control.EngineBase;
 	import nest.view.Shader3D;
@@ -28,8 +29,17 @@ package nest.view.effect
 		
 		public function TransformColor(data:Vector.<Number>) {
 			var context3d:Context3D = EngineBase.context3d;
-			var vertexShader:String = "mov op, va0\nmov v0, va1\n";
-			var fragmentShader:String = "tex ft0, v0, fs0 <2d,linear,mipnone>\nmul oc, ft0.rgb, fc0.rgb\n";
+			
+			AGAL.clear();
+			AGAL.mov(AGAL.OP, AGAL.POS_ATTRIBUTE);
+			AGAL.mov("v0", AGAL.UV_ATTRIBUTE);
+			var vertexShader:String = AGAL.code;
+			
+			AGAL.clear();
+			AGAL.tex("ft0", "v0", "fs0");
+			AGAL.mul(AGAL.OC, "ft0.rgb", "fc0.rgb");
+			var fragmentShader:String = AGAL.code;
+			
 			var vertexData:Vector.<Number> = Vector.<Number>([-1, 1, 0, -1, -1, 0, 1, -1, 0, 1, 1, 0]);
 			var uvData:Vector.<Number> = Vector.<Number>([0, 0, 0, 1, 1, 1, 1, 0]);
 			var indexData:Vector.<uint> = Vector.<uint>([0, 3, 2, 2, 1, 0]);
