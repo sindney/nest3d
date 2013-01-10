@@ -1,6 +1,6 @@
 package nest.object 
 {
-	import nest.view.partition.IPTree;
+	//import nest.view.partition.IPTree;
 	
 	/**
 	 * Container3D
@@ -9,12 +9,13 @@ package nest.object
 		
 		protected var _visible:Boolean = true;
 		protected var _mouseEnabled:Boolean = false;
+		protected var _castShadows:Boolean = false;
 		
 		protected var _numChildren:int = 0;
 		
 		protected var _objects:Vector.<IObject3D>;
 		
-		protected var _partition:IPTree;
+		//protected var _partition:IPTree;
 		
 		public function Container3D() {
 			super();
@@ -94,16 +95,24 @@ package nest.object
 			_mouseEnabled = value;
 		}
 		
-		public function get partition():IPTree {
+		/*public function get partition():IPTree {
 			return _partition;
 		}
 		
 		public function set partition(value:IPTree):void {
 			_partition = value;
-		}
+		}*/
 		
 		public function get objects():Vector.<IObject3D> {
 			return _objects;
+		}
+		
+		public function get castShadows():Boolean {
+			return _castShadows;
+		}
+		
+		public function set castShadows(value:Boolean):void {
+			_castShadows = value;
 		}
 		
 	}

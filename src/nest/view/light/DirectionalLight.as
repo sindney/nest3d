@@ -1,13 +1,10 @@
 package nest.view.light 
 {
-	import flash.geom.Vector3D;
 	
 	/**
 	 * DirectionalLight
 	 */
 	public class DirectionalLight implements ILight {
-		
-		private var _next:ILight;
 		
 		private var _color:uint;
 		private var _direction:Vector.<Number>;
@@ -52,14 +49,6 @@ package nest.view.light
 		
 		public function get rgba():Vector.<Number> {
 			return _rgba;
-		}
-		
-		public function get next():ILight {
-			return _next;
-		}
-		
-		public function set next(value:ILight):void {
-			_next = value;
 		}
 		
 	}

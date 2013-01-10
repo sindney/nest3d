@@ -176,8 +176,7 @@ package nest.control.parser
 					vertices[i].x = vs0[j];
 					vertices[i].y = vs0[j+1];
 					vertices[i].z = vs0[j+2];
-				}else {
-					//trace("no vertices!!");
+				} else {
 					vertices[i] = new Vertex(vs0[j], vs0[j + 1], vs0[j + 2]);
 				}
 			}

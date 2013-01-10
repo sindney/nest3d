@@ -9,7 +9,6 @@ package nest.view.effect
 	import flash.display3D.IndexBuffer3D;
 	import flash.display3D.Program3D;
 	import flash.display3D.VertexBuffer3D;
-	import nest.control.factory.AGAL;
 	
 	import nest.control.EngineBase;
 	import nest.view.Shader3D;
@@ -35,7 +34,7 @@ package nest.view.effect
 		private var _blurX:Number;
 		private var _blurY:Number;
 		
-		public function Bloom(blurX:Number = 4, blurY:Number = 4, threshold:Number = 0.75) {
+		public function Bloom(width:int = 512, height:int = 512, blurX:Number = 4, blurY:Number = 4, threshold:Number = 0.75) {
 			var context3d:Context3D = EngineBase.context3d;
 			var vertexData:Vector.<Number> = Vector.<Number>([-1, 1, 0, -1, -1, 0, 1, -1, 0, 1, 1, 0]);
 			var uvData:Vector.<Number> = Vector.<Number>([0, 0, 0, 1, 1, 1, 1, 0]);
@@ -55,10 +54,10 @@ package nest.view.effect
 			_blurY = blurY;
 			thresholds = Vector.<Number>([threshold, threshold, threshold, threshold]);
 			update();
-			super();
+			resize(_textures, width, height);
 		}
 		
-		override public function calculate():void {
+		override public function calculate(next:IPostEffect):void {
 			var context3d:Context3D = EngineBase.context3d;
 			context3d.setRenderToTexture(_textures[1]);
 			context3d.clear();
@@ -72,8 +71,8 @@ package nest.view.effect
 			context3d.setVertexBufferAt(1, null);
 			context3d.setTextureAt(0, null);
 			context3d.setTextureAt(1, null);
-			if (_next) {
-				context3d.setRenderToTexture(_next.textures[0], _next.enableDepthAndStencil, _next.antiAlias);
+			if (next) {
+				context3d.setRenderToTexture(next.textures[0], next.enableDepthAndStencil, next.antiAlias);
 			}else {
 				context3d.setRenderToBackBuffer();
 			}
@@ -133,45 +132,39 @@ package nest.view.effect
 			data[4] = stepX * invW;
 			data[5] = stepY * invH;
 			
-			AGAL.clear();
-			AGAL.mov(AGAL.OP, AGAL.POS_ATTRIBUTE);
-			AGAL.mov("v0", AGAL.UV_ATTRIBUTE);
-			var vertexShader:String = AGAL.code;
+			var vs:String = "mov op va0\nmov v0, va1\n";
 			
-			AGAL.clear();
-			AGAL.mov("ft0", "v0");
-			AGAL.sub("ft0.y", "v0.y", "fc0.y");
+			var fs1:String = "mov ft0, v0\n" +
+							"sub ft0.y, v0.y, fc0.y\n";
+			
 			for (y = 0; y < _blurY; y += stepY) {
-				if (y > 0) AGAL.sub("ft0.x", "v0.x", "fc0.x");
+				if (y > 0) fs1 += "sub ft0.x, v0.x, fc0.x\n";
 				for (x = 0; x < _blurX; x += stepX) {
 					if (x == 0 && y == 0){
-						AGAL.tex("ft1", "ft0", "fs0");
-					}else {
-						AGAL.tex("ft2", "ft0", "fs0");
-						AGAL.add("ft1", "ft1", "ft2");
+						fs1 += "tex ft1, ft0, fs0 <2d, nearest, clamp, mipnone>\n";
+					} else {
+						fs1 += "tex ft2, ft0, fs0 <2d, nearest, clamp, mipnone>\n" + 
+								"add ft1, ft1, ft2\n";
 					}
 					if (x < _blurX)
-						AGAL.add("ft0.x", "ft0.x", "fc1.x");
+						fs1 += "add ft0.x, ft0.x, fc1.x\n";
 				}
-				if (y < _blurY) AGAL.add("ft0.y", "ft0.y", "fc1.y");
+				if (y < _blurY) fs1 += "add ft0.y, ft0.y, fc1.y\n";
 			}
-			AGAL.mul("ft0", "ft1", "fc0.z");
-			AGAL.tex("ft1", "v0", "fs1");
-			AGAL.sat("ft1", "ft1");
-			AGAL.add(AGAL.OC, "ft0", "ft1");
-			var fragmentShader1:String = AGAL.code;
+			fs1 += "mul ft0, ft1, fc0.z\n" + 
+					"tex ft1, v0, fs1 <2d, nearest, clamp, mipnone>\n" + 
+					"sat ft1, ft1\n" + 
+					"add oc, ft0, ft1\n";
+					
+			var fs2:String = "tex ft0, v0, fs0 <2d, nearest, clamp, mipnone>\n" + 
+							"sge ft1, ft0, fc0\n" + 
+							"mul oc, ft0, ft1\n";
 			
-			AGAL.clear();
-			AGAL.tex("ft0", "v0", "fs0", AGAL.TYPE_2D, AGAL.FILTER_NEAREST, AGAL.WRAP_CLAMP);
-			AGAL.sge("ft1", "ft0", "fc0");
-			AGAL.mul(AGAL.OC, "ft0", "ft1");
-			var fragmentShader2:String = AGAL.code;
-			
-			program1.upload(Shader3D.assembler.assemble(Context3DProgramType.VERTEX, vertexShader), 
-							Shader3D.assembler.assemble(Context3DProgramType.FRAGMENT, fragmentShader1));
+			program1.upload(Shader3D.assembler.assemble(Context3DProgramType.VERTEX, vs), 
+							Shader3D.assembler.assemble(Context3DProgramType.FRAGMENT, fs1));
 							
-			program2.upload(Shader3D.assembler.assemble(Context3DProgramType.VERTEX, vertexShader), 
-							Shader3D.assembler.assemble(Context3DProgramType.FRAGMENT, fragmentShader2));
+			program2.upload(Shader3D.assembler.assemble(Context3DProgramType.VERTEX, vs), 
+							Shader3D.assembler.assemble(Context3DProgramType.FRAGMENT, fs2));
 		}
 		
 		///////////////////////////////////

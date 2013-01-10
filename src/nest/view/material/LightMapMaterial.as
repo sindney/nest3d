@@ -4,8 +4,8 @@ package nest.view.material
 	import flash.display3D.Context3D;
 	import flash.display3D.Context3DProgramType;
 	
+	import nest.control.factory.ShaderFactory;
 	import nest.view.light.*;
-	import nest.view.Shader3D;
 	
 	/**
 	 * LightMapMaterial
@@ -21,9 +21,11 @@ package nest.view.material
 		}
 		
 		override public function upload(context3d:Context3D):void {
-			var light:ILight = _light;
-			var j:int = 1;
-			while (light) {
+			var i:int, j:int = 1;
+			var light:ILight;
+			var l:int = _lights.length;
+			for (i = 0; i < l; i++) {
+				light = _lights[i];
 				if (light is AmbientLight) {
 					context3d.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, 0, light.rgba);
 				} else if (light is DirectionalLight) {
@@ -42,7 +44,6 @@ package nest.view.material
 					context3d.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, j + 3, (light as SpotLight).lightParameters);
 					j += 4;
 				}
-				light = light.next;
 			}
 			context3d.setTextureAt(0, _diffuse.texture);
 			if (_specular.texture) context3d.setTextureAt(1, _specular.texture);
@@ -61,8 +62,8 @@ package nest.view.material
 			if (_lightmap.texture) context3d.setTextureAt(3, null);
 		}
 		
-		override public function update():void {
-			var normal:Boolean = _light != null;
+		override public function comply(context3d:Context3D):void {
+			var normal:Boolean = _lights.length > 0;
 			var normalmap:Boolean = _normalmap.texture != null;
 			var specular:Boolean = specular.texture != null;
 			var vertex:String = "m44 op, va0, vc0\n" + 
@@ -113,11 +114,16 @@ package nest.view.material
 			}
 			fragment += "tex ft6, v1, fs3 <2d,linear," + (_lightmap.mipmapping ? "miplinear" : "mipnone") + ">\nmul ft7, ft7, ft6\nsat ft7, ft7\n";
 			if (specular) fragment += "tex ft6, v1, fs1 <2d,linear," + (_specular.mipmapping ? "miplinear" : "mipnone") + ">\n";
-			fragment += Shader3D.createLight(_light, specular, normalmap);
+			fragment += ShaderFactory.createLight(_lights, specular, normalmap);
 			fragment += "sub ft0.w, ft0.w, fc23.z\nkil ft0.w\n";
 			fragment += "mov oc, ft0\n";
 			
-			_shader.setFromString(vertex, fragment, normal);
+			if (!_program) _program = context3d.createProgram();
+			
+			_program.upload(
+				ShaderFactory.assembler.assemble(Context3DProgramType.VERTEX, vertex), 
+				ShaderFactory.assembler.assemble(Context3DProgramType.FRAGMENT, fragment)
+			);
 		}
 		
 		override public function dispose():void {

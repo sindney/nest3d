@@ -44,9 +44,6 @@ package nest.view.material
 			
 		}
 		
-		/**
-		 * Call this when you redraw your data but didn't change it's size.
-		 */
 		public function upload():void {
 			if (!_texture) return;
 			_mipmapping ? uploadWithMipmaps(_texture, _data) : _texture.uploadFromBitmapData(_data);
@@ -73,7 +70,6 @@ package nest.view.material
 					if (!_data || _data.width != value.width || _data.height != value.height) {
 						_texture = EngineBase.context3d.createTexture(value.width, value.height, Context3DTextureFormat.BGRA, false);
 					}
-					_mipmapping ? uploadWithMipmaps(_texture, value) : _texture.uploadFromBitmapData(value);
 				} else {
 					if(_texture) _texture.dispose();
 					_texture = null;
@@ -87,12 +83,7 @@ package nest.view.material
 		}
 		
 		public function set mipmapping(value:Boolean):void {
-			if (_mipmapping != value) {
-				_mipmapping = value;
-				if (_texture) {
-					_mipmapping ? uploadWithMipmaps(_texture, _data) : _texture.uploadFromBitmapData(_data);
-				}
-			}
+			_mipmapping = value;
 		}
 		
 		public function get texture():Texture {

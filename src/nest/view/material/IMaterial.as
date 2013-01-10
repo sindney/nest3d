@@ -1,7 +1,7 @@
 package nest.view.material 
 {
 	import flash.display3D.Context3D;
-	import nest.view.Shader3D;
+	import flash.display3D.Program3D;
 	
 	/**
 	 * Material Interface.
@@ -11,14 +11,15 @@ package nest.view.material
 		function upload(context3d:Context3D):void;
 		function unload(context3d:Context3D):void;
 		
-		/**
-		 * Update material's shader.
-		 */
-		function update():void;
+		function comply(context3d:Context3D):void;
+		
+		function dispose():void;
+		
+		function get program():Program3D;
 		
 		function get uv():Boolean;
 		
-		function get shader():Shader3D;
+		function get normal():Boolean;
 		
 	}
 	

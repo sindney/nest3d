@@ -3,7 +3,7 @@ package nest.control.factory
 	import flash.geom.Point;
 	import flash.geom.Vector3D;
 	
-	import nest.object.geom.MeshData;
+	import nest.object.geom.Geometry;
 	import nest.object.geom.Vertex;
 	import nest.object.geom.Triangle;
 	
@@ -14,7 +14,115 @@ package nest.control.factory
 	 */
 	public final class PrimitiveFactory {
 		
-		public static function createBox(width:Number = 100, height:Number = 100, depth:Number = 100):MeshData {
+		private static var _screen:Geometry;
+		
+		public static function get screen():Geometry {
+			if (!_screen) {
+				var vertices:Vector.<Vertex> = Vector.<Vertex>([new Vertex( -1.0,  1.0, 0.0, 0.0, 0.0), 
+																new Vertex( -1.0, -1.0, 0.0, 0.0, 1.0), 
+																new Vertex(  1.0, -1.0, 0.0, 1.0, 1.0), 
+																new Vertex(  1.0,  1.0, 0.0, 1.0, 0.0)]);
+				var triangles:Vector.<Triangle> = new Vector.<Triangle>(2, true);
+				
+				var tri:Triangle = new Triangle(0, 3, 2);
+				tri.u0 = 0.0; tri.v0 = 0.0;
+				tri.u1 = 1.0; tri.v1 = 0.0;
+				tri.u2 = 0.0; tri.v2 = 1.0;
+				triangles[0] = tri;
+				tri = new Triangle(2, 1, 0);
+				tri.u0 = 1.0; tri.v0 = 1.0;
+				tri.u1 = 0.0; tri.v1 = 0.1;
+				tri.u2 = 0.0; tri.v2 = 0.0;
+				triangles[1] = tri;
+				
+				Geometry.calculateNormal(vertices, triangles);
+				_screen = new Geometry(vertices, triangles);
+			}
+			return _screen;
+		}
+		
+		private static var _skybox:Geometry;
+		
+		/**
+		 * Set mesh's scale to resize your skybox.
+		 */
+		public static function get skybox():Geometry {
+			if (!_skybox) {
+				var tri:Triangle;
+				var vertices:Vector.<Vertex> = new Vector.<Vertex>(8, true);
+				var triangles:Vector.<Triangle> = new Vector.<Triangle>(12, true);
+				
+				vertices[0] = new Vertex( -.5, .5, -.5);
+				vertices[1] = new Vertex(.5, .5, -.5);
+				vertices[2] = new Vertex(.5, -.5, -.5);
+				vertices[3] = new Vertex( -.5, -.5, -.5);
+				
+				vertices[4] = new Vertex(.5, .5, .5);
+				vertices[5] = new Vertex( -.5, .5, .5);
+				vertices[6] = new Vertex( -.5, -.5, .5);
+				vertices[7] = new Vertex(.5, -.5, .5);
+				
+				// front
+				tri = triangles[0] = new Triangle(0, 3, 2);
+				tri = triangles[1] = new Triangle(0, 2, 1);
+				
+				// back
+				tri = triangles[2] = new Triangle(4, 7, 6);
+				tri = triangles[3] = new Triangle(4, 6, 5);
+				
+				// top
+				tri = triangles[4] = new Triangle(5, 0, 1);
+				tri = triangles[5] = new Triangle(5, 1, 4);
+				
+				// bottom
+				tri = triangles[6] = new Triangle(7, 2, 3);
+				tri = triangles[7] = new Triangle(7, 3, 6);
+				
+				// left
+				tri = triangles[8] = new Triangle(5, 6, 3);
+				tri = triangles[9] = new Triangle(5, 3, 0);
+				
+				// right
+				tri = triangles[10] = new Triangle(1, 2, 7);
+				tri = triangles[11] = new Triangle(1, 7, 4);
+				
+				Geometry.calculateNormal(vertices, triangles);
+				_skybox = new Geometry(vertices, triangles);
+			}
+			return _skybox;
+		}
+		
+		private static var _sprite3d:Geometry;
+		
+		/**
+		 * Set mesh's scaleX,Y to resize your sprite3d.
+		 */
+		public static function get sprite3d():Geometry {
+			if (!_sprite3d) {
+				var vertices:Vector.<Vertex> = Vector.<Vertex>([new Vertex( -0.5, -0.5, 0, 0.0, 0.0), 
+																new Vertex(0.5, -0.5, 0, 1.0, 0.0), 
+																new Vertex(0.5, 0.5, 0, 1.0, 1.0), 
+																new Vertex( -0.5, 0.5, 0, 0.0, 1.0)]);
+				var triangles:Vector.<Triangle> = new Vector.<Triangle>(2, true);
+				
+				var tri:Triangle = new Triangle(0, 2, 1);
+				tri.u0 = 0.0; tri.v0 = 1.0;
+				tri.u1 = 1.0; tri.v1 = 0.0;
+				tri.u2 = 1.0; tri.v2 = 1.0;
+				triangles[0] = tri;
+				tri = new Triangle(0, 3, 2);
+				tri.u0 = 0.0; tri.v0 = 1.0;
+				tri.u1 = 0.0; tri.v1 = 0.0;
+				tri.u2 = 1.0; tri.v2 = 0.0;
+				triangles[1] = tri;
+				
+				Geometry.calculateNormal(vertices, triangles);
+				_sprite3d = new Geometry(vertices, triangles);
+			}
+			return _sprite3d;
+		}
+		
+		public static function createBox(width:Number = 100, height:Number = 100, depth:Number = 100):Geometry {
 			const w2:Number = width / 2;
 			const h2:Number = height / 2;
 			const d2:Number = depth / 2;
@@ -93,11 +201,11 @@ package nest.control.factory
 			tri.u1 = 1; tri.v1 = 1;
 			tri.u2 = 0; tri.v2 = 1;
 			
-			MeshData.calculateNormal(vertices, triangles);
-			return new MeshData(vertices, triangles);
+			Geometry.calculateNormal(vertices, triangles);
+			return new Geometry(vertices, triangles);
 		}
 		
-		public static function createPlane(width:Number = 100, height:Number = 100, segmentsW:int = 1, segmentsH:int = 1):MeshData {
+		public static function createPlane(width:Number = 100, height:Number = 100, segmentsW:int = 1, segmentsH:int = 1):Geometry {
 			const w2:Number = width / 2;
 			const h2:Number = height / 2;
 			const dw:Number = width / segmentsW;
@@ -145,11 +253,11 @@ package nest.control.factory
 				}
 			}
 			
-			MeshData.calculateNormal(vertices, triangles);
-			return new MeshData(vertices, triangles);
+			Geometry.calculateNormal(vertices, triangles);
+			return new Geometry(vertices, triangles);
 		}
 		
-		public static function createSphere(radius:Number = 100, segmentsW:int = 8, segmentsH:int = 6):MeshData {
+		public static function createSphere(radius:Number = 100, segmentsW:int = 8, segmentsH:int = 6):Geometry {
 			const du:Number = 1 / segmentsW;
 			const dv:Number = 1 / segmentsH;
 			const da:Number = -Math.PI / segmentsH;
@@ -202,11 +310,11 @@ package nest.control.factory
 				b += db;
 			}
 			
-			MeshData.calculateNormal(vertices, triangles);
-			return new MeshData(vertices, triangles);
+			Geometry.calculateNormal(vertices, triangles);
+			return new Geometry(vertices, triangles);
 		}
 		
-		public static function createPrimitiveByRevolution(samples:Vector.<Point>,segmentsW:uint=10, startRadian:Number=0,endRadian:Number=Math.PI*2):MeshData {
+		public static function createPrimitiveByRevolution(samples:Vector.<Point>,segmentsW:uint=10, startRadian:Number=0,endRadian:Number=Math.PI*2):Geometry {
 			const segmentsH:uint = samples.length-1;
 			const radian:Number = endRadian - startRadian;
 			const du:Number = 1 / Math.PI / 2 * radian / segmentsW;
@@ -264,11 +372,11 @@ package nest.control.factory
 				b += db;
 			}
 			
-			MeshData.calculateNormal(vertices, triangles);
-			return new MeshData(vertices, triangles);
+			Geometry.calculateNormal(vertices, triangles);
+			return new Geometry(vertices, triangles);
 		}
 		
-		public static function createPrimitiveByLoft(samples:Vector.<Point>, path:Vector.<Vertex>, topCover:Boolean = false, bottomCover:Boolean = false):MeshData {
+		public static function createPrimitiveByLoft(samples:Vector.<Point>, path:Vector.<Vertex>, topCover:Boolean = false, bottomCover:Boolean = false):Geometry {
 			const segmentsW:uint = samples.length - 1;
 			const segmentsH:uint = path.length - 1;
 			const du:Number = 1 / segmentsW;
@@ -363,8 +471,8 @@ package nest.control.factory
 			}
 			vertices.fixed = triangles.fixed = true;
 			
-			MeshData.calculateNormal(vertices, triangles);
-			return new MeshData(vertices, triangles);
+			Geometry.calculateNormal(vertices, triangles);
+			return new Geometry(vertices, triangles);
 		}
 	}
 

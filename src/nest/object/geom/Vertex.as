@@ -16,6 +16,9 @@ package nest.object.geom
 		
 		public var normal:Vector3D;
 		
+		public var joints:Vector.<int>;
+		public var weights:Vector.<Number>;
+		
 		public function Vertex(x:Number = 0, y:Number = 0, z:Number = 0, u:Number = 0, v:Number = 0) {
 			this.x = x;
 			this.y = y;

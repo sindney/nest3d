@@ -1,63 +1,57 @@
 package  
-{	
-	import flash.events.MouseEvent;
-	import flash.geom.Vector3D;
-	
-	import nest.control.factories.PrimitiveFactory;
-	import nest.object.data.*;
+{
+	import nest.control.factory.PrimitiveFactory;
+	import nest.object.geom.Geometry;
 	import nest.object.Mesh;
-	import nest.view.lights.*;
-	import nest.view.materials.*;
+	import nest.object.Container3D;
+	import nest.view.material.ColorMaterial;
+	import nest.view.process.*;
 	
 	/**
 	 * BasicDemo
 	 */
 	public class BasicDemo extends DemoBase {
 		
-		private var pointLight:PointLight;
+		private var process0:ContainerProcess;
+		private var container:Container3D;
 		
 		public function BasicDemo() {
-			super();
+			
 		}
 		
-		private var colorMat:ColorMaterial;
-		private var colorMat1:ColorMaterial;
-		
 		override public function init():void {
-			var light:AmbientLight = new AmbientLight(0x333333);
-			light.next = pointLight = new PointLight(0xffffff, 200, 0, 0, 0);
+			container = new Container3D();
 			
-			var data:MeshData = PrimitiveFactory.createBox(1, 1, 1);
+			process0 = new ContainerProcess(camera, container);
+			process0.meshProcess = new BasicMeshProcess(camera);
+			process0.color = 0x0066ff;
 			
-			colorMat = new ColorMaterial(0xff0000);
-			colorMat.light = light;
-			colorMat.update();
-			colorMat1 = new ColorMaterial(0x00ff00);
-			colorMat1.light = light;
-			colorMat1.update();
+			view.processes.push(process0);
 			
-			var cube:Mesh;
+			var geom:Geometry = PrimitiveFactory.createBox(1, 1, 1);
+			var material:ColorMaterial = new ColorMaterial();
+			material.comply(view.context3d);
+			var mesh:Mesh;
+			
 			var i:int, j:int, k:int = 0;
 			for (i = 0; i < 10; i++) {
 				for (j = 0; j < 10; j++) {
 					for (k = 0; k < 10; k++) {
-						cube = new Mesh(data, k > 4 ? colorMat : colorMat1);
-						cube.position.setTo(i * 40, j * 40, k * 40);
-						cube.scale.setTo(10, 10, 10);
-						cube.changed = true;
-						scene.addChild(cube);
+						mesh = new Mesh(geom, material);
+						mesh.position.setTo(i * 40, j * 40, k * 40);
+						mesh.scale.setTo(10, 10, 10);
+						container.addChild(mesh);
+						mesh.recompose();
 					}
 				}
 			}
 			
-			camera.position.z = -20;
-			camera.changed = true;
+			camera.position.z = -100;
+			camera.recompose();
 		}
 		
 		override public function loop():void {
-			pointLight.position[0] = camera.position.x;
-			pointLight.position[1] = camera.position.y;
-			pointLight.position[2] = camera.position.z;
+			view.diagram.message = "Objects: " + process0.numObjects + "/" + process0.container.numChildren;
 		}
 		
 	}

@@ -1,13 +1,10 @@
 package nest.view.light 
 {
-	import flash.geom.Vector3D;
 	
 	/**
 	 * PointLight
 	 */
 	public class PointLight implements ILight {
-		
-		private var _next:ILight;
 		
 		private var _color:uint;
 		private var _rgba:Vector.<Number>;
@@ -64,14 +61,6 @@ package nest.view.light
 		 */
 		public function get radius():Vector.<Number> {
 			return _radius;
-		}
-		
-		public function get next():ILight {
-			return _next;
-		}
-		
-		public function set next(value:ILight):void {
-			_next = value;
 		}
 		
 	}

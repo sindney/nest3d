@@ -3,9 +3,10 @@ package nest.view.material
 	import flash.display.BitmapData;
 	import flash.display3D.Context3D;
 	import flash.display3D.Context3DProgramType;
+	import flash.display3D.Program3D;
 	
+	import nest.control.factory.ShaderFactory;
 	import nest.view.light.*;
-	import nest.view.Shader3D;
 	
 	/**
 	 * TextureMaterial
@@ -19,8 +20,8 @@ package nest.view.material
 		protected var _vertData:Vector.<Number>;
 		protected var _fragData:Vector.<Number>;
 		
-		protected var _light:AmbientLight;
-		protected var _shader:Shader3D;
+		protected var _lights:Vector.<ILight>;
+		protected var _program:Program3D;
 		
 		public function TextureMaterial(diffuse:BitmapData, specular:BitmapData = null, glossiness:int = 10, normalmap:BitmapData = null) {
 			_vertData = new Vector.<Number>(4, true);
@@ -30,7 +31,7 @@ package nest.view.material
 			_fragData[0] = glossiness;
 			_fragData[1] = 1;
 			_fragData[2] = 1;
-			_shader = new Shader3D();
+			_lights = new Vector.<ILight>();
 			_diffuse = new TextureResource();
 			_diffuse.data = diffuse;
 			_specular = new TextureResource();
@@ -40,9 +41,11 @@ package nest.view.material
 		}
 		
 		public function upload(context3d:Context3D):void {
-			var light:ILight = _light;
-			var j:int = 1;
-			while (light) {
+			var i:int, j:int = 1;
+			var light:ILight;
+			var l:int = _lights.length;
+			for (i = 0; i < l; i++) {
+				light = _lights[i];
 				if (light is AmbientLight) {
 					context3d.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, 0, light.rgba);
 				} else if (light is DirectionalLight) {
@@ -61,7 +64,6 @@ package nest.view.material
 					context3d.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, j + 3, (light as SpotLight).lightParameters);
 					j += 4;
 				}
-				light = light.next;
 			}
 			context3d.setTextureAt(0, _diffuse.texture);
 			if (_specular.texture) context3d.setTextureAt(1, _specular.texture);
@@ -78,8 +80,8 @@ package nest.view.material
 			if (_normalmap.texture) context3d.setTextureAt(2, null);
 		}
 		
-		public function update():void {
-			var normal:Boolean = _light != null;
+		public function comply(context3d:Context3D):void {
+			var normal:Boolean = _lights.length > 0;
 			var normalmap:Boolean = _normalmap.texture != null;
 			var specular:Boolean = specular.texture != null;
 			var vertex:String = "m44 op, va0, vc0\n" + 
@@ -129,22 +131,27 @@ package nest.view.material
 							"add ft5, ft0, ft1\n";
 			}
 			if (specular) fragment += "tex ft6, v1, fs1 <2d,linear," + (_specular.mipmapping ? "miplinear" : "mipnone") + ">\n";
-			fragment += Shader3D.createLight(_light, specular, normalmap);
+			fragment += ShaderFactory.createLight(_lights, specular, normalmap);
 			fragment += "sub ft0.w, ft0.w, fc23.z\nkil ft0.w\n";
 			fragment += "mov oc, ft0\n";
 			
-			_shader.setFromString(vertex, fragment, normal);
+			if (!_program) _program = context3d.createProgram();
+			
+			_program.upload(
+				ShaderFactory.assembler.assemble(Context3DProgramType.VERTEX, vertex), 
+				ShaderFactory.assembler.assemble(Context3DProgramType.FRAGMENT, fragment)
+			);
 		}
 		
 		public function dispose():void {
-			_shader.program.dispose();
+			_program.dispose();
 			_diffuse.dispose();
 			_specular.dispose();
 			_normalmap.dispose();
 			_diffuse = null;
 			_specular = null;
 			_normalmap = null;
-			_light = null;
+			_lights = null;
 			_vertData = null;
 			_fragData = null;
 		}
@@ -154,20 +161,13 @@ package nest.view.material
 		///////////////////////////////////
 		
 		/**
-		 * Root light is an AmbientLight.
-		 * <p>Link new light source to light.next.</p>
-		 * <p>There's 23 empty fc left.</p>
-		 * <p>Ambient light absorbs 1 fc.</p>
+		 * There's 23 empty fc left.
 		 * <p>Directional light takes 2.</p>
 		 * <p>PointLight light takes 3.</p>
 		 * <p>SpotLight light takes 4.</p>
 		 */
-		public function get light():AmbientLight {
-			return _light;
-		}
-		
-		public function set light(value:AmbientLight):void {
-			_light = value;
+		public function get lights():Vector.<ILight> {
+			return _lights;
 		}
 		
 		public function get glossiness():int {
@@ -186,10 +186,6 @@ package nest.view.material
 			_fragData[2] = value;
 		}
 		
-		public function get uv():Boolean {
-			return true;
-		}
-		
 		public function get diffuse():TextureResource {
 			return _diffuse;
 		}
@@ -202,8 +198,16 @@ package nest.view.material
 			return _normalmap;
 		}
 		
-		public function get shader():Shader3D {
-			return _shader;
+		public function get program():Program3D {
+			return _program;
+		}
+		
+		public function get uv():Boolean {
+			return true;
+		}
+		
+		public function get normal():Boolean {
+			return _lights.length > 0;
 		}
 		
 	}

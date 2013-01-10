@@ -5,6 +5,8 @@ package nest.view
 	import flash.geom.Orientation3D;
 	import flash.geom.Vector3D;
 	
+	import nest.control.math.Frustum;
+	
 	/**
 	 * Camera3D
 	 */
@@ -53,7 +55,10 @@ package nest.view
 			_invertMatrix.invert();
 		}
 		
-		protected function update():void {
+		/**
+		 * Update camera's matrix.
+		 */
+		public function update():void {
 			const ys:Number = 1.0 / Math.tan(_fov / 2.0);
 			const xs:Number = ys / _aspect;
 			
@@ -76,10 +81,7 @@ package nest.view
 		}
 		
 		public function set aspect(value:Number):void {
-			if (_aspect != value) {
-				_aspect = value;
-				update();
-			}
+			_aspect = value;
 		}
 		
 		public function get near():Number {
@@ -87,10 +89,7 @@ package nest.view
 		}
 		
 		public function set near(value:Number):void {
-			if (_near != value) {
-				_near = value;
-				update();
-			}
+			_near = value;
 		}
 		
 		public function get far():Number {
@@ -98,10 +97,7 @@ package nest.view
 		}
 		
 		public function set far(value:Number):void {
-			if (_far != value) {
-				_far = value;
-				update();
-			}
+			_far = value;
 		}
 		
 		public function get fov():Number {
@@ -109,10 +105,7 @@ package nest.view
 		}
 		
 		public function set fov(value:Number):void {
-			if (_fov != value) {
-				_fov = value;
-				update();
-			}
+			_fov = value;
 		}
 		
 		public function get pm():Matrix3D {

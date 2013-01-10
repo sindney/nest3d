@@ -2,9 +2,10 @@ package nest.view.material
 {
 	import flash.display3D.Context3D;
 	import flash.display3D.Context3DProgramType;
+	import flash.display3D.Program3D;
 	
+	import nest.control.factory.ShaderFactory;
 	import nest.view.light.*;
-	import nest.view.Shader3D;
 	
 	/**
 	 * ColorMaterial
@@ -14,21 +15,22 @@ package nest.view.material
 		protected var _color:uint;
 		protected var _rgba:Vector.<Number>;
 		
-		protected var _light:AmbientLight;
+		protected var _lights:Vector.<ILight>;
 		
-		protected var _shader:Shader3D;
+		protected var _program:Program3D;
 		
-		public function ColorMaterial(color:uint = 0xffffff, alpha:Number = 1) {
+		public function ColorMaterial(color:uint = 0xffffffff) {
 			_rgba = new Vector.<Number>(4, true);
-			_shader = new Shader3D();
+			_lights = new Vector.<ILight>();
 			this.color = color;
-			this.alpha = alpha;
 		}
 		
 		public function upload(context3d:Context3D):void {
-			var light:ILight = _light;
-			var j:int = 1;
-			while (light) {
+			var i:int, j:int = 1;
+			var light:ILight;
+			var l:int = _lights.length;
+			for (i = 0; i < l; i++) {
+				light = _lights[i];
 				if (light is AmbientLight) {
 					context3d.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, 0, light.rgba);
 				} else if (light is DirectionalLight) {
@@ -47,7 +49,6 @@ package nest.view.material
 					context3d.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, j + 3, (light as SpotLight).lightParameters);
 					j += 4;
 				}
-				light = light.next;
 			}
 			context3d.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, 23, _rgba);
 		}
@@ -56,7 +57,8 @@ package nest.view.material
 			
 		}
 		
-		public function update():void {
+		public function comply(context3d:Context3D):void {
+			var normal:Boolean = _lights.length > 0;
 			var vertex:String = "m44 op, va0, vc0\n" + 
 								"mov v0, va0\n" + 
 								// cameraPos
@@ -66,13 +68,24 @@ package nest.view.material
 								// v6 = cameraDir
 								"nrm vt7.xyz, vt1\n" + 
 								"mov v6, vt7.xyz\n";
-			if (_light) vertex += "mov v2, va2\n";
+			if (normal) vertex += "mov v2, va2\n";
 			
 			var fragment:String = "mov ft7, fc23\n";
-			fragment += Shader3D.createLight(_light);
+			fragment += ShaderFactory.createLight(_lights);
 			fragment += "mov oc, ft0\n";
 			
-			_shader.setFromString(vertex, fragment, _light != null);
+			if (!_program) _program = context3d.createProgram();
+			
+			_program.upload(
+				ShaderFactory.assembler.assemble(Context3DProgramType.VERTEX, vertex), 
+				ShaderFactory.assembler.assemble(Context3DProgramType.FRAGMENT, fragment)
+			);
+		}
+		
+		public function dispose():void {
+			_program.dispose();
+			_lights = null;
+			_rgba = null;
 		}
 		
 		///////////////////////////////////
@@ -80,20 +93,14 @@ package nest.view.material
 		///////////////////////////////////
 		
 		/**
-		 * Root light is an AmbientLight.
-		 * <p>Link new light source to light.next.</p>
-		 * <p>There's 23 empty fc left.</p>
-		 * <p>Ambient light absorbs 1 fc.</p>
+		 * There's 23 empty fc left.
+		 * <p>Ambient light takes 1.</p>
 		 * <p>Directional light takes 2.</p>
 		 * <p>PointLight light takes 3.</p>
 		 * <p>SpotLight light takes 4.</p>
 		 */
-		public function get light():AmbientLight {
-			return _light;
-		}
-		
-		public function set light(value:AmbientLight):void {
-			_light = value;
+		public function get lights():Vector.<ILight> {
+			return _lights;
 		}
 		
 		public function get color():uint {
@@ -105,26 +112,23 @@ package nest.view.material
 			_rgba[0] = ((value >> 16) & 0xFF) / 255;
 			_rgba[1] = ((value >> 8) & 0xFF) / 255;
 			_rgba[2] = (value & 0xFF) / 255;
-		}
-		
-		public function get alpha():Number {
-			return _rgba[3];
-		}
-		
-		public function set alpha(value:Number):void {
-			_rgba[3] = value;
+			_rgba[3] = (value >> 24) / 255;
 		}
 		
 		public function get rgba():Vector.<Number> {
 			return _rgba;
 		}
 		
+		public function get program():Program3D {
+			return _program;
+		}
+		
 		public function get uv():Boolean {
 			return false;
 		}
 		
-		public function get shader():Shader3D {
-			return _shader;
+		public function get normal():Boolean {
+			return _lights.length > 0;
 		}
 		
 	}

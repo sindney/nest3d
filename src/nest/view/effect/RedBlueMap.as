@@ -9,10 +9,8 @@ package nest.view.effect
 	import flash.display3D.Program3D;
 	import flash.display3D.VertexBuffer3D;
 	import flash.geom.Vector3D;
-	import nest.control.factory.AGAL;
 	
 	import nest.control.EngineBase;
-	import nest.view.manager.ISceneManager;
 	import nest.view.Shader3D;
 	
 	/**
@@ -29,7 +27,7 @@ package nest.view.effect
 		
 		private var _eyePadding:Number;
 		
-		public function RedBlueMap(eyePadding:Number = 1) {
+		public function RedBlueMap(width:int = 512, height:int = 512, eyePadding:Number = 1) {
 			var context3d:Context3D = EngineBase.context3d;
 			var vertexData:Vector.<Number> = Vector.<Number>([-1, 1, 0, -1, -1, 0, 1, -1, 0, 1, 1, 0]);
 			var uvData:Vector.<Number> = Vector.<Number>([0, 0, 0, 1, 1, 1, 1, 0]);
@@ -47,47 +45,46 @@ package nest.view.effect
 			
 			_eyePadding = eyePadding;
 			
-			AGAL.clear();
-			AGAL.mov(AGAL.OP, AGAL.POS_ATTRIBUTE);
-			AGAL.mov("v0", AGAL.UV_ATTRIBUTE);
-			var vertexShader:String = AGAL.code;
+			var vs:String = "mov op, va0\n" + 
+							"mov v0, va1\n";
 			
-			AGAL.clear();
-			AGAL.tex("ft0", "v0", "fs0");
-			AGAL.tex("ft1", "v0", "fs1");
-			AGAL.mul("ft2", "ft0", "fc0");
-			AGAL.mul("ft3", "ft1", "fc1");
-			AGAL.add(AGAL.OC, "ft2", "ft3");
-			var fragmentShader:String = AGAL.code;
+			var fs:String = "tex ft0, v0, fs0 <2d, nearest, clamp, mipnone>\n" + 
+							"tex ft1, v0, fs1 <2d, nearest, clamp, mipnone>\n" + 
+							"mul ft2, ft0, fc0\n" + 
+							"mul ft3, ft1, fc1\n" + 
+							"add oc, ft2, ft3\n";
 			
-			program.upload(Shader3D.assembler.assemble(Context3DProgramType.VERTEX, vertexShader), 
-							Shader3D.assembler.assemble(Context3DProgramType.FRAGMENT, fragmentShader));
-			super();
+			program.upload(Shader3D.assembler.assemble(Context3DProgramType.VERTEX, vs), 
+							Shader3D.assembler.assemble(Context3DProgramType.FRAGMENT, fs));
+			resize(_textures, width, height);
 		}
 		
-		override public function calculate():void {
+		override public function calculate(next:IPostEffect):void {
 			var context3d:Context3D = EngineBase.context3d;
 			context3d.setRenderToTexture(_textures[1], enableDepthAndStencil, antiAlias);
 			context3d.clear();
-			EngineBase.camera.translate(Vector3D.X_AXIS, _eyePadding);
+			
+			var p:Vector3D = new Vector3D(1, 0, 0);
+			p.scaleBy(_eyePadding);
+			EngineBase.camera.position.copyFrom(EngineBase.camera.matrix.transformVector(p));
 			EngineBase.camera.recompose();
+			
 			var _camPos:Vector.<Number> = new Vector.<Number>(4, true);
-			_camPos[0] = EngineBase.camera.position.x;
-			_camPos[1] = EngineBase.camera.position.y;
-			_camPos[2] = EngineBase.camera.position.z;
+			_camPos[0] = p.x;
+			_camPos[1] = p.y;
+			_camPos[2] = p.z;
 			_camPos[3] = 1;
 			context3d.setProgramConstantsFromVector(Context3DProgramType.VERTEX, 8, _camPos);
 			
-			EngineBase.manager.first = false;
-			EngineBase.manager.culling = EngineBase.view.culling;
-			EngineBase.manager.process = EngineBase.view.process;
-			EngineBase.manager.calculate();
+			EngineBase.manager.calculate(false, EngineBase.camera.invertMatrix, EngineBase.camera.pm);
 			
-			EngineBase.camera.translate(Vector3D.X_AXIS, -_eyePadding);
+			p.setTo(1, 0, 0);
+			p.scaleBy( -_eyePadding);
+			EngineBase.camera.position.copyFrom(EngineBase.camera.matrix.transformVector(p));
 			EngineBase.camera.recompose();
 			
-			if (_next) {
-				context3d.setRenderToTexture(_next.textures[0], _next.enableDepthAndStencil, _next.antiAlias);
+			if (next) {
+				context3d.setRenderToTexture(next.textures[0], next.enableDepthAndStencil, next.antiAlias);
 			} else {
 				context3d.setRenderToBackBuffer();
 			}

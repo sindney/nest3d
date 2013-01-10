@@ -6,7 +6,7 @@ package nest.view.light
 	 */
 	public class AmbientLight implements ILight {
 		
-		private var _next:ILight;
+		private var _castShadows:Boolean = false;
 		
 		private var _color:uint;
 		private var _rgba:Vector.<Number>;
@@ -36,12 +36,12 @@ package nest.view.light
 			return _rgba;
 		}
 		
-		public function get next():ILight {
-			return _next;
+		public function get castShadows():Boolean {
+			return _castShadows;
 		}
 		
-		public function set next(value:ILight):void {
-			_next = value;
+		public function set castShadows(value:Boolean):void {
+			_castShadows = value;
 		}
 		
 	}

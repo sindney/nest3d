@@ -8,7 +8,6 @@ package nest.view.effect
 	import flash.display3D.IndexBuffer3D;
 	import flash.display3D.Program3D;
 	import flash.display3D.VertexBuffer3D;
-	import nest.control.factory.AGAL;
 	
 	import nest.control.EngineBase;
 	import nest.view.Shader3D;
@@ -25,7 +24,7 @@ package nest.view.effect
 		
 		private var data:Vector.<Number>;
 		
-		public function CellShader(redLevel:uint=32, greenLevel:uint=32,blueLevel:uint=32,alphaLevel:uint=32) {
+		public function CellShader(width:int = 512, height:int = 512, redLevel:uint = 32, greenLevel:uint = 32, blueLevel:uint = 32, alphaLevel:uint = 32) {
 			var context3d:Context3D = EngineBase.context3d;
 			var vertexData:Vector.<Number> = Vector.<Number>([-1, 1, 0, -1, -1, 0, 1, -1, 0, 1, 1, 0]);
 			var uvData:Vector.<Number> = Vector.<Number>([0, 0, 0, 1, 1, 1, 1, 0]);
@@ -45,28 +44,24 @@ package nest.view.effect
 			
 			_textures = new Vector.<TextureBase>(1, true);
 			
-			AGAL.clear();
-			AGAL.mov(AGAL.OP, AGAL.POS_ATTRIBUTE);
-			AGAL.mov("v0", AGAL.UV_ATTRIBUTE);
-			var vertexShader:String = AGAL.code;
+			var vs:String = "mov op, va0\n" + 
+							"mov v0, va1\n";
 			
-			AGAL.clear();
-			AGAL.tex("ft0", "v0", "fs0");
-			AGAL.mul("ft0", "ft0", "fc0");
-			AGAL.frc("ft1", "ft0");
-			AGAL.sub("ft0", "ft0", "ft1");
-			AGAL.div(AGAL.OC, "ft0", "fc0");
-			var fragmentShader:String = AGAL.code;
+			var fs:String = "tex ft0, v0, fs0 <2d, nearest, clamp, mipnone>\n" + 
+							"mul ft0, ft0, fc0\n" + 
+							"frc ft1, ft0\n" + 
+							"sub ft0, ft0, ft1\n" + 
+							"div oc, ft0, fc0\n";
 			
-			program.upload(Shader3D.assembler.assemble(Context3DProgramType.VERTEX, vertexShader), 
-							Shader3D.assembler.assemble(Context3DProgramType.FRAGMENT, fragmentShader));
-			super();
+			program.upload(Shader3D.assembler.assemble(Context3DProgramType.VERTEX, vs), 
+							Shader3D.assembler.assemble(Context3DProgramType.FRAGMENT, fs));
+			resize(_textures, width, height);
 		}
 		
-		override public function calculate():void {
+		override public function calculate(next:IPostEffect):void {
 			var context3d:Context3D = EngineBase.context3d;
-			if (_next) {
-				context3d.setRenderToTexture(_next.textures[0], _next.enableDepthAndStencil, _next.antiAlias);
+			if (next) {
+				context3d.setRenderToTexture(next.textures[0], next.enableDepthAndStencil, next.antiAlias);
 			} else {
 				context3d.setRenderToBackBuffer();
 			}

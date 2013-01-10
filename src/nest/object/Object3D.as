@@ -5,48 +5,10 @@ package nest.object
 	import flash.geom.Orientation3D;
 	import flash.geom.Vector3D;
 	
-	import nest.control.animation.AnimationClip;
-	
 	/**
 	 * Object3D
 	 */
 	public class Object3D extends EventDispatcher implements IObject3D {
-		
-		public static function localToGlobal(object:Object3D, target:Vector3D):Vector3D {
-			return object.worldMatrix.transformVector(target);
-		}
-		
-		public static function globalToLocal(object:Object3D, target:Vector3D):Vector3D {
-			return object.invertWorldMatrix.transformVector(target);
-		}
-		
-		public static function translate(object:Object3D, axis:Vector3D, value:Number):Vector3D {
-			var p:Vector3D = axis.clone();
-			p.scaleBy(value);
-			return object.worldMatrix.transformVector(p);
-		}
-		
-		public static function lookAt(object:Object3D, target:Vector3D, upAxis:Vector3D = null):Vector3D {
-			if (!upAxis) upAxis = Vector3D.Y_AXIS;
-			var zAxis:Vector3D = target.subtract(object.position);
-			zAxis.normalize();
-			var xAxis:Vector3D = zAxis.crossProduct(upAxis);
-			xAxis.normalize();
-			var yAxis:Vector3D = zAxis.crossProduct(xAxis);
-			yAxis.normalize();
-			// TODO: 检查本地matrix是否正确
-			var scale:Vector3D = object.matrix.decompose()[2];
-			var rawData:Vector.<Number> = Vector.<Number>([scale.x * xAxis.x, scale.x * xAxis.y, scale.x * xAxis.z, 0,
-														   scale.y * yAxis.x, scale.y * yAxis.y, scale.y * yAxis.z, 0,
-														   scale.z * zAxis.x, scale.z * zAxis.y, scale.z * zAxis.z, 0,
-														   object.position.x, object.position.y, object.position.z, 1]);
-			var matrix:Matrix3D = new Matrix3D(rawData);
-			var result:Vector3D = matrix.decompose()[2];
-			if (zAxis.z < 0) {
-				result.setTo(result.x - Math.PI, Math.PI - result.y , result.z - Math.PI);
-			}
-			return result;
-		}
 		
 		public var name:String;
 		
@@ -58,8 +20,6 @@ package nest.object
 		protected var _invertMatrix:Matrix3D;
 		protected var _worldMatrix:Matrix3D;
 		protected var _invertWorldMatrix:Matrix3D;
-		
-		protected var _clips:Vector.<AnimationClip>;
 		
 		protected var _parent:IContainer3D;
 		
@@ -75,6 +35,9 @@ package nest.object
 			_invertWorldMatrix = new Matrix3D();
 		}
 		
+		/**
+		 * Call this when you changed object3d's transform matrix.
+		 */
 		public function decompose():void {
 			_components = _matrix.decompose(_orientation);
 			_invertMatrix.copyFrom(_matrix);
@@ -87,6 +50,9 @@ package nest.object
 			}
 		}
 		
+		/**
+		 * Call this when your changed object3d's parent, position, rotation vector or orientation type.
+		 */
 		public function recompose():void {
 			_matrix.recompose(_components, _orientation);
 			_invertMatrix.copyFrom(_matrix);
@@ -111,18 +77,35 @@ package nest.object
 			return _components[1];
 		}
 		
+		public function get scale():Vector3D {
+			return _components[2];
+		}
+		
+		/**
+		 * You can call matrix's function to transform this object3d.
+		 * <p>matrix.appendTranslation ... </p>
+		 */
 		public function get matrix():Matrix3D {
 			return _matrix;
 		}
 		
+		/**
+		 * Do not change this, use matrix instead.
+		 */
 		public function get invertMatrix():Matrix3D {
 			return _invertMatrix;
 		}
 		
+		/**
+		 * Do not change this, use matrix instead.
+		 */
 		public function get worldMatrix():Matrix3D {
 			return _worldMatrix;
 		}
 		
+		/**
+		 * Do not change this, use matrix instead.
+		 */
 		public function get invertWorldMatrix():Matrix3D {
 			return _invertWorldMatrix;
 		}
@@ -141,18 +124,6 @@ package nest.object
 		
 		public function set parent(value:IContainer3D):void {
 			_parent = value;
-			recompose();
-		}
-		
-		public function get clips():Vector.<AnimationClip> {
-			return _clips;
-		}
-		
-		public function set clips(value:Vector.<AnimationClip>):void {
-			for each(var clip:AnimationClip in value) {
-				if(clip) clip.target = this;
-			}
-			_clips = value;
 		}
 		
 	}

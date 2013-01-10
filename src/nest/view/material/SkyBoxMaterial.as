@@ -3,8 +3,9 @@ package nest.view.material
 	import flash.display.BitmapData;
 	import flash.display3D.Context3D;
 	import flash.display3D.Context3DProgramType;
+	import flash.display3D.Program3D;
 	
-	import nest.view.Shader3D;
+	import nest.control.factory.ShaderFactory;
 	
 	/**
 	 * SkyBoxMaterial
@@ -12,12 +13,11 @@ package nest.view.material
 	public class SkyBoxMaterial implements IMaterial {
 		
 		protected var _cubicmap:CubeTextureResource;
-		protected var _shader:Shader3D;
+		protected var _program:Program3D;
 		
 		public function SkyBoxMaterial(cubicmap:Vector.<BitmapData>) {
 			_cubicmap = new CubeTextureResource();
 			_cubicmap.data = cubicmap;
-			_shader = new Shader3D();
 		}
 		
 		public function upload(context3d:Context3D):void {
@@ -28,13 +28,16 @@ package nest.view.material
 			context3d.setTextureAt(0, null);
 		}
 		
-		public function update():void {
-			_shader.setFromString("m44 op, va0, vc0\nmov v0, va0\n", 
-								"tex oc, v0, fs0 <cube,linear,miplinear>\n", false);
+		public function comply(context3d:Context3D):void {
+			if (!_program) _program = context3d.createProgram();
+			_program.upload(
+				ShaderFactory.assembler.assemble(Context3DProgramType.VERTEX, "m44 op, va0, vc0\nmov v0, va0\n"), 
+				ShaderFactory.assembler.assemble(Context3DProgramType.FRAGMENT, "tex oc, v0, fs0 <cube,linear,miplinear>\n")
+			);
 		}
 		
 		public function dispose():void {
-			_shader.program.dispose();
+			_program.dispose();
 			_cubicmap.dispose();
 			_cubicmap = null;
 		}
@@ -47,12 +50,16 @@ package nest.view.material
 			return false;
 		}
 		
+		public function get normal():Boolean {
+			return false;
+		}
+		
 		public function get cubicmap():CubeTextureResource {
 			return _cubicmap;
 		}
 		
-		public function get shader():Shader3D {
-			return _shader;
+		public function get program():Program3D {
+			return _program;
 		}
 		
 	}

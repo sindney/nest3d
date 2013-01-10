@@ -8,7 +8,6 @@ package nest.view.effect
 	import flash.display3D.IndexBuffer3D;
 	import flash.display3D.Program3D;
 	import flash.display3D.VertexBuffer3D;
-	import nest.control.factory.AGAL;
 	
 	import nest.control.EngineBase;
 	import nest.view.Shader3D;
@@ -31,7 +30,7 @@ package nest.view.effect
 		private var _blurX:Number;
 		private var _blurY:Number;
 		
-		public function Blur(blurX:Number = 3, blurY:Number = 3) {
+		public function Blur(width:int = 512, height:Number = 512, blurX:Number = 3, blurY:Number = 3) {
 			var context3d:Context3D = EngineBase.context3d;
 			var vertexData:Vector.<Number> = Vector.<Number>([-1, 1, 0, -1, -1, 0, 1, -1, 0, 1, 1, 0]);
 			var uvData:Vector.<Number> = Vector.<Number>([0, 0, 0, 1, 1, 1, 1, 0]);
@@ -49,13 +48,13 @@ package nest.view.effect
 			_blurX = blurX;
 			_blurY = blurY;
 			update();
-			super();
+			resize(_textures, width, height);
 		}
 		
-		override public function calculate():void {
+		override public function calculate(next:IPostEffect):void {
 			var context3d:Context3D = EngineBase.context3d;
-			if (_next) {
-				context3d.setRenderToTexture(_next.textures[0], _next.enableDepthAndStencil, _next.antiAlias);
+			if (next) {
+				context3d.setRenderToTexture(next.textures[0], next.enableDepthAndStencil, next.antiAlias);
 			} else {
 				context3d.setRenderToBackBuffer();
 			}
@@ -112,33 +111,28 @@ package nest.view.effect
 			data[4] = stepX * invW;
 			data[5] = stepY * invH;
 			
-			AGAL.clear();
-			AGAL.mov(AGAL.OP, AGAL.POS_ATTRIBUTE);
-			AGAL.mov("v0", AGAL.UV_ATTRIBUTE);
-			var vertexShader:String = AGAL.code;
+			var vs:String = "mov op, va0\n" + 
+							"mov v0, va1\n";
 			
-			AGAL.clear();
-			AGAL.mov("ft0", "v0");
-			AGAL.sub("ft0.y", "v0.y", "fc0.y");
+			var fs:String = "mov ft0, v0\n" + 
+							"sub ft0.y, v0.y, fc0.y\n";
 			for (y = 0; y < _blurY; y += stepY) {
-				if (y > 0) AGAL.sub("ft0.x", "v0.x", "fc0.x");
+				if (y > 0) fs += "sub ft0.x, v0.x, fc0.x\n";
 				for (x = 0; x < _blurX; x += stepX) {
-					if (x == 0 && y == 0)
-						AGAL.tex("ft1", "ft0", "fs0");
-					else{
-						AGAL.tex("ft2", "ft0", "fs0");
-						AGAL.add("ft1", "ft1", "ft2");
+					if (x == 0 && y == 0) {
+						fs += "tex ft1, ft0, fs0 <2d, nearest, clamp, mipnone>\n";
+					} else {
+						fs += "tex ft2, ft0, fs0 <2d, nearest, clamp, mipnone>\n" + 
+								"add ft1, ft1, ft2\n";
 					}
-					if (x < _blurX)
-						AGAL.add("ft0.x", "ft0.x", "fc1.x");
+					if (x < _blurX) fs += "add ft0.x, ft0.x, fc1.x\n";
 				}
-				if (y < _blurY) AGAL.add("ft0.y", "ft0.y", "fc1.y");
+				if (y < _blurY) fs += "add ft0.y, ft0.y, fc1.y\n";
 			}
-			AGAL.mul(AGAL.OC, "ft1", "fc0.z");
-			var fragmentShader2:String = AGAL.code;
+			fs += "mul oc, ft1, fc0.z\n";
 			
-			program.upload(Shader3D.assembler.assemble(Context3DProgramType.VERTEX, vertexShader), 
-							Shader3D.assembler.assemble(Context3DProgramType.FRAGMENT, fragmentShader2));
+			program.upload(Shader3D.assembler.assemble(Context3DProgramType.VERTEX, vs), 
+							Shader3D.assembler.assemble(Context3DProgramType.FRAGMENT, fs));
 		}
 		
 		///////////////////////////////////
