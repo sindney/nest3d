@@ -11,6 +11,7 @@ package nest.view.process
 	import nest.object.IMesh;
 	import nest.object.IObject3D;
 	import nest.view.Camera3D;
+	import nest.view.ViewPort;
 	
 	/**
 	 * ContainerProcess
@@ -50,7 +51,8 @@ package nest.view.process
 			this.color = color;
 		}
 		
-		override public function calculate(context3d:Context3D, next:IRenderProcess):void {
+		override public function calculate(next:IRenderProcess):void {
+			var context3d:Context3D = ViewPort.context3d;
 			var containers:Vector.<IContainer3D> = new Vector.<IContainer3D>();
 			var container:IContainer3D = _container;
 			var object:IObject3D;
@@ -80,7 +82,7 @@ package nest.view.process
 			}
 			if (_clear) context3d.clear(_rgba[0], _rgba[1], _rgba[2], _rgba[3]);
 			
-			_meshProcess.initialize(context3d);
+			_meshProcess.initialize();
 			
 			while (container) {
 				if (!container.visible) {
@@ -98,7 +100,7 @@ package nest.view.process
 								_numVertices += mesh.geom.numVertices;
 								_numTriangles += mesh.geom.numTriangles;
 								_numObjects++;
-								_meshProcess.calculate(context3d, mesh, ivm, pm);
+								_meshProcess.calculate(mesh, ivm, pm);
 								_objects.push(mesh);
 								if (mesh.cliping)_excludedObjects.push(mesh);
 							} else {

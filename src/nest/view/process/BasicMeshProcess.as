@@ -9,6 +9,7 @@ package nest.view.process
 	import nest.object.IMesh;
 	import nest.view.material.EnvMapMaterial;
 	import nest.view.Camera3D;
+	import nest.view.ViewPort;
 	
 	/**
 	 * BasicMeshProcess
@@ -21,16 +22,17 @@ package nest.view.process
 			_camera = camera;
 		}
 		
-		public function initialize(context3d:Context3D):void {
+		public function initialize():void {
 			var position:Vector.<Number> = new Vector.<Number>(4, true);
 			position[0] = _camera.position.x;
 			position[1] = _camera.position.y;
 			position[2] = _camera.position.z;
 			position[3] = 1;
-			context3d.setProgramConstantsFromVector(Context3DProgramType.VERTEX, 8, position);
+			ViewPort.context3d.setProgramConstantsFromVector(Context3DProgramType.VERTEX, 8, position);
 		}
 		
-		public function calculate(context3d:Context3D, mesh:IMesh, ivm:Matrix3D, pm:Matrix3D):void {
+		public function calculate(mesh:IMesh, ivm:Matrix3D, pm:Matrix3D):void {
+			var context3d:Context3D = ViewPort.context3d;
 			var components:Vector.<Vector3D>;
 			var matrix:Matrix3D = new Matrix3D();
 			
@@ -47,14 +49,14 @@ package nest.view.process
 			
 			context3d.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 0, matrix, true);
 			
-			/*if (mesh.material is EnvMapMaterial) {
+			if (mesh.material is EnvMapMaterial) {
 				matrix.copyFrom(mesh.worldMatrix);
 				components = matrix.decompose();
 				components[0].setTo(0, 0, 0);
 				components[2].setTo(1, 1, 1);
 				matrix.recompose(components);
 				context3d.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 10, matrix, true);
-			}*/
+			}
 			
 			matrix.copyFrom(mesh.invertWorldMatrix);
 			matrix.appendScale(mesh.scale.x, mesh.scale.y, mesh.scale.z);
@@ -62,14 +64,14 @@ package nest.view.process
 			context3d.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 4, matrix, true);
 			context3d.setProgramConstantsFromMatrix(Context3DProgramType.FRAGMENT, 24, matrix, true);
 			
-			mesh.material.upload(context3d);
-			mesh.geom.upload(context3d, mesh.material.uv, mesh.material.normal);
+			mesh.material.upload();
+			mesh.geom.upload(mesh.material.uv, mesh.material.normal);
 			
 			context3d.setProgram(mesh.material.program);
 			context3d.drawTriangles(mesh.geom.indexBuffer);
 			
-			mesh.material.unload(context3d);
-			mesh.geom.unload(context3d);
+			mesh.material.unload();
+			mesh.geom.unload();
 		}
 		
 		///////////////////////////////////

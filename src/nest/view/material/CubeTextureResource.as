@@ -4,7 +4,7 @@ package nest.view.material
 	import flash.display3D.Context3DTextureFormat;
 	import flash.display3D.textures.CubeTexture;
 	
-	import nest.control.EngineBase;
+	import nest.view.ViewPort;
 	
 	/**
 	 * CubeTextureResource
@@ -54,7 +54,14 @@ package nest.view.material
 			if (_data != value) {
 				if (value) {
 					if (!_data || data[0].width != value[0].width || data[0].height != value[0].height) {
-						_texture = EngineBase.context3d.createCubeTexture(value[0].width, Context3DTextureFormat.BGRA, false);
+						if (_texture)_texture.dispose();
+						_texture = ViewPort.context3d.createCubeTexture(value[0].width, Context3DTextureFormat.BGRA, false);
+						TextureResource.uploadWithMipmaps(_texture, value[0], 0);
+						TextureResource.uploadWithMipmaps(_texture, value[1], 1);
+						TextureResource.uploadWithMipmaps(_texture, value[2], 2);
+						TextureResource.uploadWithMipmaps(_texture, value[3], 3);
+						TextureResource.uploadWithMipmaps(_texture, value[4], 4);
+						TextureResource.uploadWithMipmaps(_texture, value[5], 5);
 					}
 				} else {
 					if (_texture) _texture.dispose();

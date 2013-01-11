@@ -7,6 +7,7 @@ package nest.view.material
 	
 	import nest.control.factory.ShaderFactory;
 	import nest.view.light.*;
+	import nest.view.ViewPort;
 	
 	/**
 	 * TextureMaterial
@@ -38,9 +39,11 @@ package nest.view.material
 			_specular.data = specular;
 			_normalmap = new TextureResource();
 			_normalmap.data = normalmap;
+			_program = ViewPort.context3d.createProgram();
 		}
 		
-		public function upload(context3d:Context3D):void {
+		public function upload():void {
+			var context3d:Context3D = ViewPort.context3d;
 			var i:int, j:int = 1;
 			var light:ILight;
 			var l:int = _lights.length;
@@ -74,13 +77,14 @@ package nest.view.material
 			context3d.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, 23, _fragData);
 		}
 		
-		public function unload(context3d:Context3D):void {
+		public function unload():void {
+			var context3d:Context3D = ViewPort.context3d;
 			context3d.setTextureAt(0, null);
 			if (_specular.texture) context3d.setTextureAt(1, null);
 			if (_normalmap.texture) context3d.setTextureAt(2, null);
 		}
 		
-		public function comply(context3d:Context3D):void {
+		public function comply():void {
 			var normal:Boolean = _lights.length > 0;
 			var normalmap:Boolean = _normalmap.texture != null;
 			var specular:Boolean = specular.texture != null;
@@ -134,8 +138,6 @@ package nest.view.material
 			fragment += ShaderFactory.createLight(_lights, specular, normalmap);
 			fragment += "sub ft0.w, ft0.w, fc23.z\nkil ft0.w\n";
 			fragment += "mov oc, ft0\n";
-			
-			if (!_program) _program = context3d.createProgram();
 			
 			_program.upload(
 				ShaderFactory.assembler.assemble(Context3DProgramType.VERTEX, vertex), 

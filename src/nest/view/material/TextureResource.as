@@ -7,7 +7,7 @@ package nest.view.material
 	import flash.display3D.textures.TextureBase;
 	import flash.geom.Matrix;
 	
-	import nest.control.EngineBase;
+	import nest.view.ViewPort;
 	
 	/**
 	 * TextureResource
@@ -44,11 +44,6 @@ package nest.view.material
 			
 		}
 		
-		public function upload():void {
-			if (!_texture) return;
-			_mipmapping ? uploadWithMipmaps(_texture, _data) : _texture.uploadFromBitmapData(_data);
-		}
-		
 		public function dispose():void {
 			if (_texture) _texture.dispose();
 			if (_data) _data.dispose();
@@ -68,7 +63,9 @@ package nest.view.material
 			if (_data != value) {
 				if (value) {
 					if (!_data || _data.width != value.width || _data.height != value.height) {
-						_texture = EngineBase.context3d.createTexture(value.width, value.height, Context3DTextureFormat.BGRA, false);
+						if (_texture)_texture.dispose();
+						_texture = ViewPort.context3d.createTexture(value.width, value.height, Context3DTextureFormat.BGRA, false);
+						_mipmapping ? uploadWithMipmaps(_texture, value) : _texture.uploadFromBitmapData(value);
 					}
 				} else {
 					if(_texture) _texture.dispose();
@@ -83,7 +80,10 @@ package nest.view.material
 		}
 		
 		public function set mipmapping(value:Boolean):void {
-			_mipmapping = value;
+			if (_mipmapping != value) {
+				_mipmapping = value;
+				if (_data) _mipmapping ? uploadWithMipmaps(_texture, _data) : _texture.uploadFromBitmapData(_data);
+			}
 		}
 		
 		public function get texture():Texture {

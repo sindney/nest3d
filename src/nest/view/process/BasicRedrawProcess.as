@@ -4,6 +4,7 @@ package nest.view.process
 	import flash.geom.Matrix3D;
 	
 	import nest.object.IMesh;
+	import nest.view.ViewPort;
 	
 	/**
 	 * BasicRedrawProcess
@@ -17,12 +18,13 @@ package nest.view.process
 			
 		}
 		
-		public function calculate(context3d:Context3D, next:IRenderProcess):void {
+		public function calculate(next:IRenderProcess):void {
+			var context3d:Context3D = ViewPort.context3d;
 			var object:IMesh;
 			
 			context3d.setRenderToTexture(_texture, _enableDepthAndStencil, _antiAlias);
-			context3d.clear(_containerProcess.rgba[0], _containerProcess.rgba[1], 
-							_containerProcess.rgba[2], _containerProcess.rgba[3]);
+			if (_clear) context3d.clear(_containerProcess.rgba[0], _containerProcess.rgba[1], 
+										_containerProcess.rgba[2], _containerProcess.rgba[3]);
 			
 			_meshProcess.initialize();
 			for each(object in _containerProcess.objects) {

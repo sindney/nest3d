@@ -6,6 +6,8 @@ package nest.object.geom
 	import flash.display3D.VertexBuffer3D;
 	import flash.geom.Vector3D;
 	
+	import nest.view.ViewPort;
+	
 	/**
 	 * Geometry
 	 */
@@ -193,7 +195,8 @@ package nest.object.geom
 			_changed = true;
 		}
 		
-		public function upload(context3d:Context3D, uv:Boolean, normal:Boolean):void {
+		public function upload(uv:Boolean, normal:Boolean):void {
+			var context3d:Context3D = ViewPort.context3d;
 			if (_changed) {
 				_changed = false;
 				if (_vertexBuffer)_vertexBuffer.dispose();
@@ -214,7 +217,8 @@ package nest.object.geom
 			if (normal) context3d.setVertexBufferAt(2, _normalBuffer, 0, Context3DVertexBufferFormat.FLOAT_3);
 		}
 		
-		public function unload(context3d:Context3D):void {
+		public function unload():void {
+			var context3d:Context3D = ViewPort.context3d;
 			context3d.setVertexBufferAt(0, null, 0, Context3DVertexBufferFormat.FLOAT_3);
 			context3d.setVertexBufferAt(1, null, 0, Context3DVertexBufferFormat.FLOAT_2);
 			context3d.setVertexBufferAt(2, null, 0, Context3DVertexBufferFormat.FLOAT_3);

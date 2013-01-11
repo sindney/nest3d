@@ -1,6 +1,5 @@
 package nest.view.material 
 {
-	import flash.display3D.Context3D;
 	import flash.display3D.Program3D;
 	
 	/**
@@ -8,10 +7,10 @@ package nest.view.material
 	 */
 	public interface IMaterial {
 		
-		function upload(context3d:Context3D):void;
-		function unload(context3d:Context3D):void;
+		function upload():void;
+		function unload():void;
 		
-		function comply(context3d:Context3D):void;
+		function comply():void;
 		
 		function dispose():void;
 		

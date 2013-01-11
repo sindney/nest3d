@@ -6,6 +6,7 @@ package nest.view.material
 	import flash.display3D.Program3D;
 	
 	import nest.control.factory.ShaderFactory;
+	import nest.view.ViewPort;
 	
 	/**
 	 * SkyBoxMaterial
@@ -18,18 +19,18 @@ package nest.view.material
 		public function SkyBoxMaterial(cubicmap:Vector.<BitmapData>) {
 			_cubicmap = new CubeTextureResource();
 			_cubicmap.data = cubicmap;
+			_program = ViewPort.context3d.createProgram();
 		}
 		
-		public function upload(context3d:Context3D):void {
-			context3d.setTextureAt(0, _cubicmap.texture);
+		public function upload():void {
+			ViewPort.context3d.setTextureAt(0, _cubicmap.texture);
 		}
 		
-		public function unload(context3d:Context3D):void {
-			context3d.setTextureAt(0, null);
+		public function unload():void {
+			ViewPort.context3d.setTextureAt(0, null);
 		}
 		
 		public function comply(context3d:Context3D):void {
-			if (!_program) _program = context3d.createProgram();
 			_program.upload(
 				ShaderFactory.assembler.assemble(Context3DProgramType.VERTEX, "m44 op, va0, vc0\nmov v0, va0\n"), 
 				ShaderFactory.assembler.assemble(Context3DProgramType.FRAGMENT, "tex oc, v0, fs0 <cube,linear,miplinear>\n")

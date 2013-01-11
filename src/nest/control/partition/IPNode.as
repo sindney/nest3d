@@ -1,4 +1,4 @@
-package nest.view.partition 
+package nest.control.partition 
 {
 	import nest.object.IMesh;
 	

@@ -6,6 +6,7 @@ package nest.view.material
 	
 	import nest.control.factory.ShaderFactory;
 	import nest.view.light.*;
+	import nest.view.ViewPort;
 	
 	/**
 	 * ColorMaterial
@@ -22,10 +23,12 @@ package nest.view.material
 		public function ColorMaterial(color:uint = 0xffffffff) {
 			_rgba = new Vector.<Number>(4, true);
 			_lights = new Vector.<ILight>();
+			_program = ViewPort.context3d.createProgram();
 			this.color = color;
 		}
 		
-		public function upload(context3d:Context3D):void {
+		public function upload():void {
+			var context3d:Context3D = ViewPort.context3d;
 			var i:int, j:int = 1;
 			var light:ILight;
 			var l:int = _lights.length;
@@ -53,11 +56,11 @@ package nest.view.material
 			context3d.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, 23, _rgba);
 		}
 		
-		public function unload(context3d:Context3D):void {
+		public function unload():void {
 			
 		}
 		
-		public function comply(context3d:Context3D):void {
+		public function comply():void {
 			var normal:Boolean = _lights.length > 0;
 			var vertex:String = "m44 op, va0, vc0\n" + 
 								"mov v0, va0\n" + 
@@ -73,8 +76,6 @@ package nest.view.material
 			var fragment:String = "mov ft7, fc23\n";
 			fragment += ShaderFactory.createLight(_lights);
 			fragment += "mov oc, ft0\n";
-			
-			if (!_program) _program = context3d.createProgram();
 			
 			_program.upload(
 				ShaderFactory.assembler.assemble(Context3DProgramType.VERTEX, vertex), 

@@ -11,15 +11,22 @@ package nest.view
 	 */
 	public class ViewPort extends EventDispatcher {
 		
-		private var _context3d:Context3D;
+		public static var output:String = "";
+		
+		private static var _context3d:Context3D;
+		
+		public static function get context3d():Context3D {
+			return _context3d;
+		}
+		
 		private var _processes:Vector.<IRenderProcess>;
 		
 		private var _diagram:Diagram;
 		
-		public function ViewPort(context3d:Context3D) {
-			_processes = new Vector.<IRenderProcess>();
+		public function ViewPort(context3d:Context3D, processes:Vector.<IRenderProcess>) {
 			_diagram = new Diagram();
-			this.context3d = context3d;
+			_context3d = context3d;
+			this.processes = processes;
 		}
 		
 		/**
@@ -31,7 +38,7 @@ package nest.view
 			
 			for (i = 0; i < j; i++) {
 				process = _processes[i];
-				process.calculate(_context3d, (i + 1 < j) ? _processes[i + 1] : null);
+				process.calculate((i + 1 < j) ? _processes[i + 1] : null);
 			}
 			
 			_diagram.update();
@@ -44,16 +51,12 @@ package nest.view
 		// getter/setters
 		///////////////////////////////////
 		
-		public function get context3d():Context3D {
-			return _context3d;
-		}
-		
-		public function set context3d(value:Context3D):void {
-			_context3d = value;
-		}
-		
 		public function get processes():Vector.<IRenderProcess> {
 			return _processes;
+		}
+		
+		public function set processes(value:Vector.<IRenderProcess>):void {
+			_processes = value;
 		}
 		
 		public function get diagram():Diagram {

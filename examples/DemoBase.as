@@ -9,6 +9,7 @@ package
 	import flash.display.StageScaleMode;
 	import flash.events.Event;
 	import flash.events.MouseEvent;
+	import nest.view.process.IRenderProcess;
 	
 	import nest.control.controller.CameraController;
 	import nest.view.Camera3D;
@@ -47,7 +48,7 @@ package
 			context3d.setBlendFactors(Context3DBlendFactor.ONE, Context3DBlendFactor.ZERO);
 			context3d.setDepthTest(true, Context3DCompareMode.LESS);
 			
-			view = new ViewPort(context3d);
+			view = new ViewPort(context3d, new Vector.<IRenderProcess>());
 			addChild(view.diagram);
 			
 			camera = new Camera3D();
@@ -92,7 +93,7 @@ package
 		}
 		
 		protected function onResize(e:Event):void {
-			view.context3d.configureBackBuffer(stage.stageWidth, stage.stageHeight, 0);
+			ViewPort.context3d.configureBackBuffer(stage.stageWidth, stage.stageHeight, 0);
 			camera.aspect = stage.stageWidth / stage.stageHeight;
 			camera.update();
 		}

@@ -24,13 +24,13 @@ package
 			
 			process0 = new ContainerProcess(camera, container);
 			process0.meshProcess = new BasicMeshProcess(camera);
-			process0.color = 0x0066ff;
+			process0.color = 0xff000000;
 			
 			view.processes.push(process0);
 			
 			var geom:Geometry = PrimitiveFactory.createBox(1, 1, 1);
 			var material:ColorMaterial = new ColorMaterial();
-			material.comply(view.context3d);
+			material.comply();
 			var mesh:Mesh;
 			
 			var i:int, j:int, k:int = 0;

@@ -1,6 +1,5 @@
 package nest.view.process 
 {
-	import flash.display3D.Context3D;
 	import flash.display3D.textures.TextureBase;
 	
 	/**
@@ -8,7 +7,7 @@ package nest.view.process
 	 */
 	public interface IRenderProcess {
 		
-		function calculate(context3d:Context3D, next:IRenderProcess):void;
+		function calculate(next:IRenderProcess):void;
 		
 		function dispose():void;
 		
