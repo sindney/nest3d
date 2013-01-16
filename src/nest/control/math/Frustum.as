@@ -25,15 +25,15 @@ package nest.control.math
 			var fTL:Vector3D, fTR:Vector3D, fBL:Vector3D, fBR:Vector3D;
 			var vn:Vector3D, vf:Vector3D;
 			
-			const r:Number = Math.tan(angle * 0.5);
-			const nH:Number = near * r;
-			const nW:Number = nH * ratio;
-			const fH:Number = far * r;
-			const fW:Number = fH * ratio;
+			var r:Number = Math.tan(angle * 0.5);
+			var nH:Number = near * r;
+			var nW:Number = nH * ratio;
+			var fH:Number = far * r;
+			var fW:Number = fH * ratio;
 			
-			const zv:Vector3D = new Vector3D(0, 0, -1);
-			const xv:Vector3D = new Vector3D( -1, 0, 0);
-			const yv:Vector3D = new Vector3D(0, 1, 0);
+			var zv:Vector3D = new Vector3D(0, 0, -1);
+			var xv:Vector3D = new Vector3D( -1, 0, 0);
+			var yv:Vector3D = new Vector3D(0, 1, 0);
 			
 			vn = scaleVector(zv, near);
 			vn.negate();
@@ -85,34 +85,35 @@ package nest.control.math
 		}
 		
 		public function classifyAABB(vertices:Vector.<Vector3D>):Boolean {
-			const near:Boolean = findIntersection(vertices, planes[4]);
-			const far:Boolean = findIntersection(vertices, planes[5]);
+			var length:int = vertices.length;
+			var near:Boolean = findIntersection(vertices, length, planes[4]);
+			var far:Boolean = findIntersection(vertices, length, planes[5]);
 			if (near != far) return false;
-			const left:Boolean = findIntersection(vertices, planes[2]);
-			const right:Boolean = findIntersection(vertices, planes[3]);
+			var left:Boolean = findIntersection(vertices, length, planes[2]);
+			var right:Boolean = findIntersection(vertices, length, planes[3]);
 			if (left != right) return false;
-			const top:Boolean = findIntersection(vertices, planes[0]);
-			const bottom:Boolean = findIntersection(vertices, planes[1]);
+			var top:Boolean = findIntersection(vertices, length, planes[0]);
+			var bottom:Boolean = findIntersection(vertices, length, planes[1]);
 			if (top != bottom) return false;
 			return true;
 		}
 		
-		private function findIntersection(vertices:Vector.<Vector3D>, plane:Plane):Boolean {
-			const index:int = findNearestPoint(vertices, plane);
-			const v0:Vector3D = vertices[index];
-			const v1:Vector3D = vertices[findFarestPoint(vertices, plane, index)];
-			const a:Boolean = plane.getDistance(v0) > 0;
-			const b:Boolean = plane.getDistance(v1) > 0;
+		private function findIntersection(vertices:Vector.<Vector3D>, length:int, plane:Plane):Boolean {
+			var index:int = findNearestPoint(vertices, length, plane);
+			var v0:Vector3D = vertices[index];
+			var v1:Vector3D = vertices[findFarestPoint(vertices, length, plane, index)];
+			var a:Boolean = plane.getDistance(v0) > 0;
+			var b:Boolean = plane.getDistance(v1) > 0;
 			
 			if (!a && !b) return false;
 			return true;
 		}
 		
-		private function findNearestPoint(vertices:Vector.<Vector3D>, plane:Plane):int {
+		private function findNearestPoint(vertices:Vector.<Vector3D>, length:int, plane:Plane):int {
 			var i:int, index:int;
 			var j:int, k:int;
 			var v:Vector3D;
-			for (i = 0; i < 8; i++) {
+			for (i = 0; i < length; i++) {
 				v = vertices[i];
 				j = Math.abs(plane.getDistance(v));
 				if (!k) {
@@ -127,11 +128,11 @@ package nest.control.math
 			return index;
 		}
 		
-		private function findFarestPoint(vertices:Vector.<Vector3D>, plane:Plane, p:int):int {
+		private function findFarestPoint(vertices:Vector.<Vector3D>, length:int, plane:Plane, p:int):int {
 			var i:int, index:int;
 			var j:int, k:int, l:int = plane.getDistance(vertices[p]);
 			var v:Vector3D;
-			for (i = 0; i < 8; i++) {
+			for (i = 0; i < length; i++) {
 				if (i != p) {
 					v = vertices[i];
 					j = plane.getDistance(v);

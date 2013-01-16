@@ -1,17 +1,14 @@
 package  
 {
-	import flash.display3D.Context3D;
-	import flash.display3D.Context3DBlendFactor;
-	import flash.display3D.Context3DCompareMode;
 	import flash.display.Sprite;
 	import flash.display.Stage3D;
 	import flash.display.StageAlign;
 	import flash.display.StageScaleMode;
 	import flash.events.Event;
 	import flash.events.MouseEvent;
-	import nest.view.process.IRenderProcess;
 	
 	import nest.control.controller.CameraController;
+	import nest.view.process.IRenderProcess;
 	import nest.view.Camera3D;
 	import nest.view.ViewPort;
 	
@@ -42,13 +39,8 @@ package
 		protected function onContext3DCreated(e:Event):void {
 			stage3d.removeEventListener(Event.CONTEXT3D_CREATE, onContext3DCreated);
 			
-			var context3d:Context3D = stage3d.context3D;
-			
-			context3d.configureBackBuffer(stage.stageWidth, stage.stageHeight, 0);
-			context3d.setBlendFactors(Context3DBlendFactor.ONE, Context3DBlendFactor.ZERO);
-			context3d.setDepthTest(true, Context3DCompareMode.LESS);
-			
-			view = new ViewPort(context3d, new Vector.<IRenderProcess>());
+			view = new ViewPort(stage3d.context3D, new Vector.<IRenderProcess>());
+			view.configure(stage.stageWidth, stage.stageHeight);
 			addChild(view.diagram);
 			
 			camera = new Camera3D();
@@ -93,7 +85,7 @@ package
 		}
 		
 		protected function onResize(e:Event):void {
-			ViewPort.context3d.configureBackBuffer(stage.stageWidth, stage.stageHeight, 0);
+			view.configure(stage.stageWidth, stage.stageHeight);
 			camera.aspect = stage.stageWidth / stage.stageHeight;
 			camera.update();
 		}

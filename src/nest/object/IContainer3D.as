@@ -1,6 +1,6 @@
 package nest.object 
 {
-	//import nest.view.partition.IPTree;
+	import nest.control.partition.IPTree;
 	
 	/**
 	 * Container3D Interface
@@ -17,8 +17,8 @@ package nest.object
 		
 		function get objects():Vector.<IObject3D>;
 		
-		//function get partition():IPTree;
-		//function set partition(value:IPTree):void;
+		function get partition():IPTree;
+		function set partition(value:IPTree):void;
 		
 		function get visible():Boolean;
 		function set visible(value:Boolean):void;

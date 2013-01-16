@@ -2,6 +2,8 @@ package nest.control.math
 {
 	import flash.geom.Vector3D;
 	
+	import nest.object.geom.AABB;
+	import nest.object.geom.BSphere;
 	import nest.object.geom.Geometry;
 	import nest.object.geom.Triangle;
 	import nest.object.geom.Vertex;
@@ -83,39 +85,31 @@ package nest.control.math
 		///////////////////////////////////
 		
 		public static function AABB_BSphere(max:Vector3D, min:Vector3D, center:Vector3D, r:Number):Boolean {
-			const r2:Number = r * r;
-			const a:Vector3D = new Vector3D();
+			var x:Number = center.x, y:Number = center.y, z:Number = center.z;
 			
-			if (center.x < min.x) {
-				a.x = min.x;
-			} else if (center.x > max.x) {
-				a.x = max.x;
-			} else {
-				a.x = center.x;
+			if (x < min.x) {
+				x = min.x;
+			} else if (x > max.x) {
+				x = max.x;
 			}
 			
-			if (center.y < min.y) {
-				a.y = min.y;
-			} else if (center.y > max.y) {
-				a.y = max.y;
-			} else {
-				a.y = center.y;
+			if (y < min.y) {
+				y = min.y;
+			} else if (y > max.y) {
+				y = max.y;
 			}
 			
-			if (center.z < min.z) {
-				a.z = min.z;
-			} else if (center.z > max.z) {
-				a.z = max.z;
-			} else {
-				a.z = center.z;
+			if (z < min.z) {
+				z = min.z;
+			} else if (z > max.z) {
+				z = max.z;
 			}
 			
-			const x:Number = a.x - center.x;
-			const y:Number = a.y - center.y;
-			const z:Number = a.z - center.z;
-			const d:Number = x * x + y * y + z * z;
+			x -= center.x;
+			y -= center.y;
+			z -= center.z;
 			
-			return d < r2;
+			return (x * x + y * y + z * z) <= (r * r);
 		}
 		
 		public static function AABB_AABB(max:Vector3D, min:Vector3D, max1:Vector3D, min1:Vector3D):Boolean {
@@ -129,11 +123,10 @@ package nest.control.math
 		}
 		
 		public static function BSphere_BSphere(center:Vector3D, r:Number, center1:Vector3D, r1:Number):Boolean {
-			const x:Number = center.x - center1.x;
-			const y:Number = center.y - center1.y;
-			const z:Number = center.z - center1.z;
-			const d:Number = x * x + y * y + z * z;
-			return d < (r + r1) * (r + r1);
+			var x:Number = center.x - center1.x;
+			var y:Number = center.y - center1.y;
+			var z:Number = center.z - center1.z;
+			return (x * x + y * y + z * z) <= (r + r1) * (r + r1);
 		}
 		
 		///////////////////////////////////
@@ -146,8 +139,8 @@ package nest.control.math
 		 * <p>result.w == 1 means they're intersected.</p>
 		 */
 		public static function Ray_BSphere(result:Vector3D, orgion:Vector3D, delta:Vector3D, bsphere:BSphere):void {
-			const e:Vector3D = new Vector3D(bsphere.center.x - orgion.x, bsphere.center.y - orgion.y, bsphere.center.z - orgion.z);
-			const a:Number = e.dotProduct(delta) / delta.length;
+			var e:Vector3D = new Vector3D(bsphere.center.x - orgion.x, bsphere.center.y - orgion.y, bsphere.center.z - orgion.z);
+			var a:Number = e.dotProduct(delta) / delta.length;
 			var f:Number = bsphere.radius * bsphere.radius - e.lengthSquared + a * a;
 			if (f < 0) {
 				// no intersection.
@@ -273,14 +266,14 @@ package nest.control.math
 		 * <p>Graphics Gems I Dider Badouel.</p>
 		 */
 		public static function Ray_Triangle(orgion:Vector3D, delta:Vector3D, p0:Vertex, p1:Vertex, p2:Vertex, normal:Vector3D, minT:Number = 1):Number {
-			const dot:Number = normal.dotProduct(delta);
+			var dot:Number = normal.dotProduct(delta);
 			if (!(dot < 0)) return Number.MAX_VALUE;
-			const d:Number = normal.x * p0.x + normal.y * p0.y + normal.z * p0.z;
+			var d:Number = normal.x * p0.x + normal.y * p0.y + normal.z * p0.z;
 			var t:Number = d - normal.dotProduct(orgion);
 			if (!(t <= 0)) return Number.MAX_VALUE;
 			if (!(t >= dot * minT)) return Number.MAX_VALUE;
 			t = t / dot;
-			const p:Vector3D = new Vector3D();
+			var p:Vector3D = new Vector3D();
 			p.copyFrom(delta);
 			p.scaleBy(t);
 			p.x += orgion.x;
@@ -324,11 +317,11 @@ package nest.control.math
 			var tmp:Number = u1 * v2 - v1 * u2;
 			if (!(tmp != 0)) return Number.MAX_VALUE;
 			tmp = 1 / tmp;
-			const alpha:Number = (u0 * v2 - v0 * u2) * tmp;
+			var alpha:Number = (u0 * v2 - v0 * u2) * tmp;
 			if (!(alpha >= 0)) return Number.MAX_VALUE;
-			const beta:Number = (u1 * v0 - v1 * u0) * tmp;
+			var beta:Number = (u1 * v0 - v1 * u0) * tmp;
 			if (!(beta >= 0)) return Number.MAX_VALUE;
-			const gamma:Number = 1 - alpha - beta;
+			var gamma:Number = 1 - alpha - beta;
 			if (!(gamma >= 0)) return Number.MAX_VALUE;
 			return t;
 		}
@@ -348,9 +341,9 @@ package nest.control.math
 				var t:Number;
 				var triangle:Triangle;
 				for each(triangle in mesh.geom.triangles) {
-					t = Ray_Triangle(orgion, delta, mesh.data.vertices[triangle.index0], 
-													mesh.data.vertices[triangle.index1], 
-													mesh.data.vertices[triangle.index2], 
+					t = Ray_Triangle(orgion, delta, mesh.geom.vertices[triangle.index0], 
+													mesh.geom.vertices[triangle.index1], 
+													mesh.geom.vertices[triangle.index2], 
 													triangle.normal);
 					if (t <= 1) {
 						result.copyFrom(delta);

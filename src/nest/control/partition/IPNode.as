@@ -1,12 +1,16 @@
 package nest.control.partition 
 {
+	import flash.geom.Vector3D;
+	
 	import nest.object.IMesh;
+	import nest.view.Camera3D;
 	
 	/**
 	 * IPNode
 	 */
 	public interface IPNode {
 		
+		function classify(camera:Camera3D):Boolean;
 		function dispose():void;
 		
 		function get childs():Vector.<IPNode>;

@@ -2,45 +2,50 @@ package nest.control.partition
 {
 	import flash.geom.Vector3D;
 	
-	import nest.control.EngineBase;
 	import nest.object.IMesh;
+	import nest.view.Camera3D;
 	
 	/**
 	 * QuadNode
 	 */
 	public class QuadNode implements IPNode {
 		
-		private var _childs:Vector.<IPNode>;
-		private var _objects:Vector.<IMesh>;
+		protected var _childs:Vector.<IPNode>;
+		protected var _objects:Vector.<IMesh>;
 		
-		private var _parent:IPNode;
+		protected var _parent:IPNode;
 		
-		private var _max:Vector3D;
-		private var _min:Vector3D;
+		protected var _vertices:Vector.<Vector3D>;
 		
-		private var _depth:int;
+		protected var _depth:int;
 		
 		public function QuadNode() {
 			_childs = new Vector.<IPNode>(4, true);
-			_max = new Vector3D();
-			_min = new Vector3D();
+			_vertices = new Vector.<Vector3D>(4, true);
+			for (var i:int = 0; i < 4; i++) {
+				_vertices[i] = new Vector3D();
+			}
+		}
+		
+		public function classify(camera:Camera3D):Boolean {
+			var i:int, j:int = _vertices.length;
+			var vertices:Vector.<Vector3D> = new Vector.<Vector3D>(j, true);
+			for (i = 0; i < j; i++) {
+				vertices[i] = camera.invertMatrix.transformVector(_vertices[i]);
+			}
+			return camera.frustum.classifyAABB(vertices);
 		}
 		
 		public function dispose():void {
-			var i:int;
+			var i:int, j:int = _childs.length;
 			var node:IPNode;
-			for (i = 0; i < 4; i++) {
+			for (i = 0; i < j; i++) {
 				node = _childs[i];
-				if (node) {
-					node.dispose();
-					EngineBase.returnObject(node);
-				}
+				if (node) node.dispose();
 				_childs[i] = null;
 			}
 			_objects = null;
 			_parent = null;
-			_max.setTo(0, 0, 0);
-			_min.setTo(0, 0, 0);
 			_depth = 0;
 		}
 		
@@ -60,12 +65,16 @@ package nest.control.partition
 			_objects = value;
 		}
 		
+		public function get vertices():Vector.<Vector3D> {
+			return _vertices;
+		}
+		
 		public function get max():Vector3D {
-			return _max;
+			return _vertices[3];
 		}
 		
 		public function get min():Vector3D {
-			return _min;
+			return _vertices[0];
 		}
 		
 		public function get depth():int {

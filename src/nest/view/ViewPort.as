@@ -2,6 +2,8 @@ package nest.view
 {
 	import flash.display.BitmapData;
 	import flash.display3D.Context3D;
+	import flash.display3D.Context3DBlendFactor;
+	import flash.display3D.Context3DCompareMode;
 	import flash.events.EventDispatcher;
 	
 	import nest.view.process.IRenderProcess;
@@ -11,12 +13,22 @@ package nest.view
 	 */
 	public class ViewPort extends EventDispatcher {
 		
-		public static var output:String = "";
-		
 		private static var _context3d:Context3D;
 		
 		public static function get context3d():Context3D {
 			return _context3d;
+		}
+		
+		private static var _width:Number = 0;
+		
+		public static function get width():Number {
+			return _width;
+		}
+		
+		private static var _height:Number = 0;
+		
+		public static function get height():Number {
+			return _height;
 		}
 		
 		private var _processes:Vector.<IRenderProcess>;
@@ -27,6 +39,17 @@ package nest.view
 			_diagram = new Diagram();
 			_context3d = context3d;
 			this.processes = processes;
+		}
+		
+		public function configure(width:Number = 512, height:Number = 512, antiAlias:int = 0, 
+									enableDepthAndStencil:Boolean = true, sourceFactor:String = Context3DBlendFactor.ONE, 
+									destinationFactor:String = Context3DBlendFactor.ZERO, depthMask:Boolean = true, 
+									passCompareMode:String = Context3DCompareMode.LESS):void {
+			_width = width;
+			_height = height;
+			_context3d.configureBackBuffer(width, height, antiAlias, enableDepthAndStencil);
+			_context3d.setBlendFactors(sourceFactor, destinationFactor);
+			_context3d.setDepthTest(depthMask, passCompareMode);
 		}
 		
 		/**

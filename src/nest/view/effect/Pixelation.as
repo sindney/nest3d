@@ -8,14 +8,16 @@ package nest.view.effect
 	import flash.display3D.IndexBuffer3D;
 	import flash.display3D.Program3D;
 	import flash.display3D.VertexBuffer3D;
+	import nest.view.process.IRenderProcess;
 	
-	import nest.control.EngineBase;
-	import nest.view.Shader3D;
+	import nest.control.factory.ShaderFactory;
+	import nest.view.process.RenderProcess;
+	import nest.view.ViewPort;
 	
 	/**
 	 * Pixelation
 	 */
-	public class Pixelation extends PostEffect {
+	public class Pixelation extends RenderProcess {
 		
 		private var program:Program3D;
 		private var vertexBuffer:VertexBuffer3D;
@@ -28,7 +30,7 @@ package nest.view.effect
 		public var pixelHeight:Number;
 		
 		public function Pixelation(width:int = 512, height:int = 512, pixelWidth:Number = 3, pixelHeight:Number = 3) {
-			var context3d:Context3D = EngineBase.context3d;
+			var context3d:Context3D = ViewPort.context3d;
 			var vertexData:Vector.<Number> = Vector.<Number>([-1, 1, 0, -1, -1, 0, 1, -1, 0, 1, 1, 0]);
 			var uvData:Vector.<Number> = Vector.<Number>([0, 0, 0, 1, 1, 1, 1, 0]);
 			var indexData:Vector.<uint> = Vector.<uint>([0, 3, 2, 2, 1, 0]);
@@ -39,11 +41,17 @@ package nest.view.effect
 			uvBuffer.uploadFromVector(uvData, 0, 4);
 			indexBuffer = context3d.createIndexBuffer(6);
 			indexBuffer.uploadFromVector(indexData, 0, 6);
+			
 			data = Vector.<Number>([0, 0, 1, 1]);
+			
 			_textures = new Vector.<TextureBase>(1, true);
 			this.pixelWidth = pixelWidth;
 			this.pixelHeight = pixelHeight;
 			
+			resize(_textures, width, height);
+		}
+		
+		public function comply():void {
 			var vs:String = "mov op, va0\n" + 
 							"mov v0, va1\n";
 			
@@ -53,17 +61,16 @@ package nest.view.effect
 							"mul ft0, ft0, fc0\n" + 
 							"tex oc, ft0, fc0 <2d, nearest, clamp, mipnone>\n";
 			
-			program.upload(Shader3D.assembler.assemble(Context3DProgramType.VERTEX, vs), 
-							Shader3D.assembler.assemble(Context3DProgramType.FRAGMENT, fs));
-			resize(_textures, width, height);
+			program.upload(ShaderFactory.assembler.assemble(Context3DProgramType.VERTEX, vs), 
+							ShaderFactory.assembler.assemble(Context3DProgramType.FRAGMENT, fs));
 		}
 		
-		override public function calculate(next:IPostEffect):void {
-			var context3d:Context3D = EngineBase.context3d;
-			data[0] = pixelWidth / EngineBase.view.width;
-			data[1] = pixelHeight / EngineBase.view.height;
+		override public function calculate(next:IRenderProcess):void {
+			var context3d:Context3D = ViewPort.context3d;
+			data[0] = pixelWidth / ViewPort.width;
+			data[1] = pixelHeight / ViewPort.height;
 			if (next) {
-				context3d.setRenderToTexture(next.textures[0], next.enableDepthAndStencil, next.antiAlias);
+				context3d.setRenderToTexture(next.texture, next.enableDepthAndStencil, next.antiAlias);
 			} else {
 				context3d.setRenderToBackBuffer();
 			}

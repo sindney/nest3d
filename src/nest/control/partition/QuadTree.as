@@ -2,7 +2,7 @@ package nest.control.partition
 {
 	import flash.geom.Vector3D;
 	
-	import nest.control.EngineBase;
+	import nest.control.math.MeshOPS;
 	import nest.object.geom.AABB;
 	import nest.object.geom.BSphere;
 	import nest.object.Mesh;
@@ -12,42 +12,11 @@ package nest.control.partition
 	
 	/**
 	 * QuadTree
-	 * <p>QuadTree divides constant meshes in specific container.</p>
+	 * <p>QuadTree divides constant meshes in specific container along xz plane.</p>
 	 * <p>If any of the container's child mesh's transform matrix is changed, you should regenerate the tree.</p>
 	 * <p>So you'd better put only constant meshes here.</p>
 	 */
 	public class QuadTree implements IPTree {
-		
-		public static function classifyAABB(max:Vector3D, min:Vector3D, node:QuadNode):Boolean {
-			if (max.x > node.max.x) {
-				if (max.z > node.max.z) {
-					return (min.x < node.max.x && min.z < node.max.z);
-				} else {
-					return (min.x < node.max.x && min.z > node.min.z);
-				}
-			} else {
-				if (max.z > node.max.z) {
-					return (min.z < node.max.z);
-				}
-			}
-			return true;
-		}
-		
-		// TODO: 注意半径要乘mesh缩放
-		public static function classifyBSphere(center:Vector3D, radius:Number, node:QuadNode):Boolean {
-			if (center.x > node.max.x) {
-				if (center.z > node.max.z) {
-					return (center.z - node.max.z < radius);
-				} else {
-					return (center.x - node.max.x < radius);
-				}
-			} else {
-				if (center.z > node.max.z) {
-					return (center.z - node.max.z < radius);
-				}
-			}
-			return true;
-		}
 		
 		private var _root:QuadNode;
 		private var _nonMeshes:Vector.<IObject3D>;
@@ -56,7 +25,7 @@ package nest.control.partition
 			_root = new QuadNode();
 		}
 		
-		public function create(target:IContainer3D, size:Number, depth:int):void {
+		public function create(target:IContainer3D, depth:int, size:Number, offsetX:Number = 0, offsetZ:Number = 0):void {
 			var size:Number = size / 2;
 			
 			var containers:Vector.<IContainer3D> = new Vector.<IContainer3D>();
@@ -81,23 +50,25 @@ package nest.control.partition
 					}
 				}
 				container = containers.pop();
+				if (container && container.partition) throw new Error("Can't use partition tree inside another one.");
 			}
 			
 			_root.dispose();
 			_root.depth = 0;
 			_root.parent = null;
 			_root.objects = meshes;
-			_root.max.setTo(size, 0, size);
-			_root.min.setTo( -size, 0, -size);
-			divide(_root, 1, depth);
+			_root.max.setTo(size + offsetX, 0, size + offsetZ);
+			_root.min.setTo( -size + offsetX, 0, -size + offsetZ);
+			_root.vertices[1].setTo(_root.max.x, 0, _root.min.z);
+			_root.vertices[2].setTo(_root.min.x, 0, _root.max.z);
+			if (depth > 0) divide(_root, size, 1, depth);
 		}
 		
-		private function divide(node:QuadNode, depth:int, maxDepth:int):void {
-			var TL:QuadNode = EngineBase.getObject(QuadNode);
-			var TR:QuadNode = EngineBase.getObject(QuadNode);
-			var BL:QuadNode = EngineBase.getObject(QuadNode);
-			var BR:QuadNode = EngineBase.getObject(QuadNode);
-			var size:Number = (node.max.x - node.min.x) / 2;
+		private function divide(node:QuadNode, size:int, depth:int, maxDepth:int):void {
+			var TL:QuadNode = new QuadNode();
+			var TR:QuadNode = new QuadNode();
+			var BL:QuadNode = new QuadNode();
+			var BR:QuadNode = new QuadNode();
 			
 			node.childs[0] = TL;
 			node.childs[1] = TR;
@@ -110,22 +81,27 @@ package nest.control.partition
 			TR.max.copyFrom(node.max);
 			
 			BL.min.copyFrom(node.min);
-			BL.max.setTo(BL.min.x + size, 0, BL.min.z + size);
+			BL.max.copyFrom(TR.min);
 			BR.min.setTo(node.min.x + size, 0, node.min.z);
 			BR.max.setTo(BR.min.x + size, 0, BR.min.z + size);
 			
 			TL.parent = TR.parent = BL.parent = BR.parent = node;
 			TL.depth = TR.depth = BL.depth = BR.depth = depth;
 			
+			var i:int, j:int, k:int, l:int;
+			for (i = 0; i < 4; i++) {
+				var tmp:QuadNode = node.childs[i] as QuadNode;
+				tmp.vertices[1].setTo(tmp.max.x, 0, tmp.min.z);
+				tmp.vertices[2].setTo(tmp.min.x, 0, tmp.max.z);
+			}
+			
 			var BTL:Boolean, BTR:Boolean, BBL:Boolean, BBR:Boolean;
 			
-			var i:int, j:int, l:int;
 			var mesh:IMesh;
 			var objects:Vector.<IMesh> = node.objects;
 			var a:Vector3D, b:Vector3D;
 			
 			j = objects.length;
-			node.objects = null;
 			node.objects = new Vector.<IMesh>();
 			
 			for (i = 0; i < j; i++) {
@@ -134,42 +110,48 @@ package nest.control.partition
 				if (mesh.bound is AABB) {
 					a = mesh.worldMatrix.transformVector((mesh.bound as AABB).max);
 					b = mesh.worldMatrix.transformVector((mesh.bound as AABB).min);
-					BTL = classifyAABB(a, b, TL);
-					BTR = classifyAABB(a, b, TR);
-					BBL = classifyAABB(a, b, BL);
-					BBR = classifyAABB(a, b, BR);
+					a.y = b.y = 0;
+					BTL = MeshOPS.AABB_AABB(a, b, TL.max, TL.min);
+					BTR = MeshOPS.AABB_AABB(a, b, TR.max, TR.min);
+					BBL = MeshOPS.AABB_AABB(a, b, BL.max, BL.min);
+					BBR = MeshOPS.AABB_AABB(a, b, BR.max, BR.min);
 				} else {
 					a = mesh.worldMatrix.transformVector(mesh.bound.center);
+					a.y = 0;
 					l = (mesh.bound as BSphere).radius;
-					BTL = classifyBSphere(a, l, TL);
-					BTR = classifyBSphere(a, l, TR);
-					BBL = classifyBSphere(a, l, BL);
-					BBR = classifyBSphere(a, l, BR);
+					k = mesh.scale.x;
+					if (mesh.scale.y > k) k = mesh.scale.y;
+					if (mesh.scale.z > k) k = mesh.scale.z;
+					l *= k;
+					BTL = MeshOPS.AABB_BSphere(TL.max, TL.min, a, l);
+					BTR = MeshOPS.AABB_BSphere(TR.max, TR.min, a, l);
+					BBL = MeshOPS.AABB_BSphere(BL.max, BL.min, a, l);
+					BBR = MeshOPS.AABB_BSphere(BR.max, BR.min, a, l);
 				}
 				
 				if (BTL && (BTR || BBL || BBR) || BTR && (BTL || BBL || BBR) || 
 					BBL && (BTL || BTR || BBR) || BBR && (BTL || BTR || BBL)) {
 					node.objects.push(mesh);
 				} else if (BTL) {
-					TL.objects = new Vector.<IMesh>();
+					if (!TL.objects) TL.objects = new Vector.<IMesh>();
 					TL.objects.push(mesh);
 				} else if (BTR) {
-					TR.objects = new Vector.<IMesh>();
+					if (!TR.objects) TR.objects = new Vector.<IMesh>();
 					TR.objects.push(mesh);
 				} else if (BBL) {
-					BL.objects = new Vector.<IMesh>();
+					if (!BL.objects) BL.objects = new Vector.<IMesh>();
 					BL.objects.push(mesh);
 				} else if (BBR) {
-					BR.objects = new Vector.<IMesh>();
+					if (!BR.objects) BR.objects = new Vector.<IMesh>();
 					BR.objects.push(mesh);
 				}
 			}
 			
 			if (depth + 1 < maxDepth) {
-				if (TL.objects.length > 0) divide(TL, depth + 1, maxDepth);
-				if (TR.objects.length > 0) divide(TR, depth + 1, maxDepth);
-				if (BL.objects.length > 0) divide(BL, depth + 1, maxDepth);
-				if (BR.objects.length > 0) divide(BR, depth + 1, maxDepth);
+				if (TL.objects) divide(TL, size / 2, depth + 1, maxDepth);
+				if (TR.objects) divide(TR, size / 2, depth + 1, maxDepth);
+				if (BL.objects) divide(BL, size / 2, depth + 1, maxDepth);
+				if (BR.objects) divide(BR, size / 2, depth + 1, maxDepth);
 			}
  		}
 		

@@ -1,6 +1,8 @@
 package  
 {
 	import nest.control.factory.PrimitiveFactory;
+	import nest.control.partition.QuadTree;
+	import nest.object.geom.AABB;
 	import nest.object.geom.Geometry;
 	import nest.object.Mesh;
 	import nest.object.Container3D;
@@ -33,20 +35,20 @@ package
 			material.comply();
 			var mesh:Mesh;
 			
-			var i:int, j:int, k:int = 0;
-			for (i = 0; i < 10; i++) {
-				for (j = 0; j < 10; j++) {
-					for (k = 0; k < 10; k++) {
-						mesh = new Mesh(geom, material);
-						mesh.position.setTo(i * 40, j * 40, k * 40);
-						mesh.scale.setTo(10, 10, 10);
-						container.addChild(mesh);
-						mesh.recompose();
-					}
+			var i:int, j:int, k:int = 70, l:int = k * 25;
+			for (i = 0; i < k; i++) {
+				for (j = 0; j < k; j++) {
+					mesh = new Mesh(geom, material);
+					mesh.position.setTo(i * 50 - l, 0, j * 50 - l);
+					mesh.scale.setTo(10, 10, 10);
+					container.addChild(mesh);
+					mesh.recompose();
 				}
 			}
 			
-			camera.position.z = -100;
+			container.partition = new QuadTree();
+			(container.partition as QuadTree).create(container, 5, k * 50);
+			
 			camera.recompose();
 		}
 		

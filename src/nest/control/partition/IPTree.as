@@ -1,6 +1,7 @@
 package nest.control.partition 
 {	
 	import nest.object.IObject3D;
+	
 	/**
 	 * IPTree
 	 */

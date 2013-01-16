@@ -5,6 +5,7 @@ package nest.view.process
 	import flash.geom.Matrix3D;
 	import flash.geom.Vector3D;
 	
+	import nest.control.partition.IPNode;
 	import nest.object.geom.AABB;
 	import nest.object.geom.BSphere;
 	import nest.object.IContainer3D;
@@ -33,19 +34,7 @@ package nest.view.process
 		protected var _numTriangles:int = 0;
 		protected var _numObjects:int = 0;
 		
-		protected var vertices:Vector.<Vector3D>;
-		
 		public function ContainerProcess(camera:Camera3D, container:IContainer3D, color:uint = 0xff000000) {
-			vertices = new Vector.<Vector3D>(9, true);
-			vertices[0] = new Vector3D();
-			vertices[1] = new Vector3D();
-			vertices[2] = new Vector3D();
-			vertices[3] = new Vector3D();
-			vertices[4] = new Vector3D();
-			vertices[5] = new Vector3D();
-			vertices[6] = new Vector3D();
-			vertices[7] = new Vector3D();
-			vertices[8] = new Vector3D();
 			this.camera = camera;
 			this.container = container;
 			this.color = color;
@@ -90,25 +79,55 @@ package nest.view.process
 					continue;
 				}
 				
-				j = container.numChildren;
-				for (i = 0; i < j; i++) {
-					object = container.getChildAt(i);
-					if (object is IMesh) {
-						mesh = object as IMesh;
-						if (mesh.visible) {
-							if (!mesh.cliping || classifyMesh(mesh)) {
-								_numVertices += mesh.geom.numVertices;
-								_numTriangles += mesh.geom.numTriangles;
-								_numObjects++;
-								_meshProcess.calculate(mesh, ivm, pm);
-								_objects.push(mesh);
-								if (mesh.cliping)_excludedObjects.push(mesh);
-							} else {
-								_excludedObjects.push(mesh);
+				if (container.partition) {
+					var nodes:Vector.<IPNode> = new Vector.<IPNode>();
+					var node:IPNode = container.partition.root;
+					while (node) {
+						if (node.classify(_camera)) {
+							j = node.childs.length;
+							for (i = 0; i < j; i++) {
+								if (node.childs[i]) {
+									nodes.push(node.childs[i]);
+								}
+							}
+							if (node.objects) {
+								j = node.objects.length;
+								for (i = 0; i < j; i++) {
+									mesh = node.objects[i];
+									if (mesh.visible) {
+										_numVertices += mesh.geom.numVertices;
+										_numTriangles += mesh.geom.numTriangles;
+										_numObjects++;
+										_meshProcess.calculate(mesh, ivm, pm);
+										_objects.push(mesh);
+										if (mesh.cliping)_excludedObjects.push(mesh);
+									}
+								}
 							}
 						}
-					} else if (object is IContainer3D) {
-						containers.push(object as IContainer3D);
+						node = nodes.pop();
+					}
+				} else {
+					j = container.numChildren;
+					for (i = 0; i < j; i++) {
+						object = container.getChildAt(i);
+						if (object is IMesh) {
+							mesh = object as IMesh;
+							if (mesh.visible) {
+								if (!mesh.cliping || classifyMesh(mesh)) {
+									_numVertices += mesh.geom.numVertices;
+									_numTriangles += mesh.geom.numTriangles;
+									_numObjects++;
+									_meshProcess.calculate(mesh, ivm, pm);
+									_objects.push(mesh);
+									if (mesh.cliping)_excludedObjects.push(mesh);
+								} else {
+									_excludedObjects.push(mesh);
+								}
+							}
+						} else if (object is IContainer3D) {
+							containers.push(object as IContainer3D);
+						}
 					}
 				}
 				
@@ -118,12 +137,12 @@ package nest.view.process
 		
 		protected function classifyMesh(mesh:IMesh):Boolean {
 			var i:int;
-			var v:Vector3D = new Vector3D();
 			if (mesh.bound is AABB) {
+				var vertices:Vector.<Vector3D> = new Vector.<Vector3D>(8, true);
 				for (i = 0; i < 8; i++) {
-					v.copyFrom((mesh.bound as AABB).vertices[i]);
-					v.copyFrom(_camera.invertMatrix.transformVector(mesh.worldMatrix.transformVector(v)));
-					vertices[i].copyFrom(v);
+					vertices[i] = _camera.invertMatrix.transformVector(
+									mesh.worldMatrix.transformVector((mesh.bound as AABB).vertices[i])
+								);
 				}
 				return _camera.frustum.classifyAABB(vertices);
 			}
@@ -131,8 +150,10 @@ package nest.view.process
 			// BoundingShpere
 			i = mesh.scale.x > mesh.scale.y ? mesh.scale.x : mesh.scale.y;
 			if (mesh.scale.z > i) i = mesh.scale.z;
-			v.copyFrom(_camera.invertMatrix.transformVector(mesh.worldMatrix.transformVector(mesh.bound.center)));
-			return _camera.frustum.classifyBSphere(v, (mesh.bound as BSphere).radius * i);
+			return _camera.frustum.classifyBSphere(
+						_camera.invertMatrix.transformVector(mesh.worldMatrix.transformVector(mesh.bound.center)), 
+						(mesh.bound as BSphere).radius * i
+					);
 		}
 		
 		override public function dispose():void {
@@ -143,7 +164,6 @@ package nest.view.process
 			_excludedObjects = null;
 			_camera = null;
 			_rgba = null;
-			vertices = null;
 		}
 		
 		///////////////////////////////////
