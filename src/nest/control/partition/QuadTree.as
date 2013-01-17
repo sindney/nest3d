@@ -12,7 +12,7 @@ package nest.control.partition
 	
 	/**
 	 * QuadTree
-	 * <p>QuadTree divides constant meshes in specific container along xz plane.</p>
+	 * <p>QuadTree divides meshes in specific container along xz plane.</p>
 	 * <p>If any of the container's child mesh's transform matrix is changed, you should regenerate the tree.</p>
 	 * <p>So you'd better put only constant meshes here.</p>
 	 */

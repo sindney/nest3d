@@ -1,8 +1,8 @@
 package  
 {
 	import nest.control.factory.PrimitiveFactory;
-	import nest.control.partition.QuadTree;
-	import nest.object.geom.AABB;
+	import nest.control.partition.OcNode;
+	import nest.control.partition.OcTree;
 	import nest.object.geom.Geometry;
 	import nest.object.Mesh;
 	import nest.object.Container3D;
@@ -35,19 +35,23 @@ package
 			material.comply();
 			var mesh:Mesh;
 			
-			var i:int, j:int, k:int = 70, l:int = k * 25;
-			for (i = 0; i < k; i++) {
-				for (j = 0; j < k; j++) {
-					mesh = new Mesh(geom, material);
-					mesh.position.setTo(i * 50 - l, 0, j * 50 - l);
-					mesh.scale.setTo(10, 10, 10);
-					container.addChild(mesh);
-					mesh.recompose();
+			var offsetX:Number = 0, offsetY:Number = 0, offsetZ:Number = 0;
+			
+			var i:int, j:int, k:int, l:int = 13, m:int = l * 25;
+			for (i = 0; i < l; i++) {
+				for (j = 0; j < l; j++) {
+					for (k = 0; k < l; k++) {
+						mesh = new Mesh(geom, material);
+						mesh.position.setTo(i * 50 - m + offsetX, j * 50 - m + offsetY, k * 50 - m + offsetZ);
+						mesh.scale.setTo(10, 10, 10);
+						container.addChild(mesh);
+						mesh.recompose();
+					}
 				}
 			}
 			
-			container.partition = new QuadTree();
-			(container.partition as QuadTree).create(container, 5, k * 50);
+			container.partition = new OcTree();
+			(container.partition as OcTree).create(container, 4, l * 50, offsetX, offsetY, offsetZ);
 			
 			camera.recompose();
 		}
