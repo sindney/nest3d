@@ -75,6 +75,10 @@ package nest.view.material
 			return _texture;
 		}
 		
+		public function set texture(value:CubeTexture):void {
+			_texture = value;
+		}
+		
 	}
 
 }

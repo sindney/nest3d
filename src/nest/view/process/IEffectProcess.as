@@ -1,6 +1,6 @@
 package nest.view.process 
 {	
-	import nest.object.geom.Geometry;
+	import flash.display3D.textures.TextureBase;
 	
 	/**
 	 * IEffectProcess
@@ -9,8 +9,9 @@ package nest.view.process
 		
 		function comply():void;
 		
-		function get geom():Geometry;
-		function set geom(value:Geometry):void;
+		function resize(width:Number, height:Number):void;
+		
+		function get textures():Vector.<TextureBase>;
 		
 	}
 	

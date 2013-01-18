@@ -90,6 +90,10 @@ package nest.view.material
 			return _texture;
 		}
 		
+		public function set texture(value:Texture):void {
+			_texture = value;
+		}
+		
 	}
 
 }

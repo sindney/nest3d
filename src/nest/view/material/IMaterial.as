@@ -2,12 +2,14 @@ package nest.view.material
 {
 	import flash.display3D.Program3D;
 	
+	import nest.object.IMesh;
+	
 	/**
 	 * Material Interface.
 	 */
 	public interface IMaterial {
 		
-		function upload():void;
+		function upload(mesh:IMesh):void;
 		function unload():void;
 		
 		function comply():void;

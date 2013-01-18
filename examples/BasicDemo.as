@@ -1,11 +1,14 @@
 package  
 {
+	import flash.display3D.textures.Texture;
+	
 	import nest.control.factory.PrimitiveFactory;
 	import nest.control.partition.OcNode;
 	import nest.control.partition.OcTree;
 	import nest.object.geom.Geometry;
 	import nest.object.Mesh;
 	import nest.object.Container3D;
+	import nest.view.effect.RedBlueMap;
 	import nest.view.material.ColorMaterial;
 	import nest.view.process.*;
 	
@@ -28,7 +31,12 @@ package
 			process0.meshProcess = new BasicMeshProcess(camera);
 			process0.color = 0xff000000;
 			
-			view.processes.push(process0);
+			var effect:RedBlueMap = new RedBlueMap(512, 512, process0);
+			effect.comply();
+			
+			process0.renderTarget.texture = effect.texture;
+			
+			view.processes.push(process0, effect);
 			
 			var geom:Geometry = PrimitiveFactory.createBox(1, 1, 1);
 			var material:ColorMaterial = new ColorMaterial();

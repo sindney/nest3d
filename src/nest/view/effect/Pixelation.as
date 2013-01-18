@@ -4,25 +4,18 @@ package nest.view.effect
 	import flash.display3D.Context3D;
 	import flash.display3D.Context3DProgramType;
 	import flash.display3D.Context3DVertexBufferFormat;
-	import flash.display3D.Context3DTextureFormat;
-	import flash.display3D.IndexBuffer3D;
 	import flash.display3D.Program3D;
-	import flash.display3D.VertexBuffer3D;
-	import nest.view.process.IRenderProcess;
 	
 	import nest.control.factory.ShaderFactory;
-	import nest.view.process.RenderProcess;
+	import nest.view.process.EffectProcess;
 	import nest.view.ViewPort;
 	
 	/**
 	 * Pixelation
 	 */
-	public class Pixelation extends RenderProcess {
+	public class Pixelation extends EffectProcess {
 		
 		private var program:Program3D;
-		private var vertexBuffer:VertexBuffer3D;
-		private var uvBuffer:VertexBuffer3D;
-		private var indexBuffer:IndexBuffer3D;
 		
 		private var data:Vector.<Number>;
 		
@@ -31,46 +24,25 @@ package nest.view.effect
 		
 		public function Pixelation(width:int = 512, height:int = 512, pixelWidth:Number = 3, pixelHeight:Number = 3) {
 			var context3d:Context3D = ViewPort.context3d;
-			var vertexData:Vector.<Number> = Vector.<Number>([-1, 1, 0, -1, -1, 0, 1, -1, 0, 1, 1, 0]);
-			var uvData:Vector.<Number> = Vector.<Number>([0, 0, 0, 1, 1, 1, 1, 0]);
-			var indexData:Vector.<uint> = Vector.<uint>([0, 3, 2, 2, 1, 0]);
+			
 			program = context3d.createProgram();
-			vertexBuffer = context3d.createVertexBuffer(4, 3);
-			vertexBuffer.uploadFromVector(vertexData, 0, 4);
-			uvBuffer = context3d.createVertexBuffer(4, 2);
-			uvBuffer.uploadFromVector(uvData, 0, 4);
-			indexBuffer = context3d.createIndexBuffer(6);
-			indexBuffer.uploadFromVector(indexData, 0, 6);
 			
 			data = Vector.<Number>([0, 0, 1, 1]);
 			
-			_textures = new Vector.<TextureBase>(1, true);
 			this.pixelWidth = pixelWidth;
 			this.pixelHeight = pixelHeight;
 			
-			resize(_textures, width, height);
+			_textures = new Vector.<TextureBase>(1, true);
+			
+			resize(width, height);
 		}
 		
-		public function comply():void {
-			var vs:String = "mov op, va0\n" + 
-							"mov v0, va1\n";
-			
-			var fs:String = "div ft0, v0, fc0\n" + 
-							"frc ft1, ft0\n" + 
-							"sub ft0, ft0, ft1\n" + 
-							"mul ft0, ft0, fc0\n" + 
-							"tex oc, ft0, fc0 <2d, nearest, clamp, mipnone>\n";
-			
-			program.upload(ShaderFactory.assembler.assemble(Context3DProgramType.VERTEX, vs), 
-							ShaderFactory.assembler.assemble(Context3DProgramType.FRAGMENT, fs));
-		}
-		
-		override public function calculate(next:IRenderProcess):void {
+		override public function calculate():void {
 			var context3d:Context3D = ViewPort.context3d;
 			data[0] = pixelWidth / ViewPort.width;
 			data[1] = pixelHeight / ViewPort.height;
-			if (next) {
-				context3d.setRenderToTexture(next.texture, next.enableDepthAndStencil, next.antiAlias);
+			if (_renderTarget.texture) {
+				context3d.setRenderToTexture(_renderTarget.texture, _renderTarget.enableDepthAndStencil, _renderTarget.antiAlias);
 			} else {
 				context3d.setRenderToBackBuffer();
 			}
@@ -86,12 +58,24 @@ package nest.view.effect
 			context3d.setTextureAt(0, null);
 		}
 		
+		override public function comply():void {
+			var vs:String = "mov op, va0\n" + 
+							"mov v0, va1\n";
+			
+			var fs:String = "div ft0, v0, fc0\n" + 
+							"frc ft1, ft0\n" + 
+							"sub ft0, ft0, ft1\n" + 
+							"mul ft0, ft0, fc0\n" + 
+							"tex oc, ft0, fc0 <2d, nearest, clamp, mipnone>\n";
+			
+			program.upload(ShaderFactory.assembler.assemble(Context3DProgramType.VERTEX, vs), 
+							ShaderFactory.assembler.assemble(Context3DProgramType.FRAGMENT, fs));
+		}
+		
 		override public function dispose():void {
 			super.dispose();
-			vertexBuffer.dispose();
-			uvBuffer.dispose();
-			indexBuffer.dispose();
 			program.dispose();
+			program = null;
 			data = null;
 		}
 		

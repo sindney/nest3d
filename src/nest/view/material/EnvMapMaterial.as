@@ -3,8 +3,11 @@ package nest.view.material
 	import flash.display.BitmapData;
 	import flash.display3D.Context3D;
 	import flash.display3D.Context3DProgramType;
+	import flash.geom.Matrix3D;
+	import flash.geom.Vector3D;
 	
 	import nest.control.factory.ShaderFactory;
+	import nest.object.IMesh;
 	import nest.view.light.*;
 	import nest.view.ViewPort;
 	
@@ -22,7 +25,7 @@ package nest.view.material
 			_cubicmap.data = cubicmap;
 		}
 		
-		override public function upload():void {
+		override public function upload(mesh:IMesh):void {
 			var context3d:Context3D = ViewPort.context3d;
 			var i:int, j:int = 1;
 			var light:ILight;
@@ -56,6 +59,13 @@ package nest.view.material
 			}
 			if (_cubicmap.texture) context3d.setTextureAt(3, _cubicmap.texture);
 			context3d.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, 23, _fragData);
+			
+			var matrix:Matrix3D = mesh.worldMatrix.clone();
+			var components:Vector.<Vector3D> = matrix.decompose();
+			components[0].setTo(0, 0, 0);
+			components[2].setTo(1, 1, 1);
+			matrix.recompose(components);
+			context3d.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 10, matrix, true);
 		}
 		
 		override public function unload():void {

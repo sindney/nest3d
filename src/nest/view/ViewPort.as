@@ -57,11 +57,9 @@ package nest.view
 		 */
 		public function calculate(bitmapData:BitmapData = null, present:Boolean = true):void {
 			var i:int, j:int = _processes.length;
-			var process:IRenderProcess;
 			
 			for (i = 0; i < j; i++) {
-				process = _processes[i];
-				process.calculate((i + 1 < j) ? _processes[i + 1] : null);
+				_processes[i].calculate();
 			}
 			
 			_diagram.update();

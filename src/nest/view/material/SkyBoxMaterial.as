@@ -6,6 +6,7 @@ package nest.view.material
 	import flash.display3D.Program3D;
 	
 	import nest.control.factory.ShaderFactory;
+	import nest.object.IMesh;
 	import nest.view.ViewPort;
 	
 	/**
@@ -22,7 +23,7 @@ package nest.view.material
 			_program = ViewPort.context3d.createProgram();
 		}
 		
-		public function upload():void {
+		public function upload(mesh:IMesh):void {
 			ViewPort.context3d.setTextureAt(0, _cubicmap.texture);
 		}
 		

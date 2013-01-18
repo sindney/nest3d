@@ -1,5 +1,6 @@
 package nest.view.process 
 {
+	import flash.display3D.textures.TextureBase;
 	import flash.geom.Matrix3D;
 	
 	import nest.object.IContainer3D;

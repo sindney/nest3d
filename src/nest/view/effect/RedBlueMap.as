@@ -4,70 +4,54 @@ package nest.view.effect
 	import flash.display3D.Context3D;
 	import flash.display3D.Context3DProgramType;
 	import flash.display3D.Context3DVertexBufferFormat;
-	import flash.display3D.Context3DTextureFormat;
-	import flash.display3D.IndexBuffer3D;
 	import flash.display3D.Program3D;
-	import flash.display3D.VertexBuffer3D;
 	import flash.geom.Vector3D;
 	
-	import nest.control.EngineBase;
-	import nest.view.Shader3D;
+	import nest.control.factory.ShaderFactory;
+	import nest.object.IMesh;
+	import nest.view.process.ContainerProcess;
+	import nest.view.process.EffectProcess;
+	import nest.view.Camera3D;
+	import nest.view.ViewPort;
 	
 	/**
 	 * RedBlueMap
 	 */
-	public class RedBlueMap extends PostEffect {
+	public class RedBlueMap extends EffectProcess {
 		
 		private var program:Program3D;
-		private var vertexBuffer:VertexBuffer3D;
-		private var uvBuffer:VertexBuffer3D;
-		private var indexBuffer:IndexBuffer3D;
 		
 		private var data:Vector.<Number>;
 		
-		private var _eyePadding:Number;
+		public var containerProcess:ContainerProcess;
+		public var eyePadding:Number;
 		
-		public function RedBlueMap(width:int = 512, height:int = 512, eyePadding:Number = 1) {
-			var context3d:Context3D = EngineBase.context3d;
-			var vertexData:Vector.<Number> = Vector.<Number>([-1, 1, 0, -1, -1, 0, 1, -1, 0, 1, 1, 0]);
-			var uvData:Vector.<Number> = Vector.<Number>([0, 0, 0, 1, 1, 1, 1, 0]);
-			var indexData:Vector.<uint> = Vector.<uint>([0, 3, 2, 2, 1, 0]);
+		public function RedBlueMap(width:int = 512, height:int = 512, containerProcess:ContainerProcess = null, eyePadding:Number = 1) {
+			super();
+			var context3d:Context3D = ViewPort.context3d;
+			
 			program = context3d.createProgram();
-			vertexBuffer = context3d.createVertexBuffer(4, 3);
-			vertexBuffer.uploadFromVector(vertexData, 0, 4);
-			uvBuffer = context3d.createVertexBuffer(4, 2);
-			uvBuffer.uploadFromVector(uvData, 0, 4);
-			indexBuffer = context3d.createIndexBuffer(6);
-			indexBuffer.uploadFromVector(indexData, 0, 6);
+			
 			data = Vector.<Number>([1, 0, 0, 1, 0, 1, 1, 1]);
 			
+			this.containerProcess = containerProcess;
+			this.eyePadding = eyePadding;
+			
 			_textures = new Vector.<TextureBase>(2, true);
-			
-			_eyePadding = eyePadding;
-			
-			var vs:String = "mov op, va0\n" + 
-							"mov v0, va1\n";
-			
-			var fs:String = "tex ft0, v0, fs0 <2d, nearest, clamp, mipnone>\n" + 
-							"tex ft1, v0, fs1 <2d, nearest, clamp, mipnone>\n" + 
-							"mul ft2, ft0, fc0\n" + 
-							"mul ft3, ft1, fc1\n" + 
-							"add oc, ft2, ft3\n";
-			
-			program.upload(Shader3D.assembler.assemble(Context3DProgramType.VERTEX, vs), 
-							Shader3D.assembler.assemble(Context3DProgramType.FRAGMENT, fs));
-			resize(_textures, width, height);
+			resize(width, height);
 		}
 		
-		override public function calculate(next:IPostEffect):void {
-			var context3d:Context3D = EngineBase.context3d;
-			context3d.setRenderToTexture(_textures[1], enableDepthAndStencil, antiAlias);
+		override public function calculate():void {
+			var context3d:Context3D = ViewPort.context3d;
+			var camera:Camera3D = containerProcess.camera;
+			
+			context3d.setRenderToTexture(_textures[1], _enableDepthAndStencil, _antiAlias);
 			context3d.clear();
 			
 			var p:Vector3D = new Vector3D(1, 0, 0);
-			p.scaleBy(_eyePadding);
-			EngineBase.camera.position.copyFrom(EngineBase.camera.matrix.transformVector(p));
-			EngineBase.camera.recompose();
+			p.scaleBy(eyePadding);
+			camera.position.copyFrom(camera.matrix.transformVector(p));
+			camera.recompose();
 			
 			var _camPos:Vector.<Number> = new Vector.<Number>(4, true);
 			_camPos[0] = p.x;
@@ -76,15 +60,18 @@ package nest.view.effect
 			_camPos[3] = 1;
 			context3d.setProgramConstantsFromVector(Context3DProgramType.VERTEX, 8, _camPos);
 			
-			EngineBase.manager.calculate(false, EngineBase.camera.invertMatrix, EngineBase.camera.pm);
+			var object:IMesh;
+			for each(object in containerProcess.objects) {
+				containerProcess.meshProcess.calculate(object, camera.invertMatrix, camera.pm);
+			}
 			
 			p.setTo(1, 0, 0);
-			p.scaleBy( -_eyePadding);
-			EngineBase.camera.position.copyFrom(EngineBase.camera.matrix.transformVector(p));
-			EngineBase.camera.recompose();
+			p.scaleBy( -eyePadding);
+			camera.position.copyFrom(camera.matrix.transformVector(p));
+			camera.recompose();
 			
-			if (next) {
-				context3d.setRenderToTexture(next.textures[0], next.enableDepthAndStencil, next.antiAlias);
+			if (_renderTarget.texture) {
+				context3d.setRenderToTexture(_renderTarget.texture, _renderTarget.enableDepthAndStencil, _renderTarget.antiAlias);
 			} else {
 				context3d.setRenderToBackBuffer();
 			}
@@ -102,24 +89,26 @@ package nest.view.effect
 			context3d.setTextureAt(1, null);
 		}
 		
+		override public function comply():void {
+			var vs:String = "mov op, va0\n" + 
+							"mov v0, va1\n";
+			
+			var fs:String = "tex ft0, v0, fs0 <2d, nearest, clamp, mipnone>\n" + 
+							"tex ft1, v0, fs1 <2d, nearest, clamp, mipnone>\n" + 
+							"mul ft2, ft0, fc0\n" + 
+							"mul ft3, ft1, fc1\n" + 
+							"add oc, ft2, ft3\n";
+			
+			program.upload(ShaderFactory.assembler.assemble(Context3DProgramType.VERTEX, vs), 
+							ShaderFactory.assembler.assemble(Context3DProgramType.FRAGMENT, fs));
+		}
+		
 		override public function dispose():void {
 			super.dispose();
-			vertexBuffer.dispose();
-			uvBuffer.dispose();
-			indexBuffer.dispose();
 			program.dispose();
-		}
-		
-		///////////////////////////////////
-		// getter/setters
-		///////////////////////////////////
-		
-		public function get eyePadding():Number {
-			return _eyePadding;
-		}
-		
-		public function set eyePadding(value:Number):void {
-			_eyePadding = value;
+			program = null;
+			containerProcess = null;
+			data = null;
 		}
 		
 	}

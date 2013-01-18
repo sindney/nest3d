@@ -7,7 +7,6 @@ package nest.view.process
 	import flash.geom.Vector3D;
 	
 	import nest.object.IMesh;
-	import nest.view.material.EnvMapMaterial;
 	import nest.view.Camera3D;
 	import nest.view.ViewPort;
 	
@@ -49,22 +48,13 @@ package nest.view.process
 			
 			context3d.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 0, matrix, true);
 			
-			if (mesh.material is EnvMapMaterial) {
-				matrix.copyFrom(mesh.worldMatrix);
-				components = matrix.decompose();
-				components[0].setTo(0, 0, 0);
-				components[2].setTo(1, 1, 1);
-				matrix.recompose(components);
-				context3d.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 10, matrix, true);
-			}
-			
 			matrix.copyFrom(mesh.invertWorldMatrix);
 			matrix.appendScale(mesh.scale.x, mesh.scale.y, mesh.scale.z);
 			
 			context3d.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 4, matrix, true);
 			context3d.setProgramConstantsFromMatrix(Context3DProgramType.FRAGMENT, 24, matrix, true);
 			
-			mesh.material.upload();
+			mesh.material.upload(mesh);
 			mesh.geom.upload(mesh.material.uv, mesh.material.normal);
 			
 			context3d.setProgram(mesh.material.program);

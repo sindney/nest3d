@@ -5,6 +5,7 @@ package nest.view.material
 	import flash.display3D.Context3DProgramType;
 	
 	import nest.control.factory.ShaderFactory;
+	import nest.object.IMesh;
 	import nest.view.light.*;
 	import nest.view.ViewPort;
 	
@@ -21,7 +22,7 @@ package nest.view.material
 			_lightmap.data = lightmap;
 		}
 		
-		override public function upload():void {
+		override public function upload(mesh:IMesh):void {
 			var context3d:Context3D = ViewPort.context3d;
 			var i:int, j:int = 1;
 			var light:ILight;

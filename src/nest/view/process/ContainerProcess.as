@@ -17,7 +17,9 @@ package nest.view.process
 	/**
 	 * ContainerProcess
 	 */
-	public class ContainerProcess extends RenderProcess implements IContainerProcess {
+	public class ContainerProcess implements IContainerProcess {
+		
+		protected var _renderTarget:TextureProcess;
 		
 		protected var _meshProcess:IMeshProcess;
 		protected var _container:IContainer3D;
@@ -38,9 +40,10 @@ package nest.view.process
 			this.camera = camera;
 			this.container = container;
 			this.color = color;
+			_renderTarget = new TextureProcess();
 		}
 		
-		override public function calculate(next:IRenderProcess):void {
+		public function calculate():void {
 			var context3d:Context3D = ViewPort.context3d;
 			var containers:Vector.<IContainer3D> = new Vector.<IContainer3D>();
 			var container:IContainer3D = _container;
@@ -59,17 +62,12 @@ package nest.view.process
 			_numTriangles = 0;
 			_numObjects = 0;
 			
-			if (_texture != null) {
-				context3d.setRenderToTexture(_texture, _enableDepthAndStencil, _antiAlias);
-			} else if (next != null && next is IEffectProcess) {
-				var effectProcess:IEffectProcess = next as IEffectProcess;
-				context3d.setRenderToTexture(effectProcess.texture, 
-											effectProcess.enableDepthAndStencil, 
-											effectProcess.antiAlias);
+			if (_renderTarget.texture) {
+				context3d.setRenderToTexture(_renderTarget.texture, _renderTarget.enableDepthAndStencil, _renderTarget.antiAlias);
 			} else {
 				context3d.setRenderToBackBuffer();
 			}
-			if (_clear) context3d.clear(_rgba[0], _rgba[1], _rgba[2], _rgba[3]);
+			context3d.clear(_rgba[0], _rgba[1], _rgba[2], _rgba[3]);
 			
 			_meshProcess.initialize();
 			
@@ -156,8 +154,8 @@ package nest.view.process
 					);
 		}
 		
-		override public function dispose():void {
-			super.dispose();
+		public function dispose():void {
+			_renderTarget = null;
 			_container = null;
 			_meshProcess = null;
 			_objects = null;
@@ -169,6 +167,10 @@ package nest.view.process
 		///////////////////////////////////
 		// getter/setters
 		///////////////////////////////////
+		
+		public function get renderTarget():TextureProcess {
+			return _renderTarget;
+		}
 		
 		public function get container():IContainer3D {
 			return _container;

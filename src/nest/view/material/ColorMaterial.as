@@ -5,6 +5,7 @@ package nest.view.material
 	import flash.display3D.Program3D;
 	
 	import nest.control.factory.ShaderFactory;
+	import nest.object.IMesh;
 	import nest.view.light.*;
 	import nest.view.ViewPort;
 	
@@ -27,7 +28,7 @@ package nest.view.material
 			this.color = color;
 		}
 		
-		public function upload():void {
+		public function upload(mesh:IMesh):void {
 			var context3d:Context3D = ViewPort.context3d;
 			var i:int, j:int = 1;
 			var light:ILight;

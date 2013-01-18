@@ -14,33 +14,6 @@ package nest.control.factory
 	 */
 	public final class PrimitiveFactory {
 		
-		private static var _screen:Geometry;
-		
-		public static function get screen():Geometry {
-			if (!_screen) {
-				var vertices:Vector.<Vertex> = Vector.<Vertex>([new Vertex( -1.0,  1.0, 0.0, 0.0, 0.0), 
-																new Vertex( -1.0, -1.0, 0.0, 0.0, 1.0), 
-																new Vertex(  1.0, -1.0, 0.0, 1.0, 1.0), 
-																new Vertex(  1.0,  1.0, 0.0, 1.0, 0.0)]);
-				var triangles:Vector.<Triangle> = new Vector.<Triangle>(2, true);
-				
-				var tri:Triangle = new Triangle(0, 3, 2);
-				tri.u0 = 0.0; tri.v0 = 0.0;
-				tri.u1 = 1.0; tri.v1 = 0.0;
-				tri.u2 = 0.0; tri.v2 = 1.0;
-				triangles[0] = tri;
-				tri = new Triangle(2, 1, 0);
-				tri.u0 = 1.0; tri.v0 = 1.0;
-				tri.u1 = 0.0; tri.v1 = 0.1;
-				tri.u2 = 0.0; tri.v2 = 0.0;
-				triangles[1] = tri;
-				
-				Geometry.calculateNormal(vertices, triangles);
-				_screen = new Geometry(vertices, triangles);
-			}
-			return _screen;
-		}
-		
 		private static var _skybox:Geometry;
 		
 		/**
