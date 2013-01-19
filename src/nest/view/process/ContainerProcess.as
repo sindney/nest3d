@@ -205,7 +205,7 @@ package nest.view.process
 			_rgba[0] = ((value >> 16) & 0xFF) / 255;
 			_rgba[1] = ((value >> 8) & 0xFF) / 255;
 			_rgba[2] = (value & 0xFF) / 255;
-			_rgba[3] = (value >> 24) / 255;
+			_rgba[3] = ((value >> 24) & 0xFF) / 255;
 		}
 		
 		public function get numVertices():int {
