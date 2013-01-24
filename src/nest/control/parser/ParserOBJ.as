@@ -3,7 +3,7 @@ package nest.control.parser
 	import flash.geom.Vector3D;
 	import flash.utils.ByteArray;
 	
-	import nest.object.geom.MeshData;
+	import nest.object.geom.Geometry;
 	import nest.object.geom.Triangle;
 	import nest.object.geom.Vertex;
 	
@@ -26,7 +26,7 @@ package nest.control.parser
 			
 		}
 		
-		public function parse(model:ByteArray, scale:Number = 1):MeshData {
+		public function parse(model:ByteArray, scale:Number = 1):Geometry {
 			var vertices:Vector.<Number> = new Vector.<Number>();
 			var normals:Vector.<Number> = new Vector.<Number>();
 			var uvs:Vector.<Number> = new Vector.<Number>();
@@ -118,7 +118,7 @@ package nest.control.parser
 				tri.normal.normalize();
 			}
 			
-			return new MeshData(rawVertex, rawTriangle);
+			return new Geometry(rawVertex, rawTriangle);
 		}
 		
 	}

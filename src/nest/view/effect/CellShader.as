@@ -38,7 +38,7 @@ package nest.view.effect
 		override public function calculate():void {
 			var context3d:Context3D = ViewPort.context3d;
 			if (_renderTarget.texture) {
-				context3d.setRenderToTexture(_renderTarget.texture, _renderTarget.enableDepthAndStencil, _renderTarget.antiAlias);
+				context3d.setRenderToTexture(_renderTarget.texture, _renderTarget.enableDepthAndStencil, _renderTarget.antiAlias, _renderTarget.surfaceSelector);
 			} else {
 				context3d.setRenderToBackBuffer();
 			}

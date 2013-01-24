@@ -7,6 +7,8 @@ package
 	import nest.object.Mesh;
 	import nest.object.Container3D;
 	import nest.view.Camera3D;
+	import nest.view.light.AmbientLight;
+	import nest.view.light.DirectionalLight;
 	import nest.view.material.ColorMaterial;
 	import nest.view.material.TextureMaterial;
 	import nest.view.process.*;
@@ -40,10 +42,10 @@ package
 			
 			view.processes.push(process0, process1);
 			
-			mesh = new Mesh(PrimitiveFactory.createBox(), new ColorMaterial(0xff0066ff));
+			mesh = new Mesh(PrimitiveFactory.createSphere(100, 16, 12), new ColorMaterial(0xff0066ff));
+			(mesh.material as ColorMaterial).lights.push(new AmbientLight(0x333333), new DirectionalLight(0xffffff, 0.414, 0.414, 0.414));
 			mesh.material.comply();
 			container0.addChild(mesh);
-			mesh.rotation.x = Math.PI / 4;
 			mesh.position.z = 400;
 			mesh.recompose();
 			

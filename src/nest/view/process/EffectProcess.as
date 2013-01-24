@@ -13,7 +13,7 @@ package nest.view.process
 	 */
 	public class EffectProcess implements IEffectProcess {
 		
-		protected var _renderTarget:TextureProcess;
+		protected var _renderTarget:RenderTarget;
 		
 		protected var _textures:Vector.<TextureBase>;
 		
@@ -41,7 +41,7 @@ package nest.view.process
 			indexBuffer = context3d.createIndexBuffer(6);
 			indexBuffer.uploadFromVector(indexData, 0, 6);
 			
-			_renderTarget = new TextureProcess();
+			_renderTarget = new RenderTarget();
 		}
 		
 		public function calculate():void {
@@ -109,7 +109,7 @@ package nest.view.process
 			_antiAlias = value;
 		}
 		
-		public function get renderTarget():TextureProcess {
+		public function get renderTarget():RenderTarget {
 			return _renderTarget;
 		}
 		

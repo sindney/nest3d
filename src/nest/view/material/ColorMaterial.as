@@ -4,6 +4,7 @@ package nest.view.material
 	import flash.display3D.Context3DProgramType;
 	import flash.display3D.Program3D;
 	
+	import nest.control.animation.AnimationTrack;
 	import nest.control.factory.ShaderFactory;
 	import nest.object.IMesh;
 	import nest.view.light.*;
@@ -20,6 +21,8 @@ package nest.view.material
 		protected var _lights:Vector.<ILight>;
 		
 		protected var _program:Program3D;
+		
+		protected var _tracks:Vector.<AnimationTrack>;
 		
 		public function ColorMaterial(color:uint = 0xffffffff) {
 			_rgba = new Vector.<Number>(4, true);
@@ -111,10 +114,10 @@ package nest.view.material
 		
 		public function set color(value:uint):void {
 			_color = value;
-			_rgba[0] = ((value >> 16) & 0xFF) / 255;
-			_rgba[1] = ((value >> 8) & 0xFF) / 255;
-			_rgba[2] = (value & 0xFF) / 255;
-			_rgba[3] = ((value >> 24) & 0xFF) / 255;
+			_rgba[0] = ((value >> 16) & 0xff) / 255;
+			_rgba[1] = ((value >> 8) & 0xff) / 255;
+			_rgba[2] = (value & 0xff) / 255;
+			_rgba[3] = ((value >> 24) & 0xff) / 255;
 		}
 		
 		public function get rgba():Vector.<Number> {
@@ -131,6 +134,14 @@ package nest.view.material
 		
 		public function get normal():Boolean {
 			return _lights.length > 0;
+		}
+		
+		public function get tracks():Vector.<AnimationTrack> {
+			return _tracks;
+		}
+		
+		public function set tracks(value:Vector.<AnimationTrack>):void {
+			_tracks = value;
 		}
 		
 	}

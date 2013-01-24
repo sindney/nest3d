@@ -4,7 +4,7 @@ package nest.control.parser
 	import flash.utils.ByteArray;
 	import flash.utils.Endian;
 	
-	import nest.object.data.*;
+	import nest.object.geom.Geometry;
 	import nest.object.geom.Triangle;
 	import nest.object.geom.Vertex;
 	import nest.object.Mesh;
@@ -123,8 +123,8 @@ package nest.control.parser
 						data.position += 2;
 					}
 					
-					MeshData.calculateNormal(rawVertices, rawTriangles);
-					last.data = new MeshData(rawVertices, rawTriangles);
+					Geometry.calculateNormal(rawVertices, rawTriangles);
+					last.geom = new Geometry(rawVertices, rawTriangles);
 					_objects.push(last);
 					last = null;
 					break;

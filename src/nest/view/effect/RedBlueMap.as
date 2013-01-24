@@ -71,7 +71,7 @@ package nest.view.effect
 			camera.recompose();
 			
 			if (_renderTarget.texture) {
-				context3d.setRenderToTexture(_renderTarget.texture, _renderTarget.enableDepthAndStencil, _renderTarget.antiAlias);
+				context3d.setRenderToTexture(_renderTarget.texture, _renderTarget.enableDepthAndStencil, _renderTarget.antiAlias, _renderTarget.surfaceSelector);
 			} else {
 				context3d.setRenderToBackBuffer();
 			}

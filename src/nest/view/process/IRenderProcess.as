@@ -9,7 +9,7 @@ package nest.view.process
 		
 		function dispose():void;
 		
-		function get renderTarget():TextureProcess;
+		function get renderTarget():RenderTarget;
 		
 	}
 	

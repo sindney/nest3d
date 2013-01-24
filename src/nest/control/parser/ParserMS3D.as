@@ -4,7 +4,7 @@ package nest.control.parser
 	import flash.utils.ByteArray;
 	import flash.utils.Endian;
 	
-	import nest.object.geom.MeshData;
+	import nest.object.geom.Geometry;
 	import nest.object.geom.Triangle;
 	import nest.object.geom.Vertex;
 	import nest.object.Mesh;
@@ -157,7 +157,7 @@ package nest.control.parser
 				}
 				// materialIndex
 				model.position++;
-				mesh = new Mesh(new MeshData(rawVertex, rawTriangle), null, null);
+				mesh = new Mesh(new Geometry(rawVertex, rawTriangle), null, null);
 				mesh.name = name;
 				_objects.push(mesh);
 			}

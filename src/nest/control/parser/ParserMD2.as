@@ -3,10 +3,9 @@ package nest.control.parser
 	import flash.utils.ByteArray;
 	import flash.utils.Endian;
 	
-	import nest.control.animation.AnimationClip;
 	import nest.control.animation.AnimationTrack;
 	import nest.control.animation.VertexKeyFrame;
-	import nest.object.geom.MeshData;
+	import nest.object.geom.Geometry;
 	import nest.object.geom.Triangle;
 	import nest.object.geom.Vertex;
 	import nest.object.Mesh;
@@ -83,12 +82,12 @@ package nest.control.parser
 			var u:Number, v:Number;
 			var tri:Triangle;
 			var frame:VertexKeyFrame;
-			if (num_skins>0) {
-				for (i = 0; i < 64;i++ ) {
+			if (num_skins > 0) {
+				for (i = 0; i < 64; i++) {
 					char = model.readUnsignedByte();
-					if (char==0) {
+					if (char == 0) {
 						break;
-					}else {
+					} else {
 						texture_name += String.fromCharCode(char);
 					}
 				}
@@ -100,6 +99,7 @@ package nest.control.parser
 				uvs[i << 1] = model.readShort() / skin_width;
 				uvs[(i << 1) + 1] = model.readShort() / skin_height;
 			}
+			
 			//get triangles
 			model.position = offset_triangles;
 			for (i = 0; i < num_triangles;i++ ) {
@@ -158,11 +158,12 @@ package nest.control.parser
 				frame.name = name;
 				frame.time = i;
 				frame.vertices = new Vector.<Number>(num_vertices * 3, true);
-				for (j = 0, k = 0; j < num_vertices; j++, k += 3 ) {
+				for (j = 0, k = 0; j < num_vertices; j++, k += 3) {
 					frame.vertices[k] = (sx * model.readUnsignedByte() + tx) * scale;
 					frame.vertices[k + 1] = (sy * model.readUnsignedByte() + ty) * scale;
 					frame.vertices[k + 2] = (sz * model.readUnsignedByte() + tz) * scale;
 					
+					// TODO: 读取法线信息存入VertexKeyFrame的normals数组中
 					//index of normal
 					model.readUnsignedByte();
 				}
@@ -170,26 +171,24 @@ package nest.control.parser
 			}
 			
 			//reset vertex data to frame0
-			var vs0:Vector.<Number> = (vertexTrack.frameList as VertexKeyFrame).vertices;
-			for (i = 0,j=0; i < num_vertices;i++,j+=3 ) {
+			var vs0:Vector.<Number> = (vertexTrack.first as VertexKeyFrame).vertices;
+			for (i = 0, j = 0; i < num_vertices; i++, j += 3) {
 				if (vertices[i]) {
 					vertices[i].x = vs0[j];
-					vertices[i].y = vs0[j+1];
-					vertices[i].z = vs0[j+2];
+					vertices[i].y = vs0[j + 1];
+					vertices[i].z = vs0[j + 2];
 				} else {
 					vertices[i] = new Vertex(vs0[j], vs0[j + 1], vs0[j + 2]);
 				}
 			}
 			
-			MeshData.calculateNormal(vertices, triangles);
-			var data:MeshData = new MeshData(vertices, triangles);
-			var clips:Vector.<AnimationClip> = new Vector.<AnimationClip>(1, true);
-			clips[0] = new AnimationClip();
-			clips[0].addTrack(vertexTrack);
+			var geom:Geometry = new Geometry(vertices, triangles);
 			
-			var aniMesh:Mesh = new Mesh(data, null);
-			aniMesh.clips = clips;
-			return aniMesh;
+			var mesh:Mesh = new Mesh(geom, null);
+			mesh.tracks = new Vector.<AnimationTrack>();
+			mesh.tracks.push(vertexTrack);
+			
+			return mesh;
 		}
 		
 	}

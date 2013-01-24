@@ -5,6 +5,7 @@ package nest.view.material
 	import flash.display3D.Context3DProgramType;
 	import flash.display3D.Program3D;
 	
+	import nest.control.animation.AnimationTrack;
 	import nest.control.factory.ShaderFactory;
 	import nest.object.IMesh;
 	import nest.view.ViewPort;
@@ -16,6 +17,8 @@ package nest.view.material
 		
 		protected var _cubicmap:CubeTextureResource;
 		protected var _program:Program3D;
+		
+		protected var _tracks:Vector.<AnimationTrack>;
 		
 		public function SkyBoxMaterial(cubicmap:Vector.<BitmapData>) {
 			_cubicmap = new CubeTextureResource();
@@ -62,6 +65,14 @@ package nest.view.material
 		
 		public function get program():Program3D {
 			return _program;
+		}
+		
+		public function get tracks():Vector.<AnimationTrack> {
+			return _tracks;
+		}
+		
+		public function set tracks(value:Vector.<AnimationTrack>):void {
+			_tracks = value;
 		}
 		
 	}

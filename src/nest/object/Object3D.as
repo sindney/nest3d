@@ -5,6 +5,8 @@ package nest.object
 	import flash.geom.Orientation3D;
 	import flash.geom.Vector3D;
 	
+	import nest.control.animation.AnimationTrack;
+	
 	/**
 	 * Object3D
 	 */
@@ -22,6 +24,8 @@ package nest.object
 		protected var _invertWorldMatrix:Matrix3D;
 		
 		protected var _parent:IContainer3D;
+		
+		protected var _tracks:Vector.<AnimationTrack>;
 		
 		public function Object3D() {
 			_components = new Vector.<Vector3D>(3, true);
@@ -124,6 +128,14 @@ package nest.object
 		
 		public function set parent(value:IContainer3D):void {
 			_parent = value;
+		}
+		
+		public function get tracks():Vector.<AnimationTrack> {
+			return _tracks;
+		}
+		
+		public function set tracks(value:Vector.<AnimationTrack>):void {
+			_tracks = value;
 		}
 		
 	}

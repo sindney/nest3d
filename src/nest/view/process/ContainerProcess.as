@@ -19,7 +19,7 @@ package nest.view.process
 	 */
 	public class ContainerProcess implements IContainerProcess {
 		
-		protected var _renderTarget:TextureProcess;
+		protected var _renderTarget:RenderTarget;
 		
 		protected var _meshProcess:IMeshProcess;
 		protected var _container:IContainer3D;
@@ -40,7 +40,7 @@ package nest.view.process
 			this.camera = camera;
 			this.container = container;
 			this.color = color;
-			_renderTarget = new TextureProcess();
+			_renderTarget = new RenderTarget();
 		}
 		
 		public function calculate():void {
@@ -63,7 +63,7 @@ package nest.view.process
 			_numObjects = 0;
 			
 			if (_renderTarget.texture) {
-				context3d.setRenderToTexture(_renderTarget.texture, _renderTarget.enableDepthAndStencil, _renderTarget.antiAlias);
+				context3d.setRenderToTexture(_renderTarget.texture, _renderTarget.enableDepthAndStencil, _renderTarget.antiAlias, _renderTarget.surfaceSelector);
 			} else {
 				context3d.setRenderToBackBuffer();
 			}
@@ -168,7 +168,7 @@ package nest.view.process
 		// getter/setters
 		///////////////////////////////////
 		
-		public function get renderTarget():TextureProcess {
+		public function get renderTarget():RenderTarget {
 			return _renderTarget;
 		}
 		

@@ -4,10 +4,12 @@ package nest.object
 	import flash.geom.Matrix3D;
 	import flash.geom.Vector3D;
 	
+	import nest.control.animation.IAnimatable;
+	
 	/**
 	 * Object3D Interface
 	 */
-	public interface IObject3D extends IEventDispatcher {
+	public interface IObject3D extends IAnimatable, IEventDispatcher {
 		
 		function decompose():void;
 		function recompose():void;

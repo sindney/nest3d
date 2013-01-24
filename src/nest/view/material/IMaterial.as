@@ -2,12 +2,13 @@ package nest.view.material
 {
 	import flash.display3D.Program3D;
 	
+	import nest.control.animation.IAnimatable;
 	import nest.object.IMesh;
 	
 	/**
 	 * Material Interface.
 	 */
-	public interface IMaterial {
+	public interface IMaterial extends IAnimatable {
 		
 		function upload(mesh:IMesh):void;
 		function unload():void;

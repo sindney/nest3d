@@ -1,14 +1,12 @@
 package  
 {
-	import flash.display3D.textures.Texture;
-	
 	import nest.control.factory.PrimitiveFactory;
 	import nest.control.partition.OcNode;
 	import nest.control.partition.OcTree;
 	import nest.object.geom.Geometry;
 	import nest.object.Mesh;
 	import nest.object.Container3D;
-	import nest.view.effect.RedBlueMap;
+	import nest.view.effect.RadialBlur;
 	import nest.view.material.ColorMaterial;
 	import nest.view.process.*;
 	
@@ -31,7 +29,7 @@ package
 			process0.meshProcess = new BasicMeshProcess(camera);
 			process0.color = 0xff000000;
 			
-			var effect:RedBlueMap = new RedBlueMap(512, 512, process0);
+			var effect:RadialBlur = new RadialBlur(256, 256, 1, 10);
 			effect.comply();
 			
 			process0.renderTarget.texture = effect.texture;
@@ -65,7 +63,9 @@ package
 		}
 		
 		override public function loop():void {
-			view.diagram.message = "Objects: " + process0.numObjects + "/" + process0.container.numChildren;
+			view.diagram.message = "Objects: " + process0.numObjects + "/" + process0.container.numChildren + 
+									"\nVertices: " + process0.numVertices + 
+									"\nTriangles: " + process0.numTriangles;
 		}
 		
 	}
