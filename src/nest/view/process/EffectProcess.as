@@ -24,8 +24,8 @@ package nest.view.process
 		protected var uvBuffer:VertexBuffer3D;
 		protected var indexBuffer:IndexBuffer3D;
 		
-		protected var width:Number = 0;
-		protected var height:Number = 0;
+		protected var width:int = 0;
+		protected var height:int = 0;
 		
 		public function EffectProcess() {
 			var context3d:Context3D = ViewPort.context3d;
@@ -52,7 +52,7 @@ package nest.view.process
 			
 		}
 		
-		public function resize(width:Number, height:Number):void {
+		public function resize(width:int, height:int):void {
 			if (this.width != width || this.height != height) {
 				var i:int, j:int = _textures.length;
 				var texture:TextureBase;

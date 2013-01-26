@@ -9,8 +9,6 @@ package nest.view.process
 		
 		function dispose():void;
 		
-		function get renderTarget():RenderTarget;
-		
 	}
 	
 }

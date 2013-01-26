@@ -50,8 +50,8 @@ package nest.view.process
 			var object:IObject3D;
 			var mesh:IMesh;
 			
-			var ivm:Matrix3D = this.ivm;
-			var pm:Matrix3D = this.pm;
+			var ivm:Matrix3D = camera.invertMatrix;
+			var pm:Matrix3D = camera.pm;
 			
 			var i:int, j:int;
 			
@@ -226,14 +226,6 @@ package nest.view.process
 		
 		public function set camera(value:Camera3D):void {
 			_camera = value;
-		}
-		
-		public function get ivm():Matrix3D {
-			return _camera.invertMatrix;
-		}
-		
-		public function get pm():Matrix3D {
-			return _camera.pm;
 		}
 		
 	}

@@ -5,6 +5,7 @@ package nest.view.process
 	
 	import nest.object.IContainer3D;
 	import nest.object.IMesh;
+	import nest.view.Camera3D;
 	
 	/**
 	 * IContainerProcess
@@ -21,8 +22,8 @@ package nest.view.process
 		
 		function get excludedObjects():Vector.<IMesh>;
 		
-		function get ivm():Matrix3D;
-		function get pm():Matrix3D;
+		function get camera():Camera3D;
+		function set camera(value:Camera3D):void;
 		
 		function get color():uint;
 		function set color(value:uint):void;
@@ -30,6 +31,8 @@ package nest.view.process
 		function get numVertices():int;
 		function get numTriangles():int;
 		function get numObjects():int;
+		
+		function get renderTarget():RenderTarget;
 		
 	}
 	

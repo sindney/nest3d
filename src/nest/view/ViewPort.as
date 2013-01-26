@@ -55,7 +55,7 @@ package nest.view
 		/**
 		 * Put this into a loop to draw your scene on stage3d.
 		 */
-		public function calculate(bitmapData:BitmapData = null, present:Boolean = true):void {
+		public function calculate(bitmapData:BitmapData = null):void {
 			var i:int, j:int = _processes.length;
 			
 			for (i = 0; i < j; i++) {
@@ -65,7 +65,7 @@ package nest.view
 			_diagram.update();
 			
 			if (bitmapData) _context3d.drawToBitmapData(bitmapData);
-			if (present) _context3d.present();
+			_context3d.present();
 		}
 		
 		///////////////////////////////////

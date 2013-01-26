@@ -9,9 +9,11 @@ package nest.view.process
 		
 		function comply():void;
 		
-		function resize(width:Number, height:Number):void;
+		function resize(width:int, height:int):void;
 		
 		function get textures():Vector.<TextureBase>;
+		
+		function get renderTarget():RenderTarget;
 		
 	}
 	

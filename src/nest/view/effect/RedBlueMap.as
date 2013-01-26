@@ -9,8 +9,8 @@ package nest.view.effect
 	
 	import nest.control.factory.ShaderFactory;
 	import nest.object.IMesh;
-	import nest.view.process.ContainerProcess;
 	import nest.view.process.EffectProcess;
+	import nest.view.process.IContainerProcess;
 	import nest.view.Camera3D;
 	import nest.view.ViewPort;
 	
@@ -23,10 +23,10 @@ package nest.view.effect
 		
 		private var data:Vector.<Number>;
 		
-		public var containerProcess:ContainerProcess;
+		public var containerProcess:IContainerProcess;
 		public var eyePadding:Number;
 		
-		public function RedBlueMap(width:int = 512, height:int = 512, containerProcess:ContainerProcess = null, eyePadding:Number = 1) {
+		public function RedBlueMap(width:int = 512, height:int = 512, containerProcess:IContainerProcess = null, eyePadding:Number = 1) {
 			super();
 			var context3d:Context3D = ViewPort.context3d;
 			
@@ -52,6 +52,8 @@ package nest.view.effect
 			p.scaleBy(eyePadding);
 			camera.position.copyFrom(camera.matrix.transformVector(p));
 			camera.recompose();
+			
+			containerProcess.meshProcess.initialize();
 			
 			var _camPos:Vector.<Number> = new Vector.<Number>(4, true);
 			_camPos[0] = p.x;
