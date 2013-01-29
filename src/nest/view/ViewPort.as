@@ -42,13 +42,11 @@ package nest.view
 		}
 		
 		public function configure(width:Number = 512, height:Number = 512, antiAlias:int = 0, 
-									enableDepthAndStencil:Boolean = true, sourceFactor:String = Context3DBlendFactor.ONE, 
-									destinationFactor:String = Context3DBlendFactor.ZERO, depthMask:Boolean = true, 
+									enableDepthAndStencil:Boolean = true, depthMask:Boolean = true, 
 									passCompareMode:String = Context3DCompareMode.LESS):void {
 			_width = width;
 			_height = height;
 			_context3d.configureBackBuffer(width, height, antiAlias, enableDepthAndStencil);
-			_context3d.setBlendFactors(sourceFactor, destinationFactor);
 			_context3d.setDepthTest(depthMask, passCompareMode);
 		}
 		
@@ -57,6 +55,8 @@ package nest.view
 		 */
 		public function calculate(bitmapData:BitmapData = null):void {
 			var i:int, j:int = _processes.length;
+			
+			_context3d.setBlendFactors(Context3DBlendFactor.ONE, Context3DBlendFactor.ZERO);
 			
 			for (i = 0; i < j; i++) {
 				_processes[i].calculate();

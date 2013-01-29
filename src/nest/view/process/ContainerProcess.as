@@ -1,6 +1,7 @@
 package nest.view.process 
 {
 	import flash.display3D.Context3D;
+	import flash.display3D.Context3DBlendFactor;
 	import flash.display3D.textures.TextureBase;
 	import flash.geom.Matrix3D;
 	import flash.geom.Vector3D;
@@ -25,7 +26,7 @@ package nest.view.process
 		protected var _container:IContainer3D;
 		
 		protected var _objects:Vector.<IMesh>;
-		protected var _excludedObjects:Vector.<IMesh>;
+		protected var _alphaObjects:Vector.<IMesh>;
 		
 		protected var _camera:Camera3D;
 		
@@ -50,13 +51,16 @@ package nest.view.process
 			var object:IObject3D;
 			var mesh:IMesh;
 			
-			var ivm:Matrix3D = camera.invertMatrix;
-			var pm:Matrix3D = camera.pm;
+			var ivm:Matrix3D = _camera.invertMatrix;
+			var pm:Matrix3D = _camera.pm;
 			
 			var i:int, j:int;
+			var dx:int, dy:int, dz:int;
+			
+			var alphaParms:Vector.<int> = new Vector.<int>();
 			
 			_objects = new Vector.<IMesh>();
-			_excludedObjects = new Vector.<IMesh>();
+			_alphaObjects = new Vector.<IMesh>();
 			
 			_numVertices = 0;
 			_numTriangles = 0;
@@ -93,12 +97,19 @@ package nest.view.process
 								for (i = 0; i < j; i++) {
 									mesh = node.objects[i];
 									if (mesh.visible) {
+										if (mesh.alphaTest) {
+											dx = _camera.position.x - mesh.position.x;
+											dy = _camera.position.y - mesh.position.y;
+											dz = _camera.position.z - mesh.position.z;
+											alphaParms.push(dx * dx + dy * dy + dz * dz);
+											_alphaObjects.push(mesh);
+										} else {
+											_meshProcess.calculate(mesh, ivm, pm);
+											_objects.push(mesh);
+										}
 										_numVertices += mesh.geom.numVertices;
 										_numTriangles += mesh.geom.numTriangles;
 										_numObjects++;
-										_meshProcess.calculate(mesh, ivm, pm);
-										_objects.push(mesh);
-										if (mesh.cliping)_excludedObjects.push(mesh);
 									}
 								}
 							}
@@ -113,14 +124,19 @@ package nest.view.process
 							mesh = object as IMesh;
 							if (mesh.visible) {
 								if (!mesh.cliping || classifyMesh(mesh)) {
+									if (mesh.alphaTest) {
+										dx = _camera.position.x - mesh.position.x;
+										dy = _camera.position.y - mesh.position.y;
+										dz = _camera.position.z - mesh.position.z;
+										alphaParms.push(dx * dx + dy * dy + dz * dz);
+										_alphaObjects.push(mesh);
+									} else {
+										_meshProcess.calculate(mesh, ivm, pm);
+										_objects.push(mesh);
+									}
 									_numVertices += mesh.geom.numVertices;
 									_numTriangles += mesh.geom.numTriangles;
 									_numObjects++;
-									_meshProcess.calculate(mesh, ivm, pm);
-									_objects.push(mesh);
-									if (mesh.cliping)_excludedObjects.push(mesh);
-								} else {
-									_excludedObjects.push(mesh);
 								}
 							}
 						} else if (object is IContainer3D) {
@@ -131,6 +147,17 @@ package nest.view.process
 				
 				container = containers.pop();
 			}
+			
+			context3d.setBlendFactors(Context3DBlendFactor.SOURCE_ALPHA, Context3DBlendFactor.ONE_MINUS_SOURCE_ALPHA);
+			
+			i = _alphaObjects.length - 1;
+			if (i > 0) quickSort(alphaParms, 0, i);
+			
+			for each(mesh in _alphaObjects) {
+				_meshProcess.calculate(mesh, ivm, pm);
+			}
+			
+			context3d.setBlendFactors(Context3DBlendFactor.ONE, Context3DBlendFactor.ZERO);
 		}
 		
 		protected function classifyMesh(mesh:IMesh):Boolean {
@@ -154,12 +181,38 @@ package nest.view.process
 					);
 		}
 		
+		protected function quickSort(data:Vector.<int>, left:int, right:int):void {
+			var i:int = left;
+			var j:int = right;
+			var key:int = data[(left + right) >> 1];
+			var temp:int;
+			var mesh:IMesh;
+			// loop
+			while (i <= j) {
+				while (data[i] > key) i++;
+				while (data[j] < key) j--;
+				if (i <= j) {
+					temp = data[i];
+					data[i] = data[j];
+					data[j] = temp;
+					mesh = _alphaObjects[i];
+					_alphaObjects[i] = _alphaObjects[j];
+					_alphaObjects[j] = mesh;
+					i++;
+					j--;
+				}
+			}
+			// swap
+			if (left < j) quickSort(data, left, j);
+			if (i < right) quickSort(data, i, right);
+		}
+		
 		public function dispose():void {
 			_renderTarget = null;
 			_container = null;
 			_meshProcess = null;
 			_objects = null;
-			_excludedObjects = null;
+			_alphaObjects = null;
 			_camera = null;
 			_rgba = null;
 		}
@@ -192,8 +245,8 @@ package nest.view.process
 			return _objects;
 		}
 		
-		public function get excludedObjects():Vector.<IMesh> {
-			return _excludedObjects;
+		public function get alphaObjects():Vector.<IMesh> {
+			return _alphaObjects;
 		}
 		
 		public function get color():uint {

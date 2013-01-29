@@ -2,6 +2,7 @@ package nest.view.effect
 {
 	import flash.display3D.textures.TextureBase;
 	import flash.display3D.Context3D;
+	import flash.display3D.Context3DBlendFactor;
 	import flash.display3D.Context3DProgramType;
 	import flash.display3D.Context3DVertexBufferFormat;
 	import flash.display3D.Program3D;
@@ -63,9 +64,18 @@ package nest.view.effect
 			context3d.setProgramConstantsFromVector(Context3DProgramType.VERTEX, 8, _camPos);
 			
 			var object:IMesh;
+			
 			for each(object in containerProcess.objects) {
 				containerProcess.meshProcess.calculate(object, camera.invertMatrix, camera.pm);
 			}
+			
+			context3d.setBlendFactors(Context3DBlendFactor.SOURCE_ALPHA, Context3DBlendFactor.ONE_MINUS_SOURCE_ALPHA);
+			
+			for each(object in containerProcess.alphaObjects) {
+				containerProcess.meshProcess.calculate(object, camera.invertMatrix, camera.pm);
+			}
+			
+			context3d.setBlendFactors(Context3DBlendFactor.ONE, Context3DBlendFactor.ZERO);
 			
 			p.setTo(1, 0, 0);
 			p.scaleBy( -eyePadding);
@@ -78,7 +88,7 @@ package nest.view.effect
 				context3d.setRenderToBackBuffer();
 			}
 			context3d.clear();
-			context3d.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, 0, data,2);
+			context3d.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, 0, data, 2);
 			context3d.setVertexBufferAt(0, vertexBuffer, 0, Context3DVertexBufferFormat.FLOAT_3);
 			context3d.setVertexBufferAt(1, uvBuffer, 0, Context3DVertexBufferFormat.FLOAT_2);
 			context3d.setTextureAt(0, _textures[0]);
@@ -90,7 +100,7 @@ package nest.view.effect
 			context3d.setTextureAt(0, null);
 			context3d.setTextureAt(1, null);
 		}
-		
+		// TODO: 貌似shader有问题，只能是白色的ColorMaterial才有红蓝效果，颜色一变化就没了，你检查下这里
 		override public function comply():void {
 			var vs:String = "mov op, va0\n" + 
 							"mov v0, va1\n";

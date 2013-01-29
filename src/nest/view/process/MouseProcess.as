@@ -2,6 +2,7 @@ package nest.view.process
 {
 	import flash.display.BitmapData;
 	import flash.display.Stage;
+	import flash.display3D.Context3DBlendFactor;
 	import flash.display3D.Context3DProgramType;
 	import flash.display3D.Context3D;
 	import flash.display3D.Program3D;
@@ -92,6 +93,36 @@ package nest.view.process
 						mesh.geom.unload();
 					}
 				}
+				
+				context3d.setBlendFactors(Context3DBlendFactor.SOURCE_ALPHA, Context3DBlendFactor.ONE_MINUS_SOURCE_ALPHA);
+				
+				for each(mesh in containerProcess.alphaObjects) {
+					if (mesh.mouseEnabled) {
+						mesh.id = ++i;
+						
+						matrix.copyFrom(mesh.worldMatrix);
+						matrix.append(camera.invertMatrix);
+						if (mesh.ignoreRotation) {
+							components = matrix.decompose();
+							components[1].setTo(0, 0, 0);
+							matrix.recompose(components);
+						}
+						matrix.append(camera.pm);
+						
+						context3d.setCulling(mesh.triangleCulling);
+						context3d.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 0, matrix, true);
+						context3d.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, 0, Vector.<Number>([0, ((i >> 8) & 0xff) / 255, (i & 0xff) / 255, 1]));
+						
+						mesh.geom.upload(false, false);
+						
+						context3d.setProgram(program);
+						context3d.drawTriangles(mesh.geom.indexBuffer);
+						
+						mesh.geom.unload();
+					}
+				}
+				
+				context3d.setBlendFactors(Context3DBlendFactor.ONE, Context3DBlendFactor.ZERO);
 				
 				context3d.drawToBitmapData(bmd);
 				context3d.present();

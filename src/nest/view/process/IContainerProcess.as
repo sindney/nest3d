@@ -20,7 +20,7 @@ package nest.view.process
 		
 		function get objects():Vector.<IMesh>;
 		
-		function get excludedObjects():Vector.<IMesh>;
+		function get alphaObjects():Vector.<IMesh>;
 		
 		function get camera():Camera3D;
 		function set camera(value:Camera3D):void;
