@@ -2,6 +2,7 @@ package nest.control.animation
 {
 	/**
 	 * AnimationTrack
+	 * <p>Run this track when controller's time is greater than track.start.</p>
 	 */
 	public class AnimationTrack {
 		
@@ -9,9 +10,16 @@ package nest.control.animation
 		
 		public var length:Number = 0;
 		
+		/**
+		 * <p>The start time(sec) for this track.</p>
+		 */
+		public var start:Number = 0;
+		
 		public var first:IKeyFrame;
 		
 		public var last:IKeyFrame;
+		
+		public var modifier:IAnimationModifier;
 		
 		public function AnimationTrack(name:String = "") {
 			this.name = name;

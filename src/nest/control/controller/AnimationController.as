@@ -7,45 +7,46 @@ package nest.control.controller
 	
 	/**
 	 * AnimationController
+	 * <p>The time value in this Controller is used to calculate all IAnimatable object's AnimationTracks.</p>
 	 */
 	public class AnimationController {
 		
 		private var _time:Number = 0;
-		private var _last:int = -1;
-		private var _loop:uint = 0;
+		
+		private var last:int = 0;
+		private var count:int = 0;
 		
 		public var objects:Vector.<IAnimatable> = new Vector.<IAnimatable>();
 		public var paused:Boolean = true;
 		public var speed:Number = 1;
-		public var loops:uint = 0;
+		public var loops:int = 0;
 		
 		public function AnimationController() {
 			
 		}
 		
-		public function update():void {
-			var l:int = targets.length;
-			if (paused || l < 1) return;
+		public function calculate():void {
+			if (paused) return;
 			
-			var curTime:int = getTimer();
-			var dt:Number = (curTime - _last) / 1000;
+			var ct:int = getTimer();
+			var dt:Number = (ct - last) / 1000;
 			
-			_last = curTime;
+			last = ct;
 			_time += dt * speed;
-			l = length;
 			
-			if (_time > l) {
-				_time -= l;
-				_loop++;
-				if (_loop > loops) paused = true;
+			if (_time > length) {
+				_time = 0;
+				count++;
+				if (count >= loops) paused = true;
 			}
 			
 			var object:IAnimatable;
 			var track:AnimationTrack;
 			for each(object in objects) {
+				if (!object.tracks) continue;
 				for each(track in object.tracks) {
-					if (track.length > 0) {
-						track.first.calculate(object, track.first, _time);
+					if (track.length > 0 && _time >= track.start && _time < track.start + track.length) {
+						track.modifier.calculate(object, track.first, _time - track.start);
 					}
 				}
 			}
@@ -53,8 +54,8 @@ package nest.control.controller
 		
 		public function restart():void {
 			paused = false;
-			_current = 0;
-			_last = getTimer();
+			count = 0;
+			last = getTimer();
 		}
 		
 		///////////////////////////////////
@@ -67,7 +68,7 @@ package nest.control.controller
 		
 		public function set time(value:Number):void {
 			_time = value;
-			_last = getTimer();
+			last = getTimer();
 		}
 		
 		public function get length():Number {
@@ -75,8 +76,9 @@ package nest.control.controller
 			var object:IAnimatable;
 			var track:AnimationTrack;
 			for each(object in objects) {
+				if (!object.tracks) continue;
 				for each(track in object.tracks) {
-					if (track.length > i) i = track.length;
+					if (track.length + track.start > i) i = track.length + track.start;
 				}
 			}
 			return i;

@@ -6,8 +6,7 @@ package nest.control.animation
 	 */
 	public interface IKeyFrame {
 		
-		function interpolate(k1:IKeyFrame, k2:IKeyFrame, w1:Number, w2:Number):IKeyFrame;
-		function calculate(target:IAnimatable, root:IKeyFrame, time:Number):void;
+		function clone():IKeyFrame;
 		
 		function get time():Number;
 		function set time(value:Number):void;
