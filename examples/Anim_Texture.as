@@ -1,26 +1,32 @@
 package  
 {
+	import flash.display3D.Context3DTriangleFace;
+	
 	import nest.control.animation.AnimationTrack;
-	import nest.control.animation.TransformKeyFrame;
-	import nest.control.animation.TransformModifier;
+	import nest.control.animation.TextureKeyFrame;
+	import nest.control.animation.TextureModifier;
 	import nest.control.controller.AnimationController;
 	import nest.control.factory.PrimitiveFactory;
 	import nest.object.geom.Geometry;
 	import nest.object.Mesh;
 	import nest.object.Container3D;
-	import nest.view.material.ColorMaterial;
+	import nest.view.material.TextureMaterial;
 	import nest.view.process.*;
 	
 	/**
-	 * Anim_Transform
+	 * Anim_Texture
 	 */
-	public class Anim_Transform extends DemoBase {
+	public class Anim_Texture extends DemoBase {
+		
+		[Embed(source = "assets/sprite_sheet.png")]
+		private var data:Class;
 		
 		private var process0:ContainerProcess;
 		private var container:Container3D;
 		private var anim_controller:AnimationController;
+		private var modifier:TextureModifier;
 		
-		public function Anim_Transform() {
+		public function Anim_Texture() {
 			
 		}
 		
@@ -33,46 +39,28 @@ package
 			
 			view.processes.push(process0);
 			
-			var geom:Geometry = PrimitiveFactory.createBox(10, 10, 10);
-			var material:ColorMaterial = new ColorMaterial(0xffffffff);
+			modifier = new TextureModifier();
+			var track:AnimationTrack = modifier.getFromSpriteSheet(new data().bitmapData, 96, 128, 10, 19);
+			track.modifier = modifier;
+			
+			var geom:Geometry = PrimitiveFactory.createPlane();
+			var material:TextureMaterial = new TextureMaterial((track.first as TextureKeyFrame).diffuse);
+			material.kill = 1;
 			material.comply();
+			
 			var mesh:Mesh = new Mesh(geom, material);
 			container.addChild(mesh);
-			
-			var track:AnimationTrack = new AnimationTrack();
-			track.modifier = new TransformModifier();
-			track.start = 1;
+			mesh.rotation.x = Math.PI / 2;
+			mesh.triangleCulling = Context3DTriangleFace.NONE;
+			mesh.recompose();
 			
 			mesh.tracks = new Vector.<AnimationTrack>();
 			mesh.tracks.push(track);
 			
-			var keyFrame:TransformKeyFrame = new TransformKeyFrame();
-			keyFrame.time = 0;
-			keyFrame.position.x = 0;
-			keyFrame.scale.setTo(1, 1, 1);
-			track.addChild(keyFrame);
-			
-			keyFrame = new TransformKeyFrame();
-			keyFrame.time = 1;
-			keyFrame.position.x = 100;
-			keyFrame.scale.setTo(1, 10, 1);
-			track.addChild(keyFrame);
-			
-			keyFrame = new TransformKeyFrame();
-			keyFrame.time = 3;
-			keyFrame.position.x = -100;
-			keyFrame.scale.setTo(1, 10, 1);
-			track.addChild(keyFrame);
-			
-			keyFrame = new TransformKeyFrame();
-			keyFrame.time = 4;
-			keyFrame.position.x = 0;
-			keyFrame.scale.setTo(1, 1, 1);
-			track.addChild(keyFrame);
-			
 			anim_controller = new AnimationController();
 			anim_controller.objects.push(mesh);
 			anim_controller.loops = int.MAX_VALUE;
+			anim_controller.speed = 20;
 			anim_controller.restart();
 			
 			camera.position.z = -200;
@@ -83,7 +71,6 @@ package
 			anim_controller.calculate();
 			view.diagram.message = anim_controller.time.toFixed(2);
 		}
-		
 	}
 
 }

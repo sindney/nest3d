@@ -9,14 +9,15 @@ package nest.control.animation
 		
 		public function interpolate(k1:IKeyFrame, k2:IKeyFrame, w1:Number, w2:Number):IKeyFrame {
 			if (!k2) return k1.clone();
-			var tmp:UVKeyFrame = k2 as UVKeyFrame;
+			var tk1:UVKeyFrame = k1 as UVKeyFrame;
+			var tk2:UVKeyFrame = k2 as UVKeyFrame;
 			var result:UVKeyFrame = new UVKeyFrame();
-			result.time = k1.time * w1 + w2 * tmp.time;
-			if (k1.uvs && tmp.uvs) {
-				var l:uint = k1.uvs.length;
+			result.time = tk1.time * w1 + w2 * tk2.time;
+			if (tk1.uvs && tk2.uvs) {
+				var l:uint = tk1.uvs.length;
 				var copy:Vector.<Number> = new Vector.<Number>(l);
 				for (var i:int = 0; i < l;i++ ) {
-					copy[i] = k1.uvs[i] * w1 + tmp.uvs[i] * w2;
+					copy[i] = tk1.uvs[i] * w1 + tk2.uvs[i] * w2;
 				}
 				result.uvs = copy;
 			}

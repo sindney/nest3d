@@ -65,8 +65,8 @@ package nest.view.material
 					if (!_data || _data.width != value.width || _data.height != value.height) {
 						if (_texture)_texture.dispose();
 						_texture = ViewPort.context3d.createTexture(value.width, value.height, Context3DTextureFormat.BGRA, false);
-						_mipmapping ? uploadWithMipmaps(_texture, value) : _texture.uploadFromBitmapData(value);
 					}
+					_mipmapping ? uploadWithMipmaps(_texture, value) : _texture.uploadFromBitmapData(value);
 				} else {
 					if(_texture) _texture.dispose();
 					_texture = null;

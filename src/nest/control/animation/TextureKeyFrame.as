@@ -5,7 +5,7 @@ package nest.control.animation
 	/**
 	 * TextureKeyFrame
 	 */
-	public class TextureKeyFrame extends IKeyFrame {
+	public class TextureKeyFrame implements IKeyFrame {
 		
 		/**
 		 * argb: 0xff000000

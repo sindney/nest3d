@@ -5,6 +5,7 @@ package nest.control.animation
 	import flash.geom.Point;
 	import flash.geom.Rectangle;
 	
+	import nest.object.IMesh;
 	import nest.view.material.ColorMaterial;
 	import nest.view.material.TextureMaterial;
 	
@@ -97,17 +98,18 @@ package nest.control.animation
 		
 		public function interpolate(k1:IKeyFrame, k2:IKeyFrame, w1:Number, w2:Number):IKeyFrame {
 			if (!k2) return k1.clone();
-			var tmp:TextureKeyFrame = k2 as TextureKeyFrame;
+			var tk1:TextureKeyFrame = k1 as TextureKeyFrame;
+			var tk2:TextureKeyFrame = k2 as TextureKeyFrame;
 			var result:TextureKeyFrame = new TextureKeyFrame();
-			result.time = k1.time * w1 + w2 * k2.time;
-			var a:uint = ((k1.color >> 24) & 0xff) * w1 + ((tmp.color >> 24) & 0xff) * w2;
-			var r:uint = ((k1.color >> 16) & 0xff) * w1 + ((tmp.color >> 16) & 0xff) * w2;
-			var g:uint = ((k1.color >> 8) & 0xff) * w1 + ((tmp.color >> 8) & 0xff) * w2;
-			var b:uint = (k1.color & 0xff) * w1 + (tmp.color & 0xff) * w2;
+			result.time = tk1.time * w1 + w2 * tk2.time;
+			var a:uint = ((tk1.color >> 24) & 0xff) * w1 + ((tk2.color >> 24) & 0xff) * w2;
+			var r:uint = ((tk1.color >> 16) & 0xff) * w1 + ((tk2.color >> 16) & 0xff) * w2;
+			var g:uint = ((tk1.color >> 8) & 0xff) * w1 + ((tk2.color >> 8) & 0xff) * w2;
+			var b:uint = (tk1.color & 0xff) * w1 + (tk2.color & 0xff) * w2;
 			result.color = (a << 24) | (r << 16) | (g << 8) | b;
-			result.diffuse = k1.diffuse;
-			result.specular = k1.specular;
-			result.normalMap = k1.normalMap;
+			result.diffuse = tk1.diffuse;
+			result.specular = tk1.specular;
+			result.normalMap = tk1.normalMap;
 			return result;
 		}
 		
@@ -123,15 +125,16 @@ package nest.control.animation
 			var w1:Number = (offset - time) / (offset - frame.time);
 			var w2:Number = 1 - w1;
 			
+			var mesh:IMesh = target as IMesh;
 			var current:TextureKeyFrame = frame as TextureKeyFrame;
-			if (target is TextureMaterial) {
-				var textureMat:TextureMaterial = target as TextureMaterial;
+			if (mesh.material is TextureMaterial) {
+				var textureMat:TextureMaterial = mesh.material as TextureMaterial;
 				if (current.diffuse) textureMat.diffuse.data = current.diffuse;
 				if (current.specular) textureMat.specular.data = current.specular;
 				if (current.normalMap) textureMat.normalmap.data = current.normalMap;
-			} else if (target is ColorMaterial) {
+			} else if (mesh.material is ColorMaterial) {
 				var next:TextureKeyFrame = frame.next as TextureKeyFrame;
-				var colorMat:ColorMaterial = target as ColorMaterial;
+				var colorMat:ColorMaterial = mesh.material as ColorMaterial;
 				var a:uint = ((current.color >> 24) & 0xff) * w1 + ((next.color >> 24) & 0xff) * w2;
 				var r:uint = ((current.color >> 16) & 0xff) * w1 + ((next.color >> 16) & 0xff) * w2;
 				var g:uint = ((current.color >> 8) & 0xff) * w1 + ((next.color >> 8) & 0xff) * w2;

@@ -10,13 +10,15 @@ package nest.control.animation
 		
 		public function interpolate(k1:IKeyFrame, k2:IKeyFrame, w1:Number, w2:Number):IKeyFrame {
 			if (!k2) return k1.clone();
+			var tk1:VertexKeyFrame = k1 as VertexKeyFrame;
+			var tk2:VertexKeyFrame = k2 as VertexKeyFrame;
 			var result:VertexKeyFrame = new VertexKeyFrame();
-			result.time = k1.time * w1 + w2 * k2.time;
-			if (k1.vertices && k2.vertices) {
-				var l:uint = k1.vertices.length;
+			result.time = tk1.time * w1 + w2 * tk2.time;
+			if (tk1.vertices && tk2.vertices) {
+				var l:int = tk1.vertices.length;
 				var copy_vertices:Vector.<Number> = new Vector.<Number>(l);
-				for (var i:int = 0; i < l;i++ ) {
-					copy_vertices[i] = k1.vertices[i] * w1 + k2.vertices[i] * w2;
+				for (var i:int = 0; i < l; i++) {
+					copy_vertices[i] = tk1.vertices[i] * w1 + tk2.vertices[i] * w2;
 				}
 				result.vertices = copy_vertices;
 			}
