@@ -167,19 +167,19 @@ package nest.control.parser
 					//index of normal
 					model.readUnsignedByte();
 				}
-				vertexTrack.addFrame(frame);
+				vertexTrack.addChild(frame);
 			}
 			
 			//reset vertex data to frame0
 			var vs0:Vector.<Number> = (vertexTrack.first as VertexKeyFrame).vertices;
+			var vn0:Vector.<Number> = (vertexTrack.first as VertexKeyFrame).normals;
+			var vertex:Vertex;
 			for (i = 0, j = 0; i < num_vertices; i++, j += 3) {
-				if (vertices[i]) {
-					vertices[i].x = vs0[j];
-					vertices[i].y = vs0[j + 1];
-					vertices[i].z = vs0[j + 2];
-				} else {
-					vertices[i] = new Vertex(vs0[j], vs0[j + 1], vs0[j + 2]);
-				}
+				vertex = vertices[i];
+				vertex.x = vs0[j];
+				vertex.y = vs0[j + 1];
+				vertex.z = vs0[j + 2];
+				vertex.normal.setTo(vn0[j], vn0[j + 1], vn0[j + 2]);
 			}
 			
 			var geom:Geometry = new Geometry(vertices, triangles);

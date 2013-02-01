@@ -15,12 +15,19 @@ package nest.control.animation
 			var result:VertexKeyFrame = new VertexKeyFrame();
 			result.time = tk1.time * w1 + w2 * tk2.time;
 			if (tk1.vertices && tk2.vertices) {
+				var i:int;
 				var l:int = tk1.vertices.length;
-				var copy_vertices:Vector.<Number> = new Vector.<Number>(l);
-				for (var i:int = 0; i < l; i++) {
-					copy_vertices[i] = tk1.vertices[i] * w1 + tk2.vertices[i] * w2;
+				var copy:Vector.<Number> = new Vector.<Number>(l, true);
+				for (i = 0; i < l; i++) {
+					copy[i] = tk1.vertices[i] * w1 + tk2.vertices[i] * w2;
 				}
-				result.vertices = copy_vertices;
+				result.vertices = copy;
+				l = tk1.normals.length;
+				copy = new Vector.<Number>(l, true);
+				for (i = 0; i < l; i++) {
+					copy[i] = tk1.normals[i] * w1 + tk2.normals[i] * w2;
+				}
+				result.normals = copy;
 			}
 			return result;
 		}

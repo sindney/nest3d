@@ -15,7 +15,7 @@ package nest.control.animation
 			result.time = tk1.time * w1 + w2 * tk2.time;
 			if (tk1.uvs && tk2.uvs) {
 				var l:uint = tk1.uvs.length;
-				var copy:Vector.<Number> = new Vector.<Number>(l);
+				var copy:Vector.<Number> = new Vector.<Number>(l, true);
 				for (var i:int = 0; i < l;i++ ) {
 					copy[i] = tk1.uvs[i] * w1 + tk2.uvs[i] * w2;
 				}
