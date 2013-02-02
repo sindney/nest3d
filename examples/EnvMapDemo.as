@@ -1,10 +1,14 @@
 package  
 {
 	import flash.display.BitmapData;
-	import nest.control.parsers.ParserOBJ;
-	import nest.object.data.MeshData;
+	
+	import nest.control.factory.PrimitiveFactory;
+	import nest.object.geom.Geometry;
+	import nest.object.Container3D;
 	import nest.object.Mesh;
-	import nest.view.materials.*;
+	import nest.view.material.*;
+	import nest.view.process.BasicMeshProcess;
+	import nest.view.process.ContainerProcess;
 	
 	/**
 	 * EnvMapDemo
@@ -29,17 +33,25 @@ package
 		[Embed(source = "assets/skybox_back.jpg")]
 		private const back:Class;
 		
-		[Embed(source = "assets/teapot.obj", mimeType = "application/octet-stream")]
-		private const model:Class;
-		
 		private var mesh:Mesh;
+		
+		private var process0:ContainerProcess;
+		private var container:Container3D;
 		
 		public function EnvMapDemo() {
 			super();
 		}
 		
 		override public function init():void {
-			var parser:ParserOBJ = new ParserOBJ();
+			container = new Container3D();
+			
+			process0 = new ContainerProcess(camera, container);
+			process0.meshProcess = new BasicMeshProcess(camera);
+			process0.color = 0xff000000;
+			
+			view.processes.push(process0);
+			
+			var geom:Geometry = PrimitiveFactory.createSphere(100, 16, 12);
 			
 			var cubicmap:Vector.<BitmapData> = new Vector.<BitmapData>(6, true);
 			cubicmap[0] = new right().bitmapData;
@@ -49,23 +61,22 @@ package
 			cubicmap[4] = new front().bitmapData;
 			cubicmap[5] = new back().bitmapData;
 			
-			var data:MeshData = parser.parse(new model(), 5);
 			var texture:EnvMapMaterial = new EnvMapMaterial(cubicmap, 0.8, new BitmapData(1, 1, false, 0xffffff));
-			texture.update();
+			texture.comply();
 			
-			mesh = new Mesh(data, texture);
-			mesh.position.z = 200;
-			mesh.changed = true;
-			scene.addChild(mesh);
+			mesh = new Mesh(geom, texture);
+			container.addChild(mesh);
+			mesh.rotation.x = Math.PI / 4;
+			mesh.recompose();
 			
-			camera.position.y = 20;
-			camera.changed = true;
+			camera.position.z = -200;
+			camera.recompose();
 		}
 		
 		override public function loop():void {
-			mesh.rotation.y += 0.01;
-			mesh.changed = true;
+			view.diagram.message = "Objects: " + process0.numObjects + "/" + process0.container.numChildren;
 		}
+		
 	}
 
 }

@@ -1,5 +1,6 @@
 package nest.object 
 {
+	import nest.control.partition.IPTree;
 	
 	/**
 	 * Container3D
@@ -8,10 +9,13 @@ package nest.object
 		
 		protected var _visible:Boolean = true;
 		protected var _mouseEnabled:Boolean = false;
+		protected var _castShadows:Boolean = false;
 		
 		protected var _numChildren:int = 0;
 		
 		protected var _objects:Vector.<IObject3D>;
+		
+		protected var _partition:IPTree;
 		
 		public function Container3D() {
 			super();
@@ -47,6 +51,26 @@ package nest.object
 			return index < _numChildren ? _objects[index] : null;
 		}
 		
+		override public function recompose():void {
+			super.recompose();
+			var i:int;
+			var child:IObject3D;
+			for (i = 0; i < _numChildren; i++) {
+				child = _objects[i];
+				child.recompose();
+			}
+		}
+		
+		override public function decompose():void {
+			super.decompose();
+			var i:int;
+			var child:IObject3D;
+			for (i = 0; i < _numChildren; i++) {
+				child = _objects[i];
+				child.recompose();
+			}
+		}
+		
 		///////////////////////////////////
 		// getter/setters
 		///////////////////////////////////
@@ -69,6 +93,26 @@ package nest.object
 		
 		public function set mouseEnabled(value:Boolean):void {
 			_mouseEnabled = value;
+		}
+		
+		public function get partition():IPTree {
+			return _partition;
+		}
+		
+		public function set partition(value:IPTree):void {
+			_partition = value;
+		}
+		
+		public function get objects():Vector.<IObject3D> {
+			return _objects;
+		}
+		
+		public function get castShadows():Boolean {
+			return _castShadows;
+		}
+		
+		public function set castShadows(value:Boolean):void {
+			_castShadows = value;
 		}
 		
 	}

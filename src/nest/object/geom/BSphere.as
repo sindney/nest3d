@@ -9,6 +9,13 @@ package nest.object.geom
 	 */
 	public class BSphere implements IBound {
 		
+		public static function BSphere_BSphere(center:Vector3D, r:Number, center1:Vector3D, r1:Number):Boolean {
+			var x:Number = center.x - center1.x;
+			var y:Number = center.y - center1.y;
+			var z:Number = center.z - center1.z;
+			return (x * x + y * y + z * z) <= (r + r1) * (r + r1);
+		}
+		
 		private var _center:Vector3D;
 		private var _radius:Number;
 		

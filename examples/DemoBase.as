@@ -1,44 +1,26 @@
 package  
 {
 	import flash.display.Sprite;
+	import flash.display.Stage3D;
 	import flash.display.StageAlign;
 	import flash.display.StageScaleMode;
 	import flash.events.Event;
 	import flash.events.MouseEvent;
-	import flash.geom.Vector3D;
 	
-	import nest.control.CameraController;
-	import nest.control.EngineBase;
-	import nest.object.Container3D;
-	import nest.view.culls.BasicCulling;
-	import nest.view.managers.BasicManager;
-	import nest.view.managers.ISceneManager;
+	import nest.control.controller.CameraController;
+	import nest.view.process.IRenderProcess;
 	import nest.view.Camera3D;
 	import nest.view.ViewPort;
 	
 	/**
 	 * DemoBase
-	 * 
-	 * Y
-	 * |     Z
-	 * |    /
-	 * |   /
-	 * |  /
-	 * | /
-	 * |/__ _ _ _ _ X
-	 * 
-	 * Left Handed Crood SyS.
-	 * 
-	 * rx = pitch
-	 * ry = yaw
-	 * rz = roll
 	 */
 	public class DemoBase extends Sprite {
 		
+		protected var stage3d:Stage3D;
+		
 		protected var view:ViewPort;
 		protected var camera:Camera3D;
-		protected var scene:Container3D;
-		protected var manager:ISceneManager;
 		protected var controller:CameraController;
 		
 		protected var actived:Boolean = true;
@@ -49,21 +31,30 @@ package
 			stage.frameRate = 60;
 			stage.addEventListener(MouseEvent.RIGHT_CLICK, onRightClick);
 			
-			EngineBase.stage = stage;
-			EngineBase.stage3d = stage.stage3Ds[0];
-			EngineBase.camera = camera = new Camera3D();
-			EngineBase.root = scene = new Container3D();
-			EngineBase.manager = manager = new BasicManager();
-			EngineBase.view = view = new ViewPort(800, 600);
-			view.culling = new BasicCulling();
+			stage3d = stage.stage3Ds[0];
+			stage3d.addEventListener(Event.CONTEXT3D_CREATE, onContext3DCreated);
+			stage3d.requestContext3D();
+		}
+		
+		protected function onContext3DCreated(e:Event):void {
+			stage3d.removeEventListener(Event.CONTEXT3D_CREATE, onContext3DCreated);
+			
+			view = new ViewPort(stage3d.context3D, new Vector.<IRenderProcess>());
+			view.configure(stage.stageWidth, stage.stageHeight);
 			addChild(view.diagram);
 			
-			controller = new CameraController();
-			controller.mouseEnabled = true;
+			camera = new Camera3D();
+			
+			controller = new CameraController(stage, camera);
 			controller.keyboardEnabled = true;
+			controller.mouseEnabled = true;
 			controller.speed = 10;
 			
-			view.addEventListener(Event.CONTEXT3D_CREATE, onContext3DCreated);
+			init();
+			stage.addEventListener(Event.RESIZE, onResize);
+			stage.addEventListener(Event.ACTIVATE, onStageActived);
+			stage.addEventListener(Event.DEACTIVATE, onStageDeactived);
+			stage.addEventListener(Event.ENTER_FRAME, onEnterFrame);
 		}
 		
 		protected function onStageDeactived(e:Event):void {
@@ -85,15 +76,6 @@ package
 			
 		}
 		
-		protected function onContext3DCreated(e:Event):void {
-			stage.addEventListener(Event.RESIZE, onResize);
-			stage.addEventListener(Event.ACTIVATE, onStageActived);
-			stage.addEventListener(Event.DEACTIVATE, onStageDeactived);
-			stage.addEventListener(Event.ENTER_FRAME, onEnterFrame);
-			init();
-			view.calculate();
-		}
-		
 		public function init():void {
 			
 		}
@@ -103,15 +85,15 @@ package
 		}
 		
 		protected function onResize(e:Event):void {
-			view.width = stage.stageWidth;
-			view.height = stage.stageHeight;
+			view.configure(stage.stageWidth, stage.stageHeight);
+			camera.aspect = stage.stageWidth / stage.stageHeight;
+			camera.update();
 		}
 		
 		protected function onEnterFrame(e:Event):void {
-			controller.update();
+			controller.calculate();
 			loop();
 			view.calculate();
-			view.diagram.message = "Objects: " + manager.numObjects + "\nTriangles: " + manager.numTriangles + "\nVertices: " + manager.numVertices;
 		}
 		
 	}
