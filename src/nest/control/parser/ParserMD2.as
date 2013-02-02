@@ -211,13 +211,10 @@ package nest.control.parser
 					n1 = frame.normals[i];
 					n2 = frame.normals[i + 1];
 					n3 = frame.normals[i + 2];
-					mag = n1 * n1 + n2 * n2 + n3 * n3;
-					if (mag > 0) {
-						mag = 1 / Math.sqrt(mag);
-						frame.normals[i] *= mag;
-						frame.normals[i + 1] *= mag;
-						frame.normals[i + 2] *= mag;
-					}
+					mag = 1 / Math.sqrt(n1 * n1 + n2 * n2 + n3 * n3);
+					frame.normals[i] *= mag;
+					frame.normals[i + 1] *= mag;
+					frame.normals[i + 2] *= mag;
 				}
 				frame = frame.next as VertexKeyFrame;
 			}

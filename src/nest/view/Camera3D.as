@@ -59,8 +59,8 @@ package nest.view
 		 * Update camera's matrix.
 		 */
 		public function update():void {
-			const ys:Number = 1.0 / Math.tan(_fov / 2.0);
-			const xs:Number = ys / _aspect;
+			var ys:Number = 1.0 / Math.tan(_fov / 2.0);
+			var xs:Number = ys / _aspect;
 			
 			pm.copyRawDataFrom(Vector.<Number>([
 				xs, 0.0, 0.0, 0.0, 

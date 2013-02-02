@@ -33,10 +33,10 @@ package nest.view.light
 		}
 		
 		public function normalize():void {
-			const length:Number = Math.sqrt(_direction[0] * _direction[0] + _direction[1] * _direction[1] + _direction[2] * _direction[2]);
-			_direction[0] = _direction[0] / length;
-			_direction[1] = _direction[1] / length;
-			_direction[2] = _direction[2] / length;
+			var length:Number = 1 / Math.sqrt(_direction[0] * _direction[0] + _direction[1] * _direction[1] + _direction[2] * _direction[2]);
+			_direction[0] *= length;
+			_direction[1] *= length;
+			_direction[2] *= length;
 		}
 		
 		///////////////////////////////////

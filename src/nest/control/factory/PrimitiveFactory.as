@@ -96,9 +96,9 @@ package nest.control.factory
 		}
 		
 		public static function createBox(width:Number = 100, height:Number = 100, depth:Number = 100):Geometry {
-			const w2:Number = width / 2;
-			const h2:Number = height / 2;
-			const d2:Number = depth / 2;
+			var w2:Number = width / 2;
+			var h2:Number = height / 2;
+			var d2:Number = depth / 2;
 			
 			var tri:Triangle;
 			var vertices:Vector.<Vertex> = new Vector.<Vertex>(8, true);
@@ -179,13 +179,13 @@ package nest.control.factory
 		}
 		
 		public static function createPlane(width:Number = 100, height:Number = 100, segmentsW:int = 1, segmentsH:int = 1):Geometry {
-			const w2:Number = width / 2;
-			const h2:Number = height / 2;
-			const dw:Number = width / segmentsW;
-			const dh:Number = height / segmentsH;
-			const du:Number = 1 / segmentsW;
-			const dv:Number = 1 / segmentsH;
-			const s:int = (segmentsW + 1) * (segmentsH + 1);
+			var w2:Number = width / 2;
+			var h2:Number = height / 2;
+			var dw:Number = width / segmentsW;
+			var dh:Number = height / segmentsH;
+			var du:Number = 1 / segmentsW;
+			var dv:Number = 1 / segmentsH;
+			var s:int = (segmentsW + 1) * (segmentsH + 1);
 			
 			var p1:int, p2:int, p3:int, p4:int;
 			var i:int, j:int, k:int, l:int = 0;
@@ -231,11 +231,11 @@ package nest.control.factory
 		}
 		
 		public static function createSphere(radius:Number = 100, segmentsW:int = 8, segmentsH:int = 6):Geometry {
-			const du:Number = 1 / segmentsW;
-			const dv:Number = 1 / segmentsH;
-			const da:Number = -Math.PI / segmentsH;
-			const db:Number = Math.PI * 2 / segmentsW;
-			const s:int = (segmentsW + 1) * (segmentsH + 1);
+			var du:Number = 1 / segmentsW;
+			var dv:Number = 1 / segmentsH;
+			var da:Number = -Math.PI / segmentsH;
+			var db:Number = Math.PI * 2 / segmentsW;
+			var s:int = (segmentsW + 1) * (segmentsH + 1);
 			
 			var a:Number = Math.PI / 2;
 			var b:Number = 0;
@@ -288,13 +288,13 @@ package nest.control.factory
 		}
 		
 		public static function createPrimitiveByRevolution(samples:Vector.<Point>,segmentsW:uint=10, startRadian:Number=0,endRadian:Number=Math.PI*2):Geometry {
-			const segmentsH:uint = samples.length-1;
-			const radian:Number = endRadian - startRadian;
-			const du:Number = 1 / Math.PI / 2 * radian / segmentsW;
-			const dv:Number = 1 / segmentsH;
+			var segmentsH:uint = samples.length-1;
+			var radian:Number = endRadian - startRadian;
+			var du:Number = 1 / Math.PI / 2 * radian / segmentsW;
+			var dv:Number = 1 / segmentsH;
 			
-			const db:Number = radian / segmentsW;
-			const s:int = (segmentsW + 1) * (segmentsH + 1);
+			var db:Number = radian / segmentsW;
+			var s:int = (segmentsW + 1) * (segmentsH + 1);
 			
 			var b:Number = startRadian;
 			var radius1:Number;
@@ -350,13 +350,13 @@ package nest.control.factory
 		}
 		
 		public static function createPrimitiveByLoft(samples:Vector.<Point>, path:Vector.<Vertex>, topCover:Boolean = false, bottomCover:Boolean = false):Geometry {
-			const segmentsW:uint = samples.length - 1;
-			const segmentsH:uint = path.length - 1;
-			const du:Number = 1 / segmentsW;
-			const dv:Number = 1 / segmentsH;
+			var segmentsW:uint = samples.length - 1;
+			var segmentsH:uint = path.length - 1;
+			var du:Number = 1 / segmentsW;
+			var dv:Number = 1 / segmentsH;
 			
-			const s:int = (segmentsW + 1) * (segmentsH + 1);
-			const ts:int = segmentsW * segmentsH * 2;
+			var s:int = (segmentsW + 1) * (segmentsH + 1);
+			var ts:int = segmentsW * segmentsH * 2;
 			
 			var i:int, j:int, k:int, l:int = 0;
 			var p1:int, p2:int, p3:int, p4:int;

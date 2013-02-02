@@ -12,6 +12,7 @@ package nest.view.effect
 	
 	/**
 	 * InverseColor
+	 * <p>Just need to call comply() once.</p>
 	 */
 	public class InverseColor extends EffectProcess {
 		

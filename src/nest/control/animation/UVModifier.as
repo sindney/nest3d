@@ -39,11 +39,11 @@ package nest.control.animation
 			var mesh:IMesh = target as IMesh;
 			var curUVs:Vector.<Number> = (frame as UVKeyFrame).uvs;
 			var nextUVs:Vector.<Number> = (frame.next as UVKeyFrame).uvs;
-			var l:int = curVertices.length / 2;
-			var i:int;
-			for (i = 0; i < l; i++ ) {
-				mesh.geom.vertices[i].u = curUVs[i << 1] * w1 + nextUVs[i << 1] * w2;
-				mesh.geom.vertices[i].v = curUVs[(i << 1) + 1] * w1 + nextUVs[(i << 1) + 1] * w2;
+			var l:int = curUVs.length / 2;
+			var i:int, j:int;
+			for (i = 0, j = 0; i < l; i++, j += 2) {
+				mesh.geom.vertices[i].u = curUVs[j] * w1 + nextUVs[j] * w2;
+				mesh.geom.vertices[i].v = curUVs[j + 1] * w1 + nextUVs[j + 1] * w2;
 			}
 			mesh.geom.update(false);
 		}

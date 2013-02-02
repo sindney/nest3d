@@ -12,6 +12,7 @@ package nest.view.effect
 	
 	/**
 	 * CellShader
+	 * <p>Just need to call comply() once.</p>
 	 */
 	public class CellShader extends EffectProcess {
 		

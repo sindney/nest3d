@@ -12,6 +12,7 @@ package nest.view.effect
 	
 	/**
 	 * TransformColor
+	 * <p>Just need to call comply() once.</p>
 	 */
 	public class TransformColor extends EffectProcess {
 		

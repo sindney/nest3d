@@ -17,6 +17,7 @@ package nest.view.effect
 	
 	/**
 	 * RedBlueMap
+	 * <p>Just need to call comply() once.</p>
 	 */
 	public class RedBlueMap extends EffectProcess {
 		

@@ -11,7 +11,7 @@ package nest.view
 	 */
 	public class Diagram extends Sprite {
 		
-		private const mem:Number = 0.000000954;
+		private var mem:Number = 0.000000954;
 		
 		private var _info:TextField;
 		private var _msg:TextField;
@@ -49,8 +49,8 @@ package nest.view
 		
 		public function update():void {
 			_ticks++;
-			const now:uint = getTimer();
-			const delta:uint = now - _last;
+			var now:uint = getTimer();
+			var delta:uint = now - _last;
 			if (delta >= 500) {
 				_info.text = "F " + (_ticks / delta * 1000).toFixed(2) + " M " + (System.totalMemory * mem).toFixed(2);
 				_ticks = 0;

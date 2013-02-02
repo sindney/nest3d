@@ -12,6 +12,7 @@ package nest.view.effect
 	
 	/**
 	 * Pixelation
+	 * <p>Just need to call comply() once.</p>
 	 */
 	public class Pixelation extends EffectProcess {
 		

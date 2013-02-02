@@ -13,7 +13,7 @@ package nest.control.math
 		 * Rotate Quaternion object to a certain angle around X axis.
 		 */
 		public static function rotationX(object:Vector3D, value:Number):void {
-			const t2:Number = value * 0.5;
+			var t2:Number = value * 0.5;
 			object.w = Math.cos(t2);
 			object.x = Math.sin(t2);
 			object.y = 0;
@@ -24,7 +24,7 @@ package nest.control.math
 		 * Rotate Quaternion object to a certain angle around Y axis.
 		 */
 		public static function rotationY(object:Vector3D, value:Number):void {
-			const t2:Number = value * 0.5;
+			var t2:Number = value * 0.5;
 			object.w = Math.cos(t2);
 			object.x = 0;
 			object.y = Math.sin(t2);
@@ -35,7 +35,7 @@ package nest.control.math
 		 * Rotate Quaternion object to a certain angle around Z axis.
 		 */
 		public static function rotationZ(object:Vector3D, value:Number):void {
-			const t2:Number = value * 0.5;
+			var t2:Number = value * 0.5;
 			object.w = Math.cos(t2);
 			object.x = 0;
 			object.y = 0;
@@ -43,12 +43,12 @@ package nest.control.math
 		}
 		
 		public static function rotationXYZ(object:Vector3D, x:Number, y:Number, z:Number):void {
-			const c1:Number = Math.cos(x / 2);
-			const c2:Number = Math.cos(y / 2);
-			const c3:Number = Math.cos(z / 2);
-			const s1:Number = Math.sin(x / 2);
-			const s2:Number = Math.sin(y / 2);
-			const s3:Number = Math.sin(z / 2);
+			var c1:Number = Math.cos(x / 2);
+			var c2:Number = Math.cos(y / 2);
+			var c3:Number = Math.cos(z / 2);
+			var s1:Number = Math.sin(x / 2);
+			var s2:Number = Math.sin(y / 2);
+			var s3:Number = Math.sin(z / 2);
 			object.w = c1 * c2 * c3 + s1 * s2 * s3;
 			object.x = s1 * c2 * c3 - c1 * s2 * s3;
 			object.y = c1 * s2 * c3 + s1 * c2 * s3;
@@ -60,8 +60,8 @@ package nest.control.math
 		 * @param	axis Axis must be normalized.
 		 */
 		public static function rotate(object:Vector3D, axis:Vector3D, value:Number):void {
-			const t2:Number = value * 0.5;
-			const st2:Number = Math.sin(t2);
+			var t2:Number = value * 0.5;
+			var st2:Number = Math.sin(t2);
 			object.w = Math.cos(t2);
 			object.x = axis.x * st2;
 			object.y = axis.y * st2;
@@ -81,9 +81,9 @@ package nest.control.math
 		}
 		
 		public static function normalize(object:Vector3D):void {
-			const m:Number = Math.sqrt(object.w * object.w + object.x * object.x + object.y * object.y + object.z * object.z);
+			var m:Number = Math.sqrt(object.w * object.w + object.x * object.x + object.y * object.y + object.z * object.z);
 			if (m > 0) {
-				const m2:Number = 1 / m;
+				var m2:Number = 1 / m;
 				object.w *= m2;
 				object.x *= m2;
 				object.y *= m2;
@@ -98,7 +98,7 @@ package nest.control.math
 		}
 		
 		public static function slerp(a:Vector3D, b:Vector3D, t:Number, output:Vector3D):void {
-			const cos:Number = dotProduct(a, b);
+			var cos:Number = dotProduct(a, b);
 			if (cos == 0) {
 				output.copyFrom(a);
 				output.w = a.w;
@@ -109,9 +109,9 @@ package nest.control.math
 				k0 = 1 - t;
 				k1 = t;
 			} else {
-				const sin:Number = Math.sqrt(1 - cos * cos);
-				const o:Number = Math.atan2(sin, cos);
-				const sin2:Number = 1 / sin;
+				var sin:Number = Math.sqrt(1 - cos * cos);
+				var o:Number = Math.atan2(sin, cos);
+				var sin2:Number = 1 / sin;
 				k0 = Math.sin((1 - t) * o) * sin2;
 				k1 = Math.sin(t * o) * sin2;
 			}
@@ -133,9 +133,9 @@ package nest.control.math
 				output.copyFrom(object);
 				return;
 			}
-			const a:Number = Math.acos(object.w);
-			const a2:Number = a * t;
-			const m:Number = Math.sin(a2) / Math.sin(a);
+			var a:Number = Math.acos(object.w);
+			var a2:Number = a * t;
+			var m:Number = Math.sin(a2) / Math.sin(a);
 			output.w = Math.cos(a2);
 			output.x = object.x * m;
 			output.y = object.y * m;
@@ -143,12 +143,12 @@ package nest.control.math
 		}
 		
 		public static function getAxis(object:Vector3D, axis:Vector3D):void {
-			const t:Number = 1 - object.w * object.w;
+			var t:Number = 1 - object.w * object.w;
 			if (t <= 0) {
 				axis.setTo(1, 0, 0);
 				return;
 			}
-			const t2:Number = 1 / Math.sqrt(t);
+			var t2:Number = 1 / Math.sqrt(t);
 			axis.setTo(object.x * t2, object.y * t2, object.z * t2);
 		}
 		

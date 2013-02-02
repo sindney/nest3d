@@ -12,6 +12,7 @@ package nest.view.effect
 	
 	/**
 	 * Bloom
+	 * <p>Call comply() when threshold/maxIteration/blurX/blurY is changed.</p>
 	 */
 	public class Bloom extends EffectProcess {
 		

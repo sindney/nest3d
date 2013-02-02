@@ -12,6 +12,7 @@ package nest.view.effect
 	
 	/**
 	 * Blur
+	 * <p>Call comply() when maxIteration/blurX/blurY is changed.</p>
 	 */
 	public class Blur extends EffectProcess {
 		

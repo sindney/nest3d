@@ -12,6 +12,7 @@ package nest.view.effect
 	
 	/**
 	 * ConvolutionFilter
+	 * <p>Just need to call comply() once.</p>
 	 */
 	public class ConvolutionFilter extends EffectProcess {													  
 		

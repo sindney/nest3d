@@ -12,6 +12,7 @@ package nest.view.effect
 	
 	/**
 	 * GrayScale
+	 * <p>Just need to call comply() once.</p>
 	 */
 	public class GrayScale extends EffectProcess {
 		

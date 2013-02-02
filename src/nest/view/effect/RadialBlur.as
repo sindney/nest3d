@@ -12,7 +12,7 @@ package nest.view.effect
 	
 	/**
 	 * RadialBlur
-	 * <p>comply() after iteration is changed.</p>
+	 * <p>Call comply() when iteration is changed.</p>
 	 */
 	public class RadialBlur extends EffectProcess {
 		
