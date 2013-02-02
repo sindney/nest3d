@@ -25,7 +25,6 @@ package nest.object
 		protected var _alphaTest:Boolean = false;
 		protected var _mouseEnabled:Boolean = false;
 		protected var _ignoreRotation:Boolean = false;
-		protected var _castShadows:Boolean = false;
 		
 		protected var _id:uint;
 		
@@ -100,14 +99,6 @@ package nest.object
 		
 		public function set mouseEnabled(value:Boolean):void {
 			_mouseEnabled = value;
-		}
-		
-		public function get castShadows():Boolean {
-			return _castShadows;
-		}
-		
-		public function set castShadows(value:Boolean):void {
-			_castShadows = value;
 		}
 		
 		public function get id():uint {

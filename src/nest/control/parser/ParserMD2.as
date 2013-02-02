@@ -1,5 +1,6 @@
 package nest.control.parser 
 {
+	import flash.geom.Vector3D;
 	import flash.utils.ByteArray;
 	import flash.utils.Endian;
 	
@@ -78,7 +79,7 @@ package nest.control.parser
 			//get texture name
 			model.position = offset_skins;
 			var texture_name:String = "";
-			var i:int, j:int,k:uint, char:uint;
+			var i:int, j:int, k:int, char:uint;
 			var u:Number, v:Number;
 			var tri:Triangle;
 			var frame:VertexKeyFrame;
@@ -158,16 +159,67 @@ package nest.control.parser
 				frame.name = name;
 				frame.time = i;
 				frame.vertices = new Vector.<Number>(num_vertices * 3, true);
+				frame.normals = new Vector.<Number>(num_vertices * 3, true);
 				for (j = 0, k = 0; j < num_vertices; j++, k += 3) {
 					frame.vertices[k] = (sx * model.readUnsignedByte() + tx) * scale;
 					frame.vertices[k + 1] = (sy * model.readUnsignedByte() + ty) * scale;
 					frame.vertices[k + 2] = (sz * model.readUnsignedByte() + tz) * scale;
-					
-					// TODO: 读取法线信息存入VertexKeyFrame的normals数组中
-					//index of normal
+					frame.normals[k] = frame.normals[k + 1] = frame.normals[k + 2] = 0;
 					model.readUnsignedByte();
 				}
 				vertexTrack.addChild(frame);
+			}
+			
+			// calculate normals for each frame
+			var vt1:Vector3D = new Vector3D();
+			var vt2:Vector3D = new Vector3D();
+			var v1:int, v2:int, v3:int;
+			var n1:Number, n2:Number, n3:Number;
+			var mag:Number;
+			
+			j = triangles.length;
+			frame = vertexTrack.first as VertexKeyFrame;
+			while (frame) {
+				for (i = 0; i < j; i++) {
+					tri = triangles[i];
+					v1 = tri.index0 * 3;
+					v2 = tri.index1 * 3;
+					v3 = tri.index2 * 3;
+					
+					vt1.x = frame.vertices[v2]     - frame.vertices[v1];
+					vt1.y = frame.vertices[v2 + 1] - frame.vertices[v1 + 1];
+					vt1.z = frame.vertices[v2 + 2] - frame.vertices[v1 + 2];
+					vt2.x = frame.vertices[v3]     - frame.vertices[v2];
+					vt2.y = frame.vertices[v3 + 1] - frame.vertices[v2 + 1];
+					vt2.z = frame.vertices[v3 + 2] - frame.vertices[v2 + 2];
+					
+					vt1 = vt1.crossProduct(vt2);
+					vt1.normalize();
+					
+					frame.normals[v1]     += vt1.x;
+					frame.normals[v1 + 1] += vt1.y;
+					frame.normals[v1 + 2] += vt1.z;
+					frame.normals[v2]     += vt1.x;
+					frame.normals[v2 + 1] += vt1.y;
+					frame.normals[v2 + 2] += vt1.z;
+					frame.normals[v3]     += vt1.x;
+					frame.normals[v3 + 1] += vt1.y;
+					frame.normals[v3 + 2] += vt1.z;
+				}
+				k = frame.normals.length;
+				for (i = 0; i < k; i += 3) {
+					n1 = frame.normals[i];
+					n2 = frame.normals[i + 1];
+					n3 = frame.normals[i + 2];
+					mag = n1 * n1 + n2 * n2 + n3 * n3;
+					if (mag > 0) {
+						mag = 1 / Math.sqrt(mag);
+						frame.normals[i] *= mag;
+						frame.normals[i + 1] *= mag;
+						frame.normals[i + 2] *= mag;
+					}
+				}
+				frame = frame.next as VertexKeyFrame;
 			}
 			
 			//reset vertex data to frame0

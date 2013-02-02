@@ -9,6 +9,44 @@ package nest.object.geom
 	 */
 	public class AABB implements IBound {
 		
+		public static function AABB_BSphere(max:Vector3D, min:Vector3D, center:Vector3D, r:Number):Boolean {
+			var x:Number = center.x, y:Number = center.y, z:Number = center.z;
+			
+			if (x < min.x) {
+				x = min.x;
+			} else if (x > max.x) {
+				x = max.x;
+			}
+			
+			if (y < min.y) {
+				y = min.y;
+			} else if (y > max.y) {
+				y = max.y;
+			}
+			
+			if (z < min.z) {
+				z = min.z;
+			} else if (z > max.z) {
+				z = max.z;
+			}
+			
+			x -= center.x;
+			y -= center.y;
+			z -= center.z;
+			
+			return (x * x + y * y + z * z) <= (r * r);
+		}
+		
+		public static function AABB_AABB(max:Vector3D, min:Vector3D, max1:Vector3D, min1:Vector3D):Boolean {
+			if (min.x > max1.x) return false;
+			if (max.x < min1.x) return false;
+			if (min.y > max1.y) return false;
+			if (max.y < min1.y) return false;
+			if (min.z > max1.z) return false;
+			if (max.z < min1.z) return false;
+			return true;
+		}
+		
 		private var _vertices:Vector.<Vector3D>;
 		private var _center:Vector3D;
 		

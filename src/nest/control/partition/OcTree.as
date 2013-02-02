@@ -2,7 +2,6 @@ package nest.control.partition
 {
 	import flash.geom.Vector3D;
 	
-	import nest.control.math.MeshOPS;
 	import nest.object.geom.AABB;
 	import nest.object.geom.BSphere;
 	import nest.object.Mesh;
@@ -19,7 +18,6 @@ package nest.control.partition
 	public class OcTree implements IPTree {
 		
 		private var _root:OcNode;
-		private var _nonMeshes:Vector.<IObject3D>;
 		
 		public function OcTree() {
 			_root = new OcNode();
@@ -35,8 +33,6 @@ package nest.control.partition
 			var object:IObject3D;
 			var i:int, j:int;
 			
-			_nonMeshes = new Vector.<IObject3D>();
-			
 			while (container) {
 				j = container.numChildren;
 				for (i = 0; i < j; i++) {
@@ -45,8 +41,6 @@ package nest.control.partition
 						meshes.push(object);
 					} else if (object is IContainer3D) {
 						containers.push(object);
-					} else {
-						_nonMeshes.push(object);
 					}
 				}
 				container = containers.pop();
@@ -142,14 +136,14 @@ package nest.control.partition
 				if (mesh.bound is AABB) {
 					a = mesh.worldMatrix.transformVector((mesh.bound as AABB).max);
 					b = mesh.worldMatrix.transformVector((mesh.bound as AABB).min);
-					BBTL = MeshOPS.AABB_AABB(a, b, BTL.max, BTL.min);
-					BBTR = MeshOPS.AABB_AABB(a, b, BTR.max, BTR.min);
-					BBBL = MeshOPS.AABB_AABB(a, b, BBL.max, BBL.min);
-					BBBR = MeshOPS.AABB_AABB(a, b, BBR.max, BBR.min);
-					BTTL = MeshOPS.AABB_AABB(a, b, TTL.max, TTL.min);
-					BTTR = MeshOPS.AABB_AABB(a, b, TTR.max, TTR.min);
-					BTBL = MeshOPS.AABB_AABB(a, b, TBL.max, TBL.min);
-					BTBR = MeshOPS.AABB_AABB(a, b, TBR.max, TBR.min);
+					BBTL = AABB.AABB_AABB(a, b, BTL.max, BTL.min);
+					BBTR = AABB.AABB_AABB(a, b, BTR.max, BTR.min);
+					BBBL = AABB.AABB_AABB(a, b, BBL.max, BBL.min);
+					BBBR = AABB.AABB_AABB(a, b, BBR.max, BBR.min);
+					BTTL = AABB.AABB_AABB(a, b, TTL.max, TTL.min);
+					BTTR = AABB.AABB_AABB(a, b, TTR.max, TTR.min);
+					BTBL = AABB.AABB_AABB(a, b, TBL.max, TBL.min);
+					BTBR = AABB.AABB_AABB(a, b, TBR.max, TBR.min);
 				} else {
 					a = mesh.worldMatrix.transformVector(mesh.bound.center);
 					l = (mesh.bound as BSphere).radius;
@@ -157,14 +151,14 @@ package nest.control.partition
 					if (mesh.scale.y > k) k = mesh.scale.y;
 					if (mesh.scale.z > k) k = mesh.scale.z;
 					l *= k;
-					BBTL = MeshOPS.AABB_BSphere(BTL.max, BTL.min, a, l);
-					BBTR = MeshOPS.AABB_BSphere(BTR.max, BTR.min, a, l);
-					BBBL = MeshOPS.AABB_BSphere(BBL.max, BBL.min, a, l);
-					BBBR = MeshOPS.AABB_BSphere(BBR.max, BBR.min, a, l);
-					BTTL = MeshOPS.AABB_BSphere(TTL.max, TTL.min, a, l);
-					BTTR = MeshOPS.AABB_BSphere(TTR.max, TTR.min, a, l);
-					BTBL = MeshOPS.AABB_BSphere(TBL.max, TBL.min, a, l);
-					BTBR = MeshOPS.AABB_BSphere(TBR.max, TBR.min, a, l);
+					BBTL = AABB.AABB_BSphere(BTL.max, BTL.min, a, l);
+					BBTR = AABB.AABB_BSphere(BTR.max, BTR.min, a, l);
+					BBBL = AABB.AABB_BSphere(BBL.max, BBL.min, a, l);
+					BBBR = AABB.AABB_BSphere(BBR.max, BBR.min, a, l);
+					BTTL = AABB.AABB_BSphere(TTL.max, TTL.min, a, l);
+					BTTR = AABB.AABB_BSphere(TTR.max, TTR.min, a, l);
+					BTBL = AABB.AABB_BSphere(TBL.max, TBL.min, a, l);
+					BTBR = AABB.AABB_BSphere(TBR.max, TBR.min, a, l);
 				}
 				
 				if (BBTL && (BBTR || BBBL || BBBR || BTTL || BTTR || BTBL || BTBR) || 
@@ -221,10 +215,6 @@ package nest.control.partition
 		
 		public function get root():IPNode {
 			return _root;
-		}
-		
-		public function get nonMeshes():Vector.<IObject3D> {
-			return _nonMeshes;
 		}
 		
 	}

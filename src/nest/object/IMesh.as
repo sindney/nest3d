@@ -33,9 +33,6 @@ package nest.object
 		function get ignoreRotation():Boolean;
 		function set ignoreRotation(value:Boolean):void;
 		
-		function get castShadows():Boolean;
-		function set castShadows(value:Boolean):void;
-		
 		function get triangleCulling():String;
 		function set triangleCulling(value:String):void;
 		

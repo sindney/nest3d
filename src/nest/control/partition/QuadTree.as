@@ -2,7 +2,6 @@ package nest.control.partition
 {
 	import flash.geom.Vector3D;
 	
-	import nest.control.math.MeshOPS;
 	import nest.object.geom.AABB;
 	import nest.object.geom.BSphere;
 	import nest.object.Mesh;
@@ -19,7 +18,6 @@ package nest.control.partition
 	public class QuadTree implements IPTree {
 		
 		private var _root:QuadNode;
-		private var _nonMeshes:Vector.<IObject3D>;
 		
 		public function QuadTree() {
 			_root = new QuadNode();
@@ -35,8 +33,6 @@ package nest.control.partition
 			var object:IObject3D;
 			var i:int, j:int;
 			
-			_nonMeshes = new Vector.<IObject3D>();
-			
 			while (container) {
 				j = container.numChildren;
 				for (i = 0; i < j; i++) {
@@ -45,8 +41,6 @@ package nest.control.partition
 						meshes.push(object);
 					} else if (object is IContainer3D) {
 						containers.push(object);
-					} else {
-						_nonMeshes.push(object);
 					}
 				}
 				container = containers.pop();
@@ -111,10 +105,10 @@ package nest.control.partition
 					a = mesh.worldMatrix.transformVector((mesh.bound as AABB).max);
 					b = mesh.worldMatrix.transformVector((mesh.bound as AABB).min);
 					a.y = b.y = 0;
-					BTL = MeshOPS.AABB_AABB(a, b, TL.max, TL.min);
-					BTR = MeshOPS.AABB_AABB(a, b, TR.max, TR.min);
-					BBL = MeshOPS.AABB_AABB(a, b, BL.max, BL.min);
-					BBR = MeshOPS.AABB_AABB(a, b, BR.max, BR.min);
+					BTL = AABB.AABB_AABB(a, b, TL.max, TL.min);
+					BTR = AABB.AABB_AABB(a, b, TR.max, TR.min);
+					BBL = AABB.AABB_AABB(a, b, BL.max, BL.min);
+					BBR = AABB.AABB_AABB(a, b, BR.max, BR.min);
 				} else {
 					a = mesh.worldMatrix.transformVector(mesh.bound.center);
 					a.y = 0;
@@ -123,10 +117,10 @@ package nest.control.partition
 					if (mesh.scale.y > k) k = mesh.scale.y;
 					if (mesh.scale.z > k) k = mesh.scale.z;
 					l *= k;
-					BTL = MeshOPS.AABB_BSphere(TL.max, TL.min, a, l);
-					BTR = MeshOPS.AABB_BSphere(TR.max, TR.min, a, l);
-					BBL = MeshOPS.AABB_BSphere(BL.max, BL.min, a, l);
-					BBR = MeshOPS.AABB_BSphere(BR.max, BR.min, a, l);
+					BTL = AABB.AABB_BSphere(TL.max, TL.min, a, l);
+					BTR = AABB.AABB_BSphere(TR.max, TR.min, a, l);
+					BBL = AABB.AABB_BSphere(BL.max, BL.min, a, l);
+					BBR = AABB.AABB_BSphere(BR.max, BR.min, a, l);
 				}
 				
 				if (BTL && (BTR || BBL || BBR) || BTR && (BTL || BBL || BBR) || 
@@ -161,10 +155,6 @@ package nest.control.partition
 		
 		public function get root():IPNode {
 			return _root;
-		}
-		
-		public function get nonMeshes():Vector.<IObject3D> {
-			return _nonMeshes;
 		}
 		
 	}

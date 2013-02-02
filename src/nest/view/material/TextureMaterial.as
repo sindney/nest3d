@@ -140,7 +140,7 @@ package nest.view.material
 			}
 			if (specular) fragment += "tex ft6, v1, fs1 <2d,linear," + (_specular.mipmapping ? "miplinear" : "mipnone") + ">\n";
 			fragment += ShaderFactory.createLight(_lights, specular, normalmap);
-			fragment += "sub ft0.w, ft0.w, fc23.z\nkil ft0.w\n";
+			fragment += "sub ft7.w, ft0.w, fc23.z\nkil ft7.w\n";
 			fragment += "mov oc, ft0\n";
 			
 			_program.upload(

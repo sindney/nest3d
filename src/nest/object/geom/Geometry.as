@@ -17,8 +17,8 @@ package nest.object.geom
 			var i:int, j:int;
 			var tri:Triangle;
 			var v1:Vertex, v2:Vertex, v3:Vertex;
-			var n1:Vector3D = new Vector3D();
-			var n2:Vector3D = new Vector3D();
+			var vt1:Vector3D = new Vector3D();
+			var vt2:Vector3D = new Vector3D();
 			
 			j = triangles.length;
 			for (i = 0; i < j; i++) {
@@ -27,20 +27,20 @@ package nest.object.geom
 				v2 = vertices[tri.index1];
 				v3 = vertices[tri.index2];
 				
-				n1.setTo(v2.x - v1.x, v2.y - v1.y, v2.z - v1.z);
-				n2.setTo(v3.x - v2.x, v3.y - v2.y, v3.z - v2.z);
-				tri.normal.copyFrom(n1.crossProduct(n2));
-				tri.normal.normalize();
+				vt1.setTo(v2.x - v1.x, v2.y - v1.y, v2.z - v1.z);
+				vt2.setTo(v3.x - v2.x, v3.y - v2.y, v3.z - v2.z);
+				vt1 = vt1.crossProduct(vt2);
+				vt1.normalize();
 				
-				v1.normal.x += tri.normal.x;
-				v1.normal.y += tri.normal.y;
-				v1.normal.z += tri.normal.z;
-				v2.normal.x += tri.normal.x;
-				v2.normal.y += tri.normal.y;
-				v2.normal.z += tri.normal.z;
-				v3.normal.x += tri.normal.x;
-				v3.normal.y += tri.normal.y;
-				v3.normal.z += tri.normal.z;
+				v1.normal.x += vt1.x;
+				v1.normal.y += vt1.y;
+				v1.normal.z += vt1.z;
+				v2.normal.x += vt1.x;
+				v2.normal.y += vt1.y;
+				v2.normal.z += vt1.z;
+				v3.normal.x += vt1.x;
+				v3.normal.y += vt1.y;
+				v3.normal.z += vt1.z;
 			}
 			
 			j = vertices.length;

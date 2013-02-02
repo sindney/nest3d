@@ -1,7 +1,6 @@
 package nest.view.material 
 {
 	import flash.display.BitmapData;
-	import flash.display3D.Context3D;
 	import flash.display3D.Context3DProgramType;
 	import flash.display3D.Program3D;
 	
@@ -34,7 +33,7 @@ package nest.view.material
 			ViewPort.context3d.setTextureAt(0, null);
 		}
 		
-		public function comply(context3d:Context3D):void {
+		public function comply():void {
 			_program.upload(
 				ShaderFactory.assembler.assemble(Context3DProgramType.VERTEX, "m44 op, va0, vc0\nmov v0, va0\n"), 
 				ShaderFactory.assembler.assemble(Context3DProgramType.FRAGMENT, "tex oc, v0, fs0 <cube,linear,miplinear>\n")

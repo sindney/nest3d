@@ -88,11 +88,6 @@ package nest.control.parser
 					vt1.normal.setTo(model.readFloat(), model.readFloat(), model.readFloat());
 					vt2.normal.setTo(model.readFloat(), model.readFloat(), model.readFloat());
 					vt3.normal.setTo(model.readFloat(), model.readFloat(), model.readFloat());
-					// calculate triangle normal
-					v1.setTo(vt2.x - vt1.x, vt2.y - vt1.y, vt2.z - vt1.z);
-					v2.setTo(vt3.x - vt2.x, vt3.y - vt2.y, vt3.z - vt2.z);
-					triangle.normal.copyFrom(v1.crossProduct(v2));
-					triangle.normal.normalize();
 					// vertex uv
 					triangle.u0 = vt1.u = model.readFloat();
 					triangle.u1 = vt2.u = model.readFloat();

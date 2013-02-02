@@ -111,11 +111,6 @@ package nest.control.parser
 				tri.v2 = vt3.v = 1 - uvs[k + 1];
 				k = (indices[i + 8] - 1) * 3;
 				vt3.normal.setTo(normals[k], normals[k + 1], normals[k + 2]);
-				
-				v1.setTo(vt2.x - vt1.x, vt2.y - vt1.y, vt2.z - vt1.z);
-				v2.setTo(vt3.x - vt2.x, vt3.y - vt2.y, vt3.z - vt2.z);
-				tri.normal.copyFrom(v1.crossProduct(v2));
-				tri.normal.normalize();
 			}
 			
 			return new Geometry(rawVertex, rawTriangle);

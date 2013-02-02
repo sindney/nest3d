@@ -34,6 +34,23 @@ package
 			
 			process0.renderTarget.texture = effect.texture;
 			
+			/**
+			 * Engine's rendering process is controled by ViewPort's process array.
+			 * We use ContainerProcess to draw the objects contained in container.
+			 * Here, we want to add RadialBlur effect to our render pipeline, so we push it afer process0.
+			 * Then we set process0's renderTarget to RadialBlur's texture, and the pipeline is:
+			 * 
+			 * 引擎渲染流程由view的processes数组控制，从前到后执行相应child的运算。
+			 * 首先我们用ContainerProcess来对container包含的场景进行绘制操作。
+			 * 这里，我们想添加RadialBlur这个效果，就将其push于process0之后。
+			 * 再将process0的renderTarget设置为RadialBlur的texture，渲染流程就是：
+			 * 
+			 * setRenderToTexture(RadialBlur.texture);
+			 * draw(container);
+			 * setRenderToBackBuffer();
+			 * effectShader();
+			 * present();
+			 */
 			view.processes.push(process0, effect);
 			
 			var geom:Geometry = PrimitiveFactory.createBox(1, 1, 1);
@@ -56,6 +73,11 @@ package
 				}
 			}
 			
+			// We can splite certain container with Quad or Oc tree.
+			// When any of the container's mesh's transform matrix is changed, you'll need to recalculate the tree.
+			// 我们可以对指定容器使用四叉八叉树进行划分，从而可以在绘制时进行高效的剔除操作。
+			// 这一这些分割树都是静态的，就是说，当其中的任意Mesh有变换，就需要重新生成树以得到正确的结果。
+			// 所以，您最好只在分割的容器中添加不动的Mesh。
 			container.partition = new OcTree();
 			(container.partition as OcTree).create(container, 4, l * 50, offsetX, offsetY, offsetZ);
 			
