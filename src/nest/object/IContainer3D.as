@@ -28,9 +28,6 @@ package nest.object
 		function get mouseEnabled():Boolean;
 		function set mouseEnabled(value:Boolean):void;
 		
-		function get castShadows():Boolean;
-		function set castShadows(value:Boolean):void;
-		
 	}
 	
 }

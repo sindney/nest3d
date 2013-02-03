@@ -15,17 +15,17 @@ package nest.view.process
 	 */
 	public class BasicMeshProcess implements IMeshProcess {
 		
-		protected var _camera:Camera3D;
+		public var camera:Camera3D;
 		
 		public function BasicMeshProcess(camera:Camera3D) {
-			_camera = camera;
+			this.camera = camera;
 		}
 		
 		public function initialize():void {
 			var position:Vector.<Number> = new Vector.<Number>(4, true);
-			position[0] = _camera.position.x;
-			position[1] = _camera.position.y;
-			position[2] = _camera.position.z;
+			position[0] = camera.position.x;
+			position[1] = camera.position.y;
+			position[2] = camera.position.z;
 			position[3] = 1;
 			ViewPort.context3d.setProgramConstantsFromVector(Context3DProgramType.VERTEX, 8, position);
 		}
@@ -62,18 +62,6 @@ package nest.view.process
 			
 			mesh.material.unload();
 			mesh.geom.unload();
-		}
-		
-		///////////////////////////////////
-		// getter/setters
-		///////////////////////////////////
-		
-		public function get camera():Camera3D {
-			return _camera;
-		}
-		
-		public function set camera(value:Camera3D):void {
-			_camera = value;
 		}
 		
 	}

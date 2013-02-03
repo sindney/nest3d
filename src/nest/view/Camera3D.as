@@ -12,8 +12,6 @@ package nest.view
 	 */
 	public class Camera3D extends EventDispatcher {
 		
-		protected var _orientation:String = Orientation3D.EULER_ANGLES;
-		
 		protected var _components:Vector.<Vector3D>;
 		
 		protected var _matrix:Matrix3D;
@@ -22,10 +20,12 @@ package nest.view
 		protected var _pm:Matrix3D;
 		protected var _frustum:Frustum;
 		
-		protected var _aspect:Number = 4 / 3;
-		protected var _near:Number = 0.1;
-		protected var _far:Number = 10000;
-		protected var _fov:Number = 45 * Math.PI / 180;
+		public var orientation:String = Orientation3D.EULER_ANGLES;
+		
+		public var aspect:Number = 4 / 3;
+		public var near:Number = 0.1;
+		public var far:Number = 10000;
+		public var fov:Number = 45 * Math.PI / 180;
 		
 		public function Camera3D() {
 			super();
@@ -44,13 +44,13 @@ package nest.view
 		}
 		
 		public function decompose():void {
-			_components = _matrix.decompose(_orientation);
+			_components = _matrix.decompose(orientation);
 			_invertMatrix.copyFrom(_matrix);
 			_invertMatrix.invert();
 		}
 		
 		public function recompose():void {
-			_matrix.recompose(_components, _orientation);
+			_matrix.recompose(_components, orientation);
 			_invertMatrix.copyFrom(_matrix);
 			_invertMatrix.invert();
 		}
@@ -59,54 +59,22 @@ package nest.view
 		 * Update camera's matrix.
 		 */
 		public function update():void {
-			var ys:Number = 1.0 / Math.tan(_fov / 2.0);
-			var xs:Number = ys / _aspect;
+			var ys:Number = 1.0 / Math.tan(fov / 2.0);
+			var xs:Number = ys / aspect;
 			
 			pm.copyRawDataFrom(Vector.<Number>([
 				xs, 0.0, 0.0, 0.0, 
 				0.0, ys, 0.0, 0.0, 
-				0.0, 0.0, _far / (_far - _near), 1.0, 
-				0.0, 0.0, (_near * _far) / (_near - _far), 0.0
+				0.0, 0.0, far / (far - near), 1.0, 
+				0.0, 0.0, (near * far) / (near - far), 0.0
 			]));
 			
-			_frustum.create(_fov, _aspect, _near, _far);
+			_frustum.create(fov, aspect, near, far);
 		}
 		
 		///////////////////////////////////
 		// getter/setters
 		///////////////////////////////////
-		
-		public function get aspect():Number {
-			return _aspect;
-		}
-		
-		public function set aspect(value:Number):void {
-			_aspect = value;
-		}
-		
-		public function get near():Number {
-			return _near;
-		}
-		
-		public function set near(value:Number):void {
-			_near = value;
-		}
-		
-		public function get far():Number {
-			return _far;
-		}
-		
-		public function set far(value:Number):void {
-			_far = value;
-		}
-		
-		public function get fov():Number {
-			return _fov;
-		}
-		
-		public function set fov(value:Number):void {
-			_fov = value;
-		}
 		
 		public function get pm():Matrix3D {
 			return _pm;
@@ -130,14 +98,6 @@ package nest.view
 		
 		public function get rotation():Vector3D {
 			return _components[1];
-		}
-		
-		public function get orientation():String {
-			return _orientation;
-		}
-		
-		public function set orientation(value:String):void {
-			_orientation = value;
 		}
 		
 	}

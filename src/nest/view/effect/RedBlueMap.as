@@ -101,7 +101,7 @@ package nest.view.effect
 			context3d.setTextureAt(0, null);
 			context3d.setTextureAt(1, null);
 		}
-		// TODO: 貌似shader有问题，只能是白色的ColorMaterial才有红蓝效果，颜色一变化就没了，你检查下这里
+		
 		override public function comply():void {
 			var vs:String = "mov op, va0\n" + 
 							"mov v0, va1\n";

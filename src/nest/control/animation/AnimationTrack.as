@@ -2,7 +2,8 @@ package nest.control.animation
 {
 	/**
 	 * AnimationTrack
-	 * <p>Run this track when controller's time is greater than track.start.</p>
+	 * <p>This track will run when controller's time is greater than track.start.</p>
+	 * <p>And the type of KeyFrames must be the same.</p>
 	 */
 	public class AnimationTrack {
 		
@@ -11,7 +12,7 @@ package nest.control.animation
 		public var length:Number = 0;
 		
 		/**
-		 * <p>The start time(sec) for this track.</p>
+		 * The start time(sec) for this track.
 		 */
 		public var start:Number = 0;
 		
@@ -19,6 +20,9 @@ package nest.control.animation
 		
 		public var last:IKeyFrame;
 		
+		/**
+		 * Track modifier's type depends on the type of your KeyFrames.
+		 */
 		public var modifier:IAnimationModifier;
 		
 		public function AnimationTrack(name:String = "") {
