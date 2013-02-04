@@ -21,7 +21,6 @@ package nest.control.factory
 		 */
 		public static function get skybox():Geometry {
 			if (!_skybox) {
-				var tri:Triangle;
 				var vertices:Vector.<Vertex> = new Vector.<Vertex>(8, true);
 				var triangles:Vector.<Triangle> = new Vector.<Triangle>(12, true);
 				
@@ -36,28 +35,28 @@ package nest.control.factory
 				vertices[7] = new Vertex(.5, -.5, .5);
 				
 				// front
-				tri = triangles[0] = new Triangle(0, 3, 2);
-				tri = triangles[1] = new Triangle(0, 2, 1);
+				triangles[0] = new Triangle(0, 3, 2);
+				triangles[1] = new Triangle(0, 2, 1);
 				
 				// back
-				tri = triangles[2] = new Triangle(4, 7, 6);
-				tri = triangles[3] = new Triangle(4, 6, 5);
+				triangles[2] = new Triangle(4, 7, 6);
+				triangles[3] = new Triangle(4, 6, 5);
 				
 				// top
-				tri = triangles[4] = new Triangle(5, 0, 1);
-				tri = triangles[5] = new Triangle(5, 1, 4);
+				triangles[4] = new Triangle(5, 0, 1);
+				triangles[5] = new Triangle(5, 1, 4);
 				
 				// bottom
-				tri = triangles[6] = new Triangle(7, 2, 3);
-				tri = triangles[7] = new Triangle(7, 3, 6);
+				triangles[6] = new Triangle(7, 2, 3);
+				triangles[7] = new Triangle(7, 3, 6);
 				
 				// left
-				tri = triangles[8] = new Triangle(5, 6, 3);
-				tri = triangles[9] = new Triangle(5, 3, 0);
+				triangles[8] = new Triangle(5, 6, 3);
+				triangles[9] = new Triangle(5, 3, 0);
 				
 				// right
-				tri = triangles[10] = new Triangle(1, 2, 7);
-				tri = triangles[11] = new Triangle(1, 7, 4);
+				triangles[10] = new Triangle(1, 2, 7);
+				triangles[11] = new Triangle(1, 7, 4);
 				
 				Geometry.calculateNormal(vertices, triangles);
 				_skybox = new Geometry(vertices, triangles);
@@ -318,7 +317,6 @@ package nest.control.factory
 					
 					radius1 = samples[j].x;
 					radius2 = samples[j + 1].x;
-					
 					
 					if (!vertices[p1]) vertices[p1] = new Vertex(radius1*Math.cos(b), samples[j].y, radius1 * Math.sin(b), i * du, j * dv);
 					if (!vertices[p2]) vertices[p2] = new Vertex(radius2*Math.cos(b), samples[j+1].y, radius2 * Math.sin(b), i * du, (j + 1) * dv);
