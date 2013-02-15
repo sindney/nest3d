@@ -1,4 +1,4 @@
-package nest.control.factory
+package nest.control.util
 {
 	import flash.geom.Point;
 	import flash.geom.Vector3D;

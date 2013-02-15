@@ -2,8 +2,7 @@ package nest.control.partition
 {
 	import flash.geom.Vector3D;
 	
-	import nest.object.geom.AABB;
-	import nest.object.geom.BSphere;
+	import nest.object.geom.Bound;
 	import nest.object.Mesh;
 	import nest.object.IContainer3D;
 	import nest.object.IMesh;
@@ -101,26 +100,26 @@ package nest.control.partition
 			for (i = 0; i < j; i++) {
 				mesh = objects[i];
 				BTL = BTR = BBL = BBR = false;
-				if (mesh.bound is AABB) {
-					a = mesh.worldMatrix.transformVector((mesh.bound as AABB).max);
-					b = mesh.worldMatrix.transformVector((mesh.bound as AABB).min);
+				if (mesh.bound.type == Bound.AABB) {
+					a = mesh.worldMatrix.transformVector(mesh.bound.max);
+					b = mesh.worldMatrix.transformVector(mesh.bound.min);
 					a.y = b.y = 0;
-					BTL = AABB.AABB_AABB(a, b, TL.max, TL.min);
-					BTR = AABB.AABB_AABB(a, b, TR.max, TR.min);
-					BBL = AABB.AABB_AABB(a, b, BL.max, BL.min);
-					BBR = AABB.AABB_AABB(a, b, BR.max, BR.min);
+					BTL = Bound.AABB_AABB(a, b, TL.max, TL.min);
+					BTR = Bound.AABB_AABB(a, b, TR.max, TR.min);
+					BBL = Bound.AABB_AABB(a, b, BL.max, BL.min);
+					BBR = Bound.AABB_AABB(a, b, BR.max, BR.min);
 				} else {
 					a = mesh.worldMatrix.transformVector(mesh.bound.center);
 					a.y = 0;
-					l = (mesh.bound as BSphere).radius;
+					l = mesh.bound.radius;
 					k = mesh.scale.x;
 					if (mesh.scale.y > k) k = mesh.scale.y;
 					if (mesh.scale.z > k) k = mesh.scale.z;
 					l *= k;
-					BTL = AABB.AABB_BSphere(TL.max, TL.min, a, l);
-					BTR = AABB.AABB_BSphere(TR.max, TR.min, a, l);
-					BBL = AABB.AABB_BSphere(BL.max, BL.min, a, l);
-					BBR = AABB.AABB_BSphere(BR.max, BR.min, a, l);
+					BTL = Bound.AABB_BSphere(TL.max, TL.min, a, l);
+					BTR = Bound.AABB_BSphere(TR.max, TR.min, a, l);
+					BBL = Bound.AABB_BSphere(BL.max, BL.min, a, l);
+					BBR = Bound.AABB_BSphere(BR.max, BR.min, a, l);
 				}
 				
 				if (BTL && (BTR || BBL || BBR) || BTR && (BTL || BBL || BBR) || 

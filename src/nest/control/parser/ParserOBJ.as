@@ -6,6 +6,7 @@ package nest.control.parser
 	import nest.object.geom.Geometry;
 	import nest.object.geom.Triangle;
 	import nest.object.geom.Vertex;
+	import nest.object.Mesh;
 	
 	/**
 	 * ParserOBJ
@@ -26,7 +27,7 @@ package nest.control.parser
 			
 		}
 		
-		public function parse(model:ByteArray, scale:Number = 1):Geometry {
+		public function parse(model:ByteArray, scale:Number = 1):Mesh {
 			var vertices:Vector.<Number> = new Vector.<Number>();
 			var normals:Vector.<Number> = new Vector.<Number>();
 			var uvs:Vector.<Number> = new Vector.<Number>();
@@ -92,28 +93,20 @@ package nest.control.parser
 				tri = rawTriangle[i / 9] = new Triangle(indices[i] - 1, indices[i + 3] - 1, indices[i + 6] - 1);
 				
 				vt1 = rawVertex[tri.index0];
-				k = (indices[i + 1] - 1) * 2;
-				tri.u0 = vt1.u = uvs[k];
-				tri.v0 = vt1.v = 1 - uvs[k + 1];
 				k = (indices[i + 2] - 1) * 3;
 				vt1.normal.setTo(normals[k], normals[k + 1], normals[k + 2]);
 				
 				vt2 = rawVertex[tri.index1];
-				k = (indices[i + 4] - 1) * 2;
-				tri.u1 = vt2.u = uvs[k];
-				tri.v1 = vt2.v = 1 - uvs[k + 1];
 				k = (indices[i + 5] - 1) * 3;
 				vt2.normal.setTo(normals[k], normals[k + 1], normals[k + 2]);
 				
 				vt3 = rawVertex[tri.index2];
-				k = (indices[i + 7] - 1) * 2;
-				tri.u2 = vt3.u = uvs[k];
-				tri.v2 = vt3.v = 1 - uvs[k + 1];
 				k = (indices[i + 8] - 1) * 3;
 				vt3.normal.setTo(normals[k], normals[k + 1], normals[k + 2]);
 			}
 			
-			return new Geometry(rawVertex, rawTriangle);
+			var geom:Geometry = new Geometry(rawVertex, rawTriangle);
+			return new Mesh(geom, null, null);
 		}
 		
 	}

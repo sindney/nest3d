@@ -1,6 +1,5 @@
 package nest.view.process 
 {
-	import flash.display3D.textures.TextureBase;
 	import flash.geom.Matrix3D;
 	
 	import nest.object.IContainer3D;
@@ -17,7 +16,7 @@ package nest.view.process
 		
 		function get meshProcess():IMeshProcess;
 		function set meshProcess(value:IMeshProcess):void;
-		
+
 		function get objects():Vector.<IMesh>;
 		
 		function get alphaObjects():Vector.<IMesh>;

@@ -4,6 +4,7 @@ package nest.control.parser
 	import flash.utils.ByteArray;
 	import flash.utils.Endian;
 	
+	import nest.control.util.GeometryUtil;
 	import nest.object.geom.Geometry;
 	import nest.object.geom.Triangle;
 	import nest.object.geom.Vertex;
@@ -37,6 +38,15 @@ package nest.control.parser
 			
 		}
 		
+		public function dispose():void {
+			_objects = null;
+			last = null;
+			name = null;
+			rawVertices = null;
+			rawTriangles = null;
+			scale = 1;
+		}
+
 		public function getObjectByName(name:String):Mesh {
 			var object:Mesh;
 			for each(object in _objects) {
@@ -52,7 +62,6 @@ package nest.control.parser
 			model.endian = Endian.LITTLE_ENDIAN;
 			model.position = 0;
 			
-			// header.id
 			if (model.readUnsignedShort() != HEADER) throw new Error("Error reading 3DS file: Not a valid 3DS file");
 			
 			rawVertices = new Vector.<Vertex>();
@@ -111,19 +120,13 @@ package nest.control.parser
 					for (i = 0; i < j; i++) {
 						triangle = new Triangle(data.readUnsignedShort(), data.readUnsignedShort(), data.readUnsignedShort());
 						vertex = rawVertices[triangle.index0];
-						triangle.u0 = vertex.u;
-						triangle.v0 = vertex.v;
 						vertex = rawVertices[triangle.index1];
-						triangle.u1 = vertex.u;
-						triangle.v1 = vertex.v;
 						vertex = rawVertices[triangle.index2];
-						triangle.u2 = vertex.u;
-						triangle.v2 = vertex.v;
 						rawTriangles.push(triangle);
 						data.position += 2;
 					}
-					
-					Geometry.calculateNormal(rawVertices, rawTriangles);
+					// TODO: Fix same vertex pos, different uv data bug.
+					GeometryUtil.calculateNormal(rawVertices, rawTriangles);
 					last.geom = new Geometry(rawVertices, rawTriangles);
 					_objects.push(last);
 					last = null;
@@ -133,7 +136,7 @@ package nest.control.parser
 			data.position = init + length;
 			if (data.position < data.length) readChunk(data, size);
 		}
-		
+
 		private function readName(data:ByteArray):String {
 			var byte:uint = data.readUnsignedByte();
 			var char:String = String.fromCharCode(byte);

@@ -2,12 +2,10 @@ package nest.control.controller
 {
 	import flash.utils.getTimer;
 	
-	import nest.control.animation.AnimationTrack;
-	import nest.control.animation.IAnimatable;
+	import nest.control.animation.ANimationSet;
 	
 	/**
 	 * AnimationController
-	 * <p>The time value in this Controller is used to calculate all IAnimatable object's AnimationTracks.</p>
 	 */
 	public class AnimationController {
 		
@@ -16,7 +14,7 @@ package nest.control.controller
 		private var last:int = 0;
 		private var count:int = 0;
 		
-		public var objects:Vector.<IAnimatable> = new Vector.<IAnimatable>();
+		public var objects:Vector.<AnimationSet> = new Vector.<AnimationSet>();
 		public var paused:Boolean = true;
 		public var speed:Number = 1;
 		public var loops:int = 0;
@@ -40,14 +38,10 @@ package nest.control.controller
 				if (count >= loops) paused = true;
 			}
 			
-			var object:IAnimatable;
-			var track:AnimationTrack;
+			var object:AnimationSet;
 			for each(object in objects) {
-				if (!object.tracks) continue;
-				for each(track in object.tracks) {
-					if (track.length > 0 && _time >= track.start && _time < track.start + track.length) {
-						track.modifier.calculate(object, track.first, _time - track.start);
-					}
+				if (_time >= object.track.position && _time < object.position + object.track.length * track.loops) {
+					object.track.modifier.calculate(object.target, object.track.first, _time - track.start);
 				}
 			}
 		}

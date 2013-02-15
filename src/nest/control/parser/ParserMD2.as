@@ -117,20 +117,14 @@ package nest.control.parser
 				u = uvs[uv0 << 1];
 				v = uvs[(uv0 << 1) + 1];
 				vertices[index0] = new Vertex(0, 0, 0, u, v);
-				tri.u2 = u;
-				tri.v2 = v;
 				
 				u = uvs[uv1 << 1];
 				v = uvs[(uv1 << 1) + 1];
 				vertices[index1] = new Vertex(0, 0, 0, u, v);
-				tri.u1 = u;
-				tri.v1 = v;
 				
 				u = uvs[uv2 << 1];
 				v = uvs[(uv2 << 1) + 1];
 				vertices[index2] = new Vertex(0, 0, 0, u, v);
-				tri.u0 = u;
-				tri.v0 = v;
 				
 				triangles[i] = tri;
 			}

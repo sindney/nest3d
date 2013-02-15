@@ -1,8 +1,10 @@
 package nest.object 
 {	
+	import nest.object.geom.Bound;
 	import nest.object.geom.Geometry;
-	import nest.object.geom.IBound;
-	import nest.view.material.IMaterial;
+	import nest.view.material.Material;
+	import nest.view.shader.Shader3D;
+	import nest.view.TextureResource;
 	
 	/**
 	 * Mesh Interface
@@ -10,10 +12,18 @@ package nest.object
 	public interface IMesh extends IObject3D {
 		
 		function get geom():Geometry;
+		function set geom(value:Geometry):void;
 		
-		function get material():IMaterial;
+		function get material():Material;
+		function set material(value:Material):void;
 		
-		function get bound():IBound;
+		function get shader():Shader3D;
+		function set shader(value:Shader3D):void;
+		
+		function get skinInfo():SkinInfo;
+		function set skinInfo(value:SkinInfo):void;
+
+		function get bound():Bound;
 		
 		function get cliping():Boolean;
 		function set cliping(value:Boolean):void;

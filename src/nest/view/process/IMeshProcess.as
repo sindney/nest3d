@@ -9,9 +9,7 @@ package nest.view.process
 	 */
 	public interface IMeshProcess {
 		
-		function initialize():void;
-		
-		function calculate(mesh:IMesh, ivm:Matrix3D, pm:Matrix3D):void;
+		function calculate(mesh:IMesh, pm:Matrix3D):void;
 		
 	}
 	

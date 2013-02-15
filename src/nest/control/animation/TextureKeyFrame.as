@@ -7,16 +7,8 @@ package nest.control.animation
 	 */
 	public class TextureKeyFrame implements IKeyFrame {
 		
-		/**
-		 * argb: 0xff000000
-		 */
-		public var color:uint;
-		
-		public var diffuse:BitmapData;
-		
-		public var specular:BitmapData;
-		
-		public var normalMap:BitmapData;
+		public var data:BitmapData;
+		public var index:int;
 		
 		private var _time:Number;
 		private var _name:String;
@@ -30,10 +22,8 @@ package nest.control.animation
 			var result:TextureKeyFrame = new TextureKeyFrame();
 			result.time = _time;
 			result.name = _name;
-			result.color = color;
-			result.diffuse = diffuse;
-			result.specular = specular;
-			result.normalMap = normalMap;
+			result.data = data;
+			result.index = index;
 			return result;
 		}
 		

@@ -55,17 +55,7 @@ package nest.view.effect
 			camera.position.copyFrom(camera.matrix.transformVector(p));
 			camera.recompose();
 			
-			containerProcess.meshProcess.initialize();
-			
-			var _camPos:Vector.<Number> = new Vector.<Number>(4, true);
-			_camPos[0] = p.x;
-			_camPos[1] = p.y;
-			_camPos[2] = p.z;
-			_camPos[3] = 1;
-			context3d.setProgramConstantsFromVector(Context3DProgramType.VERTEX, 8, _camPos);
-			
 			var object:IMesh;
-			
 			for each(object in containerProcess.objects) {
 				containerProcess.meshProcess.calculate(object, camera.invertMatrix, camera.pm);
 			}

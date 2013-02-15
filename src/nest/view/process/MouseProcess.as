@@ -12,6 +12,7 @@ package nest.view.process
 	
 	import nest.control.factory.ShaderFactory;
 	import nest.object.IMesh;
+	import nest.view.shader.Shader3D;
 	import nest.view.Camera3D;
 	import nest.view.ViewPort;
 	
@@ -36,8 +37,8 @@ package nest.view.process
 			this.containerProcess = containerProcess;
 			
 			program = ViewPort.context3d.createProgram();
-			program.upload(ShaderFactory.assembler.assemble(Context3DProgramType.VERTEX, "m44 op, va0, vc0"), 
-							ShaderFactory.assembler.assemble(Context3DProgramType.FRAGMENT, "mov oc, fc0"));
+			program.upload(Shader3D.assembler.assemble(Context3DProgramType.VERTEX, "m44 vt0, vc4, vc0\nm44 op, va0, vt0"), 
+							Shader3D.assembler.assemble(Context3DProgramType.FRAGMENT, "mov oc, fc0"));
 			
 			stage.addEventListener(MouseEvent.MOUSE_MOVE, onMouseEvent);
 			stage.addEventListener(MouseEvent.MOUSE_DOWN, onMouseEvent);
@@ -54,17 +55,19 @@ package nest.view.process
 			var height:Number = ViewPort.height;
 			
 			if (mouseX <= width && mouseY <= height) {
-				var pm:Vector.<Number> = camera.pm.rawData.concat();
-				pm[8] = -mouseX * 2 / width;
-				pm[9] = mouseY * 2 / height;
-				camera.pm.copyRawDataFrom(pm);
-				
+				var rawData:Vector.<Number> = camera.pm.rawData.concat();
+				rawData[8] = -mouseX * 2 / width;
+				rawData[9] = mouseY * 2 / height;
+				var pm:Matrix3D = new Matrix3D(rawData);
+				pm.prepend(camera.invertMatrix);
+
 				context3d.setRenderToBackBuffer();
 				context3d.clear();
 				
 				var bmd:BitmapData = new BitmapData(1, 1, true, 0);
-				var matrix:Matrix3D = new Matrix3D();
 				var components:Vector.<Vector3D>;
+				var vertexBuffer:VertexBuffer3DProxy;
+				var indexBuffer:IndexBuffer3DProxy;
 				var mesh:IMesh;
 				var i:int = 0;
 				
@@ -72,25 +75,24 @@ package nest.view.process
 					if (mesh.mouseEnabled) {
 						mesh.id = ++i;
 						
-						matrix.copyFrom(mesh.worldMatrix);
-						matrix.append(camera.invertMatrix);
-						if (mesh.ignoreRotation) {
-							components = matrix.decompose();
-							components[1].setTo(0, 0, 0);
-							matrix.recompose(components);
-						}
-						matrix.append(camera.pm);
-						
 						context3d.setCulling(mesh.triangleCulling);
-						context3d.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 0, matrix, true);
+						context3d.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 0, pm, true);
+						context3d.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 4, mesh.worldMatrix, true);
 						context3d.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, 0, Vector.<Number>([0, ((i >> 8) & 0xff) / 255, (i & 0xff) / 255, 1]));
 						
-						mesh.geom.upload(false, false);
+						for each(vertexBuffer in mesh.geom.vertexBuffers) {
+							if (vertexBuffer.name == Geometry.VERTEX) {
+								context3d.setVertexBufferAt(0, vertexBuffer.buffer);
+							}
+						}
 						
 						context3d.setProgram(program);
-						context3d.drawTriangles(mesh.geom.indexBuffer);
-						
-						mesh.geom.unload();
+
+						for each(indexBuffer in mesh.geom.indexBuffers) {
+							context3d.drawTriangles(indexBuffer);
+						}
+
+						context3d.setVertexBufferAt(0, null);
 					}
 				}
 				
@@ -100,25 +102,24 @@ package nest.view.process
 					if (mesh.mouseEnabled) {
 						mesh.id = ++i;
 						
-						matrix.copyFrom(mesh.worldMatrix);
-						matrix.append(camera.invertMatrix);
-						if (mesh.ignoreRotation) {
-							components = matrix.decompose();
-							components[1].setTo(0, 0, 0);
-							matrix.recompose(components);
-						}
-						matrix.append(camera.pm);
-						
 						context3d.setCulling(mesh.triangleCulling);
-						context3d.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 0, matrix, true);
+						context3d.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 0, pm, true);
+						context3d.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 4, mesh.worldMatrix, true);
 						context3d.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, 0, Vector.<Number>([0, ((i >> 8) & 0xff) / 255, (i & 0xff) / 255, 1]));
 						
-						mesh.geom.upload(false, false);
+						for each(vertexBuffer in mesh.geom.vertexBuffers) {
+							if (vertexBuffer.name == Geometry.VERTEX) {
+								context3d.setVertexBufferAt(0, vertexBuffer.buffer);
+							}
+						}
 						
 						context3d.setProgram(program);
-						context3d.drawTriangles(mesh.geom.indexBuffer);
-						
-						mesh.geom.unload();
+
+						for each(indexBuffer in mesh.geom.indexBuffers) {
+							context3d.drawTriangles(indexBuffer);
+						}
+
+						context3d.setVertexBufferAt(0, null);
 					}
 				}
 				
@@ -143,10 +144,6 @@ package nest.view.process
 					if (target) target.dispatchEvent(new MouseEvent3D(MouseEvent3D.MOUSE_OUT));
 					target = null;
 				}
-				
-				pm[8] = 0;
-				pm[9] = 0;
-				camera.pm.copyRawDataFrom(pm);
 			}
 		}
 		
