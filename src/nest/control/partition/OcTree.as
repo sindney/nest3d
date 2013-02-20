@@ -132,9 +132,9 @@ package nest.control.partition
 				mesh = objects[i];
 				BBTL = BBTR = BBBL = BBBR = false;
 				BTTL = BTTR = BTBL = BTBR = false;
-				if (mesh.bound.type == Bound.AABB) {
-					a = mesh.worldMatrix.transformVector(mesh.bound.max);
-					b = mesh.worldMatrix.transformVector(mesh.bound.min);
+				if (mesh.bound.aabb) {
+					a = mesh.worldMatrix.transformVector(mesh.matrix.transformVector(mesh.bound.vertices[7]));
+					b = mesh.worldMatrix.transformVector(mesh.matrix.transformVector(mesh.bound.vertices[0]));
 					BBTL = Bound.AABB_AABB(a, b, BTL.max, BTL.min);
 					BBTR = Bound.AABB_AABB(a, b, BTR.max, BTR.min);
 					BBBL = Bound.AABB_AABB(a, b, BBL.max, BBL.min);
@@ -144,7 +144,8 @@ package nest.control.partition
 					BTBL = Bound.AABB_AABB(a, b, TBL.max, TBL.min);
 					BTBR = Bound.AABB_AABB(a, b, TBR.max, TBR.min);
 				} else {
-					a = mesh.worldMatrix.transformVector(mesh.bound.center);
+					a = mesh.worldMatrix.transformVector(mesh.matrix.transformVector(mesh.bound.center));
+					//TODO: 半径缩放有问题
 					l = mesh.bound.radius;
 					k = mesh.scale.x;
 					if (mesh.scale.y > k) k = mesh.scale.y;

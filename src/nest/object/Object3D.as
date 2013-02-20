@@ -44,7 +44,6 @@ package nest.object
 			_invertMatrix.invert();
 			if (parent) {
 				_worldMatrix.copyFrom(parent.worldMatrix);
-				_worldMatrix.append(_matrix);
 				_invertWorldMatrix.copyFrom(_worldMatrix);
 				_invertWorldMatrix.invert();
 			}
@@ -58,8 +57,8 @@ package nest.object
 			_invertMatrix.copyFrom(_matrix);
 			_invertMatrix.invert();
 			if (parent) {
-				_worldMatrix.copyFrom(parent.worldMatrix);
-				_worldMatrix.append(_matrix);
+				_worldMatrix.copyFrom(parent.matrix);
+				_worldMatrix.append(parent.worldMatrix);
 				_invertWorldMatrix.copyFrom(_worldMatrix);
 				_invertWorldMatrix.invert();
 			}

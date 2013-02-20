@@ -16,7 +16,7 @@ package nest.view.process
 		
 		function get meshProcess():IMeshProcess;
 		function set meshProcess(value:IMeshProcess):void;
-
+		
 		function get objects():Vector.<IMesh>;
 		
 		function get alphaObjects():Vector.<IMesh>;

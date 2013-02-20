@@ -53,25 +53,21 @@ package nest.object.geom
 		}
 		
 		public static function calculate(bound:Bound, geom:Geometry):void {
-			var i:int, j:int = geom.length;
-			var vertices:Vector.<Vertex>;
+			var i:int, j:int = geom.numVertices;
 			var max:Vector3D, min:Vector3D;
-			if (bound.type == AABB) {
+			if (bound.aabb) {
 				max = bound.vertices[7];
 				min = bound.vertices[0];
 				max.setTo(0, 0, 0);
 				min.setTo(0, 0, 0);
 				
-				for (i = 0; i < j; i++) {
-					vertices = geom[i].vertices;
-					for each(var vertex:Vertex in vertices) {
-						if (vertex.x > max.x) max.x = vertex.x;
-						else if (vertex.x < min.x) min.x = vertex.x;
-						if (vertex.y > max.y) max.y = vertex.y;
-						else if (vertex.y < min.y) min.y = vertex.y;
-						if (vertex.z > max.z) max.z = vertex.z;
-						else if (vertex.z < min.z) min.z = vertex.z;
-					}
+				for each(var vertex:Vertex in geom.vertices) {
+					if (vertex.x > max.x) max.x = vertex.x;
+					else if (vertex.x < min.x) min.x = vertex.x;
+					if (vertex.y > max.y) max.y = vertex.y;
+					else if (vertex.y < min.y) min.y = vertex.y;
+					if (vertex.z > max.z) max.z = vertex.z;
+					else if (vertex.z < min.z) min.z = vertex.z;
 				}
 				
 				bound.vertices[1].setTo(max.x, min.y, min.z);
@@ -80,57 +76,37 @@ package nest.object.geom
 				bound.vertices[4].setTo(min.x, min.y, max.z);
 				bound.vertices[5].setTo(max.x, min.y, max.z);
 				bound.vertices[6].setTo(min.x, max.y, max.z);
-				
-				bound.center.x = (max.x + min.x) * 0.5;
-				bound.center.y = (max.y + min.y) * 0.5;
-				bound.center.z = (max.z + min.z) * 0.5;
 			} else {
 				max = new Vector3D();
-				for (i = 0; i < j; i++) {
-					vertices = geom[i].vertices;
-					for each(vertex in vertices) {
-						if (vertex.x > max.x) max.x = vertex.x;
-						if (vertex.y > max.y) max.y = vertex.y;
-						if (vertex.z > max.z) max.z = vertex.z;
-					}
+				for each(vertex in geom.vertices) {
+					if (vertex.x > max.x) max.x = vertex.x;
+					if (vertex.y > max.y) max.y = vertex.y;
+					if (vertex.z > max.z) max.z = vertex.z;
 				}
 				bound.radius = max.x > max.y ? max.x : max.y;
 				if (max.z > bound.radius) bound.radius = max.z;
 			}
+			bound.center.x = (max.x + min.x) * 0.5;
+			bound.center.y = (max.y + min.y) * 0.5;
+			bound.center.z = (max.z + min.z) * 0.5;
 		}
 		
-		private var _center:Vector3D = new Vector3D();
-		private var _radius:Number = 0;
-		private var _vertices:Vector.<Vector3D>;
+		public var center:Vector3D = new Vector3D();
+		public var radius:Number = 0;
+		public var vertices:Vector.<Vector3D>;
 		
 		public var aabb:Boolean = true;
 		
 		public function Bound() {
-			_vertices = new Vector.<Vector3D>(8, true);
-			_vertices[0] = new Vector3D();
-			_vertices[1] = new Vector3D();
-			_vertices[2] = new Vector3D();
-			_vertices[3] = new Vector3D();
-			_vertices[4] = new Vector3D();
-			_vertices[5] = new Vector3D();
-			_vertices[6] = new Vector3D();
-			_vertices[7] = new Vector3D();
-		}
-		
-		///////////////////////////////////
-		// getter/setters
-		///////////////////////////////////
-		
-		public function get vertices():Vector.<Vector3D> {
-			return _vertices;
-		}
-		
-		public function get radius():Number {
-			return _radius;
-		}
-		
-		public function get center():Vector3D {
-			return _center;
+			vertices = new Vector.<Vector3D>(8, true);
+			vertices[0] = new Vector3D();
+			vertices[1] = new Vector3D();
+			vertices[2] = new Vector3D();
+			vertices[3] = new Vector3D();
+			vertices[4] = new Vector3D();
+			vertices[5] = new Vector3D();
+			vertices[6] = new Vector3D();
+			vertices[7] = new Vector3D();
 		}
 		
 	}

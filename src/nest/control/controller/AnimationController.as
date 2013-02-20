@@ -2,7 +2,7 @@ package nest.control.controller
 {
 	import flash.utils.getTimer;
 	
-	import nest.control.animation.ANimationSet;
+	import nest.control.animation.AnimationSet;
 	
 	/**
 	 * AnimationController

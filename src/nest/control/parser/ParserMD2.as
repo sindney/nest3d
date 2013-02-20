@@ -16,11 +16,22 @@ package nest.control.parser
 	 */
 	public class ParserMD2 {
 		
+		public var geom:Geometry;
+		public var track:AnimationTrack;
+		
 		public function ParserMD2() {
 			
 		}
 		
-		public function parse(model:ByteArray, scale:Number = 1):Mesh {
+		public function dispose():void {
+			geom = null;
+			track = null;
+		}
+		
+		public function parse(model:ByteArray, scale:Number = 1):void {
+			geom = 0;
+			track = 0;
+			
 			model.position = 0;
 			model.endian = Endian.LITTLE_ENDIAN;
 			
@@ -117,14 +128,20 @@ package nest.control.parser
 				u = uvs[uv0 << 1];
 				v = uvs[(uv0 << 1) + 1];
 				vertices[index0] = new Vertex(0, 0, 0, u, v);
+				tri.uvs[0] = u;
+				tri.uvs[1] = v;
 				
 				u = uvs[uv1 << 1];
 				v = uvs[(uv1 << 1) + 1];
 				vertices[index1] = new Vertex(0, 0, 0, u, v);
+				tri.uvs[2] = u;
+				tri.uvs[3] = v;
 				
 				u = uvs[uv2 << 1];
 				v = uvs[(uv2 << 1) + 1];
 				vertices[index2] = new Vertex(0, 0, 0, u, v);
+				tri.uvs[4] = u;
+				tri.uvs[5] = v;
 				
 				triangles[i] = tri;
 			}
@@ -176,9 +193,9 @@ package nest.control.parser
 			while (frame) {
 				for (i = 0; i < j; i++) {
 					tri = triangles[i];
-					v1 = tri.index0 * 3;
-					v2 = tri.index1 * 3;
-					v3 = tri.index2 * 3;
+					v1 = tri.indices[0] * 3;
+					v2 = tri.indices[1] * 3;
+					v3 = tri.indices[2] * 3;
 					
 					vt1.x = frame.vertices[v2]     - frame.vertices[v1];
 					vt1.y = frame.vertices[v2 + 1] - frame.vertices[v1 + 1];
@@ -222,16 +239,13 @@ package nest.control.parser
 				vertex.x = vs0[j];
 				vertex.y = vs0[j + 1];
 				vertex.z = vs0[j + 2];
-				vertex.normal.setTo(vn0[j], vn0[j + 1], vn0[j + 2]);
+				vertex.nx = vn0[j];
+				vertex.ny = vn0[j + 1];
+				vertex.nz = vn0[j + 2];
 			}
 			
-			var geom:Geometry = new Geometry(vertices, triangles);
-			
-			var mesh:Mesh = new Mesh(geom, null);
-			mesh.tracks = new Vector.<AnimationTrack>();
-			mesh.tracks.push(vertexTrack);
-			
-			return mesh;
+			geom = new Geometry(vertices, triangles);
+			track = vertexTrack;
 		}
 		
 	}

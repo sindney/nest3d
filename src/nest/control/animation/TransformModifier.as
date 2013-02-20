@@ -1,5 +1,6 @@
 package nest.control.animation 
 {
+	import nest.object.IMesh;
 	import nest.object.IObject3D;
 	
 	/**
@@ -19,7 +20,7 @@ package nest.control.animation
 			return result;
 		}
 		
-		public function calculate(target:IAnimatable, root:IKeyFrame, time:Number):void {
+		public function calculate(target:IMesh, root:IKeyFrame, time:Number):void {
 			var frame:IKeyFrame = root;
 			var offset:Number = root.next.time;
 			

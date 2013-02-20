@@ -2,12 +2,12 @@ package nest.view.process
 {
 	import flash.display3D.Context3D;
 	import flash.display3D.Context3DProgramType;
+	import flash.display3D.Context3DVertexBufferFormat;
+	import flash.geom.Matrix3D;
 	
-	import nest.object.geom.IndexBuffer3DProxy;
-	import nest.object.geom.VertexBuffer3DProxy;
 	import nest.object.IMesh;
-	import nest.view.material.TextureResource;
 	import nest.view.shader.*;
+	import nest.view.TextureResource;
 	import nest.view.ViewPort;
 	
 	/**
@@ -19,7 +19,9 @@ package nest.view.process
 			var context3d:Context3D = ViewPort.context3d;
 			
 			context3d.setCulling(mesh.triangleCulling);
-			context3d.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 0, pm, true);
+			context3d.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 0, mesh.matrix, true);
+			context3d.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 4, mesh.worldMatrix, true);
+			context3d.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 8, pm, true);
 			
 			var byteArraySP:ByteArrayShaderPart;
 			var matrixSP:MatrixShaderPart;
@@ -29,7 +31,7 @@ package nest.view.process
 					byteArraySP = csp as ByteArrayShaderPart;
 					context3d.setProgramConstantsFromByteArray(byteArraySP.programType, byteArraySP.firstRegister, 
 																byteArraySP.numRegisters, byteArraySP.data, 
-																byteArray.byteArrayOffset);
+																byteArraySP.byteArrayOffset);
 				} else if (csp is MatrixShaderPart) {
 					matrixSP = csp as MatrixShaderPart;
 					context3d.setProgramConstantsFromMatrix(matrixSP.programType, matrixSP.firstRegister, 
@@ -41,42 +43,25 @@ package nest.view.process
 				}
 			}
 			
-			if (mesh.skinInfo) {
-				var i:int, j:int = mesh.skinInfo.bones.length;
-				var bone:Bone;
-				if (mesh.skinInfo.hardware) {
-					for (i = 0; i < j; i++) {
-						bone = mesh.skinInfo.bones[i];
-						// TODO: update combinedMatrix.
-						context3d.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, i * 4, 
-																bone.combinedMatrix, true);
-					}
-				} else {
-					
-				}
-			}
+			for each(var tr:TextureResource in mesh.material) context3d.setTextureAt(tr.sampler, tr.texture);
 			
-			for each(var tr:TextureResource in mesh.material.textures) {
-				context3d.setTextureAt(tr.sampler, tr.texture);
-			}
+			var a:Boolean = mesh.geom.vertexBuffer != null;
+			var b:Boolean = mesh.geom.normalBuffer != null;
+			var c:Boolean = mesh.geom.uvBuffer != null;
 			
-			for each(var vb:VertexBuffer3DProxy in mesh.geom.vertexBuffers) {
-				context3d.setVertexBufferAt(vb.index, vb.buffer, vb.bufferOffset, vb.format);
-			}
+			if (a) context3d.setVertexBufferAt(0, mesh.geom.vertexBuffer, 0, Context3DVertexBufferFormat.FLOAT_3);
+			if (b) context3d.setVertexBufferAt(1, mesh.geom.normalBuffer, 0, Context3DVertexBufferFormat.FLOAT_3);
+			if (c) context3d.setVertexBufferAt(2, mesh.geom.uvBuffer, 0, Context3DVertexBufferFormat.FLOAT_2);
 			
 			context3d.setProgram(mesh.shader.program);
 			
-			for each(var ib:IndexBuffer3DProxy in mesh.geom.indexBuffers) {
-				context3D.drawTriangles(ib.buffer, ib.firstIndex, ib.numTriangles);
-			}
+			context3d.drawTriangles(mesh.geom.indexBuffer);
 			
-			for each(tr in mesh.material.textures) {
-				context3d.setTextureAt(tr.sampler, null);
-			}
+			for each(tr in mesh.material) context3d.setTextureAt(tr.sampler, null);
 			
-			for each(vb in mesh.geom.vertexBuffers) {
-				context3d.setVertexBufferAt(vb.index, null);
-			}
+			if (a) context3d.setVertexBufferAt(0, null);
+			if (b) context3d.setVertexBufferAt(1, null);
+			if (c) context3d.setVertexBufferAt(2, null);
 		}
 		
 	}

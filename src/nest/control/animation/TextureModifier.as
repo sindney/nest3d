@@ -1,6 +1,7 @@
 package nest.control.animation 
 {
 	import nest.control.util.TextureUtil;
+	import nest.object.IMesh;
 	import nest.view.material.Material;
 	
 	/**
@@ -19,7 +20,7 @@ package nest.control.animation
 			return result;
 		}
 		
-		public function calculate(target:IAnimatable, root:IKeyFrame, time:Number):void {
+		public function calculate(target:IMesh, root:IKeyFrame, time:Number):void {
 			var frame:IKeyFrame = root;
 			var offset:Number = root.next.time;
 			

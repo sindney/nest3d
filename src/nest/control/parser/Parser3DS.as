@@ -4,7 +4,6 @@ package nest.control.parser
 	import flash.utils.ByteArray;
 	import flash.utils.Endian;
 	
-	import nest.control.util.GeometryUtil;
 	import nest.object.geom.Geometry;
 	import nest.object.geom.Triangle;
 	import nest.object.geom.Vertex;
@@ -46,7 +45,7 @@ package nest.control.parser
 			rawTriangles = null;
 			scale = 1;
 		}
-
+		
 		public function getObjectByName(name:String):Mesh {
 			var object:Mesh;
 			for each(object in _objects) {
@@ -79,7 +78,7 @@ package nest.control.parser
 			var id:uint = data.readUnsignedShort();
 			var length:uint = data.readUnsignedInt();
 			
-			var i:int, j:int;
+			var i:int, j:int, k:int;
 			var vertex:Vertex;
 			var triangle:Triangle;
 			
@@ -119,14 +118,15 @@ package nest.control.parser
 					j = data.readUnsignedShort();
 					for (i = 0; i < j; i++) {
 						triangle = new Triangle(data.readUnsignedShort(), data.readUnsignedShort(), data.readUnsignedShort());
-						vertex = rawVertices[triangle.index0];
-						vertex = rawVertices[triangle.index1];
-						vertex = rawVertices[triangle.index2];
 						rawTriangles.push(triangle);
+						for (k = 0; k < 3; k++) {
+							vertex = rawVertices[triangle.indices[k]];
+							triangle.uvs[k * 2] = vertex.u;
+							triangle.uvs[k * 2 + 1] = vertex.v;
+						}
 						data.position += 2;
 					}
-					// TODO: Fix same vertex pos, different uv data bug.
-					GeometryUtil.calculateNormal(rawVertices, rawTriangles);
+					Geometry.calculateNormal(rawVertices, rawTriangles);
 					last.geom = new Geometry(rawVertices, rawTriangles);
 					_objects.push(last);
 					last = null;
@@ -136,7 +136,7 @@ package nest.control.parser
 			data.position = init + length;
 			if (data.position < data.length) readChunk(data, size);
 		}
-
+		
 		private function readName(data:ByteArray):String {
 			var byte:uint = data.readUnsignedByte();
 			var char:String = String.fromCharCode(byte);

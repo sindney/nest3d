@@ -58,7 +58,13 @@ package nest.view.process
 			
 			var pm:Matrix3D = _camera.invertMatrix.clone();
 			pm.append(_camera.pm);
-
+			
+			var pm1:Matrix3D = _camera.invertMatrix.clone();
+			var comps:Vector.<Vector3D> = pm1.decompose();
+			comps[1].setTo(0, 0, 0);
+			pm1.recompose(comps);
+			pm1.append(_camera.pm);
+			
 			_objects = new Vector.<IMesh>();
 			_alphaObjects = new Vector.<IMesh>();
 			
@@ -102,7 +108,7 @@ package nest.view.process
 											alphaParms.push(dx * dx + dy * dy + dz * dz);
 											_alphaObjects.push(mesh);
 										} else {
-											_meshProcess.calculate(mesh, pm);
+											_meshProcess.calculate(mesh, mesh.ignoreRotation ? pm1 : pm);
 											_objects.push(mesh);
 										}
 										_numVertices += mesh.geom.numVertices;
@@ -129,7 +135,7 @@ package nest.view.process
 										alphaParms.push(dx * dx + dy * dy + dz * dz);
 										_alphaObjects.push(mesh);
 									} else {
-										_meshProcess.calculate(mesh, pm);
+										_meshProcess.calculate(mesh, mesh.ignoreRotation ? pm1 : pm);
 										_objects.push(mesh);
 									}
 									_numVertices += mesh.geom.numVertices;
@@ -155,23 +161,24 @@ package nest.view.process
 			
 			context3d.setBlendFactors(Context3DBlendFactor.ONE, Context3DBlendFactor.ZERO);
 		}
-
+		
 		protected function classifyMesh(mesh:IMesh):Boolean {
 			var i:int;
 			if (mesh.bound.aabb) {
 				var vertices:Vector.<Vector3D> = new Vector.<Vector3D>(8, true);
 				for (i = 0; i < 8; i++) {
 					vertices[i] = _camera.invertMatrix.transformVector(
-									mesh.worldMatrix.transformVector(mesh.bound.vertices[i])
+									mesh.worldMatrix.transformVector(mesh.matrix.transformVector(mesh.bound.vertices[i]))
 								);
 				}
 				return _camera.frustum.classifyAABB(vertices);
 			}
 			
+			//TODO: 半径缩放有问题
 			i = mesh.scale.x > mesh.scale.y ? mesh.scale.x : mesh.scale.y;
 			if (mesh.scale.z > i) i = mesh.scale.z;
 			return _camera.frustum.classifyBSphere(
-						_camera.invertMatrix.transformVector(mesh.worldMatrix.transformVector(mesh.bound.center)), 
+						_camera.invertMatrix.transformVector(mesh.worldMatrix.transformVector(mesh.matrix.transformVector(mesh.bound.center))), 
 						mesh.bound.radius * i
 					);
 		}
@@ -231,11 +238,11 @@ package nest.view.process
 		public function get meshProcess():IMeshProcess {
 			return _meshProcess;
 		}
-
+		
 		public function set meshProcess(value:IMeshProcess):void {
 			_meshProcess = value;
 		}
-
+		
 		public function get objects():Vector.<IMesh> {
 			return _objects;
 		}

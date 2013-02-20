@@ -100,16 +100,17 @@ package nest.control.partition
 			for (i = 0; i < j; i++) {
 				mesh = objects[i];
 				BTL = BTR = BBL = BBR = false;
-				if (mesh.bound.type == Bound.AABB) {
-					a = mesh.worldMatrix.transformVector(mesh.bound.max);
-					b = mesh.worldMatrix.transformVector(mesh.bound.min);
+				if (mesh.bound.aabb) {
+					a = mesh.worldMatrix.transformVector(mesh.matrix.transformVector(mesh.bound.vertices[7]));
+					b = mesh.worldMatrix.transformVector(mesh.matrix.transformVector(mesh.bound.vertices[0]));
 					a.y = b.y = 0;
 					BTL = Bound.AABB_AABB(a, b, TL.max, TL.min);
 					BTR = Bound.AABB_AABB(a, b, TR.max, TR.min);
 					BBL = Bound.AABB_AABB(a, b, BL.max, BL.min);
 					BBR = Bound.AABB_AABB(a, b, BR.max, BR.min);
 				} else {
-					a = mesh.worldMatrix.transformVector(mesh.bound.center);
+					a = mesh.worldMatrix.transformVector(mesh.matrix.transformVector(mesh.bound.center));
+					//TODO: 半径缩放有问题
 					a.y = 0;
 					l = mesh.bound.radius;
 					k = mesh.scale.x;

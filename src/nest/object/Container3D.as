@@ -24,6 +24,7 @@ package nest.object
 		public function addChild(object:IObject3D):void {
 			_numChildren++;
 			object.parent = this;
+			object.recompose();
 			_objects.push(object);
 		}
 		
@@ -32,6 +33,7 @@ package nest.object
 			if (index != -1) {
 				_numChildren--;
 				object.parent = null;
+				object.recompose();
 				_objects.splice(index, 1);
 			}
 		}
@@ -41,6 +43,7 @@ package nest.object
 			if (object) {
 				_numChildren--;
 				object.parent = null;
+				object.recompose();
 				_objects.splice(index, 1);
 			}
 			return object;

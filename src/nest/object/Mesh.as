@@ -1,13 +1,12 @@
 package nest.object
 {
 	import flash.display3D.Context3DTriangleFace;
+	import flash.utils.Dictionary;
 	
 	import nest.object.geom.Bound;
 	import nest.object.geom.Geometry;
-	import nest.object.geom.SkinInfo;
-	import nest.view.material.Material;
-	import nest.view.material.TextureResource;
 	import nest.view.shader.Shader3D;
+	import nest.view.TextureResource;
 	
 	/**
 	 * Mesh
@@ -16,13 +15,13 @@ package nest.object
 		
 		protected var _geom:Geometry;
 		
-		protected var _material:Material;
+		protected var _material:Vector.<TextureResource>;
 		
 		protected var _shader:Shader3D;
 		
-		protected var _skinInfo:SkinInfo;
-		
 		protected var _bound:Bound;
+		
+		protected var _parameters:Dictionary;
 		
 		protected var _triangleCulling:String = Context3DTriangleFace.BACK;
 		
@@ -34,13 +33,13 @@ package nest.object
 		
 		protected var _id:uint;
 		
-		public function Mesh(geom:Geometry, material:Material, shader:Shader3D, skinInfo:SkinInfo = null) {
+		public function Mesh(geom:Geometry, material:Vector.<TextureResource>, shader:Shader3D) {
 			super();
 			_geom = geom;
 			_material = material;
 			_shader = shader;
-			_skinInfo = null;
 			_bound = new Bound();
+			_parameters = new Dictionary();
 		}
 		
 		///////////////////////////////////
@@ -55,11 +54,11 @@ package nest.object
 			_geom = value;
 		}
 		
-		public function get material():Material {
+		public function get material():Vector.<TextureResource> {
 			return _material;
 		}
 		
-		public function set material(value:Material):void {
+		public function set material(value:Vector.<TextureResource>):void {
 			_material = value;
 		}
 		
@@ -70,17 +69,13 @@ package nest.object
 		public function set shader(value:Shader3D):void {
 			_shader = value;
 		}
-
-		public function get skinInfo():void {
-			return _skinInfo;
-		}
 		
-		public function set skinInfo(value:SkinInfo):void {
-			_skinInfo = value;
-		}
-
 		public function get bound():Bound {
 			return _bound;
+		}
+		
+		public function get parameters():Dictionary {
+			return _parameters;
 		}
 		
 		public function get visible():Boolean {

@@ -1,8 +1,9 @@
 package nest.object 
 {	
+	import flash.utils.Dictionary;
+	
 	import nest.object.geom.Bound;
 	import nest.object.geom.Geometry;
-	import nest.view.material.Material;
 	import nest.view.shader.Shader3D;
 	import nest.view.TextureResource;
 	
@@ -14,16 +15,15 @@ package nest.object
 		function get geom():Geometry;
 		function set geom(value:Geometry):void;
 		
-		function get material():Material;
-		function set material(value:Material):void;
+		function get material():Vector.<TextureResource>;
+		function set material(value:Vector.<TextureResource>):void;
 		
 		function get shader():Shader3D;
 		function set shader(value:Shader3D):void;
 		
-		function get skinInfo():SkinInfo;
-		function set skinInfo(value:SkinInfo):void;
-
 		function get bound():Bound;
+		
+		function get parameters():Dictionary;
 		
 		function get cliping():Boolean;
 		function set cliping(value:Boolean):void;
