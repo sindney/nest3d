@@ -43,25 +43,24 @@ package nest.view.process
 				}
 			}
 			
-			for each(var tr:TextureResource in mesh.material) context3d.setTextureAt(tr.sampler, tr.texture);
+			if (mesh.material) for each(var tr:TextureResource in mesh.material) context3d.setTextureAt(tr.sampler, tr.texture);
 			
-			var a:Boolean = mesh.geom.vertexBuffer != null;
-			var b:Boolean = mesh.geom.normalBuffer != null;
-			var c:Boolean = mesh.geom.uvBuffer != null;
+			var a:Boolean = mesh.geom.normalBuffer != null;
+			var b:Boolean = mesh.geom.uvBuffer != null;
 			
-			if (a) context3d.setVertexBufferAt(0, mesh.geom.vertexBuffer, 0, Context3DVertexBufferFormat.FLOAT_3);
-			if (b) context3d.setVertexBufferAt(1, mesh.geom.normalBuffer, 0, Context3DVertexBufferFormat.FLOAT_3);
-			if (c) context3d.setVertexBufferAt(2, mesh.geom.uvBuffer, 0, Context3DVertexBufferFormat.FLOAT_2);
+			context3d.setVertexBufferAt(0, mesh.geom.vertexBuffer, 0, Context3DVertexBufferFormat.FLOAT_3);
+			if (a) context3d.setVertexBufferAt(1, mesh.geom.normalBuffer, 0, Context3DVertexBufferFormat.FLOAT_3);
+			if (b) context3d.setVertexBufferAt(2, mesh.geom.uvBuffer, 0, Context3DVertexBufferFormat.FLOAT_2);
 			
 			context3d.setProgram(mesh.shader.program);
 			
 			context3d.drawTriangles(mesh.geom.indexBuffer);
 			
-			for each(tr in mesh.material) context3d.setTextureAt(tr.sampler, null);
+			if (mesh.material) for each(tr in mesh.material) context3d.setTextureAt(tr.sampler, null);
 			
-			if (a) context3d.setVertexBufferAt(0, null);
-			if (b) context3d.setVertexBufferAt(1, null);
-			if (c) context3d.setVertexBufferAt(2, null);
+			context3d.setVertexBufferAt(0, null);
+			if (a) context3d.setVertexBufferAt(1, null);
+			if (b) context3d.setVertexBufferAt(2, null);
 		}
 		
 	}

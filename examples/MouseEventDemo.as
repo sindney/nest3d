@@ -1,13 +1,15 @@
 package  
 {
-	import nest.control.factory.PrimitiveFactory;
+	import flash.display3D.Context3DProgramType;
+	
 	import nest.control.partition.OcNode;
 	import nest.control.partition.OcTree;
+	import nest.control.util.Primitives;
 	import nest.object.geom.Geometry;
 	import nest.object.Mesh;
 	import nest.object.Container3D;
-	import nest.view.material.ColorMaterial;
 	import nest.view.process.*;
+	import nest.view.shader.*;
 	
 	/**
 	 * MouseEventDemo
@@ -18,9 +20,9 @@ package
 		private var process1:ContainerProcess;
 		private var container:Container3D;
 		
-		private var material0:ColorMaterial;
-		private var material1:ColorMaterial;
-		private var material2:ColorMaterial;
+		private var shader0:Shader3D;
+		private var shader1:Shader3D;
+		private var shader2:Shader3D;
 		
 		public function MouseEventDemo() {
 			
@@ -30,37 +32,48 @@ package
 			container = new Container3D();
 			
 			process1 = new ContainerProcess(camera, container);
-			process1.meshProcess = new BasicMeshProcess(camera);
+			process1.meshProcess = new BasicMeshProcess();
 			process1.color = 0xff000000;
 			
 			process0 = new MouseProcess(stage, process1);
 			
 			view.processes.push(process0, process1);
 			
-			material0 = new ColorMaterial();
-			material0.comply();
+			shader0 = new Shader3D();
+			shader0.constantParts.push(new VectorShaderPart(Context3DProgramType.FRAGMENT, 0, Vector.<Number>([1, 1, 1, 1])));
+			shader0.comply("m44 vt0, va0, vc0\nm44 vt0, vt0, vc4\n" + 
+							"m44 op, vt0, vc8\n",
+							"mov oc, fc0\n");
 			
-			material1 = new ColorMaterial(0xffff0000);
-			material1.comply();
+			shader1 = new Shader3D();
+			shader1.constantParts.push(new VectorShaderPart(Context3DProgramType.FRAGMENT, 0, Vector.<Number>([1, 0, 0, 1])));
+			shader1.comply("m44 vt0, va0, vc0\nm44 vt0, vt0, vc4\n" + 
+							"m44 op, vt0, vc8\n",
+							"mov oc, fc0\n");
 			
-			material2 = new ColorMaterial(0xff0000ff);
-			material2.comply();
+			shader2 = new Shader3D();
+			shader2.constantParts.push(new VectorShaderPart(Context3DProgramType.FRAGMENT, 0, Vector.<Number>([0, 0, 1, 1])));
+			shader2.comply("m44 vt0, va0, vc0\nm44 vt0, vt0, vc4\n" + 
+							"m44 op, vt0, vc8\n",
+							"mov oc, fc0\n");
 			
-			var geom:Geometry = PrimitiveFactory.createBox(1, 1, 1);
+			var geom:Geometry = Primitives.box;
+			Geometry.setupGeometry(geom, true, false, false);
+			Geometry.uploadGeometry(geom, true, false, false, true);
+			
 			var mesh:Mesh;
 			
 			var offsetX:Number = 0, offsetY:Number = 0, offsetZ:Number = 0;
 			
-			var i:int, j:int, k:int, l:int = 13, m:int = l * 25;
+			var i:int, j:int, k:int, l:int = 15, m:int = l * 25;
 			for (i = 0; i < l; i++) {
 				for (j = 0; j < l; j++) {
 					for (k = 0; k < l; k++) {
-						mesh = new Mesh(geom, material0);
+						mesh = new Mesh(geom, null, shader0);
 						mesh.position.setTo(i * 50 - m + offsetX, j * 50 - m + offsetY, k * 50 - m + offsetZ);
 						mesh.scale.setTo(10, 10, 10);
 						mesh.mouseEnabled = true;
 						container.addChild(mesh);
-						mesh.recompose();
 						mesh.addEventListener(MouseEvent3D.MOUSE_OVER, onMouseOver);
 						mesh.addEventListener(MouseEvent3D.MOUSE_DOWN, onMouseDown);
 						mesh.addEventListener(MouseEvent3D.MOUSE_OUT, onMouseOut);
@@ -75,15 +88,15 @@ package
 		}
 		
 		private function onMouseOut(e:MouseEvent3D):void {
-			(e.target as Mesh).material = material0;
+			(e.target as Mesh).shader = shader0;
 		}
 		
 		private function onMouseDown(e:MouseEvent3D):void {
-			(e.target as Mesh).material = material1;
+			(e.target as Mesh).shader = shader1;
 		}
 		
 		private function onMouseOver(e:MouseEvent3D):void {
-			(e.target as Mesh).material = material2;
+			(e.target as Mesh).shader = shader2;
 		}
 		
 		override public function loop():void {

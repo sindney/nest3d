@@ -81,7 +81,7 @@ package nest.control.partition
 			TL.parent = TR.parent = BL.parent = BR.parent = node;
 			TL.depth = TR.depth = BL.depth = BR.depth = depth;
 			
-			var i:int, j:int, k:int, l:int;
+			var i:int, j:int;
 			for (i = 0; i < 4; i++) {
 				var tmp:QuadNode = node.childs[i] as QuadNode;
 				tmp.vertices[1].setTo(tmp.max.x, 0, tmp.min.z);
@@ -90,9 +90,10 @@ package nest.control.partition
 			
 			var BTL:Boolean, BTR:Boolean, BBL:Boolean, BBR:Boolean;
 			
+			var radius:Number;
 			var mesh:IMesh;
 			var objects:Vector.<IMesh> = node.objects;
-			var a:Vector3D, b:Vector3D;
+			var a:Vector3D, b:Vector3D, c:Vector3D = new Vector3D(0.707, 0, 0.707);
 			
 			j = objects.length;
 			node.objects = new Vector.<IMesh>();
@@ -110,17 +111,13 @@ package nest.control.partition
 					BBR = Bound.AABB_AABB(a, b, BR.max, BR.min);
 				} else {
 					a = mesh.worldMatrix.transformVector(mesh.matrix.transformVector(mesh.bound.center));
-					//TODO: 半径缩放有问题
-					a.y = 0;
-					l = mesh.bound.radius;
-					k = mesh.scale.x;
-					if (mesh.scale.y > k) k = mesh.scale.y;
-					if (mesh.scale.z > k) k = mesh.scale.z;
-					l *= k;
-					BTL = Bound.AABB_BSphere(TL.max, TL.min, a, l);
-					BTR = Bound.AABB_BSphere(TR.max, TR.min, a, l);
-					BBL = Bound.AABB_BSphere(BL.max, BL.min, a, l);
-					BBR = Bound.AABB_BSphere(BR.max, BR.min, a, l);
+					b = mesh.worldMatrix.transformVector(mesh.matrix.transformVector(c));
+					a.y = b.y = 0;
+					radius = mesh.bound.radius * b.length;
+					BTL = Bound.AABB_BSphere(TL.max, TL.min, a, radius);
+					BTR = Bound.AABB_BSphere(TR.max, TR.min, a, radius);
+					BBL = Bound.AABB_BSphere(BL.max, BL.min, a, radius);
+					BBR = Bound.AABB_BSphere(BR.max, BR.min, a, radius);
 				}
 				
 				if (BTL && (BTR || BBL || BBR) || BTR && (BTL || BBL || BBR) || 

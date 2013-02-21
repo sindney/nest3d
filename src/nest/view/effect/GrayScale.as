@@ -6,8 +6,8 @@ package nest.view.effect
 	import flash.display3D.Context3DVertexBufferFormat;
 	import flash.display3D.Program3D;
 	
-	import nest.control.factory.ShaderFactory;
 	import nest.view.process.EffectProcess;
+	import nest.view.shader.Shader3D;
 	import nest.view.ViewPort;
 	
 	/**
@@ -59,8 +59,8 @@ package nest.view.effect
 							"dp3 ft1, ft0.rgb, fc0.rgb\n" + 
 							"mov oc, ft1\n";
 							
-			program.upload(ShaderFactory.assembler.assemble(Context3DProgramType.VERTEX, vs), 
-							ShaderFactory.assembler.assemble(Context3DProgramType.FRAGMENT, fs));
+			program.upload(Shader3D.assembler.assemble(Context3DProgramType.VERTEX, vs), 
+							Shader3D.assembler.assemble(Context3DProgramType.FRAGMENT, fs));
 		}
 		
 		override public function dispose():void {

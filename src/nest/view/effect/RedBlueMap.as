@@ -8,10 +8,10 @@ package nest.view.effect
 	import flash.display3D.Program3D;
 	import flash.geom.Vector3D;
 	
-	import nest.control.factory.ShaderFactory;
 	import nest.object.IMesh;
 	import nest.view.process.EffectProcess;
 	import nest.view.process.IContainerProcess;
+	import nest.view.shader.Shader3D;
 	import nest.view.Camera3D;
 	import nest.view.ViewPort;
 	
@@ -102,8 +102,8 @@ package nest.view.effect
 							"mul ft3, ft1, fc1\n" + 
 							"add oc, ft2, ft3\n";
 			
-			program.upload(ShaderFactory.assembler.assemble(Context3DProgramType.VERTEX, vs), 
-							ShaderFactory.assembler.assemble(Context3DProgramType.FRAGMENT, fs));
+			program.upload(Shader3D.assembler.assemble(Context3DProgramType.VERTEX, vs), 
+							Shader3D.assembler.assemble(Context3DProgramType.FRAGMENT, fs));
 		}
 		
 		override public function dispose():void {

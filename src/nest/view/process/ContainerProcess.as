@@ -174,12 +174,11 @@ package nest.view.process
 				return _camera.frustum.classifyAABB(vertices);
 			}
 			
-			//TODO: 半径缩放有问题
-			i = mesh.scale.x > mesh.scale.y ? mesh.scale.x : mesh.scale.y;
-			if (mesh.scale.z > i) i = mesh.scale.z;
+			var id:Vector3D = mesh.worldMatrix.transformVector(mesh.matrix.transformVector(new Vector3D(0.577, 0.577, 0.577)));
+			var scale:Number = id.length;
 			return _camera.frustum.classifyBSphere(
 						_camera.invertMatrix.transformVector(mesh.worldMatrix.transformVector(mesh.matrix.transformVector(mesh.bound.center))), 
-						mesh.bound.radius * i
+						mesh.bound.radius * scale
 					);
 		}
 		

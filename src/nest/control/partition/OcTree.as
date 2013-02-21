@@ -107,7 +107,7 @@ package nest.control.partition
 			BTL.parent = BTR.parent = BBL.parent = BBR.parent = node;
 			BTL.depth = BTR.depth = BBL.depth = BBR.depth = depth;
 			
-			var i:int, j:int, k:int, l:int;
+			var i:int, j:int;
 			for (i = 0; i < 8; i++) {
 				var tmp:OcNode = node.childs[i] as OcNode;
 				tmp.vertices[1].setTo(tmp.max.x, tmp.min.y, tmp.min.z);
@@ -121,9 +121,10 @@ package nest.control.partition
 			var BBTL:Boolean, BBTR:Boolean, BBBL:Boolean, BBBR:Boolean;
 			var BTTL:Boolean, BTTR:Boolean, BTBL:Boolean, BTBR:Boolean;
 			
+			var radius:Number;
 			var mesh:IMesh;
 			var objects:Vector.<IMesh> = node.objects;
-			var a:Vector3D, b:Vector3D;
+			var a:Vector3D, b:Vector3D, c:Vector3D = new Vector3D(0.577, 0.577, 0.577);
 			
 			j = objects.length;
 			node.objects = new Vector.<IMesh>();
@@ -145,20 +146,16 @@ package nest.control.partition
 					BTBR = Bound.AABB_AABB(a, b, TBR.max, TBR.min);
 				} else {
 					a = mesh.worldMatrix.transformVector(mesh.matrix.transformVector(mesh.bound.center));
-					//TODO: 半径缩放有问题
-					l = mesh.bound.radius;
-					k = mesh.scale.x;
-					if (mesh.scale.y > k) k = mesh.scale.y;
-					if (mesh.scale.z > k) k = mesh.scale.z;
-					l *= k;
-					BBTL = Bound.AABB_BSphere(BTL.max, BTL.min, a, l);
-					BBTR = Bound.AABB_BSphere(BTR.max, BTR.min, a, l);
-					BBBL = Bound.AABB_BSphere(BBL.max, BBL.min, a, l);
-					BBBR = Bound.AABB_BSphere(BBR.max, BBR.min, a, l);
-					BTTL = Bound.AABB_BSphere(TTL.max, TTL.min, a, l);
-					BTTR = Bound.AABB_BSphere(TTR.max, TTR.min, a, l);
-					BTBL = Bound.AABB_BSphere(TBL.max, TBL.min, a, l);
-					BTBR = Bound.AABB_BSphere(TBR.max, TBR.min, a, l);
+					b = mesh.worldMatrix.transformVector(mesh.matrix.transformVector(c));
+					radius = mesh.bound.radius * b.length;
+					BBTL = Bound.AABB_BSphere(BTL.max, BTL.min, a, radius);
+					BBTR = Bound.AABB_BSphere(BTR.max, BTR.min, a, radius);
+					BBBL = Bound.AABB_BSphere(BBL.max, BBL.min, a, radius);
+					BBBR = Bound.AABB_BSphere(BBR.max, BBR.min, a, radius);
+					BTTL = Bound.AABB_BSphere(TTL.max, TTL.min, a, radius);
+					BTTR = Bound.AABB_BSphere(TTR.max, TTR.min, a, radius);
+					BTBL = Bound.AABB_BSphere(TBL.max, TBL.min, a, radius);
+					BTBR = Bound.AABB_BSphere(TBR.max, TBR.min, a, radius);
 				}
 				
 				if (BBTL && (BBTR || BBBL || BBBR || BTTL || BTTR || BTBL || BTBR) || 

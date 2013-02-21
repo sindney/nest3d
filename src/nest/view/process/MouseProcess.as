@@ -4,13 +4,13 @@ package nest.view.process
 	import flash.display.Stage;
 	import flash.display3D.Context3DBlendFactor;
 	import flash.display3D.Context3DProgramType;
+	import flash.display3D.Context3DVertexBufferFormat;
 	import flash.display3D.Context3D;
 	import flash.display3D.Program3D;
 	import flash.events.MouseEvent;
 	import flash.geom.Matrix3D;
 	import flash.geom.Vector3D;
 	
-	import nest.control.factory.ShaderFactory;
 	import nest.object.IMesh;
 	import nest.view.shader.Shader3D;
 	import nest.view.Camera3D;
@@ -37,7 +37,7 @@ package nest.view.process
 			this.containerProcess = containerProcess;
 			
 			program = ViewPort.context3d.createProgram();
-			program.upload(Shader3D.assembler.assemble(Context3DProgramType.VERTEX, "m44 vt0, vc4, vc0\nm44 op, va0, vt0"), 
+			program.upload(Shader3D.assembler.assemble(Context3DProgramType.VERTEX, "m44 vt0, va0, vc0\nm44 vt0, vt0, vc4\nm44 op, vt0, vc8\n"), 
 							Shader3D.assembler.assemble(Context3DProgramType.FRAGMENT, "mov oc, fc0"));
 			
 			stage.addEventListener(MouseEvent.MOUSE_MOVE, onMouseEvent);
@@ -55,19 +55,25 @@ package nest.view.process
 			var height:Number = ViewPort.height;
 			
 			if (mouseX <= width && mouseY <= height) {
-				var rawData:Vector.<Number> = camera.pm.rawData.concat();
-				rawData[8] = -mouseX * 2 / width;
-				rawData[9] = mouseY * 2 / height;
-				var pm:Matrix3D = new Matrix3D(rawData);
-				pm.prepend(camera.invertMatrix);
-
+				var raw:Vector.<Number> = camera.pm.rawData.concat();
+				raw[8] = -mouseX * 2 / width;
+				raw[9] = mouseY * 2 / height;
+				var temp:Matrix3D = new Matrix3D(raw);
+				
+				var pm:Matrix3D = camera.invertMatrix.clone();
+				pm.append(temp);
+				
+				var pm1:Matrix3D = camera.invertMatrix.clone();
+				var comps:Vector.<Vector3D> = pm1.decompose();
+				comps[1].setTo(0, 0, 0);
+				pm1.recompose(comps);
+				pm1.append(temp);
+				
 				context3d.setRenderToBackBuffer();
 				context3d.clear();
 				
 				var bmd:BitmapData = new BitmapData(1, 1, true, 0);
 				var components:Vector.<Vector3D>;
-				var vertexBuffer:VertexBuffer3DProxy;
-				var indexBuffer:IndexBuffer3DProxy;
 				var mesh:IMesh;
 				var i:int = 0;
 				
@@ -76,22 +82,17 @@ package nest.view.process
 						mesh.id = ++i;
 						
 						context3d.setCulling(mesh.triangleCulling);
-						context3d.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 0, pm, true);
+						context3d.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 0, mesh.matrix, true);
 						context3d.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 4, mesh.worldMatrix, true);
+						context3d.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 8, mesh.ignoreRotation ? pm1 : pm, true);
 						context3d.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, 0, Vector.<Number>([0, ((i >> 8) & 0xff) / 255, (i & 0xff) / 255, 1]));
 						
-						for each(vertexBuffer in mesh.geom.vertexBuffers) {
-							if (vertexBuffer.name == Geometry.VERTEX) {
-								context3d.setVertexBufferAt(0, vertexBuffer.buffer);
-							}
-						}
+						context3d.setVertexBufferAt(0, mesh.geom.vertexBuffer, 0, Context3DVertexBufferFormat.FLOAT_3);
 						
 						context3d.setProgram(program);
-
-						for each(indexBuffer in mesh.geom.indexBuffers) {
-							context3d.drawTriangles(indexBuffer);
-						}
-
+						
+						context3d.drawTriangles(mesh.geom.indexBuffer);
+						
 						context3d.setVertexBufferAt(0, null);
 					}
 				}
@@ -103,22 +104,17 @@ package nest.view.process
 						mesh.id = ++i;
 						
 						context3d.setCulling(mesh.triangleCulling);
-						context3d.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 0, pm, true);
+						context3d.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 0, mesh.matrix, true);
 						context3d.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 4, mesh.worldMatrix, true);
+						context3d.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 8, mesh.ignoreRotation ? pm1 : pm, true);
 						context3d.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, 0, Vector.<Number>([0, ((i >> 8) & 0xff) / 255, (i & 0xff) / 255, 1]));
 						
-						for each(vertexBuffer in mesh.geom.vertexBuffers) {
-							if (vertexBuffer.name == Geometry.VERTEX) {
-								context3d.setVertexBufferAt(0, vertexBuffer.buffer);
-							}
-						}
+						context3d.setVertexBufferAt(0, mesh.geom.vertexBuffer, 0, Context3DVertexBufferFormat.FLOAT_3);
 						
 						context3d.setProgram(program);
-
-						for each(indexBuffer in mesh.geom.indexBuffers) {
-							context3d.drawTriangles(indexBuffer);
-						}
-
+						
+						context3d.drawTriangles(mesh.geom.indexBuffer);
+						
 						context3d.setVertexBufferAt(0, null);
 					}
 				}

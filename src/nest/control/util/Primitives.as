@@ -5,9 +5,9 @@ package nest.control.util
 	import nest.object.geom.Triangle;
 	
 	/**
-	 * PrimitiveFactory
+	 * Primitives
 	 */
-	public final class PrimitiveFactory {
+	public final class Primitives {
 		
 		private static var _skybox:Geometry;
 		
