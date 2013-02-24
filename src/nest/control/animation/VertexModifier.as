@@ -1,6 +1,6 @@
 package nest.control.animation 
 {
-	import nest.control.util.GeometryUtil;
+	import nest.object.geom.Geometry;
 	import nest.object.geom.Vertex;
 	import nest.object.IMesh;
 	
@@ -9,35 +9,27 @@ package nest.control.animation
 	 */
 	public class VertexModifier implements IAnimationModifier {
 		
-		public function calculate(target:IMesh, root:IKeyFrame, time:Number):void {
-			var frame:IKeyFrame = root;
-			var offset:Number = root.next.time;
+		public function calculate(target:IMesh, k1:IKeyFrame, k2:IKeyFrame, time:Number, weight:Number):void {
+			var w1:Number = weight * (k2.time - time) / (k2.time - k1.time);
+			var w2:Number = weight - w1;
 			
-			while (time >= frame.next.time) {
-				frame = frame.next;
-				offset = frame.next.time;
-			}
-			
-			var w1:Number = (offset - time) / (offset - frame.time);
-			var w2:Number = 1 - w1;
-			
-			var curVertices:Vector.<Number> = (frame as VertexKeyFrame).vertices;
-			var nextVertices:Vector.<Number> = (frame.next as VertexKeyFrame).vertices;
-			var curNormals:Vector.<Number> = (frame as VertexKeyFrame).normals;
-			var nextNormals:Vector.<Number> = (frame.next as VertexKeyFrame).normals;
+			var vt0:Vector.<Number> = (k1 as VertexKeyFrame).vertices;
+			var vt1:Vector.<Number> = (k2 as VertexKeyFrame).vertices;
+			var nm0:Vector.<Number> = (k1 as VertexKeyFrame).normals;
+			var nm1:Vector.<Number> = (k2 as VertexKeyFrame).normals;
 			var i:int, j:int;
-			var l:int = curVertices.length / 3;
+			var l:int = vt0.length / 3;
 			for (i = 0, j = 0; i < l; i++, j += 3) {
 				var vertex:Vertex = target.geom.vertices[i];
-				vertex.x = curVertices[j] * w1 + nextVertices[j] * w2;
-				vertex.y = curVertices[j + 1] * w1 + nextVertices[j + 1] * w2;
-				vertex.z = curVertices[j + 2] * w1 + nextVertices[j + 2] * w2;
-				vertex.normal.x = curNormals[j] * w1 + nextNormals[j] * w2;
-				vertex.normal.y = curNormals[j + 1] * w1 + nextNormals[j + 1] * w2;
-				vertex.normal.z = curNormals[j + 2] * w1 + nextNormals[j + 2] * w2;
+				vertex.x = vt0[j] * w1 + vt1[j] * w2;
+				vertex.y = vt0[j + 1] * w1 + vt1[j + 1] * w2;
+				vertex.z = vt0[j + 2] * w1 + vt1[j + 2] * w2;
+				vertex.nx = nm0[j] * w1 + nm1[j] * w2;
+				vertex.ny = nm0[j + 1] * w1 + nm1[j + 1] * w2;
+				vertex.nz = nm0[j + 2] * w1 + nm1[j + 2] * w2;
 			}
 			
-			GeometryUtil.uploadGeometry(target.geom, i, j, -1, 0);
+			Geometry.uploadGeometry(target.geom, true, target.geom.normalBuffer != null, target.geom.uvBuffer != null, false);
 		}
 		
 	}

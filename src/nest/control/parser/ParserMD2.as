@@ -5,6 +5,7 @@ package nest.control.parser
 	import flash.utils.Endian;
 	
 	import nest.control.animation.AnimationTrack;
+	import nest.control.animation.IKeyFrame;
 	import nest.control.animation.VertexKeyFrame;
 	import nest.object.geom.Geometry;
 	import nest.object.geom.Triangle;
@@ -29,8 +30,8 @@ package nest.control.parser
 		}
 		
 		public function parse(model:ByteArray, scale:Number = 1):void {
-			geom = 0;
-			track = 0;
+			geom = null;
+			track = null;
 			
 			model.position = 0;
 			model.endian = Endian.LITTLE_ENDIAN;
@@ -86,6 +87,7 @@ package nest.control.parser
 			var uvs:Vector.<Number> = new Vector.<Number>(num_uvs * 2, true);
 			var triangles:Vector.<Triangle> = new Vector.<Triangle>(num_triangles, true);
 			var vertexTrack:AnimationTrack = new AnimationTrack();
+			vertexTrack.frames = new Vector.<IKeyFrame>();
 			
 			//get texture name
 			model.position = offset_skins;
@@ -128,8 +130,8 @@ package nest.control.parser
 				u = uvs[uv0 << 1];
 				v = uvs[(uv0 << 1) + 1];
 				vertices[index0] = new Vertex(0, 0, 0, u, v);
-				tri.uvs[0] = u;
-				tri.uvs[1] = v;
+				tri.uvs[4] = u;
+				tri.uvs[5] = v;
 				
 				u = uvs[uv1 << 1];
 				v = uvs[(uv1 << 1) + 1];
@@ -140,8 +142,8 @@ package nest.control.parser
 				u = uvs[uv2 << 1];
 				v = uvs[(uv2 << 1) + 1];
 				vertices[index2] = new Vertex(0, 0, 0, u, v);
-				tri.uvs[4] = u;
-				tri.uvs[5] = v;
+				tri.uvs[0] = u;
+				tri.uvs[1] = v;
 				
 				triangles[i] = tri;
 			}
@@ -178,7 +180,7 @@ package nest.control.parser
 					frame.normals[k] = frame.normals[k + 1] = frame.normals[k + 2] = 0;
 					model.readUnsignedByte();
 				}
-				vertexTrack.addChild(frame);
+				vertexTrack.frames.push(frame);
 			}
 			
 			// calculate normals for each frame
@@ -189,8 +191,7 @@ package nest.control.parser
 			var mag:Number;
 			
 			j = triangles.length;
-			frame = vertexTrack.first as VertexKeyFrame;
-			while (frame) {
+			for each(frame in vertexTrack.frames) {
 				for (i = 0; i < j; i++) {
 					tri = triangles[i];
 					v1 = tri.indices[0] * 3;
@@ -227,12 +228,11 @@ package nest.control.parser
 					frame.normals[i + 1] *= mag;
 					frame.normals[i + 2] *= mag;
 				}
-				frame = frame.next as VertexKeyFrame;
 			}
 			
 			//reset vertex data to frame0
-			var vs0:Vector.<Number> = (vertexTrack.first as VertexKeyFrame).vertices;
-			var vn0:Vector.<Number> = (vertexTrack.first as VertexKeyFrame).normals;
+			var vs0:Vector.<Number> = (vertexTrack.frames[0] as VertexKeyFrame).vertices;
+			var vn0:Vector.<Number> = (vertexTrack.frames[0] as VertexKeyFrame).normals;
 			var vertex:Vertex;
 			for (i = 0, j = 0; i < num_vertices; i++, j += 3) {
 				vertex = vertices[i];

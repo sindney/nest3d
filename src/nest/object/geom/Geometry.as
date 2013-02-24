@@ -106,7 +106,7 @@ package nest.object.geom
 						v0 = geom.vertices[t0.indices[k]];
 						l = k * 2;
 						if (uv && (t0.uvs[l] != v0.u || t0.uvs[l + 1] != v0.v)) {
-							rawIndex[j + k] = size;
+							if (index) rawIndex[j + k] = size;
 							m = size * 3;
 							if (vertex) {
 								rawVertex[m] = v0.x;
@@ -122,12 +122,12 @@ package nest.object.geom
 							rawUV[m] = t0.uvs[l];
 							rawUV[m + 1] = t0.uvs[l + 1];
 							size++;
-						} else {
+						} else if (index) {
 							rawIndex[j + k] = t0.indices[k];
 						}
 					}
 				}
-				geom.indexBuffer.uploadFromVector(rawIndex, 0, geom.numIndices);
+				if (index) geom.indexBuffer.uploadFromVector(rawIndex, 0, geom.numIndices);
 			}
 			
 			if (vertex) geom.vertexBuffer.uploadFromVector(rawVertex, 0, size);
@@ -202,6 +202,7 @@ package nest.object.geom
 			uvBuffer = null;
 			if (indexBuffer) indexBuffer.dispose();
 			indexBuffer = null;
+			numVertices = numIndices = numTriangles = 0;
 			vertices = null;
 			triangles = null;
 		}

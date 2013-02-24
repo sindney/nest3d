@@ -54,9 +54,9 @@ package nest.control.util
 				var triangles:Vector.<Triangle> = new Vector.<Triangle>();
 				
 				vertices.push(new Vertex( -0.5, -0.5, 0, 0, 0), 
-											new Vertex(0.5, -0.5, 0, 1, 0), 
-											new Vertex(0.5, 0.5, 0, 1, 1), 
-											new Vertex( -0.5, 0.5, 0, 0, 1));
+								new Vertex(0.5, -0.5, 0, 1, 0), 
+								new Vertex(0.5, 0.5, 0, 1, 1), 
+								new Vertex( -0.5, 0.5, 0, 0, 1));
 				
 				triangles.push(new Triangle(0, 2, 1, 0, 1, 1, 0, 1, 1), 
 								new Triangle(0, 3, 2, 0, 1, 0, 0, 1, 0));

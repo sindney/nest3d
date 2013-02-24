@@ -7,22 +7,20 @@ package nest.control.animation
 	 */
 	public class TextureKeyFrame implements IKeyFrame {
 		
-		public var data:BitmapData;
-		public var index:int;
-		
 		private var _time:Number;
 		private var _name:String;
-		private var _next:IKeyFrame;
 		
-		public function TextureKeyFrame() {
-			
-		}
+		public var data:BitmapData;
+		// TODO: 注意mipmapping参数
+		public var mipmapping:Boolean = false;
+		public var index:int;
 		
 		public function clone():IKeyFrame {
 			var result:TextureKeyFrame = new TextureKeyFrame();
 			result.time = _time;
 			result.name = _name;
 			result.data = data;
+			result.mipmapping = mipmapping;
 			result.index = index;
 			return result;
 		}
@@ -45,14 +43,6 @@ package nest.control.animation
 		
 		public function set name(value:String):void {
 			_name = value;
-		}
-		
-		public function get next():IKeyFrame {
-			return _next;
-		}
-		
-		public function set next(value:IKeyFrame):void {
-			_next = value;
 		}
 		
 	}

@@ -1,12 +1,15 @@
-package nest.view.effect 
+package effect 
 {
 	import flash.display3D.textures.TextureBase;
 	import flash.display3D.Context3D;
 	import flash.display3D.Context3DProgramType;
+	import flash.display3D.Context3DTextureFormat;
 	import flash.display3D.Context3DVertexBufferFormat;
 	import flash.display3D.Program3D;
 	
 	import nest.view.process.EffectProcess;
+	import nest.view.process.IRenderProcess;
+	import nest.view.process.RenderTarget;
 	import nest.view.shader.Shader3D;
 	import nest.view.ViewPort;
 	
@@ -14,7 +17,7 @@ package nest.view.effect
 	 * ConvolutionFilter
 	 * <p>Just need to call comply() once.</p>
 	 */
-	public class ConvolutionFilter extends EffectProcess {													  
+	public class ConvolutionFilter implements IRenderProcess {													  
 		
 		public static function get EDGE():Vector.<Number> {
 			return Vector.<Number>([0, 0, 1, 0, -1, 0, -1, 4, -1, 0, -1, 0]);
@@ -32,12 +35,15 @@ package nest.view.effect
 			return Vector.<Number>([0, 0, 1, -2, -1, 0, -1, 1, 1, 0, 1, 2]);
 		}
 		
+		private var _renderTarget:RenderTarget = new RenderTarget();
+		
 		private var program:Program3D;
+		
+		public var texture0:TextureBase;
 		
 		public var kernel:Vector.<Number>;
 		
 		public function ConvolutionFilter(width:int = 512, height:int = 512, kernel:Vector.<Number> = null) {
-			super();
 			var context3d:Context3D = ViewPort.context3d;
 			
 			program = context3d.createProgram();
@@ -48,12 +54,10 @@ package nest.view.effect
 				this.kernel = kernel;
 			}
 			
-			_textures = new Vector.<TextureBase>(1, true);
-			
-			resize(width, height);
+			texture0 = context3d.createTexture(width, height, Context3DTextureFormat.BGRA, true);
 		}
 		
-		override public function calculate():void {
+		public function calculate():void {
 			var context3d:Context3D = ViewPort.context3d;
 			kernel[0] = 1 / ViewPort.width;
 			kernel[1] = 1 / ViewPort.height;
@@ -66,7 +70,7 @@ package nest.view.effect
 			context3d.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, 0, kernel, 3);
 			context3d.setVertexBufferAt(0, vertexBuffer, 0, Context3DVertexBufferFormat.FLOAT_3);
 			context3d.setVertexBufferAt(1, uvBuffer, 0, Context3DVertexBufferFormat.FLOAT_2);
-			context3d.setTextureAt(0, _textures[0]);
+			context3d.setTextureAt(0, texture0);
 			context3d.setProgram(program);
 			context3d.drawTriangles(indexBuffer);
 			context3d.setVertexBufferAt(0, null);
@@ -74,7 +78,7 @@ package nest.view.effect
 			context3d.setTextureAt(0, null);
 		}
 		
-		override public function comply():void {
+		public function comply():void {
 			var vs:String = "mov op, va0\n" + 
 							"mov v0, va1\n";
 			
@@ -122,11 +126,21 @@ package nest.view.effect
 							Shader3D.assembler.assemble(Context3DProgramType.FRAGMENT, fs));
 		}
 		
-		override public function dispose():void {
-			super.dispose();
+		public function dispose():void {
 			program.dispose();
 			program = null;
 			kernel = null;
+			_renderTarget = null;
+			if (texture0) texture0.dispose();
+			texture0 = null;
+		}
+		
+		///////////////////////////////////
+		// getter/setters
+		///////////////////////////////////
+		
+		public function get renderTarget():RenderTarget {
+			return _renderTarget;
 		}
 		
 	}

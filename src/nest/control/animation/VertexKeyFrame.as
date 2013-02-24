@@ -8,14 +8,9 @@ package nest.control.animation
 		
 		private var _time:Number;
 		private var _name:String;
-		private var _next:IKeyFrame;
 		
 		public var vertices:Vector.<Number>;
 		public var normals:Vector.<Number>;
-		
-		public function VertexKeyFrame() {
-			
-		}
 		
 		public function clone():IKeyFrame {
 			var result:VertexKeyFrame = new VertexKeyFrame();
@@ -46,13 +41,6 @@ package nest.control.animation
 			_name = value;
 		}
 		
-		public function get next():IKeyFrame {
-			return _next;
-		}
-		
-		public function set next(value:IKeyFrame):void {
-			_next = value;
-		}
 	}
 
 }

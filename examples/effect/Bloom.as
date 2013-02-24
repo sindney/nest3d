@@ -1,12 +1,14 @@
-package nest.view.effect 
+package effect 
 {
 	import flash.display3D.textures.TextureBase;
 	import flash.display3D.Context3D;
 	import flash.display3D.Context3DProgramType;
+	import flash.display3D.Context3DTextureFormat;
 	import flash.display3D.Context3DVertexBufferFormat;
 	import flash.display3D.Program3D;
 	
-	import nest.view.process.EffectProcess;
+	import nest.view.process.IRenderProcess;
+	import nest.view.process.RenderTarget;
 	import nest.view.shader.Shader3D;
 	import nest.view.ViewPort;
 	
@@ -14,7 +16,9 @@ package nest.view.effect
 	 * Bloom
 	 * <p>Call comply() when threshold/maxIteration/blurX/blurY is changed.</p>
 	 */
-	public class Bloom extends EffectProcess {
+	public class Bloom implements IRenderProcess {
+		
+		private var _renderTarget:RenderTarget = new RenderTarget();
 		
 		private var program1:Program3D;
 		private var program2:Program3D;
@@ -22,12 +26,14 @@ package nest.view.effect
 		private var data:Vector.<Number>;
 		private var thresholds:Vector.<Number>;
 		
+		public var texture0:TextureBase;
+		public var texture1:TextureBase;
+		
 		public var maxIteration:int = 6;
 		public var blurX:Number;
 		public var blurY:Number;
 		
 		public function Bloom(width:int = 512, height:int = 512, blurX:Number = 4, blurY:Number = 4, threshold:Number = 0.75) {
-			super();
 			var context3d:Context3D = ViewPort.context3d;
 			
 			program1 = context3d.createProgram();
@@ -40,19 +46,18 @@ package nest.view.effect
 			this.blurX = blurX;
 			this.blurY = blurY;
 			
-			_textures = new Vector.<TextureBase>(2, true);
-			
-			resize(width, height);
+			texture0 = context3d.createTexture(width, height, Context3DTextureFormat.BGRA, true);
+			texture1 = context3d.createTexture(width, height, Context3DTextureFormat.BGRA, true);
 		}
 		
-		override public function calculate():void {
+		public function calculate():void {
 			var context3d:Context3D = ViewPort.context3d;
-			context3d.setRenderToTexture(_textures[1]);
+			context3d.setRenderToTexture(texture1);
 			context3d.clear();
 			context3d.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, 0, thresholds);
 			context3d.setVertexBufferAt(0, vertexBuffer, 0, Context3DVertexBufferFormat.FLOAT_3);
 			context3d.setVertexBufferAt(1, uvBuffer, 0, Context3DVertexBufferFormat.FLOAT_2);
-			context3d.setTextureAt(0, _textures[0]);
+			context3d.setTextureAt(0, texture0);
 			context3d.setProgram(program2);
 			context3d.drawTriangles(indexBuffer);
 			context3d.setVertexBufferAt(0, null);
@@ -68,8 +73,8 @@ package nest.view.effect
 			context3d.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, 0, data, 2);
 			context3d.setVertexBufferAt(0, vertexBuffer, 0, Context3DVertexBufferFormat.FLOAT_3);
 			context3d.setVertexBufferAt(1, uvBuffer, 0, Context3DVertexBufferFormat.FLOAT_2);
-			context3d.setTextureAt(1, _textures[0]);
-			context3d.setTextureAt(0, _textures[1]);
+			context3d.setTextureAt(1, texture0);
+			context3d.setTextureAt(0, texture1);
 			context3d.setProgram(program1);
 			context3d.drawTriangles(indexBuffer);
 			context3d.setVertexBufferAt(0, null);
@@ -78,7 +83,7 @@ package nest.view.effect
 			context3d.setTextureAt(1, null);
 		}
 		
-		override public function comply():void {
+		public function comply():void {
 			var invW:Number = 1 / 512;
 			var invH:Number = 1 / 512;
 			
@@ -147,12 +152,16 @@ package nest.view.effect
 							Shader3D.assembler.assemble(Context3DProgramType.FRAGMENT, fs2));
 		}
 		
-		override public function dispose():void {
-			super.dispose();
+		public function dispose():void {
 			program1.dispose();
 			program2.dispose();
 			data = null;
 			thresholds = null;
+			_renderTarget = null;
+			if (texture0) texture0.dispose();
+			texture0 = null;
+			if (texture1) texture1.dispose();
+			texture1 = null;
 		}
 		
 		///////////////////////////////////
@@ -169,6 +178,11 @@ package nest.view.effect
 			thresholds[2] = value;
 			thresholds[3] = value;
 		}
+		
+		public function get renderTarget():RenderTarget {
+			return _renderTarget;
+		}
+		
 	}
 
 }

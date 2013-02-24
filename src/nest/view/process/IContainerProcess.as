@@ -1,7 +1,5 @@
 package nest.view.process 
 {
-	import flash.geom.Matrix3D;
-	
 	import nest.object.IContainer3D;
 	import nest.object.IMesh;
 	import nest.view.Camera3D;
@@ -30,8 +28,6 @@ package nest.view.process
 		function get numVertices():int;
 		function get numTriangles():int;
 		function get numObjects():int;
-		
-		function get renderTarget():RenderTarget;
 		
 	}
 	

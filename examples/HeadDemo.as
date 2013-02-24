@@ -83,10 +83,8 @@ package
 			mesh.shader.constantParts.push(lights);
 			// glossiness
 			mesh.shader.constantParts.push(new VectorShaderPart(Context3DProgramType.FRAGMENT, 3, Vector.<Number>([20, 1, 1, 1])));
-			mesh.shader.constantParts.push(new MatrixShaderPart(Context3DProgramType.FRAGMENT, 4, mesh.invertWorldMatrix, true));
 			
 			mesh.shader.comply(vertexShader(), fragmentShader());
-			
 			camera.position.z = -400;
 			camera.recompose();
 		}
@@ -106,7 +104,7 @@ package
 			"m44 op, vt0, vc8\n" + 
 			// cameraPos
 			"mov vt0, vc20.xyz\n" + 
-			// cameraPos to object space, vc12 = mesh.invertWorldMatrix
+			// cameraPos to object space
 			"m44 vt0, vt0, vc12\n" + 
 			"m44 vt0, vt0, vc16\n" + 
 			// v5 = cameraDir in object space

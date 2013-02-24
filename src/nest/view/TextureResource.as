@@ -11,6 +11,7 @@ package nest.view
 	import flash.geom.Rectangle;
 	
 	import nest.control.animation.AnimationTrack;
+	import nest.control.animation.IKeyFrame;
 	import nest.control.animation.TextureKeyFrame;
 	
 	/**
@@ -42,65 +43,68 @@ package nest.view
 		
 		public static function uploadToTexture(resource:TextureResource, data:BitmapData, mipmapping:Boolean):void {
 			if (data) {
-				if (resource.texture is CubeTexture || resource.width != data.width || resource.height != data.height) {
-					if (resource.texture) resource.texture.dispose();
-					resource.texture = ViewPort.context3d.createTexture(data.width, data.height, Context3DTextureFormat.BGRA, false);
+				if (data != resource.bmd) {
+					if (resource.texture is CubeTexture || resource.width != data.width || resource.height != data.height) {
+						if (resource.texture) resource.texture.dispose();
+						resource.texture = ViewPort.context3d.createTexture(data.width, data.height, Context3DTextureFormat.BGRA, false);
+					}
+					mipmapping ? uploadWithMipmaps(resource.texture, data) : (resource.texture as Texture).uploadFromBitmapData(data);
+					resource.bmd = data;
+					resource.width = data.width;
+					resource.height = data.height;
 				}
-				mipmapping ? uploadWithMipmaps(resource.texture, data) : (resource.texture as Texture).uploadFromBitmapData(data);
-				resource.width = data.width;
-				resource.height = data.height;
 			} else {
-				if(resource.texture) resource.texture.dispose();
-				resource.texture = null;
+				resource.dispose();
 			}
 		}
 		
 		public static function uploadToCubeTexture(resource:TextureResource, data:Vector.<BitmapData>):void {
 			if (data) {
-				if (resource.texture is Texture || resource.width != data[0].width || resource.height != data[0].height) {
-					if (resource.texture) resource.texture.dispose();
-					resource.texture = ViewPort.context3d.createCubeTexture(data[0].width, Context3DTextureFormat.BGRA, false);
+				if (data != resource.bmds) {
+					if (resource.texture is Texture || resource.width != data[0].width || resource.height != data[0].height) {
+						if (resource.texture) resource.texture.dispose();
+						resource.texture = ViewPort.context3d.createCubeTexture(data[0].width, Context3DTextureFormat.BGRA, false);
+					}
+					uploadWithMipmaps(resource.texture, data[0], 0);
+					uploadWithMipmaps(resource.texture, data[1], 1);
+					uploadWithMipmaps(resource.texture, data[2], 2);
+					uploadWithMipmaps(resource.texture, data[3], 3);
+					uploadWithMipmaps(resource.texture, data[4], 4);
+					uploadWithMipmaps(resource.texture, data[5], 5);
+					resource.bmds = data;
+					resource.width = data[0].width;
+					resource.height = data[1].height;
 				}
-				uploadWithMipmaps(resource.texture, data[0], 0);
-				uploadWithMipmaps(resource.texture, data[1], 1);
-				uploadWithMipmaps(resource.texture, data[2], 2);
-				uploadWithMipmaps(resource.texture, data[3], 3);
-				uploadWithMipmaps(resource.texture, data[4], 4);
-				uploadWithMipmaps(resource.texture, data[5], 5);
-				resource.width = data[0].width;
-				resource.height = data[1].height;
 			} else {
-				if(resource.texture) resource.texture.dispose();
-				resource.texture = null;
+				resource.dispose();
 			}
 		}
 		
-		public static function getTrackFromMovieClip(index:int, source:MovieClip, size:uint = 128):AnimationTrack {
+		public static function getTrackFromMovieClip(index:int, source:MovieClip, mipmapping:Boolean = false, size:uint = 128):AnimationTrack {
 			var result:AnimationTrack = new AnimationTrack();
-			
+			result.frames = new Vector.<IKeyFrame>();
 			var bitmapData:BitmapData;
 			var frame:TextureKeyFrame;
 			var totalFrames:uint = source.totalFrames;
-			
 			for (var i:int = 0; i < totalFrames; i++) {
 				bitmapData = new BitmapData(size, size, true, 0);
 				bitmapData.lock();
 				source.gotoAndStop(i);
 				bitmapData.draw(source);
 				bitmapData.unlock();
-				
 				frame = new TextureKeyFrame();
 				frame.time = i;
 				frame.data = bitmapData;
 				frame.index = index;
-				result.addChild(frame);
+				frame.mipmapping = mipmapping;
+				result.frames.push(frame);
 			}
-			
 			return result;
 		}
 		
-		public static function getTrackFromSpriteSheet(index:int, source:BitmapData, tileWidth:Number = 100, tileHeight:Number = 100, startIndex:int = 0, endIndex:int = int.MAX_VALUE):AnimationTrack {
+		public static function getTrackFromSpriteSheet(index:int, source:BitmapData, mipmapping:Boolean = false, tileWidth:Number = 100, tileHeight:Number = 100, startIndex:int = 0, endIndex:int = int.MAX_VALUE):AnimationTrack {
 			var result:AnimationTrack = new AnimationTrack();
+			result.frames = new Vector.<IKeyFrame>();
 			var bitmapData:BitmapData;
 			var frame:TextureKeyFrame;
 			var w:int = Math.ceil(source.width / tileWidth);
@@ -127,13 +131,16 @@ package nest.view
 				frame.time = i - startIndex;
 				frame.data = bitmapData;
 				frame.index = index;
-				result.addChild(frame);
+				frame.mipmapping = mipmapping;
+				result.frames.push(frame);
 			}
 			return result;
 		}
 		
 		public var name:String;
 		public var texture:TextureBase;
+		public var bmd:BitmapData;
+		public var bmds:Vector.<BitmapData>;
 		public var width:Number = 0;
 		public var height:Number = 0;
 		public var sampler:int;
@@ -141,6 +148,17 @@ package nest.view
 		public function TextureResource(sampler:int, texture:TextureBase) {
 			this.sampler = sampler;
 			this.texture = texture;
+		}
+		
+		public function dispose():void {
+			if (texture) {
+				texture.dispose();
+				texture = null;
+			}
+			bmd = null;
+			bmds = null;
+			width = height = 0;
+			sampler = 0;
 		}
 		
 	}
