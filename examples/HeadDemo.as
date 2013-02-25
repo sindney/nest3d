@@ -1,5 +1,6 @@
 package  
 {
+	import flash.display.BitmapData;
 	import flash.display3D.Context3DProgramType;
 	import flash.geom.Vector3D;
 	
@@ -31,10 +32,29 @@ package
 		[Embed(source = "assets/head_normals.jpg")]
 		private const bitmap_normalmap:Class;
 		
+		[Embed(source = "assets/skybox_top.jpg")]
+		private const top:Class;
+		
+		[Embed(source = "assets/skybox_bottom.jpg")]
+		private const bottom:Class;
+		
+		[Embed(source = "assets/skybox_right.jpg")]
+		private const right:Class;
+		
+		[Embed(source = "assets/skybox_left.jpg")]
+		private const left:Class;
+		
+		[Embed(source = "assets/skybox_front.jpg")]
+		private const front:Class;
+		
+		[Embed(source = "assets/skybox_back.jpg")]
+		private const back:Class;
+		
 		private var container:Container3D;
 		private var process0:ContainerProcess;
 		
 		private var mesh:Mesh;
+		private var skybox:Mesh;
 		
 		private var cameraPos:VectorShaderPart;
 		private var lights:VectorShaderPart;
@@ -85,6 +105,33 @@ package
 			mesh.shader.constantParts.push(new VectorShaderPart(Context3DProgramType.FRAGMENT, 3, Vector.<Number>([20, 1, 1, 1])));
 			
 			mesh.shader.comply(vertexShader(), fragmentShader());
+			
+			var cubicmap:Vector.<BitmapData> = new Vector.<BitmapData>();
+			cubicmap[0] = new right().bitmapData;
+			cubicmap[1] = new left().bitmapData;
+			cubicmap[2] = new top().bitmapData;
+			cubicmap[3] = new bottom().bitmapData;
+			cubicmap[4] = new front().bitmapData;
+			cubicmap[5] = new back().bitmapData;
+			
+			var skybox_material:Vector.<TextureResource> = new Vector.<TextureResource>();
+			var skybox_resource:TextureResource = new TextureResource(0, null);
+			TextureResource.uploadToCubeTexture(skybox_resource, cubicmap);
+			skybox_material.push(skybox_resource);
+			
+			var shader:Shader3D = new Shader3D();
+			shader.comply("m44 vt0, va0, vc0\nm44 vt0, vt0, vc4\n" + 
+							"m44 op, vt0, vc8\nmov v0, va0\n", 
+							"tex oc, v0, fs0 <cube,linear,miplinear>\n");
+			
+			skybox = new Mesh(Primitives.createSkybox(), skybox_material, shader);
+			Geometry.setupGeometry(skybox.geom, true, false, false);
+			Geometry.uploadGeometry(skybox.geom, true, false, false, true);
+			Bound.calculate(skybox.bound, skybox.geom);
+			skybox.cliping = false;
+			skybox.scale.setTo(10000, 10000, 10000);
+			container.addChild(skybox);
+			
 			camera.position.z = -400;
 			camera.recompose();
 		}
@@ -186,6 +233,8 @@ package
 			cameraPos.data[0] = camera.position.x;
 			cameraPos.data[1] = camera.position.y;
 			cameraPos.data[2] = camera.position.z;
+			skybox.position.copyFrom(camera.position);
+			skybox.recompose();
 			view.diagram.message = "Objects: " + process0.numObjects + "/" + process0.container.numChildren + 
 									"\nVertices: " + process0.numVertices + 
 									"\nTriangles: " + process0.numTriangles;

@@ -70,7 +70,7 @@ package
 			anim_controller.tracks.push(track);
 			anim_controller.loops = int.MAX_VALUE;
 			anim_controller.speed = 10;
-			anim_controller.calculateLength();
+			anim_controller.setup();
 			anim_controller.restart();
 			
 			camera.position.z = -100;

@@ -50,7 +50,7 @@ package
 							"m44 op, vt0, vc8\nmov v0, va2\n", 
 							"tex ft0, v0, fs0 <2d,linear,mipnone>\nkil ft0.w\nmov oc, ft0\n");
 			
-			var mesh:Mesh = new Mesh(Primitives.plane, material, shader);
+			var mesh:Mesh = new Mesh(Primitives.createPlane(), material, shader);
 			Geometry.setupGeometry(mesh.geom, true, false, true);
 			Geometry.uploadGeometry(mesh.geom, true, false, true, true);
 			mesh.ignoreRotation = true;
@@ -63,7 +63,7 @@ package
 			anim_controller.tracks.push(track);
 			anim_controller.loops = int.MAX_VALUE;
 			anim_controller.speed = 20;
-			anim_controller.calculateLength();
+			anim_controller.setup();
 			anim_controller.restart();
 			
 			camera.position.z = -200;

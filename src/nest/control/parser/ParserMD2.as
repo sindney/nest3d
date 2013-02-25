@@ -10,7 +10,6 @@ package nest.control.parser
 	import nest.object.geom.Geometry;
 	import nest.object.geom.Triangle;
 	import nest.object.geom.Vertex;
-	import nest.object.Mesh;
 	
 	/**
 	 * ParserMD2

@@ -2,6 +2,8 @@ package
 {
 	import flash.display3D.Context3DProgramType;
 	
+	import nest.control.controller.MouseController;
+	import nest.control.controller.MouseEvent3D;
 	import nest.control.partition.OcNode;
 	import nest.control.partition.OcTree;
 	import nest.control.util.Primitives;
@@ -16,8 +18,8 @@ package
 	 */
 	public class MouseEventDemo extends DemoBase {
 		
-		private var process0:MouseProcess;
-		private var process1:ContainerProcess;
+		private var mouseController:MouseController;
+		private var process0:ContainerProcess;
 		private var container:Container3D;
 		
 		private var shader0:Shader3D;
@@ -31,13 +33,13 @@ package
 		override public function init():void {
 			container = new Container3D();
 			
-			process1 = new ContainerProcess(camera, container);
-			process1.meshProcess = new BasicMeshProcess();
-			process1.color = 0xff000000;
+			process0 = new ContainerProcess(camera, container);
+			process0.meshProcess = new BasicMeshProcess();
+			process0.color = 0xff000000;
 			
-			process0 = new MouseProcess(stage, process1);
+			view.processes.push(process0);
 			
-			view.processes.push(process0, process1);
+			mouseController = new MouseController(stage, process0);
 			
 			shader0 = new Shader3D();
 			shader0.constantParts.push(new VectorShaderPart(Context3DProgramType.FRAGMENT, 0, Vector.<Number>([1, 1, 1, 1])));
@@ -57,7 +59,7 @@ package
 							"m44 op, vt0, vc8\n",
 							"mov oc, fc0\n");
 			
-			var geom:Geometry = Primitives.box;
+			var geom:Geometry = Primitives.createBox();
 			Geometry.setupGeometry(geom, true, false, false);
 			Geometry.uploadGeometry(geom, true, false, false, true);
 			
@@ -100,9 +102,10 @@ package
 		}
 		
 		override public function loop():void {
-			view.diagram.message = "Objects: " + process1.numObjects + "/" + process1.container.numChildren + 
-									"\nVertices: " + process1.numVertices + 
-									"\nTriangles: " + process1.numTriangles;
+			mouseController.calculate();
+			view.diagram.message = "Objects: " + process0.numObjects + "/" + process0.container.numChildren + 
+									"\nVertices: " + process0.numVertices + 
+									"\nTriangles: " + process0.numTriangles;
 		}
 		
 	}

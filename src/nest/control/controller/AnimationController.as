@@ -62,7 +62,7 @@ package nest.control.controller
 			}
 		}
 		
-		public function calculateLength():void {
+		public function setup():void {
 			var i:Number, j:Number = 0;
 			for each(var track:AnimationTrack in tracks) {
 				if (track.enabled && track.frames) {

@@ -40,7 +40,7 @@ package
 			
 			view.processes.push(process0);
 			
-			var geom:Geometry = Primitives.box;
+			var geom:Geometry = Primitives.createBox();
 			Geometry.setupGeometry(geom, true, false, false);
 			Geometry.uploadGeometry(geom, true, false, false, true);
 			var shader:Shader3D = new Shader3D();
@@ -79,7 +79,7 @@ package
 			keyFrame.time = 3;
 			keyFrame.position.x = -100;
 			keyFrame.scale.setTo(10, 100, 10);
-			Quaternion.rotationXYZ(keyFrame.rotation, Math.PI / 4, 0, 0);
+			Quaternion.rotationXYZ(keyFrame.rotation, Math.PI / 2, 0, 0);
 			track.frames.push(keyFrame);
 			
 			keyFrame = new TransformKeyFrame();
@@ -92,7 +92,7 @@ package
 			anim_controller = new AnimationController();
 			anim_controller.tracks.push(track);
 			anim_controller.loops = int.MAX_VALUE;
-			anim_controller.calculateLength();
+			anim_controller.setup();
 			anim_controller.restart();
 			
 			camera.position.z = -200;

@@ -1,4 +1,4 @@
-package nest.view.process 
+package nest.control.controller 
 {
 	import flash.display.BitmapData;
 	import flash.display.Stage;
@@ -12,15 +12,15 @@ package nest.view.process
 	import flash.geom.Vector3D;
 	
 	import nest.object.IMesh;
+	import nest.view.process.IContainerProcess;
 	import nest.view.shader.Shader3D;
 	import nest.view.Camera3D;
 	import nest.view.ViewPort;
 	
 	/**
-	 * MouseProcess
-	 * <p>Push this process before your target containerProcess.</p>
+	 * MouseController
 	 */
-	public class MouseProcess implements IRenderProcess {
+	public class MouseController {
 		
 		private var id:uint;
 		private var mouseX:Number = 0;
@@ -32,7 +32,7 @@ package nest.view.process
 		public var stage:Stage;
 		public var containerProcess:IContainerProcess;
 		
-		public function MouseProcess(stage:Stage, containerProcess:IContainerProcess) {
+		public function MouseController(stage:Stage, containerProcess:IContainerProcess) {
 			this.stage = stage;
 			this.containerProcess = containerProcess;
 			

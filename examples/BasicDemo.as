@@ -32,7 +32,7 @@ package
 			
 			view.processes.push(process0);
 			
-			var geom:Geometry = Primitives.box;
+			var geom:Geometry = Primitives.createBox();
 			Geometry.setupGeometry(geom, true, false, false);
 			Geometry.uploadGeometry(geom, true, false, false, true);
 			
