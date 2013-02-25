@@ -1,7 +1,5 @@
 package nest.object.geom
 {
-	import flash.display3D.Context3D;
-	import flash.display3D.Context3DVertexBufferFormat;
 	import flash.display3D.IndexBuffer3D;
 	import flash.display3D.VertexBuffer3D;
 	import flash.geom.Vector3D;
@@ -13,6 +11,130 @@ package nest.object.geom
 	 */
 	public class Geometry {
 		
+		public static function setupGeometry(geom:Geometry, vertex:Boolean = true, normal:Boolean = true, uv:Boolean = true):void {
+			geom.numVertices = geom.vertices.length;
+			geom.numTriangles = geom.triangles.length;
+			geom.numIndices = geom.numTriangles * 3;
+			
+			var i:int, j:int, k:int, size:int = geom.numVertices;
+			var t0:Triangle;
+			var v0:Vertex;
+			if (uv) {
+				for (i = 0; i < geom.numTriangles; i++) {
+					t0 = geom.triangles[i];
+					for (j = 0; j < 3; j++) {
+						v0 = geom.vertices[t0.indices[j]];
+						k = j * 2;
+						if (t0.uvs[k] != v0.u || t0.uvs[k + 1] != v0.v) size++;
+					}
+				}
+			}
+			
+			if (geom.vertexBuffer) {
+				geom.vertexBuffer.dispose();
+				geom.vertexBuffer = null;
+			}
+			
+			if (geom.normalBuffer) {
+				geom.normalBuffer.dispose();
+				geom.normalBuffer = null;
+			}
+			
+			if (geom.uvBuffer) {
+				geom.uvBuffer.dispose();
+				geom.uvBuffer = null;
+			}
+			
+			if (geom.indexBuffer) {
+				geom.indexBuffer.dispose();
+				geom.indexBuffer = null;
+			}
+			
+			if (vertex) geom.vertexBuffer = ViewPort.context3d.createVertexBuffer(size, 3);
+			if (normal) geom.normalBuffer = ViewPort.context3d.createVertexBuffer(size, 3);
+			if (uv) geom.uvBuffer = ViewPort.context3d.createVertexBuffer(size, 2);
+			geom.indexBuffer = ViewPort.context3d.createIndexBuffer(geom.numIndices);
+		}
+		
+		public static function uploadGeometry(geom:Geometry, vertex:Boolean = true, normal:Boolean = true, uv:Boolean = true, index:Boolean = true):void {
+			var rawVertex:Vector.<Number>;
+			var	rawNormal:Vector.<Number>;
+			var	rawUV:Vector.<Number>;
+			var	rawIndex:Vector.<uint>;
+			
+			if (vertex) rawVertex = new Vector.<Number>();
+			if (normal) rawNormal = new Vector.<Number>();
+			if (uv) rawUV = new Vector.<Number>();
+			if (index) rawIndex = new Vector.<uint>();
+			
+			var i:int, j:int, k:int, l:int, m:int;
+			var v0:Vertex;
+			var t0:Triangle;
+			var changed:Boolean = (vertex || normal || uv);
+			var size:int = geom.numVertices;
+			
+			if(changed) {
+				for (i = 0; i < size; i++) {
+					v0 = geom.vertices[i];
+					j = i * 3;
+					// vertex
+					if (vertex) {
+						rawVertex[j] = v0.x;
+						rawVertex[j + 1] = v0.y;
+						rawVertex[j + 2] = v0.z;
+					}
+					// normal
+					if (normal) {
+						rawNormal[j] = v0.nx;
+						rawNormal[j + 1] = v0.ny;
+						rawNormal[j + 2] = v0.nz;
+					}
+					// uv
+					if (uv) {
+						j = i * 2;
+						rawUV[j] = v0.u;
+						rawUV[j + 1] = v0.v;
+					}
+				}
+			}
+			
+			if (changed || index) {
+				for (i = 0; i < geom.numTriangles; i++) {
+					t0 = geom.triangles[i];
+					j = i * 3;
+					for (k = 0; k < 3; k++) {
+						v0 = geom.vertices[t0.indices[k]];
+						l = k * 2;
+						if (uv && (t0.uvs[l] != v0.u || t0.uvs[l + 1] != v0.v)) {
+							if (index) rawIndex[j + k] = size;
+							m = size * 3;
+							if (vertex) {
+								rawVertex[m] = v0.x;
+								rawVertex[m + 1] = v0.y;
+								rawVertex[m + 2] = v0.z;
+							}
+							if (normal) {
+								rawNormal[m] = v0.nx;
+								rawNormal[m + 1] = v0.ny;
+								rawNormal[m + 2] = v0.nz;
+							}
+							m = size * 2;
+							rawUV[m] = t0.uvs[l];
+							rawUV[m + 1] = t0.uvs[l + 1];
+							size++;
+						} else if (index) {
+							rawIndex[j + k] = t0.indices[k];
+						}
+					}
+				}
+				if (index) geom.indexBuffer.uploadFromVector(rawIndex, 0, geom.numIndices);
+			}
+			
+			if (vertex) geom.vertexBuffer.uploadFromVector(rawVertex, 0, size);
+			if (normal) geom.normalBuffer.uploadFromVector(rawNormal, 0, size);
+			if (uv) geom.uvBuffer.uploadFromVector(rawUV, 0, size);
+		}
+		
 		public static function calculateNormal(vertices:Vector.<Vertex>, triangles:Vector.<Triangle>):void {
 			var i:int, j:int;
 			var tri:Triangle;
@@ -23,38 +145,45 @@ package nest.object.geom
 			j = triangles.length;
 			for (i = 0; i < j; i++) {
 				tri = triangles[i];
-				v1 = vertices[tri.index0];
-				v2 = vertices[tri.index1];
-				v3 = vertices[tri.index2];
+				v1 = vertices[tri.indices[0]];
+				v2 = vertices[tri.indices[1]];
+				v3 = vertices[tri.indices[2]];
 				
 				vt1.setTo(v2.x - v1.x, v2.y - v1.y, v2.z - v1.z);
 				vt2.setTo(v3.x - v2.x, v3.y - v2.y, v3.z - v2.z);
 				vt1 = vt1.crossProduct(vt2);
 				vt1.normalize();
 				
-				v1.normal.x += vt1.x;
-				v1.normal.y += vt1.y;
-				v1.normal.z += vt1.z;
-				v2.normal.x += vt1.x;
-				v2.normal.y += vt1.y;
-				v2.normal.z += vt1.z;
-				v3.normal.x += vt1.x;
-				v3.normal.y += vt1.y;
-				v3.normal.z += vt1.z;
+				v1.nx += vt1.x;
+				v1.ny += vt1.y;
+				v1.nz += vt1.z;
+				v2.nx += vt1.x;
+				v2.ny += vt1.y;
+				v2.nz += vt1.z;
+				v3.nx += vt1.x;
+				v3.ny += vt1.y;
+				v3.nz += vt1.z;
 			}
 			
+			var mag:Number;
 			j = vertices.length;
-			for (i = 0; i < j; i++) vertices[i].normal.normalize();
+			for (i = 0; i < j; i++) {
+				v1 = vertices[i];
+				mag = 1 / Math.sqrt(v1.nx * v1.nx + v1.ny * v1.ny + v1.nz * v1.nz);
+				v1.nx *= mag;
+				v1.ny *= mag;
+				v1.nz *= mag;
+			}
 		}
 		
-		private var _vertexBuffer:VertexBuffer3D;
-		private var _uvBuffer:VertexBuffer3D;
-		private var _indexBuffer:IndexBuffer3D;
-		private var _normalBuffer:VertexBuffer3D;
+		public var vertexBuffer:VertexBuffer3D;
+		public var normalBuffer:VertexBuffer3D;
+		public var uvBuffer:VertexBuffer3D;
+		public var indexBuffer:IndexBuffer3D;
 		
-		private var _numVertices:int = 0;
-		private var _numIndices:int = 0;
-		private var _numTriangles:int = 0;
+		public var numVertices:int = 0;
+		public var numIndices:int = 0;
+		public var numTriangles:int = 0;
 		
 		public var vertices:Vector.<Vertex>;
 		public var triangles:Vector.<Triangle>;
@@ -62,181 +191,20 @@ package nest.object.geom
 		public function Geometry(vertices:Vector.<Vertex>, triangles:Vector.<Triangle>) {
 			this.vertices = vertices;
 			this.triangles = triangles;
-			update(true);
-		}
-		
-		/**
-		 * Call this when you modified vertices/triangles list.
-		 * <p>If the length of your vertices, triangles array is changed, set flag to true.</p>
-		 * <p>If you didn't initialize this class in it's constructor.</p>
-		 * <p>Then when you valued it's vertices, triangles array, you should call update(true).</p>
-		 */
-		public function update(flag:Boolean = false):void {
-			if (!vertices || !triangles) return;
-			
-			_numVertices = vertices.length;
-			_numTriangles = triangles.length;
-			_numIndices = _numTriangles * 3;
-			
-			var rawVertex:Vector.<Number> = new Vector.<Number>();
-			var	rawUV:Vector.<Number> = new Vector.<Number>();
-			var	rawIndex:Vector.<uint> = new Vector.<uint>();
-			var	rawNormal:Vector.<Number> = new Vector.<Number>();
-			
-			var i:int, j:int, k:int;
-			var vertex:Vertex;
-			var triangle:Triangle;
-			var size:int = _numVertices;
-			
-			for (i = 0; i < _numVertices; i++) {
-				vertex = vertices[i];
-				// vertex
-				j = i * 3;
-				rawVertex[j] = vertex.x;
-				rawVertex[j + 1] = vertex.y;
-				rawVertex[j + 2] = vertex.z;
-				// normal
-				rawNormal[j] = vertex.normal.x;
-				rawNormal[j + 1] = vertex.normal.y;
-				rawNormal[j + 2] = vertex.normal.z;
-				// uv
-				j = i * 2;
-				rawUV[j] = vertex.u;
-				rawUV[j + 1] = vertex.v;
-			}
-			
-			for (i = 0; i < _numTriangles; i++) {
-				triangle = triangles[i];
-				// index
-				j = i * 3;
-				
-				vertex = vertices[triangle.index0];
-				if (triangle.u0 != vertex.u || triangle.v0 != vertex.v) {
-					rawIndex[j] = size;
-					
-					k = size * 3;
-					// vertex
-					rawVertex[k] = vertex.x;
-					rawVertex[k + 1] = vertex.y;
-					rawVertex[k + 2] = vertex.z;
-					// normal
-					rawNormal[k] = vertex.normal.x;
-					rawNormal[k + 1] = vertex.normal.y;
-					rawNormal[k + 2] = vertex.normal.z;
-					// uv
-					k = size * 2;
-					rawUV[k] = triangle.u0;
-					rawUV[k + 1] = triangle.v0;
-					
-					size++;
-				} else {
-					rawIndex[j] = triangle.index0;
-				}
-				
-				vertex = vertices[triangle.index1];
-				if (triangle.u1 != vertex.u || triangle.v1 != vertex.v) {
-					rawIndex[j + 1] = size;
-					
-					k = size * 3;
-					// vertex
-					rawVertex[k] = vertex.x;
-					rawVertex[k + 1] = vertex.y;
-					rawVertex[k + 2] = vertex.z;
-					// normal
-					rawNormal[k] = vertex.normal.x;
-					rawNormal[k + 1] = vertex.normal.y;
-					rawNormal[k + 2] = vertex.normal.z;
-					// uv
-					k = size * 2;
-					rawUV[k] = triangle.u1;
-					rawUV[k + 1] = triangle.v1;
-					
-					size++;
-				} else {
-					rawIndex[j + 1] = triangle.index1;
-				}
-				
-				vertex = vertices[triangle.index2];
-				if (triangle.u2 != vertex.u || triangle.v2 != vertex.v) {
-					rawIndex[j + 2] = size;
-					
-					k = size * 3;
-					// vertex
-					rawVertex[k] = vertex.x;
-					rawVertex[k + 1] = vertex.y;
-					rawVertex[k + 2] = vertex.z;
-					// normal
-					rawNormal[k] = vertex.normal.x;
-					rawNormal[k + 1] = vertex.normal.y;
-					rawNormal[k + 2] = vertex.normal.z;
-					// uv
-					k = size * 2;
-					rawUV[k] = triangle.u2;
-					rawUV[k + 1] = triangle.v2;
-					
-					size++;
-				} else {
-					rawIndex[j + 2] = triangle.index2;
-				}
-			}
-			
-			if (flag) {
-				var context3d:Context3D = ViewPort.context3d;
-				if (_vertexBuffer)_vertexBuffer.dispose();
-				_vertexBuffer = context3d.createVertexBuffer(size, 3);
-				if (_uvBuffer)_uvBuffer.dispose();
-				_uvBuffer = context3d.createVertexBuffer(size, 2);
-				if (_normalBuffer)_normalBuffer.dispose();
-				_normalBuffer = context3d.createVertexBuffer(size, 3);
-				if (_indexBuffer)_indexBuffer.dispose();
-				_indexBuffer = context3d.createIndexBuffer(_numIndices);
-			}
-			
-			_vertexBuffer.uploadFromVector(rawVertex, 0, size);
-			_uvBuffer.uploadFromVector(rawUV, 0, size);
-			_normalBuffer.uploadFromVector(rawNormal, 0, size);
-			_indexBuffer.uploadFromVector(rawIndex, 0, _numIndices);
-		}
-		
-		public function upload(uv:Boolean, normal:Boolean):void {
-			var context3d:Context3D = ViewPort.context3d;
-			context3d.setVertexBufferAt(0, _vertexBuffer, 0, Context3DVertexBufferFormat.FLOAT_3);
-			if (uv) context3d.setVertexBufferAt(1, _uvBuffer, 0, Context3DVertexBufferFormat.FLOAT_2);
-			if (normal) context3d.setVertexBufferAt(2, _normalBuffer, 0, Context3DVertexBufferFormat.FLOAT_3);
-		}
-		
-		public function unload():void {
-			var context3d:Context3D = ViewPort.context3d;
-			context3d.setVertexBufferAt(0, null, 0, Context3DVertexBufferFormat.FLOAT_3);
-			context3d.setVertexBufferAt(1, null, 0, Context3DVertexBufferFormat.FLOAT_2);
-			context3d.setVertexBufferAt(2, null, 0, Context3DVertexBufferFormat.FLOAT_3);
 		}
 		
 		public function dispose():void {
-			if (_vertexBuffer)_vertexBuffer.dispose();
-			if (_uvBuffer)_uvBuffer.dispose();
-			if (_indexBuffer)_indexBuffer.dispose();
-			if (_normalBuffer)_normalBuffer.dispose();
-		}
-		
-		///////////////////////////////////
-		// getter/setters
-		///////////////////////////////////
-		
-		public function get numVertices():int {
-			return _numVertices;
-		}
-		
-		public function get numIndices():int {
-			return _numIndices;
-		}
-		
-		public function get numTriangles():int {
-			return _numTriangles;
-		}
-		
-		public function get indexBuffer():IndexBuffer3D {
-			return _indexBuffer;
+			if (vertexBuffer) vertexBuffer.dispose();
+			vertexBuffer = null;
+			if (normalBuffer) normalBuffer.dispose();
+			normalBuffer = null;
+			if (uvBuffer) uvBuffer.dispose();
+			uvBuffer = null;
+			if (indexBuffer) indexBuffer.dispose();
+			indexBuffer = null;
+			numVertices = numIndices = numTriangles = 0;
+			vertices = null;
+			triangles = null;
 		}
 		
 	}

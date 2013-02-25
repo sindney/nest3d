@@ -1,22 +1,27 @@
 package nest.object
 {
 	import flash.display3D.Context3DTriangleFace;
+	import flash.utils.Dictionary;
 	
-	import nest.object.geom.AABB;
+	import nest.object.geom.Bound;
 	import nest.object.geom.Geometry;
-	import nest.object.geom.IBound;
-	import nest.view.material.IMaterial;
+	import nest.view.shader.Shader3D;
+	import nest.view.TextureResource;
 	
 	/**
 	 * Mesh
 	 */
 	public class Mesh extends Object3D implements IMesh {
 		
-		protected var _material:IMaterial;
-		
 		protected var _geom:Geometry;
 		
-		protected var _bound:IBound;
+		protected var _material:Vector.<TextureResource>;
+		
+		protected var _shader:Shader3D;
+		
+		protected var _bound:Bound;
+		
+		protected var _parameters:Dictionary;
 		
 		protected var _triangleCulling:String = Context3DTriangleFace.BACK;
 		
@@ -28,16 +33,50 @@ package nest.object
 		
 		protected var _id:uint;
 		
-		public function Mesh(geom:Geometry, material:IMaterial, bound:IBound = null) {
+		public function Mesh(geom:Geometry, material:Vector.<TextureResource>, shader:Shader3D) {
 			super();
-			_bound = _bound ? bound : new AABB();
+			_geom = geom;
 			_material = material;
-			this.geom = geom;
+			_shader = shader;
+			_bound = new Bound();
+			_parameters = new Dictionary();
 		}
 		
 		///////////////////////////////////
 		// getter/setters
 		///////////////////////////////////
+		
+		public function get geom():Geometry {
+			return _geom;
+		}
+		
+		public function set geom(value:Geometry):void {
+			_geom = value;
+		}
+		
+		public function get material():Vector.<TextureResource> {
+			return _material;
+		}
+		
+		public function set material(value:Vector.<TextureResource>):void {
+			_material = value;
+		}
+		
+		public function get shader():Shader3D {
+			return _shader;
+		}
+		
+		public function set shader(value:Shader3D):void {
+			_shader = value;
+		}
+		
+		public function get bound():Bound {
+			return _bound;
+		}
+		
+		public function get parameters():Dictionary {
+			return _parameters;
+		}
 		
 		public function get visible():Boolean {
 			return _visible;
@@ -45,36 +84,6 @@ package nest.object
 		
 		public function set visible(value:Boolean):void {
 			_visible = value;
-		}
-		
-		public function get geom():Geometry {
-			return _geom;
-		}
-		
-		public function set geom(value:Geometry):void {
-			if (_geom != value) {
-				_geom = value;
-				if (_geom && _bound)_bound.update(_geom.vertices);
-			}
-		}
-		
-		public function get material():IMaterial {
-			return _material;
-		}
-		
-		public function set material(value:IMaterial):void {
-			if (_material != value)_material = value;
-		}
-		
-		public function get bound():IBound {
-			return _bound;
-		}
-		
-		public function set bound(value:IBound):void {
-			if (_bound != value) {
-				_bound = value;
-				if (_geom && _bound)_bound.update(_geom.vertices);
-			}
 		}
 		
 		public function get cliping():Boolean {

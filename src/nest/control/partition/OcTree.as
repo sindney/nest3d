@@ -2,8 +2,7 @@ package nest.control.partition
 {
 	import flash.geom.Vector3D;
 	
-	import nest.object.geom.AABB;
-	import nest.object.geom.BSphere;
+	import nest.object.geom.Bound;
 	import nest.object.Mesh;
 	import nest.object.IContainer3D;
 	import nest.object.IMesh;
@@ -108,7 +107,7 @@ package nest.control.partition
 			BTL.parent = BTR.parent = BBL.parent = BBR.parent = node;
 			BTL.depth = BTR.depth = BBL.depth = BBR.depth = depth;
 			
-			var i:int, j:int, k:int, l:int;
+			var i:int, j:int;
 			for (i = 0; i < 8; i++) {
 				var tmp:OcNode = node.childs[i] as OcNode;
 				tmp.vertices[1].setTo(tmp.max.x, tmp.min.y, tmp.min.z);
@@ -122,9 +121,10 @@ package nest.control.partition
 			var BBTL:Boolean, BBTR:Boolean, BBBL:Boolean, BBBR:Boolean;
 			var BTTL:Boolean, BTTR:Boolean, BTBL:Boolean, BTBR:Boolean;
 			
+			var radius:Number;
 			var mesh:IMesh;
 			var objects:Vector.<IMesh> = node.objects;
-			var a:Vector3D, b:Vector3D;
+			var a:Vector3D, b:Vector3D, c:Vector3D = new Vector3D(0.577, 0.577, 0.577);
 			
 			j = objects.length;
 			node.objects = new Vector.<IMesh>();
@@ -133,32 +133,29 @@ package nest.control.partition
 				mesh = objects[i];
 				BBTL = BBTR = BBBL = BBBR = false;
 				BTTL = BTTR = BTBL = BTBR = false;
-				if (mesh.bound is AABB) {
-					a = mesh.worldMatrix.transformVector((mesh.bound as AABB).max);
-					b = mesh.worldMatrix.transformVector((mesh.bound as AABB).min);
-					BBTL = AABB.AABB_AABB(a, b, BTL.max, BTL.min);
-					BBTR = AABB.AABB_AABB(a, b, BTR.max, BTR.min);
-					BBBL = AABB.AABB_AABB(a, b, BBL.max, BBL.min);
-					BBBR = AABB.AABB_AABB(a, b, BBR.max, BBR.min);
-					BTTL = AABB.AABB_AABB(a, b, TTL.max, TTL.min);
-					BTTR = AABB.AABB_AABB(a, b, TTR.max, TTR.min);
-					BTBL = AABB.AABB_AABB(a, b, TBL.max, TBL.min);
-					BTBR = AABB.AABB_AABB(a, b, TBR.max, TBR.min);
+				if (mesh.bound.aabb) {
+					a = mesh.worldMatrix.transformVector(mesh.matrix.transformVector(mesh.bound.vertices[7]));
+					b = mesh.worldMatrix.transformVector(mesh.matrix.transformVector(mesh.bound.vertices[0]));
+					BBTL = Bound.AABB_AABB(a, b, BTL.max, BTL.min);
+					BBTR = Bound.AABB_AABB(a, b, BTR.max, BTR.min);
+					BBBL = Bound.AABB_AABB(a, b, BBL.max, BBL.min);
+					BBBR = Bound.AABB_AABB(a, b, BBR.max, BBR.min);
+					BTTL = Bound.AABB_AABB(a, b, TTL.max, TTL.min);
+					BTTR = Bound.AABB_AABB(a, b, TTR.max, TTR.min);
+					BTBL = Bound.AABB_AABB(a, b, TBL.max, TBL.min);
+					BTBR = Bound.AABB_AABB(a, b, TBR.max, TBR.min);
 				} else {
-					a = mesh.worldMatrix.transformVector(mesh.bound.center);
-					l = (mesh.bound as BSphere).radius;
-					k = mesh.scale.x;
-					if (mesh.scale.y > k) k = mesh.scale.y;
-					if (mesh.scale.z > k) k = mesh.scale.z;
-					l *= k;
-					BBTL = AABB.AABB_BSphere(BTL.max, BTL.min, a, l);
-					BBTR = AABB.AABB_BSphere(BTR.max, BTR.min, a, l);
-					BBBL = AABB.AABB_BSphere(BBL.max, BBL.min, a, l);
-					BBBR = AABB.AABB_BSphere(BBR.max, BBR.min, a, l);
-					BTTL = AABB.AABB_BSphere(TTL.max, TTL.min, a, l);
-					BTTR = AABB.AABB_BSphere(TTR.max, TTR.min, a, l);
-					BTBL = AABB.AABB_BSphere(TBL.max, TBL.min, a, l);
-					BTBR = AABB.AABB_BSphere(TBR.max, TBR.min, a, l);
+					a = mesh.worldMatrix.transformVector(mesh.matrix.transformVector(mesh.bound.center));
+					b = mesh.worldMatrix.transformVector(mesh.matrix.transformVector(c));
+					radius = mesh.bound.radius * b.length;
+					BBTL = Bound.AABB_BSphere(BTL.max, BTL.min, a, radius);
+					BBTR = Bound.AABB_BSphere(BTR.max, BTR.min, a, radius);
+					BBBL = Bound.AABB_BSphere(BBL.max, BBL.min, a, radius);
+					BBBR = Bound.AABB_BSphere(BBR.max, BBR.min, a, radius);
+					BTTL = Bound.AABB_BSphere(TTL.max, TTL.min, a, radius);
+					BTTR = Bound.AABB_BSphere(TTR.max, TTR.min, a, radius);
+					BTBL = Bound.AABB_BSphere(TBL.max, TBL.min, a, radius);
+					BTBR = Bound.AABB_BSphere(TBR.max, TBR.min, a, radius);
 				}
 				
 				if (BBTL && (BBTR || BBBL || BBBR || BTTL || BTTR || BTBL || BTBR) || 

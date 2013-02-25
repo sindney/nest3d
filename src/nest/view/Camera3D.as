@@ -5,7 +5,7 @@ package nest.view
 	import flash.geom.Orientation3D;
 	import flash.geom.Vector3D;
 	
-	import nest.control.math.Frustum;
+	import nest.control.util.Frustum;
 	
 	/**
 	 * Camera3D

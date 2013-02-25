@@ -5,22 +5,33 @@ package nest.control.parser
 	import flash.utils.Endian;
 	
 	import nest.control.animation.AnimationTrack;
+	import nest.control.animation.IKeyFrame;
 	import nest.control.animation.VertexKeyFrame;
 	import nest.object.geom.Geometry;
 	import nest.object.geom.Triangle;
 	import nest.object.geom.Vertex;
-	import nest.object.Mesh;
 	
 	/**
 	 * ParserMD2
 	 */
 	public class ParserMD2 {
 		
+		public var geom:Geometry;
+		public var track:AnimationTrack;
+		
 		public function ParserMD2() {
 			
 		}
 		
-		public function parse(model:ByteArray, scale:Number = 1):Mesh {
+		public function dispose():void {
+			geom = null;
+			track = null;
+		}
+		
+		public function parse(model:ByteArray, scale:Number = 1):void {
+			geom = null;
+			track = null;
+			
 			model.position = 0;
 			model.endian = Endian.LITTLE_ENDIAN;
 			
@@ -75,6 +86,7 @@ package nest.control.parser
 			var uvs:Vector.<Number> = new Vector.<Number>(num_uvs * 2, true);
 			var triangles:Vector.<Triangle> = new Vector.<Triangle>(num_triangles, true);
 			var vertexTrack:AnimationTrack = new AnimationTrack();
+			vertexTrack.frames = new Vector.<IKeyFrame>();
 			
 			//get texture name
 			model.position = offset_skins;
@@ -117,20 +129,20 @@ package nest.control.parser
 				u = uvs[uv0 << 1];
 				v = uvs[(uv0 << 1) + 1];
 				vertices[index0] = new Vertex(0, 0, 0, u, v);
-				tri.u2 = u;
-				tri.v2 = v;
+				tri.uvs[4] = u;
+				tri.uvs[5] = v;
 				
 				u = uvs[uv1 << 1];
 				v = uvs[(uv1 << 1) + 1];
 				vertices[index1] = new Vertex(0, 0, 0, u, v);
-				tri.u1 = u;
-				tri.v1 = v;
+				tri.uvs[2] = u;
+				tri.uvs[3] = v;
 				
 				u = uvs[uv2 << 1];
 				v = uvs[(uv2 << 1) + 1];
 				vertices[index2] = new Vertex(0, 0, 0, u, v);
-				tri.u0 = u;
-				tri.v0 = v;
+				tri.uvs[0] = u;
+				tri.uvs[1] = v;
 				
 				triangles[i] = tri;
 			}
@@ -167,7 +179,7 @@ package nest.control.parser
 					frame.normals[k] = frame.normals[k + 1] = frame.normals[k + 2] = 0;
 					model.readUnsignedByte();
 				}
-				vertexTrack.addChild(frame);
+				vertexTrack.frames.push(frame);
 			}
 			
 			// calculate normals for each frame
@@ -178,13 +190,12 @@ package nest.control.parser
 			var mag:Number;
 			
 			j = triangles.length;
-			frame = vertexTrack.first as VertexKeyFrame;
-			while (frame) {
+			for each(frame in vertexTrack.frames) {
 				for (i = 0; i < j; i++) {
 					tri = triangles[i];
-					v1 = tri.index0 * 3;
-					v2 = tri.index1 * 3;
-					v3 = tri.index2 * 3;
+					v1 = tri.indices[0] * 3;
+					v2 = tri.indices[1] * 3;
+					v3 = tri.indices[2] * 3;
 					
 					vt1.x = frame.vertices[v2]     - frame.vertices[v1];
 					vt1.y = frame.vertices[v2 + 1] - frame.vertices[v1 + 1];
@@ -216,28 +227,24 @@ package nest.control.parser
 					frame.normals[i + 1] *= mag;
 					frame.normals[i + 2] *= mag;
 				}
-				frame = frame.next as VertexKeyFrame;
 			}
 			
 			//reset vertex data to frame0
-			var vs0:Vector.<Number> = (vertexTrack.first as VertexKeyFrame).vertices;
-			var vn0:Vector.<Number> = (vertexTrack.first as VertexKeyFrame).normals;
+			var vs0:Vector.<Number> = (vertexTrack.frames[0] as VertexKeyFrame).vertices;
+			var vn0:Vector.<Number> = (vertexTrack.frames[0] as VertexKeyFrame).normals;
 			var vertex:Vertex;
 			for (i = 0, j = 0; i < num_vertices; i++, j += 3) {
 				vertex = vertices[i];
 				vertex.x = vs0[j];
 				vertex.y = vs0[j + 1];
 				vertex.z = vs0[j + 2];
-				vertex.normal.setTo(vn0[j], vn0[j + 1], vn0[j + 2]);
+				vertex.nx = vn0[j];
+				vertex.ny = vn0[j + 1];
+				vertex.nz = vn0[j + 2];
 			}
 			
-			var geom:Geometry = new Geometry(vertices, triangles);
-			
-			var mesh:Mesh = new Mesh(geom, null);
-			mesh.tracks = new Vector.<AnimationTrack>();
-			mesh.tracks.push(vertexTrack);
-			
-			return mesh;
+			geom = new Geometry(vertices, triangles);
+			track = vertexTrack;
 		}
 		
 	}

@@ -6,21 +6,20 @@ package nest.object.geom
 	 */
 	public class Triangle {
 		
-		public var index0:uint;
-		public var index1:uint;
-		public var index2:uint;
+		public var indices:Vector.<uint> = new Vector.<uint>(3, true);
+		public var uvs:Vector.<Number> = new Vector.<Number>(6, true);
 		
-		public var u0:Number = 0;
-		public var u1:Number = 0;
-		public var u2:Number = 0;
-		public var v0:Number = 0;
-		public var v1:Number = 0;
-		public var v2:Number = 0;
-		
-		public function Triangle(index0:uint = 0, index1:uint = 0, index2:uint = 0) {
-			this.index0 = index0;
-			this.index1 = index1;
-			this.index2 = index2;
+		public function Triangle(index0:uint, index1:uint, index2:uint, 
+								u0:int = 0, v0:int = 0, u1:int = 0, v1:int = 0, u2:int = 0, v2:int = 0) {
+			indices[0] = index0;
+			indices[1] = index1;
+			indices[2] = index2;
+			uvs[0] = u0;
+			uvs[1] = v0;
+			uvs[2] = u1;
+			uvs[3] = v1;
+			uvs[4] = u2;
+			uvs[5] = v2;
 		}
 		
 	}

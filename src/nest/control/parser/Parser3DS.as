@@ -37,6 +37,15 @@ package nest.control.parser
 			
 		}
 		
+		public function dispose():void {
+			_objects = null;
+			last = null;
+			name = null;
+			rawVertices = null;
+			rawTriangles = null;
+			scale = 1;
+		}
+		
 		public function getObjectByName(name:String):Mesh {
 			var object:Mesh;
 			for each(object in _objects) {
@@ -52,7 +61,6 @@ package nest.control.parser
 			model.endian = Endian.LITTLE_ENDIAN;
 			model.position = 0;
 			
-			// header.id
 			if (model.readUnsignedShort() != HEADER) throw new Error("Error reading 3DS file: Not a valid 3DS file");
 			
 			rawVertices = new Vector.<Vertex>();
@@ -70,7 +78,7 @@ package nest.control.parser
 			var id:uint = data.readUnsignedShort();
 			var length:uint = data.readUnsignedInt();
 			
-			var i:int, j:int;
+			var i:int, j:int, k:int;
 			var vertex:Vertex;
 			var triangle:Triangle;
 			
@@ -110,19 +118,14 @@ package nest.control.parser
 					j = data.readUnsignedShort();
 					for (i = 0; i < j; i++) {
 						triangle = new Triangle(data.readUnsignedShort(), data.readUnsignedShort(), data.readUnsignedShort());
-						vertex = rawVertices[triangle.index0];
-						triangle.u0 = vertex.u;
-						triangle.v0 = vertex.v;
-						vertex = rawVertices[triangle.index1];
-						triangle.u1 = vertex.u;
-						triangle.v1 = vertex.v;
-						vertex = rawVertices[triangle.index2];
-						triangle.u2 = vertex.u;
-						triangle.v2 = vertex.v;
 						rawTriangles.push(triangle);
+						for (k = 0; k < 3; k++) {
+							vertex = rawVertices[triangle.indices[k]];
+							triangle.uvs[k * 2] = vertex.u;
+							triangle.uvs[k * 2 + 1] = vertex.v;
+						}
 						data.position += 2;
 					}
-					
 					Geometry.calculateNormal(rawVertices, rawTriangles);
 					last.geom = new Geometry(rawVertices, rawTriangles);
 					_objects.push(last);

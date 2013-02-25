@@ -1,6 +1,5 @@
 package nest.control.parser 
 {
-	import flash.geom.Vector3D;
 	import flash.utils.ByteArray;
 	
 	import nest.object.geom.Geometry;
@@ -37,7 +36,7 @@ package nest.control.parser
 			
 			var source:String = model.readUTFBytes(model.bytesAvailable);
 			var lines:Array = source.split(LINE_END);
-			var i:int, j:int, k:int, l:int;
+			var i:int, j:int, k:int, l:int, m:int;
 			
 			var start:int;
 			var triplet:String;
@@ -79,8 +78,8 @@ package nest.control.parser
 			}
 			
 			var tri:Triangle;
+			var vt:Vertex;
 			var vt1:Vertex, vt2:Vertex, vt3:Vertex;
-			var v1:Vector3D = new Vector3D(), v2:Vector3D = new Vector3D();
 			
 			j = vertices.length;
 			for (i = 0; i < j; i += 3) {
@@ -91,26 +90,19 @@ package nest.control.parser
 			for (i = 0; i < j; i += 9) {
 				tri = rawTriangle[i / 9] = new Triangle(indices[i] - 1, indices[i + 3] - 1, indices[i + 6] - 1);
 				
-				vt1 = rawVertex[tri.index0];
-				k = (indices[i + 1] - 1) * 2;
-				tri.u0 = vt1.u = uvs[k];
-				tri.v0 = vt1.v = 1 - uvs[k + 1];
-				k = (indices[i + 2] - 1) * 3;
-				vt1.normal.setTo(normals[k], normals[k + 1], normals[k + 2]);
-				
-				vt2 = rawVertex[tri.index1];
-				k = (indices[i + 4] - 1) * 2;
-				tri.u1 = vt2.u = uvs[k];
-				tri.v1 = vt2.v = 1 - uvs[k + 1];
-				k = (indices[i + 5] - 1) * 3;
-				vt2.normal.setTo(normals[k], normals[k + 1], normals[k + 2]);
-				
-				vt3 = rawVertex[tri.index2];
-				k = (indices[i + 7] - 1) * 2;
-				tri.u2 = vt3.u = uvs[k];
-				tri.v2 = vt3.v = 1 - uvs[k + 1];
-				k = (indices[i + 8] - 1) * 3;
-				vt3.normal.setTo(normals[k], normals[k + 1], normals[k + 2]);
+				for (k = 0; k < 3; k++) {
+					vt = rawVertex[tri.indices[k]];
+					
+					m = k * 2;
+					l = (indices[i + 1 + k * 3] - 1) * 2;
+					tri.uvs[m] = vt.u = uvs[l];
+					tri.uvs[m + 1] = vt.v = 1 - uvs[l + 1];
+					
+					l = (indices[i + 2 + k * 3] - 1) * 3;
+					vt.nx = normals[l];
+					vt.ny = normals[l + 1];
+					vt.nz = normals[l + 2];
+				}
 			}
 			
 			return new Geometry(rawVertex, rawTriangle);

@@ -1,13 +1,13 @@
 package nest.view.process 
 {
 	import flash.display3D.Context3D;
-	import flash.display3D.Program3D;
 	import flash.display3D.Context3DProgramType;
+	import flash.display3D.Context3DVertexBufferFormat;
 	import flash.geom.Matrix3D;
-	import flash.geom.Vector3D;
 	
 	import nest.object.IMesh;
-	import nest.view.Camera3D;
+	import nest.view.shader.*;
+	import nest.view.TextureResource;
 	import nest.view.ViewPort;
 	
 	/**
@@ -15,53 +15,52 @@ package nest.view.process
 	 */
 	public class BasicMeshProcess implements IMeshProcess {
 		
-		public var camera:Camera3D;
-		
-		public function BasicMeshProcess(camera:Camera3D) {
-			this.camera = camera;
-		}
-		
-		public function initialize():void {
-			var position:Vector.<Number> = new Vector.<Number>(4, true);
-			position[0] = camera.position.x;
-			position[1] = camera.position.y;
-			position[2] = camera.position.z;
-			position[3] = 1;
-			ViewPort.context3d.setProgramConstantsFromVector(Context3DProgramType.VERTEX, 8, position);
-		}
-		
-		public function calculate(mesh:IMesh, ivm:Matrix3D, pm:Matrix3D):void {
+		public function calculate(mesh:IMesh, pm:Matrix3D):void {
 			var context3d:Context3D = ViewPort.context3d;
-			var components:Vector.<Vector3D>;
-			var matrix:Matrix3D = new Matrix3D();
 			
 			context3d.setCulling(mesh.triangleCulling);
+			context3d.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 0, mesh.matrix, true);
+			context3d.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 4, mesh.worldMatrix, true);
+			context3d.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 8, pm, true);
 			
-			matrix.copyFrom(mesh.worldMatrix);
-			matrix.append(ivm);
-			if (mesh.ignoreRotation) {
-				components = matrix.decompose();
-				components[1].setTo(0, 0, 0);
-				matrix.recompose(components);
+			var byteArraySP:ByteArrayShaderPart;
+			var matrixSP:MatrixShaderPart;
+			var vectorSP:VectorShaderPart;
+			for each(var csp:IConstantShaderPart in mesh.shader.constantParts) {
+				if (csp is ByteArrayShaderPart) {
+					byteArraySP = csp as ByteArrayShaderPart;
+					context3d.setProgramConstantsFromByteArray(byteArraySP.programType, byteArraySP.firstRegister, 
+																byteArraySP.numRegisters, byteArraySP.data, 
+																byteArraySP.byteArrayOffset);
+				} else if (csp is MatrixShaderPart) {
+					matrixSP = csp as MatrixShaderPart;
+					context3d.setProgramConstantsFromMatrix(matrixSP.programType, matrixSP.firstRegister, 
+															matrixSP.matrix, matrixSP.transposedMatrix);
+				} else if (csp is VectorShaderPart) {
+					vectorSP = csp as VectorShaderPart;
+					context3d.setProgramConstantsFromVector(vectorSP.programType, vectorSP.firstRegister, 
+															vectorSP.data, vectorSP.numRegisters);
+				}
 			}
-			matrix.append(pm);
 			
-			context3d.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 0, matrix, true);
+			if (mesh.material) for each(var tr:TextureResource in mesh.material) context3d.setTextureAt(tr.sampler, tr.texture);
 			
-			matrix.copyFrom(mesh.invertWorldMatrix);
-			matrix.appendScale(mesh.scale.x, mesh.scale.y, mesh.scale.z);
+			var a:Boolean = mesh.geom.normalBuffer != null;
+			var b:Boolean = mesh.geom.uvBuffer != null;
 			
-			context3d.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 4, matrix, true);
-			context3d.setProgramConstantsFromMatrix(Context3DProgramType.FRAGMENT, 24, matrix, true);
+			context3d.setVertexBufferAt(0, mesh.geom.vertexBuffer, 0, Context3DVertexBufferFormat.FLOAT_3);
+			if (a) context3d.setVertexBufferAt(1, mesh.geom.normalBuffer, 0, Context3DVertexBufferFormat.FLOAT_3);
+			if (b) context3d.setVertexBufferAt(2, mesh.geom.uvBuffer, 0, Context3DVertexBufferFormat.FLOAT_2);
 			
-			mesh.material.upload(mesh);
-			mesh.geom.upload(mesh.material.uv, mesh.material.normal);
+			context3d.setProgram(mesh.shader.program);
 			
-			context3d.setProgram(mesh.material.program);
 			context3d.drawTriangles(mesh.geom.indexBuffer);
 			
-			mesh.material.unload();
-			mesh.geom.unload();
+			if (mesh.material) for each(tr in mesh.material) context3d.setTextureAt(tr.sampler, null);
+			
+			context3d.setVertexBufferAt(0, null);
+			if (a) context3d.setVertexBufferAt(1, null);
+			if (b) context3d.setVertexBufferAt(2, null);
 		}
 		
 	}

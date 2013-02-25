@@ -14,9 +14,6 @@ package nest.control.animation
 		function get name():String;
 		function set name(value:String):void;
 		
-		function get next():IKeyFrame;
-		function set next(value:IKeyFrame):void;
-		
 	}
 	
 }

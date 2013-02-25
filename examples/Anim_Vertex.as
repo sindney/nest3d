@@ -1,23 +1,18 @@
 package  
 {
 	import nest.control.animation.AnimationTrack;
-	import nest.control.animation.VertexKeyFrame;
 	import nest.control.animation.VertexModifier;
 	import nest.control.controller.AnimationController;
 	import nest.control.parser.ParserMD2;
 	import nest.object.geom.Geometry;
 	import nest.object.Mesh;
 	import nest.object.Container3D;
-	import nest.view.light.AmbientLight;
-	import nest.view.light.DirectionalLight;
-	import nest.view.material.TextureMaterial;
 	import nest.view.process.*;
+	import nest.view.shader.Shader3D;
+	import nest.view.TextureResource;
 	
 	/**
 	 * Anim_Vertex
-	 * You may want to check out Anim_Texure first.
-	 * 顶点动画
-	 * 建议您先看Anim_Texure那个例子
 	 */
 	public class Anim_Vertex extends DemoBase {
 		
@@ -40,30 +35,42 @@ package
 			container = new Container3D();
 			
 			process0 = new ContainerProcess(camera, container);
-			process0.meshProcess = new BasicMeshProcess(camera);
+			process0.meshProcess = new BasicMeshProcess();
 			process0.color = 0xff000000;
 			
 			view.processes.push(process0);
 			
-			var material:TextureMaterial = new TextureMaterial(new diffuse().bitmapData);
-			material.lights.push(new AmbientLight(0x000000), new DirectionalLight(0xffffff, 0, 0, 1));
-			material.comply();
-			
-			// We demostrate vertex animation with a MD2 model.
-			// 我们用一个MD2模型来演示顶点动画
 			var parser:ParserMD2 = new ParserMD2();
-			var mesh:Mesh = parser.parse(new model(), 1);
-			mesh.tracks[0].modifier = new VertexModifier();
-			mesh.material = material;
-			container.addChild(mesh);
+			parser.parse(new model(), 1);
+			
+			var material:Vector.<TextureResource> = new Vector.<TextureResource>();
+			material.push(new TextureResource(0, null));
+			TextureResource.uploadToTexture(material[0], new diffuse().bitmapData, false);
+			
+			var shader:Shader3D = new Shader3D();
+			shader.comply("m44 vt0, va0, vc0\nm44 vt0, vt0, vc4\n" + 
+							"m44 op, vt0, vc8\nmov v0, va2\n", 
+							"tex oc, v0, fs0 <2d,linear,mipnone>\n");
+			
+			var mesh:Mesh = new Mesh(parser.geom, material, shader);
+			Geometry.setupGeometry(mesh.geom, true, false, true);
+			Geometry.uploadGeometry(mesh.geom, true, false, true, true);
 			mesh.rotation.x = -Math.PI / 2;
 			mesh.rotation.y = Math.PI / 2;
-			mesh.recompose();
+			container.addChild(mesh);
+			
+			var track:AnimationTrack = parser.track;
+			track.modifier = new VertexModifier();
+			track.target = mesh;
+			track.enabled = true;
+			
+			parser.dispose();
 			
 			anim_controller = new AnimationController();
-			anim_controller.objects.push(mesh);
+			anim_controller.tracks.push(track);
 			anim_controller.loops = int.MAX_VALUE;
 			anim_controller.speed = 10;
+			anim_controller.setup();
 			anim_controller.restart();
 			
 			camera.position.z = -100;

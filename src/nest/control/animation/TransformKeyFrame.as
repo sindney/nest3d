@@ -9,19 +9,10 @@ package nest.control.animation
 		
 		private var _time:Number;
 		private var _name:String;
-		private var _next:IKeyFrame;
 		
-		public var position:Vector3D;
-		
-		public var rotation:Vector3D;
-		
-		public var scale:Vector3D;
-		
-		public function TransformKeyFrame() {
-			position = new Vector3D();
-			rotation = new Vector3D();
-			scale = new Vector3D(1, 1, 1);
-		}
+		public var position:Vector3D = new Vector3D();
+		public var rotation:Vector3D = new Vector3D(0, 0, 0, 1);
+		public var scale:Vector3D = new Vector3D(1, 1, 1);
 		
 		public function clone():IKeyFrame {
 			var result:TransformKeyFrame = new TransformKeyFrame();
@@ -53,13 +44,6 @@ package nest.control.animation
 			_name = value;
 		}
 		
-		public function get next():IKeyFrame {
-			return _next;
-		}
-		
-		public function set next(value:IKeyFrame):void {
-			_next = value;
-		}
 	}
 
 }

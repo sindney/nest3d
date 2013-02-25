@@ -2,13 +2,12 @@ package nest.view.process
 {
 	import flash.display3D.Context3D;
 	import flash.display3D.Context3DBlendFactor;
-	import flash.display3D.textures.TextureBase;
+	import flash.display3D.Context3DProgramType;
 	import flash.geom.Matrix3D;
 	import flash.geom.Vector3D;
 	
 	import nest.control.partition.IPNode;
-	import nest.object.geom.AABB;
-	import nest.object.geom.BSphere;
+	import nest.object.geom.Bound;
 	import nest.object.IContainer3D;
 	import nest.object.IMesh;
 	import nest.object.IObject3D;
@@ -22,9 +21,10 @@ package nest.view.process
 		
 		protected var _renderTarget:RenderTarget;
 		
-		protected var _meshProcess:IMeshProcess;
 		protected var _container:IContainer3D;
 		
+		protected var _meshProcess:IMeshProcess;
+
 		protected var _objects:Vector.<IMesh>;
 		protected var _alphaObjects:Vector.<IMesh>;
 		
@@ -51,13 +51,19 @@ package nest.view.process
 			var object:IObject3D;
 			var mesh:IMesh;
 			
-			var ivm:Matrix3D = _camera.invertMatrix;
-			var pm:Matrix3D = _camera.pm;
-			
 			var i:int, j:int;
 			var dx:int, dy:int, dz:int;
 			
 			var alphaParms:Vector.<int> = new Vector.<int>();
+			
+			var pm:Matrix3D = _camera.invertMatrix.clone();
+			pm.append(_camera.pm);
+			
+			var pm1:Matrix3D = _camera.invertMatrix.clone();
+			var comps:Vector.<Vector3D> = pm1.decompose();
+			comps[1].setTo(0, 0, 0);
+			pm1.recompose(comps);
+			pm1.append(_camera.pm);
 			
 			_objects = new Vector.<IMesh>();
 			_alphaObjects = new Vector.<IMesh>();
@@ -72,8 +78,6 @@ package nest.view.process
 				context3d.setRenderToBackBuffer();
 			}
 			context3d.clear(_rgba[0], _rgba[1], _rgba[2], _rgba[3]);
-			
-			_meshProcess.initialize();
 			
 			while (container) {
 				if (!container.visible) {
@@ -104,7 +108,7 @@ package nest.view.process
 											alphaParms.push(dx * dx + dy * dy + dz * dz);
 											_alphaObjects.push(mesh);
 										} else {
-											_meshProcess.calculate(mesh, ivm, pm);
+											_meshProcess.calculate(mesh, mesh.ignoreRotation ? pm1 : pm);
 											_objects.push(mesh);
 										}
 										_numVertices += mesh.geom.numVertices;
@@ -131,7 +135,7 @@ package nest.view.process
 										alphaParms.push(dx * dx + dy * dy + dz * dz);
 										_alphaObjects.push(mesh);
 									} else {
-										_meshProcess.calculate(mesh, ivm, pm);
+										_meshProcess.calculate(mesh, mesh.ignoreRotation ? pm1 : pm);
 										_objects.push(mesh);
 									}
 									_numVertices += mesh.geom.numVertices;
@@ -153,31 +157,28 @@ package nest.view.process
 			i = _alphaObjects.length - 1;
 			if (i > 0) quickSort(alphaParms, 0, i);
 			
-			for each(mesh in _alphaObjects) {
-				_meshProcess.calculate(mesh, ivm, pm);
-			}
+			for each(mesh in _alphaObjects) _meshProcess.calculate(mesh, pm);
 			
 			context3d.setBlendFactors(Context3DBlendFactor.ONE, Context3DBlendFactor.ZERO);
 		}
 		
 		protected function classifyMesh(mesh:IMesh):Boolean {
 			var i:int;
-			if (mesh.bound is AABB) {
+			if (mesh.bound.aabb) {
 				var vertices:Vector.<Vector3D> = new Vector.<Vector3D>(8, true);
 				for (i = 0; i < 8; i++) {
 					vertices[i] = _camera.invertMatrix.transformVector(
-									mesh.worldMatrix.transformVector((mesh.bound as AABB).vertices[i])
+									mesh.worldMatrix.transformVector(mesh.matrix.transformVector(mesh.bound.vertices[i]))
 								);
 				}
 				return _camera.frustum.classifyAABB(vertices);
 			}
 			
-			// BoundingShpere
-			i = mesh.scale.x > mesh.scale.y ? mesh.scale.x : mesh.scale.y;
-			if (mesh.scale.z > i) i = mesh.scale.z;
+			var id:Vector3D = mesh.worldMatrix.transformVector(mesh.matrix.transformVector(new Vector3D(0.577, 0.577, 0.577)));
+			var scale:Number = id.length;
 			return _camera.frustum.classifyBSphere(
-						_camera.invertMatrix.transformVector(mesh.worldMatrix.transformVector(mesh.bound.center)), 
-						(mesh.bound as BSphere).radius * i
+						_camera.invertMatrix.transformVector(mesh.worldMatrix.transformVector(mesh.matrix.transformVector(mesh.bound.center))), 
+						mesh.bound.radius * scale
 					);
 		}
 		
