@@ -31,8 +31,6 @@ package nest.object
 		protected var _mouseEnabled:Boolean = false;
 		protected var _ignoreRotation:Boolean = false;
 		
-		protected var _id:uint;
-		
 		public function Mesh(geom:Geometry, material:Vector.<TextureResource>, shader:Shader3D) {
 			super();
 			_geom = geom;
@@ -108,14 +106,6 @@ package nest.object
 		
 		public function set mouseEnabled(value:Boolean):void {
 			_mouseEnabled = value;
-		}
-		
-		public function get id():uint {
-			return _id;
-		}
-		
-		public function set id(value:uint):void {
-			_id = value;
 		}
 		
 		public function get ignoreRotation():Boolean {

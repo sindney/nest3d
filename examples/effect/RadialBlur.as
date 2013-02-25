@@ -6,9 +6,8 @@ package effect
 	import flash.display3D.Context3DTextureFormat;
 	import flash.display3D.Context3DVertexBufferFormat;
 	import flash.display3D.Program3D;
+	import nest.view.TextureResource;
 	
-	import nest.view.process.IRenderProcess;
-	import nest.view.process.RenderTarget;
 	import nest.view.shader.Shader3D;
 	import nest.view.ViewPort;
 	
@@ -16,9 +15,7 @@ package effect
 	 * RadialBlur
 	 * <p>Call comply() when iteration is changed.</p>
 	 */
-	public class RadialBlur implements IRenderProcess {
-		
-		private var _renderTarget:RenderTarget = new RenderTarget();
+	public class RadialBlur extends PostEffect {
 		
 		private var program:Program3D;
 		
@@ -27,6 +24,7 @@ package effect
 		public var texture0:TextureBase;
 		
 		public function RadialBlur(width:int = 512, height:int = 512, strength:Number = 1, iteration:int = 20, centerX:Number = 400, centerY:Number = 300) {
+			super();
 			var context3d:Context3D = ViewPort.context3d;
 			
 			program = context3d.createProgram();
@@ -36,9 +34,11 @@ package effect
 			this.iteration = iteration;
 			
 			texture0 = context3d.createTexture(width, height, Context3DTextureFormat.BGRA, true);
+			
+			comply();
 		}
 		
-		public function calculate():void {
+		override public function calculate():void {
 			var context3d:Context3D = ViewPort.context3d;
 			if (_renderTarget.texture) {
 				context3d.setRenderToTexture(_renderTarget.texture, _renderTarget.enableDepthAndStencil, _renderTarget.antiAlias, _renderTarget.surfaceSelector);
@@ -77,11 +77,11 @@ package effect
 							Shader3D.assembler.assemble(Context3DProgramType.FRAGMENT, fs));
 		}
 		
-		public function dispose():void {
+		override public function dispose():void {
+			super.dispose();
 			program.dispose();
 			program = null;
 			data = null;
-			_renderTarget = null;
 			if (texture0) texture0.dispose();
 			texture0 = null;
 		}
@@ -89,10 +89,6 @@ package effect
 		///////////////////////////////////
 		// getter/setters
 		///////////////////////////////////
-		
-		public function get renderTarget():RenderTarget {
-			return _renderTarget;
-		}
 		
 		public function get strength():Number {
 			return data[0] * 100;
@@ -124,6 +120,10 @@ package effect
 		
 		public function set centerY(value:Number):void {
 			data[4] = value / ViewPort.height;
+		}
+		
+		override public function get texture():TextureBase {
+			return texture0;
 		}
 		
 	}

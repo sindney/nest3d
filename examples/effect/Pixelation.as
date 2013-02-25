@@ -7,8 +7,6 @@ package effect
 	import flash.display3D.Context3DVertexBufferFormat;
 	import flash.display3D.Program3D;
 	
-	import nest.view.process.IRenderProcess;
-	import nest.view.process.RenderTarget;
 	import nest.view.shader.Shader3D;
 	import nest.view.ViewPort;
 	
@@ -16,9 +14,7 @@ package effect
 	 * Pixelation
 	 * <p>Just need to call comply() once.</p>
 	 */
-	public class Pixelation implements IRenderProcess {
-		
-		private var _renderTarget:RenderTarget = new RenderTarget();
+	public class Pixelation extends PostEffect {
 		
 		private var program:Program3D;
 		
@@ -30,6 +26,7 @@ package effect
 		public var pixelHeight:Number;
 		
 		public function Pixelation(width:int = 512, height:int = 512, pixelWidth:Number = 3, pixelHeight:Number = 3) {
+			super();
 			var context3d:Context3D = ViewPort.context3d;
 			
 			program = context3d.createProgram();
@@ -40,9 +37,11 @@ package effect
 			this.pixelHeight = pixelHeight;
 			
 			texture0 = context3d.createTexture(width, height, Context3DTextureFormat.BGRA, true);
+			
+			comply();
 		}
 		
-		public function calculate():void {
+		override public function calculate():void {
 			var context3d:Context3D = ViewPort.context3d;
 			data[0] = pixelWidth / ViewPort.width;
 			data[1] = pixelHeight / ViewPort.height;
@@ -77,11 +76,11 @@ package effect
 							Shader3D.assembler.assemble(Context3DProgramType.FRAGMENT, fs));
 		}
 		
-		public function dispose():void {
+		override public function dispose():void {
+			super.dispose();
 			program.dispose();
 			program = null;
 			data = null;
-			_renderTarget = null;
 			if (texture0) texture0.dispose();
 			texture0 = null;
 		}
@@ -90,8 +89,8 @@ package effect
 		// getter/setters
 		///////////////////////////////////
 		
-		public function get renderTarget():RenderTarget {
-			return _renderTarget;
+		override public function get texture():TextureBase {
+			return texture0;
 		}
 		
 	}

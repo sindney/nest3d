@@ -4,6 +4,7 @@ package
 	import flash.display3D.Context3DTextureFormat;
 	
 	import nest.control.util.Primitives;
+	import nest.object.geom.Bound;
 	import nest.object.geom.Geometry;
 	import nest.object.Mesh;
 	import nest.object.Container3D;
@@ -33,7 +34,7 @@ package
 			var camera1:Camera3D = new Camera3D();
 			
 			process0 = new ContainerProcess(camera1, container0);
-			process0.meshProcess = new BasicMeshProcess();
+			process0.meshProcess = new MeshProcess();
 			process0.color = 0xff000000;
 			
 			process1 = new ContainerProcess(camera, container1);
@@ -51,6 +52,7 @@ package
 			mesh = new Mesh(Primitives.createBox(), null, shader0);
 			Geometry.setupGeometry(mesh.geom, true, false, false);
 			Geometry.uploadGeometry(mesh.geom, true, false, false, true);
+			Bound.calculate(mesh.bound, mesh.geom);
 			mesh.position.z = 400;
 			mesh.scale.setTo(100, 100, 100);
 			container0.addChild(mesh);
@@ -66,6 +68,7 @@ package
 			var mesh1:Mesh = new Mesh(Primitives.createBox(), Vector.<TextureResource>([material]), shader1);
 			Geometry.setupGeometry(mesh1.geom, true, false, true);
 			Geometry.uploadGeometry(mesh1.geom, true, false, true, true);
+			Bound.calculate(mesh1.bound, mesh1.geom);
 			mesh1.rotation.x = Math.PI * 1.5;
 			mesh1.position.z = 200;
 			mesh1.scale.setTo(100, 100, 100);

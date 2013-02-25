@@ -11,7 +11,6 @@ package nest.control.animation
 		private var _name:String;
 		
 		public var data:BitmapData;
-		// TODO: 注意mipmapping参数
 		public var mipmapping:Boolean = false;
 		public var index:int;
 		

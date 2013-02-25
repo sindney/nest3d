@@ -7,8 +7,6 @@ package effect
 	import flash.display3D.Context3DVertexBufferFormat;
 	import flash.display3D.Program3D;
 	
-	import nest.view.process.IRenderProcess;
-	import nest.view.process.RenderTarget;
 	import nest.view.shader.Shader3D;
 	import nest.view.ViewPort;
 	
@@ -16,9 +14,7 @@ package effect
 	 * Bloom
 	 * <p>Call comply() when threshold/maxIteration/blurX/blurY is changed.</p>
 	 */
-	public class Bloom implements IRenderProcess {
-		
-		private var _renderTarget:RenderTarget = new RenderTarget();
+	public class Bloom extends PostEffect {
 		
 		private var program1:Program3D;
 		private var program2:Program3D;
@@ -34,6 +30,7 @@ package effect
 		public var blurY:Number;
 		
 		public function Bloom(width:int = 512, height:int = 512, blurX:Number = 4, blurY:Number = 4, threshold:Number = 0.75) {
+			super();
 			var context3d:Context3D = ViewPort.context3d;
 			
 			program1 = context3d.createProgram();
@@ -48,9 +45,11 @@ package effect
 			
 			texture0 = context3d.createTexture(width, height, Context3DTextureFormat.BGRA, true);
 			texture1 = context3d.createTexture(width, height, Context3DTextureFormat.BGRA, true);
+			
+			comply();
 		}
 		
-		public function calculate():void {
+		override public function calculate():void {
 			var context3d:Context3D = ViewPort.context3d;
 			context3d.setRenderToTexture(texture1);
 			context3d.clear();
@@ -152,12 +151,12 @@ package effect
 							Shader3D.assembler.assemble(Context3DProgramType.FRAGMENT, fs2));
 		}
 		
-		public function dispose():void {
+		override public function dispose():void {
+			super.dispose();
 			program1.dispose();
 			program2.dispose();
 			data = null;
 			thresholds = null;
-			_renderTarget = null;
 			if (texture0) texture0.dispose();
 			texture0 = null;
 			if (texture1) texture1.dispose();
@@ -179,8 +178,8 @@ package effect
 			thresholds[3] = value;
 		}
 		
-		public function get renderTarget():RenderTarget {
-			return _renderTarget;
+		override public function get texture():TextureBase {
+			return texture0;
 		}
 		
 	}

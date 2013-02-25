@@ -11,9 +11,9 @@ package nest.view.process
 	import nest.view.ViewPort;
 	
 	/**
-	 * BasicMeshProcess
+	 * MeshProcess
 	 */
-	public class BasicMeshProcess implements IMeshProcess {
+	public class MeshProcess implements IMeshProcess {
 		
 		public function calculate(mesh:IMesh, pm:Matrix3D):void {
 			var context3d:Context3D = ViewPort.context3d;

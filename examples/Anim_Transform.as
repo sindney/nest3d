@@ -35,7 +35,7 @@ package
 			container = new Container3D();
 			
 			process0 = new ContainerProcess(camera, container);
-			process0.meshProcess = new BasicMeshProcess();
+			process0.meshProcess = new MeshProcess();
 			process0.color = 0xff000000;
 			
 			view.processes.push(process0);

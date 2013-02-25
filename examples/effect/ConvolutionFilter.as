@@ -7,9 +7,6 @@ package effect
 	import flash.display3D.Context3DVertexBufferFormat;
 	import flash.display3D.Program3D;
 	
-	import nest.view.process.EffectProcess;
-	import nest.view.process.IRenderProcess;
-	import nest.view.process.RenderTarget;
 	import nest.view.shader.Shader3D;
 	import nest.view.ViewPort;
 	
@@ -17,7 +14,7 @@ package effect
 	 * ConvolutionFilter
 	 * <p>Just need to call comply() once.</p>
 	 */
-	public class ConvolutionFilter implements IRenderProcess {													  
+	public class ConvolutionFilter extends PostEffect {													  
 		
 		public static function get EDGE():Vector.<Number> {
 			return Vector.<Number>([0, 0, 1, 0, -1, 0, -1, 4, -1, 0, -1, 0]);
@@ -35,8 +32,6 @@ package effect
 			return Vector.<Number>([0, 0, 1, -2, -1, 0, -1, 1, 1, 0, 1, 2]);
 		}
 		
-		private var _renderTarget:RenderTarget = new RenderTarget();
-		
 		private var program:Program3D;
 		
 		public var texture0:TextureBase;
@@ -44,6 +39,7 @@ package effect
 		public var kernel:Vector.<Number>;
 		
 		public function ConvolutionFilter(width:int = 512, height:int = 512, kernel:Vector.<Number> = null) {
+			super();
 			var context3d:Context3D = ViewPort.context3d;
 			
 			program = context3d.createProgram();
@@ -55,9 +51,11 @@ package effect
 			}
 			
 			texture0 = context3d.createTexture(width, height, Context3DTextureFormat.BGRA, true);
+			
+			comply();
 		}
 		
-		public function calculate():void {
+		override public function calculate():void {
 			var context3d:Context3D = ViewPort.context3d;
 			kernel[0] = 1 / ViewPort.width;
 			kernel[1] = 1 / ViewPort.height;
@@ -126,11 +124,11 @@ package effect
 							Shader3D.assembler.assemble(Context3DProgramType.FRAGMENT, fs));
 		}
 		
-		public function dispose():void {
+		override public function dispose():void {
+			super.dispose();
 			program.dispose();
 			program = null;
 			kernel = null;
-			_renderTarget = null;
 			if (texture0) texture0.dispose();
 			texture0 = null;
 		}
@@ -139,8 +137,8 @@ package effect
 		// getter/setters
 		///////////////////////////////////
 		
-		public function get renderTarget():RenderTarget {
-			return _renderTarget;
+		override public function get texture():TextureBase {
+			return texture0;
 		}
 		
 	}

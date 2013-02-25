@@ -24,7 +24,7 @@ package nest.view.process
 		protected var _container:IContainer3D;
 		
 		protected var _meshProcess:IMeshProcess;
-
+		
 		protected var _objects:Vector.<IMesh>;
 		protected var _alphaObjects:Vector.<IMesh>;
 		

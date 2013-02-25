@@ -7,8 +7,6 @@ package effect
 	import flash.display3D.Context3DVertexBufferFormat;
 	import flash.display3D.Program3D;
 	
-	import nest.view.process.IRenderProcess;
-	import nest.view.process.RenderTarget;
 	import nest.view.shader.Shader3D;
 	import nest.view.ViewPort;
 	
@@ -16,17 +14,16 @@ package effect
 	 * CellShader
 	 * <p>Just need to call comply() once.</p>
 	 */
-	public class CellShader implements IRenderProcess {
+	public class CellShader extends PostEffect {
 		
 		private var program:Program3D;
-		
-		private var _renderTarget:RenderTarget;
 		
 		public var texture0:TextureBase;
 		
 		public var colorLevel:Vector.<Number>;
 		
 		public function CellShader(width:int = 512, height:int = 512, redLevel:uint = 32, greenLevel:uint = 32, blueLevel:uint = 32, alphaLevel:uint = 32) {
+			super();
 			var context3d:Context3D = ViewPort.context3d;
 			
 			program = context3d.createProgram();
@@ -38,9 +35,11 @@ package effect
 			colorLevel[3] = alphaLevel;
 			
 			texture0 = context3d.createTexture(width, height, Context3DTextureFormat.BGRA, true);
+			
+			comply();
 		}
 		
-		public function calculate():void {
+		override public function calculate():void {
 			var context3d:Context3D = ViewPort.context3d;
 			if (_renderTarget.texture) {
 				context3d.setRenderToTexture(_renderTarget.texture, _renderTarget.enableDepthAndStencil, _renderTarget.antiAlias, _renderTarget.surfaceSelector);
@@ -73,11 +72,11 @@ package effect
 							Shader3D.assembler.assemble(Context3DProgramType.FRAGMENT, fs));
 		}
 		
-		public function dispose():void {
+		override public function dispose():void {
+			super.dispose();
 			program.dispose();
 			program = null;
 			colorLevel = null;
-			_renderTarget = null;
 			if (texture0) texture0.dispose();
 			texture0 = null;
 		}
@@ -86,8 +85,8 @@ package effect
 		// getter/setters
 		///////////////////////////////////
 		
-		public function get renderTarget():RenderTarget {
-			return _renderTarget;
+		override public function get texture():TextureBase {
+			return texture0;
 		}
 		
 	}

@@ -79,7 +79,7 @@ package nest.control.controller
 				
 				for each(mesh in containerProcess.objects) {
 					if (mesh.mouseEnabled) {
-						mesh.id = ++i;
+						mesh.parameters["id"] = ++i;
 						
 						context3d.setCulling(mesh.triangleCulling);
 						context3d.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 0, mesh.matrix, true);
@@ -101,7 +101,7 @@ package nest.control.controller
 				
 				for each(mesh in containerProcess.alphaObjects) {
 					if (mesh.mouseEnabled) {
-						mesh.id = ++i;
+						mesh.parameters["id"] = ++i;
 						
 						context3d.setCulling(mesh.triangleCulling);
 						context3d.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 0, mesh.matrix, true);
@@ -127,7 +127,7 @@ package nest.control.controller
 				
 				if (id != 0) {
 					for each(mesh in containerProcess.objects) {
-						if (mesh.id == id) {
+						if (mesh.parameters["id"] == id) {
 							if (target != mesh) {
 								if (target) target.dispatchEvent(new MouseEvent3D(MouseEvent3D.MOUSE_OUT));
 								type = MouseEvent3D.MOUSE_OVER;

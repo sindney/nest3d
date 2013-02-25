@@ -34,9 +34,6 @@ package nest.object
 		function get alphaTest():Boolean;
 		function set alphaTest(value:Boolean):void;
 		
-		function get id():uint;
-		function set id(value:uint):void;
-		
 		function get mouseEnabled():Boolean;
 		function set mouseEnabled(value:Boolean):void;
 		

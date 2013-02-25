@@ -42,41 +42,33 @@ package nest.view
 		}
 		
 		public static function uploadToTexture(resource:TextureResource, data:BitmapData, mipmapping:Boolean):void {
-			if (data) {
-				if (data != resource.bmd) {
-					if (resource.texture is CubeTexture || resource.width != data.width || resource.height != data.height) {
-						if (resource.texture) resource.texture.dispose();
-						resource.texture = ViewPort.context3d.createTexture(data.width, data.height, Context3DTextureFormat.BGRA, false);
-					}
-					mipmapping ? uploadWithMipmaps(resource.texture, data) : (resource.texture as Texture).uploadFromBitmapData(data);
-					resource.bmd = data;
-					resource.width = data.width;
-					resource.height = data.height;
+			if (data != resource.bmd) {
+				if (resource.texture is CubeTexture || resource.width != data.width || resource.height != data.height) {
+					if (resource.texture) resource.texture.dispose();
+					resource.texture = ViewPort.context3d.createTexture(data.width, data.height, Context3DTextureFormat.BGRA, false);
 				}
-			} else {
-				resource.dispose();
+				mipmapping ? uploadWithMipmaps(resource.texture, data) : (resource.texture as Texture).uploadFromBitmapData(data);
+				resource.bmd = data;
+				resource.width = data.width;
+				resource.height = data.height;
 			}
 		}
 		
 		public static function uploadToCubeTexture(resource:TextureResource, data:Vector.<BitmapData>):void {
-			if (data) {
-				if (data != resource.bmds) {
-					if (resource.texture is Texture || resource.width != data[0].width || resource.height != data[0].height) {
-						if (resource.texture) resource.texture.dispose();
-						resource.texture = ViewPort.context3d.createCubeTexture(data[0].width, Context3DTextureFormat.BGRA, false);
-					}
-					uploadWithMipmaps(resource.texture, data[0], 0);
-					uploadWithMipmaps(resource.texture, data[1], 1);
-					uploadWithMipmaps(resource.texture, data[2], 2);
-					uploadWithMipmaps(resource.texture, data[3], 3);
-					uploadWithMipmaps(resource.texture, data[4], 4);
-					uploadWithMipmaps(resource.texture, data[5], 5);
-					resource.bmds = data;
-					resource.width = data[0].width;
-					resource.height = data[1].height;
+			if (data != resource.bmds) {
+				if (resource.texture is Texture || resource.width != data[0].width || resource.height != data[0].height) {
+					if (resource.texture) resource.texture.dispose();
+					resource.texture = ViewPort.context3d.createCubeTexture(data[0].width, Context3DTextureFormat.BGRA, false);
 				}
-			} else {
-				resource.dispose();
+				uploadWithMipmaps(resource.texture, data[0], 0);
+				uploadWithMipmaps(resource.texture, data[1], 1);
+				uploadWithMipmaps(resource.texture, data[2], 2);
+				uploadWithMipmaps(resource.texture, data[3], 3);
+				uploadWithMipmaps(resource.texture, data[4], 4);
+				uploadWithMipmaps(resource.texture, data[5], 5);
+				resource.bmds = data;
+				resource.width = data[0].width;
+				resource.height = data[1].height;
 			}
 		}
 		
