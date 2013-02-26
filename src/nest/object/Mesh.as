@@ -30,6 +30,7 @@ package nest.object
 		protected var _alphaTest:Boolean = false;
 		protected var _mouseEnabled:Boolean = false;
 		protected var _ignoreRotation:Boolean = false;
+		protected var _ignorePosition:Boolean = false;
 		
 		public function Mesh(geom:Geometry, material:Vector.<TextureResource>, shader:Shader3D) {
 			super();
@@ -108,6 +109,14 @@ package nest.object
 			_mouseEnabled = value;
 		}
 		
+		public function get triangleCulling():String {
+			return _triangleCulling;
+		}
+		
+		public function set triangleCulling(value:String):void {
+			_triangleCulling = value;
+		}
+		
 		public function get ignoreRotation():Boolean {
 			return _ignoreRotation;
 		}
@@ -116,12 +125,12 @@ package nest.object
 			_ignoreRotation = value;
 		}
 		
-		public function get triangleCulling():String {
-			return _triangleCulling;
+		public function get ignorePosition():Boolean {
+			return _ignorePosition;
 		}
 		
-		public function set triangleCulling(value:String):void {
-			_triangleCulling = value;
+		public function set ignorePosition(value:Boolean):void {
+			_ignorePosition = value;
 		}
 		
 	}

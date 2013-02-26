@@ -61,24 +61,32 @@ package effect
 			camera.position.copyFrom(camera.matrix.transformVector(p));
 			camera.recompose();
 			
-			var pm:Matrix3D = camera.invertMatrix.clone();
-			pm.append(camera.pm);
+			var pm0:Matrix3D = camera.invertMatrix.clone();
+			pm0.append(camera.pm);
 			
 			var pm1:Matrix3D = camera.invertMatrix.clone();
-			var comps:Vector.<Vector3D> = pm1.decompose();
-			comps[1].setTo(0, 0, 0);
-			pm1.recompose(comps);
+			var components:Vector.<Vector3D> = pm1.decompose();
+			components[0].setTo(0, 0, 0);
+			pm1.recompose(components);
 			pm1.append(camera.pm);
+			
+			var pm2:Matrix3D = camera.invertMatrix.clone();
+			components = pm2.decompose();
+			components[1].setTo(0, 0, 0);
+			pm2.recompose(components);
+			pm2.append(camera.pm);
+			
+			var pm3:Matrix3D = camera.pm;
 			
 			var mesh:IMesh;
 			for each(mesh in containerProcess.objects) {
-				containerProcess.meshProcess.calculate(mesh, mesh.ignoreRotation ? pm1 : pm);
+				containerProcess.drawMesh(mesh, mesh.ignorePosition ? (mesh.ignoreRotation ? pm3 : pm1) : (mesh.ignoreRotation ? pm2 : pm0));
 			}
 			
 			context3d.setBlendFactors(Context3DBlendFactor.SOURCE_ALPHA, Context3DBlendFactor.ONE_MINUS_SOURCE_ALPHA);
 			
 			for each(mesh in containerProcess.alphaObjects) {
-				containerProcess.meshProcess.calculate(mesh, mesh.ignoreRotation ? pm1 : pm);
+				containerProcess.drawMesh(mesh, mesh.ignorePosition ? (mesh.ignoreRotation ? pm3 : pm1) : (mesh.ignoreRotation ? pm2 : pm0));
 			}
 			
 			context3d.setBlendFactors(Context3DBlendFactor.ONE, Context3DBlendFactor.ZERO);

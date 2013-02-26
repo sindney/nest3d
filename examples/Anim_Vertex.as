@@ -4,6 +4,7 @@ package
 	import nest.control.animation.VertexModifier;
 	import nest.control.controller.AnimationController;
 	import nest.control.parser.ParserMD2;
+	import nest.object.geom.Bound;
 	import nest.object.geom.Geometry;
 	import nest.object.Mesh;
 	import nest.object.Container3D;
@@ -35,7 +36,6 @@ package
 			container = new Container3D();
 			
 			process0 = new ContainerProcess(camera, container);
-			process0.meshProcess = new MeshProcess();
 			process0.color = 0xff000000;
 			
 			view.processes.push(process0);
@@ -55,6 +55,7 @@ package
 			var mesh:Mesh = new Mesh(parser.geom, material, shader);
 			Geometry.setupGeometry(mesh.geom, true, false, true);
 			Geometry.uploadGeometry(mesh.geom, true, false, true, true);
+			Bound.calculate(mesh.bound, mesh.geom);
 			mesh.rotation.x = -Math.PI / 2;
 			mesh.rotation.y = Math.PI / 2;
 			container.addChild(mesh);

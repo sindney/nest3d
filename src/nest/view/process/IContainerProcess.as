@@ -1,5 +1,7 @@
 package nest.view.process 
 {
+	import flash.geom.Matrix3D;
+	
 	import nest.object.IContainer3D;
 	import nest.object.IMesh;
 	import nest.view.Camera3D;
@@ -9,11 +11,10 @@ package nest.view.process
 	 */
 	public interface IContainerProcess extends IRenderProcess {
 		
+		function drawMesh(mesh:IMesh, pm:Matrix3D):void;
+		
 		function get container():IContainer3D;
 		function set container(value:IContainer3D):void;
-		
-		function get meshProcess():IMeshProcess;
-		function set meshProcess(value:IMeshProcess):void;
 		
 		function get objects():Vector.<IMesh>;
 		

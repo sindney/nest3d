@@ -63,7 +63,6 @@ package
 			container = new Container3D();
 			
 			process0 = new ContainerProcess(camera, container);
-			process0.meshProcess = new MeshProcess();
 			process0.color = 0xff000000;
 			
 			view.processes.push(process0);
@@ -130,6 +129,7 @@ package
 			Bound.calculate(skybox.bound, skybox.geom);
 			skybox.cliping = false;
 			skybox.scale.setTo(10000, 10000, 10000);
+			skybox.ignorePosition = true;
 			container.addChild(skybox);
 			
 			camera.position.z = -400;
@@ -233,8 +233,6 @@ package
 			cameraPos.data[0] = camera.position.x;
 			cameraPos.data[1] = camera.position.y;
 			cameraPos.data[2] = camera.position.z;
-			skybox.position.copyFrom(camera.position);
-			skybox.recompose();
 			view.diagram.message = "Objects: " + process0.numObjects + "/" + process0.container.numChildren + 
 									"\nVertices: " + process0.numVertices + 
 									"\nTriangles: " + process0.numTriangles;

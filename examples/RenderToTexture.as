@@ -34,11 +34,9 @@ package
 			var camera1:Camera3D = new Camera3D();
 			
 			process0 = new ContainerProcess(camera1, container0);
-			process0.meshProcess = new MeshProcess();
 			process0.color = 0xff000000;
 			
 			process1 = new ContainerProcess(camera, container1);
-			process1.meshProcess = process0.meshProcess;
 			process1.color = 0xffffffff;
 			
 			view.processes.push(process0, process1);

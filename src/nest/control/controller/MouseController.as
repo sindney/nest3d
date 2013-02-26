@@ -58,22 +58,27 @@ package nest.control.controller
 				var raw:Vector.<Number> = camera.pm.rawData.concat();
 				raw[8] = -mouseX * 2 / width;
 				raw[9] = mouseY * 2 / height;
-				var temp:Matrix3D = new Matrix3D(raw);
+				var pm3:Matrix3D = new Matrix3D(raw);
 				
-				var pm:Matrix3D = camera.invertMatrix.clone();
-				pm.append(temp);
+				var pm0:Matrix3D = camera.invertMatrix.clone();
+				pm0.append(pm3);
 				
 				var pm1:Matrix3D = camera.invertMatrix.clone();
-				var comps:Vector.<Vector3D> = pm1.decompose();
-				comps[1].setTo(0, 0, 0);
-				pm1.recompose(comps);
-				pm1.append(temp);
+				var components:Vector.<Vector3D> = pm1.decompose();
+				components[0].setTo(0, 0, 0);
+				pm1.recompose(components);
+				pm1.append(pm3);
+				
+				var pm2:Matrix3D = camera.invertMatrix.clone();
+				components = pm2.decompose();
+				components[1].setTo(0, 0, 0);
+				pm2.recompose(components);
+				pm2.append(pm3);
 				
 				context3d.setRenderToBackBuffer();
 				context3d.clear();
 				
 				var bmd:BitmapData = new BitmapData(1, 1, true, 0);
-				var components:Vector.<Vector3D>;
 				var mesh:IMesh;
 				var i:int = 0;
 				
@@ -84,7 +89,7 @@ package nest.control.controller
 						context3d.setCulling(mesh.triangleCulling);
 						context3d.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 0, mesh.matrix, true);
 						context3d.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 4, mesh.worldMatrix, true);
-						context3d.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 8, mesh.ignoreRotation ? pm1 : pm, true);
+						context3d.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 8, mesh.ignorePosition ? (mesh.ignoreRotation ? pm3 : pm1) : (mesh.ignoreRotation ? pm2 : pm0), true);
 						context3d.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, 0, Vector.<Number>([0, ((i >> 8) & 0xff) / 255, (i & 0xff) / 255, 1]));
 						
 						context3d.setVertexBufferAt(0, mesh.geom.vertexBuffer, 0, Context3DVertexBufferFormat.FLOAT_3);
@@ -106,7 +111,7 @@ package nest.control.controller
 						context3d.setCulling(mesh.triangleCulling);
 						context3d.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 0, mesh.matrix, true);
 						context3d.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 4, mesh.worldMatrix, true);
-						context3d.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 8, mesh.ignoreRotation ? pm1 : pm, true);
+						context3d.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 8, mesh.ignorePosition ? (mesh.ignoreRotation ? pm3 : pm1) : (mesh.ignoreRotation ? pm2 : pm0), true);
 						context3d.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, 0, Vector.<Number>([0, ((i >> 8) & 0xff) / 255, (i & 0xff) / 255, 1]));
 						
 						context3d.setVertexBufferAt(0, mesh.geom.vertexBuffer, 0, Context3DVertexBufferFormat.FLOAT_3);
@@ -127,7 +132,7 @@ package nest.control.controller
 				
 				if (id != 0) {
 					for each(mesh in containerProcess.objects) {
-						if (mesh.parameters["id"] == id) {
+						if (mesh.mouseEnabled && mesh.parameters["id"] == id) {
 							if (target != mesh) {
 								if (target) target.dispatchEvent(new MouseEvent3D(MouseEvent3D.MOUSE_OUT));
 								type = MouseEvent3D.MOUSE_OVER;
