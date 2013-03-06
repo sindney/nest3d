@@ -9,15 +9,19 @@ package nest.control.animation
 		private var _time:Number;
 		private var _name:String;
 		
-		public var vertices:Vector.<Number>;
-		public var normals:Vector.<Number>;
+		// TODO: 更新bounds数组
+		public var bounds:Vector.<Number> = new Vector.<Number>(6, true);
+		public var vertices:Vector.<Number> = new Vector.<Number>();
+		public var normals:Vector.<Number> = new Vector.<Number>();
 		
 		public function clone():IKeyFrame {
 			var result:VertexKeyFrame = new VertexKeyFrame();
 			result.time = _time;
 			result.name = _name;
-			result.vertices = vertices;
-			result.normals = normals;
+			var i:int, j:int = vertices.length;
+			for (i = 0; i < 6; i++) result.bounds[i] = bounds[i];
+			for (i = 0; i < j; i++) result.vertices[i] = vertices[i];
+			for (i = 0; i < j; i++) result.normals[i] = normals[i];
 			return result;
 		}
 		

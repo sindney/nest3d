@@ -56,6 +56,10 @@ package nest.object.geom
 			geom.indexBuffer = ViewPort.context3d.createIndexBuffer(geom.numIndices);
 		}
 		
+		public static function setupGeometries(geoms:Vector.<Geometry>, vertex:Boolean = true, normal:Boolean = true, uv:Boolean = true):void {
+			for each(var geom:Geometry in geoms) setupGeometry(geom, vertex, normal, uv);
+		}
+		
 		public static function uploadGeometry(geom:Geometry, vertex:Boolean = true, normal:Boolean = true, uv:Boolean = true, index:Boolean = true):void {
 			var rawVertex:Vector.<Number>;
 			var	rawNormal:Vector.<Number>;
@@ -135,6 +139,10 @@ package nest.object.geom
 			if (uv) geom.uvBuffer.uploadFromVector(rawUV, 0, size);
 		}
 		
+		public static function uploadGeometries(geoms:Vector.<Geometry>, vertex:Boolean = true, normal:Boolean = true, uv:Boolean = true, index:Boolean = true):void {
+			for each(var geom:Geometry in geoms) uploadGeometry(geom, vertex, normal, uv, index);
+		}
+		
 		public static function calculateNormal(vertices:Vector.<Vertex>, triangles:Vector.<Triangle>):void {
 			var i:int, j:int;
 			var tri:Triangle;
@@ -175,6 +183,8 @@ package nest.object.geom
 				v1.nz *= mag;
 			}
 		}
+		
+		public var name:String;
 		
 		public var vertexBuffer:VertexBuffer3D;
 		public var normalBuffer:VertexBuffer3D;

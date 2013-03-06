@@ -17,6 +17,9 @@ package nest.object.geom
 		public var ny:Number = 0;
 		public var nz:Number = 0;
 		
+		public var indices:Vector.<uint>;
+		public var weights:Vector.<Number>;
+		
 		public function Vertex(x:Number = 0, y:Number = 0, z:Number = 0, u:Number = 0, v:Number = 0) {
 			this.x = x;
 			this.y = y;

@@ -5,6 +5,7 @@ package
 	import nest.control.util.Primitives;
 	import nest.control.partition.OcNode;
 	import nest.control.partition.OcTree;
+	import nest.object.geom.Bound;
 	import nest.object.geom.Geometry;
 	import nest.object.Mesh;
 	import nest.object.Container3D;
@@ -38,18 +39,20 @@ package
 			var shader:Shader3D = new Shader3D();
 			shader.constantParts.push(new VectorShaderPart(Context3DProgramType.FRAGMENT, 0, Vector.<Number>([1, 1, 1, 1])));
 			shader.comply("m44 vt0, va0, vc0\nm44 vt0, vt0, vc4\n" + 
-							"m44 op, vt0, vc8\n",
-							"mov oc, fc0\n");
-			
-			var mesh:Mesh;
+							"m44 op, vt0, vc8\n", "mov oc, fc0\n");
 			
 			var offsetX:Number = 0, offsetY:Number = 0, offsetZ:Number = 0;
+			var mesh:Mesh;
 			
 			var i:int, j:int, k:int, l:int = 15, m:int = l * 25;
 			for (i = 0; i < l; i++) {
 				for (j = 0; j < l; j++) {
 					for (k = 0; k < l; k++) {
-						mesh = new Mesh(geom, null, shader);
+						mesh = new Mesh();
+						mesh.geometries.push(geom);
+						mesh.materials.push(null);
+						mesh.shaders.push(shader);
+						Bound.calculate(mesh.bound, mesh.geometries);
 						mesh.position.setTo(i * 50 - m + offsetX, j * 50 - m + offsetY, k * 50 - m + offsetZ);
 						mesh.scale.setTo(10, 10, 10);
 						container.addChild(mesh);
@@ -60,14 +63,7 @@ package
 			container.partition = new OcTree();
 			(container.partition as OcTree).create(container, 4, l * 50, offsetX, offsetY, offsetZ);
 			
-			camera.position.z = -200;
 			camera.recompose();
-		}
-		
-		override public function loop():void {
-			view.diagram.message = "Objects: " + process0.numObjects + "/" + process0.container.numChildren + 
-									"\nVertices: " + process0.numVertices + 
-									"\nTriangles: " + process0.numTriangles;
 		}
 		
 	}

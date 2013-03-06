@@ -47,14 +47,16 @@ package
 			shader.comply("m44 vt0, va0, vc0\nm44 vt0, vt0, vc4\n" + 
 							"m44 op, vt0, vc8\n",
 							"mov oc, fc0\n");
-			var mesh:Mesh = new Mesh(geom, null, shader);
+			var mesh:Mesh = new Mesh();
+			mesh.geometries.push(geom);
+			mesh.materials.push(null);
+			mesh.shaders.push(shader);
 			mesh.orientation = Orientation3D.QUATERNION;
 			mesh.rotation.w = 1;
 			mesh.scale.setTo(10, 10, 10);
 			container.addChild(mesh);
 			
-			var track:AnimationTrack = new AnimationTrack();
-			track.frames = new Vector.<IKeyFrame>();
+			var track:AnimationTrack = new AnimationTrack(new Vector.<IKeyFrame>());
 			track.modifier = new TransformModifier();
 			track.target = mesh;
 			track.position = 1;
@@ -100,7 +102,7 @@ package
 		
 		override public function loop():void {
 			anim_controller.calculate();
-			view.diagram.message = anim_controller.time.toFixed(2);
+			view.diagram.message.text = anim_controller.time.toFixed(2);
 		}
 		
 	}

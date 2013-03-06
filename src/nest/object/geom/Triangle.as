@@ -10,7 +10,7 @@ package nest.object.geom
 		public var uvs:Vector.<Number> = new Vector.<Number>(6, true);
 		
 		public function Triangle(index0:uint, index1:uint, index2:uint, 
-								u0:int = 0, v0:int = 0, u1:int = 0, v1:int = 0, u2:int = 0, v2:int = 0) {
+								u0:Number = 0, v0:Number = 0, u1:Number = 0, v1:Number = 0, u2:Number = 0, v2:Number = 0) {
 			indices[0] = index0;
 			indices[1] = index1;
 			indices[2] = index2;

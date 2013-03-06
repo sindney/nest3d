@@ -25,7 +25,7 @@ package nest.control.parser
 			
 		}
 		
-		public function parse(model:ByteArray, scale:Number = 1):Geometry {
+		public function parse(model:ByteArray):Geometry {
 			var vertices:Vector.<Number> = new Vector.<Number>();
 			var normals:Vector.<Number> = new Vector.<Number>();
 			var uvs:Vector.<Number> = new Vector.<Number>();
@@ -54,7 +54,7 @@ package nest.control.parser
 				switch(words[0]) {
 					case VERTEX:
 						if (data[0] == BLANK || data[0] == BLANK1) data = data.slice(1);
-						vertices.push(Number(data[0]) * scale, Number(data[1]) * scale, Number(data[2]) * scale);
+						vertices.push(Number(data[0]), Number(data[1]), Number(data[2]));
 						break;
 					case NORMAL:
 						if (data[0] == BLANK || data[0] == BLANK1) data = data.slice(1);

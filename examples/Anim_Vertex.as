@@ -41,7 +41,7 @@ package
 			view.processes.push(process0);
 			
 			var parser:ParserMD2 = new ParserMD2();
-			parser.parse(new model(), 1);
+			parser.parse(new model());
 			
 			var material:Vector.<TextureResource> = new Vector.<TextureResource>();
 			material.push(new TextureResource(0, null));
@@ -52,16 +52,20 @@ package
 							"m44 op, vt0, vc8\nmov v0, va2\n", 
 							"tex oc, v0, fs0 <2d,linear,mipnone>\n");
 			
-			var mesh:Mesh = new Mesh(parser.geom, material, shader);
-			Geometry.setupGeometry(mesh.geom, true, false, true);
-			Geometry.uploadGeometry(mesh.geom, true, false, true, true);
-			Bound.calculate(mesh.bound, mesh.geom);
+			var mesh:Mesh = new Mesh();
+			mesh.geometries.push(parser.geom);
+			mesh.materials.push(material);
+			mesh.shaders.push(shader);
+			Geometry.setupGeometry(parser.geom, true, false, true);
+			Geometry.uploadGeometry(parser.geom, true, false, true, true);
+			Bound.calculate(mesh.bound, mesh.geometries);
 			mesh.rotation.x = -Math.PI / 2;
 			mesh.rotation.y = Math.PI / 2;
 			container.addChild(mesh);
 			
 			var track:AnimationTrack = parser.track;
 			track.modifier = new VertexModifier();
+			track.parameters[VertexModifier.GEOM_INDEX] = 0;
 			track.target = mesh;
 			track.enabled = true;
 			
@@ -80,7 +84,7 @@ package
 		
 		override public function loop():void {
 			anim_controller.calculate();
-			view.diagram.message = anim_controller.time.toFixed(2);
+			view.diagram.message.text = anim_controller.time.toFixed(2);
 		}
 		
 	}

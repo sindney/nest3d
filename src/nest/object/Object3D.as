@@ -14,25 +14,19 @@ package nest.object
 		
 		protected var _orientation:String = Orientation3D.EULER_ANGLES;
 		
-		protected var _components:Vector.<Vector3D>;
+		protected var _components:Vector.<Vector3D> = new Vector.<Vector3D>(3, true);
 		
-		protected var _matrix:Matrix3D;
-		protected var _invertMatrix:Matrix3D;
-		protected var _worldMatrix:Matrix3D;
-		protected var _invertWorldMatrix:Matrix3D;
+		protected var _matrix:Matrix3D = new Matrix3D();
+		protected var _invertMatrix:Matrix3D = new Matrix3D();
+		protected var _worldMatrix:Matrix3D = new Matrix3D();
+		protected var _invertWorldMatrix:Matrix3D = new Matrix3D();
 		
 		protected var _parent:IContainer3D;
 		
 		public function Object3D() {
-			_components = new Vector.<Vector3D>(3, true);
 			_components[0] = new Vector3D();
 			_components[1] = new Vector3D();
 			_components[2] = new Vector3D(1, 1, 1, 1);
-			
-			_matrix = new Matrix3D();
-			_invertMatrix = new Matrix3D();
-			_worldMatrix = new Matrix3D();
-			_invertWorldMatrix = new Matrix3D();
 		}
 		
 		/**

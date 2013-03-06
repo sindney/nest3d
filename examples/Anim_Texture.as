@@ -5,6 +5,7 @@ package
 	import nest.control.animation.TextureModifier;
 	import nest.control.controller.AnimationController;
 	import nest.control.util.Primitives;
+	import nest.object.geom.Bound;
 	import nest.object.geom.Geometry;
 	import nest.object.Mesh;
 	import nest.object.Container3D;
@@ -36,8 +37,10 @@ package
 			
 			view.processes.push(process0);
 			
-			var track:AnimationTrack = TextureResource.getTrackFromSpriteSheet(0, new data().bitmapData, false, 96, 128, 0, 10);
+			var track:AnimationTrack = TextureResource.getTrackFromSpriteSheet(new data().bitmapData, false, 96, 128, 0, 10);
 			track.modifier = new TextureModifier();
+			track.parameters[TextureModifier.MATERIAL_INDEX] = 0;
+			track.parameters[TextureModifier.TEXTURE_INDEX] = 0;
 			track.enabled = true;
 			
 			var material:Vector.<TextureResource> = new Vector.<TextureResource>();
@@ -49,9 +52,13 @@ package
 							"m44 op, vt0, vc8\nmov v0, va2\n", 
 							"tex ft0, v0, fs0 <2d,linear,mipnone>\nkil ft0.w\nmov oc, ft0\n");
 			
-			var mesh:Mesh = new Mesh(Primitives.createPlane(), material, shader);
-			Geometry.setupGeometry(mesh.geom, true, false, true);
-			Geometry.uploadGeometry(mesh.geom, true, false, true, true);
+			var mesh:Mesh = new Mesh();
+			mesh.geometries.push(Primitives.createPlane());
+			mesh.materials.push(material);
+			mesh.shaders.push(shader);
+			Geometry.setupGeometry(mesh.geometries[0], true, false, true);
+			Geometry.uploadGeometry(mesh.geometries[0], true, false, true, true);
+			Bound.calculate(mesh.bound, mesh.geometries);
 			mesh.ignoreRotation = true;
 			mesh.scale.setTo(100, 100, 100);
 			container.addChild(mesh);
@@ -71,7 +78,7 @@ package
 		
 		override public function loop():void {
 			anim_controller.calculate();
-			view.diagram.message = anim_controller.time.toFixed(2);
+			view.diagram.message.text = anim_controller.time.toFixed(2);
 		}
 	}
 

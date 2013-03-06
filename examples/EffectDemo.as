@@ -47,24 +47,26 @@ package
 			parser.parse(new model());
 			
 			mesh = parser.objects[0];
-			Geometry.setupGeometry(mesh.geom, true, false, true);
-			Geometry.uploadGeometry(mesh.geom, true, false, true, true);
-			Bound.calculate(mesh.bound, mesh.geom);
+			Geometry.setupGeometries(mesh.geometries, true, false, true);
+			Geometry.uploadGeometries(mesh.geometries, true, false, true, true);
+			Bound.calculate(mesh.bound, mesh.geometries);
 			mesh.scale.setTo(30, 30, 30);
 			mesh.rotation.y = Math.PI;
 			container.addChild(mesh);
 			
 			parser.dispose();
 			
-			mesh.material = new Vector.<TextureResource>();
+			var material:Vector.<TextureResource> = new Vector.<TextureResource>();
 			var diffuse:TextureResource = new TextureResource(0, null);
 			TextureResource.uploadToTexture(diffuse, new bitmap_diffuse().bitmapData, false);
-			mesh.material.push(diffuse);
+			material.push(diffuse);
+			mesh.materials.push(material);
 			
-			mesh.shader = new Shader3D();
-			mesh.shader.comply("m44 vt0, va0, vc0\nm44 vt0, vt0, vc4\n" + 
+			var shader:Shader3D = new Shader3D();
+			shader.comply("m44 vt0, va0, vc0\nm44 vt0, vt0, vc4\n" + 
 								"m44 op, vt0, vc8\nmov v0, va2\n", 
 								"tex oc, v0, fs0 <2d,linear,mipnone>\n");
+			mesh.shaders.push(shader);
 			
 			camera.position.z = -400;
 			camera.recompose();
@@ -92,7 +94,7 @@ package
 				flag++;
 			} else {
 				flag = 0;
-				if (index > effects.length - 1) {
+				if (index > effects.length - 2) {
 					index = 0;
 				} else {
 					index++;
@@ -101,7 +103,7 @@ package
 				process0.renderTarget.texture = pe.texture;
 				view.processes[1] = pe;
 			}
-			view.diagram.message = "Time: " + flag + "\n" + getQualifiedClassName(view.processes[1]);
+			view.diagram.message.text = "Time: " + flag + "\n" + getQualifiedClassName(view.processes[1]);
 		}
 		
 	}

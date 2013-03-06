@@ -28,7 +28,7 @@ package nest.control.parser
 			track = null;
 		}
 		
-		public function parse(model:ByteArray, scale:Number = 1):void {
+		public function parse(model:ByteArray):void {
 			geom = null;
 			track = null;
 			
@@ -85,8 +85,7 @@ package nest.control.parser
 			var vertices:Vector.<Vertex> = new Vector.<Vertex>(num_vertices, true);
 			var uvs:Vector.<Number> = new Vector.<Number>(num_uvs * 2, true);
 			var triangles:Vector.<Triangle> = new Vector.<Triangle>(num_triangles, true);
-			var vertexTrack:AnimationTrack = new AnimationTrack();
-			vertexTrack.frames = new Vector.<IKeyFrame>();
+			var vertexTrack:AnimationTrack = new AnimationTrack(new Vector.<IKeyFrame>());
 			
 			//get texture name
 			model.position = offset_skins;
@@ -170,12 +169,10 @@ package nest.control.parser
 				frame = new VertexKeyFrame();
 				frame.name = name;
 				frame.time = i;
-				frame.vertices = new Vector.<Number>(num_vertices * 3, true);
-				frame.normals = new Vector.<Number>(num_vertices * 3, true);
 				for (j = 0, k = 0; j < num_vertices; j++, k += 3) {
-					frame.vertices[k] = (sx * model.readUnsignedByte() + tx) * scale;
-					frame.vertices[k + 1] = (sy * model.readUnsignedByte() + ty) * scale;
-					frame.vertices[k + 2] = (sz * model.readUnsignedByte() + tz) * scale;
+					frame.vertices[k] = (sx * model.readUnsignedByte() + tx);
+					frame.vertices[k + 1] = (sy * model.readUnsignedByte() + ty);
+					frame.vertices[k + 2] = (sz * model.readUnsignedByte() + tz);
 					frame.normals[k] = frame.normals[k + 1] = frame.normals[k + 2] = 0;
 					model.readUnsignedByte();
 				}

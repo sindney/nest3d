@@ -47,10 +47,13 @@ package
 							"m44 op, vt0, vc8\n",
 							"mov oc, fc0\n");
 			
-			mesh = new Mesh(Primitives.createBox(), null, shader0);
-			Geometry.setupGeometry(mesh.geom, true, false, false);
-			Geometry.uploadGeometry(mesh.geom, true, false, false, true);
-			Bound.calculate(mesh.bound, mesh.geom);
+			mesh = new Mesh();
+			mesh.geometries.push(Primitives.createBox());
+			mesh.materials.push(null);
+			mesh.shaders.push(shader0);
+			Geometry.setupGeometry(mesh.geometries[0], true, false, false);
+			Geometry.uploadGeometry(mesh.geometries[0], true, false, false, true);
+			Bound.calculate(mesh.bound, mesh.geometries);
 			mesh.position.z = 400;
 			mesh.scale.setTo(100, 100, 100);
 			container0.addChild(mesh);
@@ -63,10 +66,13 @@ package
 							"m44 op, vt0, vc8\nmov v0, va2\n",
 							"tex oc, v0, fs0 <2d,linear,mipnone>\n");
 			
-			var mesh1:Mesh = new Mesh(Primitives.createBox(), Vector.<TextureResource>([material]), shader1);
-			Geometry.setupGeometry(mesh1.geom, true, false, true);
-			Geometry.uploadGeometry(mesh1.geom, true, false, true, true);
-			Bound.calculate(mesh1.bound, mesh1.geom);
+			var mesh1:Mesh = new Mesh();
+			mesh1.geometries.push(Primitives.createBox());
+			mesh1.materials.push(Vector.<TextureResource>([material]));
+			mesh1.shaders.push(shader1);
+			Geometry.setupGeometries(mesh1.geometries, true, false, true);
+			Geometry.uploadGeometries(mesh1.geometries, true, false, true, true);
+			Bound.calculate(mesh1.bound, mesh1.geometries);
 			mesh1.rotation.x = Math.PI * 1.5;
 			mesh1.position.z = 200;
 			mesh1.scale.setTo(100, 100, 100);
@@ -78,7 +84,6 @@ package
 		private var mesh:Mesh;
 		
 		override public function loop():void {
-			view.diagram.message = "Objects: " + (process0.numObjects + process1.numObjects) + "/" + (process0.container.numChildren + process1.container.numChildren);
 			mesh.rotation.y += 0.01;
 			mesh.recompose();
 		}

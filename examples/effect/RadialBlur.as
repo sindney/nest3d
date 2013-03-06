@@ -6,9 +6,9 @@ package effect
 	import flash.display3D.Context3DTextureFormat;
 	import flash.display3D.Context3DVertexBufferFormat;
 	import flash.display3D.Program3D;
-	import nest.view.TextureResource;
 	
 	import nest.view.shader.Shader3D;
+	import nest.view.TextureResource;
 	import nest.view.ViewPort;
 	
 	/**

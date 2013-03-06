@@ -12,7 +12,6 @@ package nest.control.animation
 		
 		public var data:BitmapData;
 		public var mipmapping:Boolean = false;
-		public var index:int;
 		
 		public function clone():IKeyFrame {
 			var result:TextureKeyFrame = new TextureKeyFrame();
@@ -20,7 +19,6 @@ package nest.control.animation
 			result.name = _name;
 			result.data = data;
 			result.mipmapping = mipmapping;
-			result.index = index;
 			return result;
 		}
 		

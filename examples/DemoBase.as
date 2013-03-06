@@ -41,6 +41,8 @@ package
 			
 			view = new ViewPort(stage3d.context3D, new Vector.<IRenderProcess>());
 			view.configure(stage.stageWidth, stage.stageHeight);
+			view.diagram.addEventListener(MouseEvent.MOUSE_OVER, onMouseOver);
+			view.diagram.addEventListener(MouseEvent.MOUSE_OUT, onMouseOut);
 			addChild(view.diagram);
 			
 			camera = new Camera3D();
@@ -54,13 +56,29 @@ package
 			stage.addEventListener(Event.RESIZE, onResize);
 			stage.addEventListener(Event.ACTIVATE, onStageActived);
 			stage.addEventListener(Event.DEACTIVATE, onStageDeactived);
+			stage.addEventListener(MouseEvent.MOUSE_DOWN, onMouseDown);
+			onResize(null);
+			onEnterFrame(null);
+		}
+		
+		private function onMouseDown(e:MouseEvent):void {
+			stage.removeEventListener(MouseEvent.MOUSE_DOWN, onMouseDown);
 			stage.addEventListener(Event.ENTER_FRAME, onEnterFrame);
+		}
+		
+		private function onMouseOut(e:MouseEvent):void {
+			controller.keyboardEnabled = true;
+			controller.mouseEnabled = true;
+		}
+		
+		private function onMouseOver(e:MouseEvent):void {
+			controller.keyboardEnabled = false;
+			controller.mouseEnabled = false;
 		}
 		
 		protected function onStageDeactived(e:Event):void {
 			if (actived) {
 				stage.removeEventListener(Event.ENTER_FRAME, onEnterFrame);
-				view.diagram.message = "Paused ... ";
 				actived = false;
 			}
 		}

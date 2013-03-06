@@ -1,10 +1,10 @@
 package nest.object
 {
 	import flash.display3D.Context3DTriangleFace;
-	import flash.utils.Dictionary;
 	
 	import nest.object.geom.Bound;
 	import nest.object.geom.Geometry;
+	import nest.object.geom.SkinInfo;
 	import nest.view.shader.Shader3D;
 	import nest.view.TextureResource;
 	
@@ -13,16 +13,13 @@ package nest.object
 	 */
 	public class Mesh extends Object3D implements IMesh {
 		
-		protected var _geom:Geometry;
+		protected var _geometries:Vector.<Geometry> = new Vector.<Geometry>();
+		protected var _materials:Vector.<Vector.<TextureResource>> = new Vector.<Vector.<TextureResource>>();
+		protected var _shaders:Vector.<Shader3D> = new Vector.<Shader3D>();
 		
-		protected var _material:Vector.<TextureResource>;
+		protected var _skinInfo:SkinInfo;
 		
-		protected var _shader:Shader3D;
-		
-		protected var _bound:Bound;
-		
-		protected var _parameters:Dictionary;
-		
+		protected var _bound:Bound = new Bound();
 		protected var _triangleCulling:String = Context3DTriangleFace.BACK;
 		
 		protected var _visible:Boolean = true;
@@ -31,50 +28,61 @@ package nest.object
 		protected var _mouseEnabled:Boolean = false;
 		protected var _ignoreRotation:Boolean = false;
 		protected var _ignorePosition:Boolean = false;
+		protected var _id:uint = 0;
 		
-		public function Mesh(geom:Geometry, material:Vector.<TextureResource>, shader:Shader3D) {
-			super();
-			_geom = geom;
-			_material = material;
-			_shader = shader;
-			_bound = new Bound();
-			_parameters = new Dictionary();
+		public function dispose():void {
+			for each(var geom:Geometry in _geometries) geom.dispose();
+			_geometries = null;
+			for each(var mats:Vector.<TextureResource> in _materials) {
+				for each(var mat:TextureResource in mats) {
+					mat.dispose();
+				}
+			}
+			_materials = null;
+			for each(var shader:Shader3D in _shaders) shader.dispose();
+			_shaders = null;
+			_skinInfo = null;
+			_bound = null;
 		}
 		
 		///////////////////////////////////
 		// getter/setters
 		///////////////////////////////////
 		
-		public function get geom():Geometry {
-			return _geom;
+		public function get geometries():Vector.<Geometry> {
+			return _geometries;
 		}
 		
-		public function set geom(value:Geometry):void {
-			_geom = value;
+		public function set geometries(value:Vector.<Geometry>):void {
+			_geometries = value;
 		}
 		
-		public function get material():Vector.<TextureResource> {
-			return _material;
+		public function get materials():Vector.<Vector.<TextureResource>> {
+			return _materials;
 		}
 		
-		public function set material(value:Vector.<TextureResource>):void {
-			_material = value;
+		public function set materials(value:Vector.<Vector.<TextureResource>>):void {
+			_materials = value;
 		}
 		
-		public function get shader():Shader3D {
-			return _shader;
+		public function get shaders():Vector.<Shader3D> {
+			return _shaders;
 		}
 		
-		public function set shader(value:Shader3D):void {
-			_shader = value;
+		public function set shaders(value:Vector.<Shader3D>):void {
+			_shaders = value;
+		}
+		
+		public function get skinInfo():SkinInfo {
+			return _skinInfo;
+		}
+		
+		public function set skinInfo(value:SkinInfo):void {
+			_skinInfo = value;
 		}
 		
 		public function get bound():Bound {
 			return _bound;
-		}
-		
-		public function get parameters():Dictionary {
-			return _parameters;
 		}
 		
 		public function get visible():Boolean {
@@ -131,6 +139,14 @@ package nest.object
 		
 		public function set ignorePosition(value:Boolean):void {
 			_ignorePosition = value;
+		}
+		
+		public function get id():uint {
+			return _id;
+		}
+		
+		public function set id(value:uint):void {
+			_id = value;
 		}
 		
 	}

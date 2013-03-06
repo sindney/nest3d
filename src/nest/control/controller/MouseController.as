@@ -11,6 +11,7 @@ package nest.control.controller
 	import flash.geom.Matrix3D;
 	import flash.geom.Vector3D;
 	
+	import nest.object.geom.Geometry;
 	import nest.object.IMesh;
 	import nest.view.process.IContainerProcess;
 	import nest.view.shader.Shader3D;
@@ -80,25 +81,25 @@ package nest.control.controller
 				
 				var bmd:BitmapData = new BitmapData(1, 1, true, 0);
 				var mesh:IMesh;
+				var geom:Geometry;
 				var i:int = 0;
 				
 				for each(mesh in containerProcess.objects) {
 					if (mesh.mouseEnabled) {
-						mesh.parameters["id"] = ++i;
+						mesh.id = ++i;
 						
 						context3d.setCulling(mesh.triangleCulling);
 						context3d.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 0, mesh.matrix, true);
 						context3d.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 4, mesh.worldMatrix, true);
 						context3d.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 8, mesh.ignorePosition ? (mesh.ignoreRotation ? pm3 : pm1) : (mesh.ignoreRotation ? pm2 : pm0), true);
 						context3d.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, 0, Vector.<Number>([0, ((i >> 8) & 0xff) / 255, (i & 0xff) / 255, 1]));
-						
-						context3d.setVertexBufferAt(0, mesh.geom.vertexBuffer, 0, Context3DVertexBufferFormat.FLOAT_3);
-						
 						context3d.setProgram(program);
 						
-						context3d.drawTriangles(mesh.geom.indexBuffer);
-						
-						context3d.setVertexBufferAt(0, null);
+						for each(geom in mesh.geometries) {
+							context3d.setVertexBufferAt(0, geom.vertexBuffer, 0, Context3DVertexBufferFormat.FLOAT_3);
+							context3d.drawTriangles(geom.indexBuffer);
+							context3d.setVertexBufferAt(0, null);
+						}
 					}
 				}
 				
@@ -106,21 +107,20 @@ package nest.control.controller
 				
 				for each(mesh in containerProcess.alphaObjects) {
 					if (mesh.mouseEnabled) {
-						mesh.parameters["id"] = ++i;
+						mesh.id = ++i;
 						
 						context3d.setCulling(mesh.triangleCulling);
 						context3d.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 0, mesh.matrix, true);
 						context3d.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 4, mesh.worldMatrix, true);
 						context3d.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 8, mesh.ignorePosition ? (mesh.ignoreRotation ? pm3 : pm1) : (mesh.ignoreRotation ? pm2 : pm0), true);
 						context3d.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, 0, Vector.<Number>([0, ((i >> 8) & 0xff) / 255, (i & 0xff) / 255, 1]));
-						
-						context3d.setVertexBufferAt(0, mesh.geom.vertexBuffer, 0, Context3DVertexBufferFormat.FLOAT_3);
-						
 						context3d.setProgram(program);
 						
-						context3d.drawTriangles(mesh.geom.indexBuffer);
-						
-						context3d.setVertexBufferAt(0, null);
+						for each(geom in mesh.geometries) {
+							context3d.setVertexBufferAt(0, geom.vertexBuffer, 0, Context3DVertexBufferFormat.FLOAT_3);
+							context3d.drawTriangles(geom.indexBuffer);
+							context3d.setVertexBufferAt(0, null);
+						}
 					}
 				}
 				
@@ -132,7 +132,7 @@ package nest.control.controller
 				
 				if (id != 0) {
 					for each(mesh in containerProcess.objects) {
-						if (mesh.mouseEnabled && mesh.parameters["id"] == id) {
+						if (mesh.mouseEnabled && mesh.id == id) {
 							if (target != mesh) {
 								if (target) target.dispatchEvent(new MouseEvent3D(MouseEvent3D.MOUSE_OUT));
 								type = MouseEvent3D.MOUSE_OVER;

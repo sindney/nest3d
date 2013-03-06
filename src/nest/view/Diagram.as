@@ -1,10 +1,15 @@
 package nest.view 
 {
 	import flash.display.Sprite;
+	import flash.events.Event;
+	import flash.events.MouseEvent;
 	import flash.system.System;
 	import flash.text.TextField;
 	import flash.text.TextFormat;
 	import flash.utils.getTimer;
+	
+	import nest.view.process.IContainerProcess;
+	import nest.view.process.IRenderProcess;
 	
 	/**
 	 * Diagram
@@ -12,62 +17,84 @@ package nest.view
 	public class Diagram extends Sprite {
 		
 		private var mem:Number = 0.000000954;
+		private var flag:Boolean = true;
 		
-		private var _info:TextField;
-		private var _msg:TextField;
-		private var _last:uint = getTimer();
-		private var _ticks:int = 0;
+		private var background:Sprite;
+		private var info:TextField;
+		private var last:uint = getTimer();
+		private var ticks:int = 0;
+		
+		private var _message:TextField;
 		
 		public function Diagram() {
-			graphics.beginFill(0x666666, 0.8);
-			graphics.drawRect(5, 5, 140, 75);
-			graphics.endFill();
-			graphics.beginFill(0x000000, 0.5);
-			graphics.drawRect(10, 20, 130, 55);
-			graphics.endFill();
+			background = new Sprite();
+			background.graphics.beginFill(0x333333, 1);
+			background.graphics.drawRect(5, 5, 80, 65);
+			background.graphics.endFill();
+			addChild(background);
 			
-			_info = new TextField();
-			_info.defaultTextFormat = new TextFormat("verdana", 10, 0xCCCCCC);
-			_info.selectable = false;
-			_info.autoSize = "left";
-			_info.x = 10;
-			_info.y = 5;
-			addChild(_info);
+			info = new TextField();
+			info.defaultTextFormat = new TextFormat("verdana", 8, 0xCCCCCC);
+			info.selectable = false;
+			info.autoSize = "left";
+			info.x = 5;
+			info.y = 5;
+			info.mouseEnabled = false;
+			addChild(info);
 			
-			_msg = new TextField();
-			_msg.defaultTextFormat = new TextFormat("verdana", 10, 0x999999);
-			_msg.type = "input";
-			_msg.multiline = true;
-			_msg.wordWrap = true;
-			_msg.selectable = true;
-			_msg.width = 130;
-			_msg.height = 55;
-			_msg.x = 10;
-			_msg.y = 20;
-			addChild(_msg);
+			_message = new TextField();
+			_message.defaultTextFormat = new TextFormat("verdana", 9, 0xCCCCCC);
+			_message.type = "input";
+			_message.multiline = true;
+			_message.wordWrap = true;
+			_message.selectable = true;
+			_message.background = true;
+			_message.backgroundColor = 0x222222;
+			_message.height = 65;
+			_message.x = 85;
+			_message.y = 5;
+			
+			onMouseClick();
+			background.addEventListener(MouseEvent.CLICK, onMouseClick);
 		}
 		
-		public function update():void {
-			_ticks++;
-			var now:uint = getTimer();
-			var delta:uint = now - _last;
-			if (delta >= 500) {
-				_info.text = "F " + (_ticks / delta * 1000).toFixed(2) + " M " + (System.totalMemory * mem).toFixed(2);
-				_ticks = 0;
-				_last = now;
+		public function update(processes:Vector.<IRenderProcess>):void {
+			ticks++;
+			var containerProcess:IContainerProcess;
+			var a:int = 0, b:int = 0, c:int = 0, d:int = 0;
+			for each(var process:IRenderProcess in processes) {
+				if (process is IContainerProcess) {
+					containerProcess = process as IContainerProcess;
+					a += containerProcess.container.numChildren;
+					b += containerProcess.numObjects;
+					c += containerProcess.numTriangles;
+					d += containerProcess.numVertices;
+				}
 			}
+			var now:uint = getTimer();
+			var delta:uint = now - last;
+			if (delta >= 500) {
+				info.text = "FPS: " + (ticks / delta * 1000).toFixed(2) + "\nMEM: " + (System.totalMemory * mem).toFixed(2);
+				info.appendText("\nTOTAL: " + a + "\nNOW: " + b + "\nTRIS: " + c + "\nVTS: " + d);
+				ticks = 0;
+				last = now;
+			}
+		}
+		
+		private function onMouseClick(e:MouseEvent = null):void {
+			flag = !flag;
+			if (flag) {
+				_message.width = stage.stageWidth - 90;
+				if (!_message.parent) addChild(_message);
+			} else if (_message.parent) removeChild(_message);
 		}
 		
 		///////////////////////////////////
 		// getter/setters
 		///////////////////////////////////
 		
-		public function get message():String {
-			return _msg.text;
-		}
-		
-		public function set message(value:String):void {
-			_msg.text = value;
+		public function get message():TextField {
+			return _message;
 		}
 		
 	}

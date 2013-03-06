@@ -56,7 +56,7 @@ package nest.control.controller
 					}
 					if (flag) {
 						frame0 = track.frames[i - 1];
-						track.modifier.calculate(track.target, frame0, frame1, tt, track.weight);
+						track.modifier.calculate(track, frame0, frame1, tt);
 					}
 				}
 			}

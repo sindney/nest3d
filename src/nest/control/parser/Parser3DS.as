@@ -31,8 +31,6 @@ package nest.control.parser
 		private var rawVertices:Vector.<Vertex>;
 		private var rawTriangles:Vector.<Triangle>;
 		
-		private var scale:Number;
-		
 		public function Parser3DS() {
 			
 		}
@@ -43,7 +41,6 @@ package nest.control.parser
 			name = null;
 			rawVertices = null;
 			rawTriangles = null;
-			scale = 1;
 		}
 		
 		public function getObjectByName(name:String):Mesh {
@@ -54,9 +51,8 @@ package nest.control.parser
 			return null;
 		}
 		
-		public function parse(model:ByteArray, scale:int = 1):void {
+		public function parse(model:ByteArray):void {
 			_objects = new Vector.<Mesh>();
-			this.scale = scale;
 			
 			model.endian = Endian.LITTLE_ENDIAN;
 			model.position = 0;
@@ -94,14 +90,14 @@ package nest.control.parser
 					readChunk(data, init + length);
 					return;
 				case MESH:
-					last = new Mesh(null, null, null);
+					last = new Mesh();
 					last.name = name;
 					readChunk(data, init + length);
 					return;
 				case VERTICES:
 					j = data.readUnsignedShort();
 					for (i = 0; i < j; i++) {
-						rawVertices.push(new Vertex(data.readFloat() * scale, data.readFloat() * scale, data.readFloat() * scale));
+						rawVertices.push(new Vertex(data.readFloat(), data.readFloat(), data.readFloat()));
 					}
 					break;
 				case UVS:
@@ -127,7 +123,7 @@ package nest.control.parser
 						data.position += 2;
 					}
 					Geometry.calculateNormal(rawVertices, rawTriangles);
-					last.geom = new Geometry(rawVertices, rawTriangles);
+					last.geometries.push(new Geometry(rawVertices, rawTriangles));
 					_objects.push(last);
 					last = null;
 					break;

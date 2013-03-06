@@ -7,6 +7,7 @@ package
 	import nest.control.partition.OcNode;
 	import nest.control.partition.OcTree;
 	import nest.control.util.Primitives;
+	import nest.object.geom.Bound;
 	import nest.object.geom.Geometry;
 	import nest.object.Mesh;
 	import nest.object.Container3D;
@@ -63,14 +64,17 @@ package
 			Geometry.uploadGeometry(geom, true, false, false, true);
 			
 			var mesh:Mesh;
-			
 			var offsetX:Number = 0, offsetY:Number = 0, offsetZ:Number = 0;
 			
 			var i:int, j:int, k:int, l:int = 15, m:int = l * 25;
 			for (i = 0; i < l; i++) {
 				for (j = 0; j < l; j++) {
 					for (k = 0; k < l; k++) {
-						mesh = new Mesh(geom, null, shader0);
+						mesh = new Mesh();
+						mesh.geometries.push(geom);
+						mesh.materials.push(null);
+						mesh.shaders.push(shader0);
+						Bound.calculate(mesh.bound, mesh.geometries);
 						mesh.position.setTo(i * 50 - m + offsetX, j * 50 - m + offsetY, k * 50 - m + offsetZ);
 						mesh.scale.setTo(10, 10, 10);
 						mesh.mouseEnabled = true;
@@ -89,22 +93,19 @@ package
 		}
 		
 		private function onMouseOut(e:MouseEvent3D):void {
-			(e.target as Mesh).shader = shader0;
+			(e.target as Mesh).shaders[0] = shader0;
 		}
 		
 		private function onMouseDown(e:MouseEvent3D):void {
-			(e.target as Mesh).shader = shader1;
+			(e.target as Mesh).shaders[0] = shader1;
 		}
 		
 		private function onMouseOver(e:MouseEvent3D):void {
-			(e.target as Mesh).shader = shader2;
+			(e.target as Mesh).shaders[0] = shader2;
 		}
 		
 		override public function loop():void {
 			mouseController.calculate();
-			view.diagram.message = "Objects: " + process0.numObjects + "/" + process0.container.numChildren + 
-									"\nVertices: " + process0.numVertices + 
-									"\nTriangles: " + process0.numTriangles;
 		}
 		
 	}

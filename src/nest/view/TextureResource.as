@@ -72,9 +72,8 @@ package nest.view
 			}
 		}
 		
-		public static function getTrackFromMovieClip(index:int, source:MovieClip, mipmapping:Boolean = false, size:uint = 128):AnimationTrack {
-			var result:AnimationTrack = new AnimationTrack();
-			result.frames = new Vector.<IKeyFrame>();
+		public static function getTrackFromMovieClip(source:MovieClip, mipmapping:Boolean = false, size:uint = 128):AnimationTrack {
+			var result:AnimationTrack = new AnimationTrack(new Vector.<IKeyFrame>());
 			var bitmapData:BitmapData;
 			var frame:TextureKeyFrame;
 			var totalFrames:uint = source.totalFrames;
@@ -87,16 +86,14 @@ package nest.view
 				frame = new TextureKeyFrame();
 				frame.time = i;
 				frame.data = bitmapData;
-				frame.index = index;
 				frame.mipmapping = mipmapping;
 				result.frames.push(frame);
 			}
 			return result;
 		}
 		
-		public static function getTrackFromSpriteSheet(index:int, source:BitmapData, mipmapping:Boolean = false, tileWidth:Number = 100, tileHeight:Number = 100, startIndex:int = 0, endIndex:int = int.MAX_VALUE):AnimationTrack {
-			var result:AnimationTrack = new AnimationTrack();
-			result.frames = new Vector.<IKeyFrame>();
+		public static function getTrackFromSpriteSheet(source:BitmapData, mipmapping:Boolean = false, tileWidth:Number = 100, tileHeight:Number = 100, startIndex:int = 0, endIndex:int = int.MAX_VALUE):AnimationTrack {
+			var result:AnimationTrack = new AnimationTrack(new Vector.<IKeyFrame>());
 			var bitmapData:BitmapData;
 			var frame:TextureKeyFrame;
 			var w:int = Math.ceil(source.width / tileWidth);
@@ -122,7 +119,6 @@ package nest.view
 				frame = new TextureKeyFrame();
 				frame.time = i - startIndex;
 				frame.data = bitmapData;
-				frame.index = index;
 				frame.mipmapping = mipmapping;
 				result.frames.push(frame);
 			}

@@ -56,7 +56,7 @@ package nest.view
 				_processes[i].calculate();
 			}
 			
-			_diagram.update();
+			_diagram.update(_processes);
 			
 			if (bitmapData) _context3d.drawToBitmapData(bitmapData);
 			_context3d.present();

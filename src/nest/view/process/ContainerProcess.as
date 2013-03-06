@@ -8,6 +8,7 @@ package nest.view.process
 	import flash.geom.Vector3D;
 	
 	import nest.control.partition.IPNode;
+	import nest.object.geom.Geometry;
 	import nest.object.geom.Bound;
 	import nest.object.IContainer3D;
 	import nest.object.IMesh;
@@ -51,6 +52,7 @@ package nest.view.process
 			var container:IContainer3D = _container;
 			var object:IObject3D;
 			var mesh:IMesh;
+			var geom:Geometry;
 			
 			var i:int, j:int;
 			var dx:int, dy:int, dz:int;
@@ -120,8 +122,10 @@ package nest.view.process
 											drawMesh(mesh, mesh.ignorePosition ? (mesh.ignoreRotation ? pm3 : pm1) : (mesh.ignoreRotation ? pm2 : pm0));
 											_objects.push(mesh);
 										}
-										_numVertices += mesh.geom.numVertices;
-										_numTriangles += mesh.geom.numTriangles;
+										for each(geom in mesh.geometries) {
+											_numVertices += geom.numVertices;
+											_numTriangles += geom.numTriangles;
+										}
 										_numObjects++;
 									}
 								}
@@ -147,8 +151,10 @@ package nest.view.process
 										drawMesh(mesh, mesh.ignorePosition ? (mesh.ignoreRotation ? pm3 : pm1) : (mesh.ignoreRotation ? pm2 : pm0));
 										_objects.push(mesh);
 									}
-									_numVertices += mesh.geom.numVertices;
-									_numTriangles += mesh.geom.numTriangles;
+									for each(geom in mesh.geometries) {
+										_numVertices += geom.numVertices;
+										_numTriangles += geom.numTriangles;
+									}
 									_numObjects++;
 								}
 							}
@@ -179,44 +185,56 @@ package nest.view.process
 			context3d.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 4, mesh.worldMatrix, true);
 			context3d.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 8, pm, true);
 			
+			var i:int, j:int = mesh.geometries.length;
+			var uv:Boolean, normal:Boolean;
 			var byteArraySP:ByteArrayShaderPart;
 			var matrixSP:MatrixShaderPart;
 			var vectorSP:VectorShaderPart;
-			for each(var csp:IConstantShaderPart in mesh.shader.constantParts) {
-				if (csp is ByteArrayShaderPart) {
-					byteArraySP = csp as ByteArrayShaderPart;
-					context3d.setProgramConstantsFromByteArray(byteArraySP.programType, byteArraySP.firstRegister, 
-																byteArraySP.numRegisters, byteArraySP.data, 
-																byteArraySP.byteArrayOffset);
-				} else if (csp is MatrixShaderPart) {
-					matrixSP = csp as MatrixShaderPart;
-					context3d.setProgramConstantsFromMatrix(matrixSP.programType, matrixSP.firstRegister, 
-															matrixSP.matrix, matrixSP.transposedMatrix);
-				} else if (csp is VectorShaderPart) {
-					vectorSP = csp as VectorShaderPart;
-					context3d.setProgramConstantsFromVector(vectorSP.programType, vectorSP.firstRegister, 
-															vectorSP.data, vectorSP.numRegisters);
+			var geom:Geometry;
+			var material:Vector.<TextureResource>;
+			var shader:Shader3D;
+			
+			for (i = 0; i < j; i++) {
+				geom = mesh.geometries[i];
+				material = mesh.materials[i];
+				shader = mesh.shaders[i];
+				
+				for each(var csp:IConstantShaderPart in shader.constantParts) {
+					if (csp is ByteArrayShaderPart) {
+						byteArraySP = csp as ByteArrayShaderPart;
+						context3d.setProgramConstantsFromByteArray(byteArraySP.programType, byteArraySP.firstRegister, 
+																	byteArraySP.numRegisters, byteArraySP.data, 
+																	byteArraySP.byteArrayOffset);
+					} else if (csp is MatrixShaderPart) {
+						matrixSP = csp as MatrixShaderPart;
+						context3d.setProgramConstantsFromMatrix(matrixSP.programType, matrixSP.firstRegister, 
+																matrixSP.matrix, matrixSP.transposedMatrix);
+					} else if (csp is VectorShaderPart) {
+						vectorSP = csp as VectorShaderPart;
+						context3d.setProgramConstantsFromVector(vectorSP.programType, vectorSP.firstRegister, 
+																vectorSP.data, vectorSP.numRegisters);
+					}
 				}
+				
+				for each(var tr:TextureResource in material) context3d.setTextureAt(tr.sampler, tr.texture);
+				
+				normal = geom.normalBuffer != null;
+				uv = geom.uvBuffer != null;
+				
+				context3d.setVertexBufferAt(0, geom.vertexBuffer, 0, Context3DVertexBufferFormat.FLOAT_3);
+				if (normal) context3d.setVertexBufferAt(1, geom.normalBuffer, 0, Context3DVertexBufferFormat.FLOAT_3);
+				if (uv) context3d.setVertexBufferAt(2, geom.uvBuffer, 0, Context3DVertexBufferFormat.FLOAT_2);
+				
+				context3d.setProgram(shader.program);
+				
+				context3d.drawTriangles(geom.indexBuffer);
+				
+				for each(tr in material) context3d.setTextureAt(tr.sampler, null);
+				
+				context3d.setVertexBufferAt(0, null);
+				if (normal) context3d.setVertexBufferAt(1, null);
+				if (uv) context3d.setVertexBufferAt(2, null);
 			}
-			
-			if (mesh.material) for each(var tr:TextureResource in mesh.material) context3d.setTextureAt(tr.sampler, tr.texture);
-			
-			var a:Boolean = mesh.geom.normalBuffer != null;
-			var b:Boolean = mesh.geom.uvBuffer != null;
-			
-			context3d.setVertexBufferAt(0, mesh.geom.vertexBuffer, 0, Context3DVertexBufferFormat.FLOAT_3);
-			if (a) context3d.setVertexBufferAt(1, mesh.geom.normalBuffer, 0, Context3DVertexBufferFormat.FLOAT_3);
-			if (b) context3d.setVertexBufferAt(2, mesh.geom.uvBuffer, 0, Context3DVertexBufferFormat.FLOAT_2);
-			
-			context3d.setProgram(mesh.shader.program);
-			
-			context3d.drawTriangles(mesh.geom.indexBuffer);
-			
-			if (mesh.material) for each(tr in mesh.material) context3d.setTextureAt(tr.sampler, null);
-			
-			context3d.setVertexBufferAt(0, null);
-			if (a) context3d.setVertexBufferAt(1, null);
-			if (b) context3d.setVertexBufferAt(2, null);
 		}
 		
 		protected function classifyMesh(mesh:IMesh):Boolean {

@@ -6,6 +6,7 @@ package
 	
 	import nest.control.parser.Parser3DS;
 	import nest.control.util.Primitives;
+	import nest.control.util.RayIntersection;
 	import nest.object.geom.Bound;
 	import nest.object.geom.Geometry;
 	import nest.object.Mesh;
@@ -54,6 +55,7 @@ package
 		private var process0:ContainerProcess;
 		
 		private var mesh:Mesh;
+		private var box:Mesh;
 		private var skybox:Mesh;
 		
 		private var cameraPos:VectorShaderPart;
@@ -67,43 +69,71 @@ package
 			
 			view.processes.push(process0);
 			
+			///////////////////////////////////
+			// HEAD
+			///////////////////////////////////
+			
 			var parser:Parser3DS = new Parser3DS();
 			parser.parse(new model());
 			
 			mesh = parser.objects[0];
-			Bound.calculate(mesh.bound, mesh.geom);
 			mesh.scale.setTo(30, 30, 30);
 			mesh.rotation.y = Math.PI;
 			container.addChild(mesh);
 			
 			parser.dispose();
 			
-			Geometry.setupGeometry(mesh.geom, true, true, true);
-			Geometry.uploadGeometry(mesh.geom, true, true, true, true);
+			Geometry.setupGeometry(mesh.geometries[0], true, true, true);
+			Geometry.uploadGeometry(mesh.geometries[0], true, true, true, true);
 			
-			mesh.material = new Vector.<TextureResource>();
+			var material:Vector.<TextureResource> = new Vector.<TextureResource>();
 			var diffuse:TextureResource = new TextureResource(0, null);
 			TextureResource.uploadToTexture(diffuse, new bitmap_diffuse().bitmapData, false);
 			var specular:TextureResource = new TextureResource(1, null);
 			TextureResource.uploadToTexture(specular, new bitmap_specular().bitmapData, false);
 			var normalmap:TextureResource = new TextureResource(2, null);
 			TextureResource.uploadToTexture(normalmap, new bitmap_normalmap().bitmapData, false);
-			mesh.material.push(diffuse, specular, normalmap);
+			material.push(diffuse, specular, normalmap);
 			
-			mesh.shader = new Shader3D();
-			
-			mesh.shader.constantParts.push(new MatrixShaderPart(Context3DProgramType.VERTEX, 12, mesh.invertWorldMatrix, true));
-			mesh.shader.constantParts.push(new MatrixShaderPart(Context3DProgramType.VERTEX, 16, mesh.invertMatrix, true));
+			var shader:Shader3D = new Shader3D();
+			shader.constantParts.push(new MatrixShaderPart(Context3DProgramType.VERTEX, 12, mesh.invertWorldMatrix, true));
+			shader.constantParts.push(new MatrixShaderPart(Context3DProgramType.VERTEX, 16, mesh.invertMatrix, true));
 			cameraPos = new VectorShaderPart(Context3DProgramType.VERTEX, 20, Vector.<Number>([0, 0, -400, 1, 1, 0, 0, 0]), 2);
-			mesh.shader.constantParts.push(cameraPos);
-			
+			shader.constantParts.push(cameraPos);
 			// ambient light color, directional light color, directional light direction
 			lights = new VectorShaderPart(Context3DProgramType.FRAGMENT, 0, Vector.<Number>([0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 1]), 3);
-			mesh.shader.constantParts.push(lights);
+			shader.constantParts.push(lights);
 			// glossiness
-			mesh.shader.constantParts.push(new VectorShaderPart(Context3DProgramType.FRAGMENT, 3, Vector.<Number>([20, 1, 1, 1])));
+			shader.constantParts.push(new VectorShaderPart(Context3DProgramType.FRAGMENT, 3, Vector.<Number>([20, 1, 1, 1])));
+			shader.comply(vertexShader(), fragmentShader());
 			
-			mesh.shader.comply(vertexShader(), fragmentShader());
+			mesh.materials.push(material);
+			mesh.shaders.push(shader);
+			Bound.calculate(mesh.bound, mesh.geometries);
+			
+			///////////////////////////////////
+			// Box
+			///////////////////////////////////
+			
+			var box_shader:Shader3D = new Shader3D();
+			box_shader.constantParts.push(new VectorShaderPart(Context3DProgramType.FRAGMENT, 0, Vector.<Number>([1, 0, 0, 1])));
+			box_shader.comply("m44 vt0, va0, vc0\nm44 vt0, vt0, vc4\n" + 
+							"m44 op, vt0, vc8\n", "mov oc, fc0\n");
+			
+			box = new Mesh();
+			box.geometries.push(Primitives.createBox());
+			Geometry.setupGeometries(box.geometries, true, false, false);
+			Geometry.uploadGeometries(box.geometries, true, false, false, true);
+			Bound.calculate(box.bound, box.geometries);
+			box.materials.push(null);
+			box.shaders.push(box_shader);
+			box.position.x = 500;
+			box.scale.setTo(10, 10, 10);
+			container.addChild(box);
+			
+			///////////////////////////////////
+			// SKYBOX
+			///////////////////////////////////
 			
 			var cubicmap:Vector.<BitmapData> = new Vector.<BitmapData>();
 			cubicmap[0] = new right().bitmapData;
@@ -118,15 +148,18 @@ package
 			TextureResource.uploadToCubeTexture(skybox_resource, cubicmap);
 			skybox_material.push(skybox_resource);
 			
-			var shader:Shader3D = new Shader3D();
-			shader.comply("m44 vt0, va0, vc0\nm44 vt0, vt0, vc4\n" + 
-							"m44 op, vt0, vc8\nmov v0, va0\n", 
-							"tex oc, v0, fs0 <cube,linear,miplinear>\n");
+			var skybox_shader:Shader3D = new Shader3D();
+			skybox_shader.comply("m44 vt0, va0, vc0\nm44 vt0, vt0, vc4\n" + 
+								"m44 op, vt0, vc8\nmov v0, va0\n", 
+								"tex oc, v0, fs0 <cube,linear,miplinear>\n");
 			
-			skybox = new Mesh(Primitives.createSkybox(), skybox_material, shader);
-			Geometry.setupGeometry(skybox.geom, true, false, false);
-			Geometry.uploadGeometry(skybox.geom, true, false, false, true);
-			Bound.calculate(skybox.bound, skybox.geom);
+			skybox = new Mesh();
+			skybox.geometries.push(Primitives.createSkybox());
+			skybox.materials.push(skybox_material);
+			skybox.shaders.push(skybox_shader);
+			Geometry.setupGeometry(skybox.geometries[0], true, false, false);
+			Geometry.uploadGeometry(skybox.geometries[0], true, false, false, true);
+			Bound.calculate(skybox.bound, skybox.geometries);
 			skybox.cliping = false;
 			skybox.scale.setTo(10000, 10000, 10000);
 			skybox.ignorePosition = true;
@@ -224,18 +257,23 @@ package
 		}
 		
 		override public function loop():void {
-			var dir:Vector3D = mesh.invertWorldMatrix.transformVector(mesh.invertMatrix.transformVector(camera.position));
-			dir.normalize();
-			dir.negate();
-			lights.data[8] = dir.x;
-			lights.data[9] = dir.y;
-			lights.data[10] = dir.z;
+			var orgion:Vector3D = mesh.invertWorldMatrix.transformVector(mesh.invertMatrix.transformVector(camera.position));
+			var delta:Vector3D = mesh.invertWorldMatrix.transformVector(mesh.invertMatrix.transformVector(camera.matrix.transformVector(new Vector3D(0, 0, 600))));
+			var result:Vector3D = new Vector3D();
+			RayIntersection.Ray_Mesh(result, orgion, delta, mesh);
+			result = mesh.worldMatrix.transformVector(mesh.matrix.transformVector(result));
+			box.position.copyFrom(result);
+			box.recompose();
+			box.visible = result.w != 0;
+			
+			orgion.normalize();
+			orgion.negate();
+			lights.data[8] = orgion.x;
+			lights.data[9] = orgion.y;
+			lights.data[10] = orgion.z;
 			cameraPos.data[0] = camera.position.x;
 			cameraPos.data[1] = camera.position.y;
 			cameraPos.data[2] = camera.position.z;
-			view.diagram.message = "Objects: " + process0.numObjects + "/" + process0.container.numChildren + 
-									"\nVertices: " + process0.numVertices + 
-									"\nTriangles: " + process0.numTriangles;
 		}
 	}
 

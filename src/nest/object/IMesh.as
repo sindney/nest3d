@@ -1,9 +1,8 @@
 package nest.object 
 {	
-	import flash.utils.Dictionary;
-	
 	import nest.object.geom.Bound;
 	import nest.object.geom.Geometry;
+	import nest.object.geom.SkinInfo;
 	import nest.view.shader.Shader3D;
 	import nest.view.TextureResource;
 	
@@ -12,18 +11,21 @@ package nest.object
 	 */
 	public interface IMesh extends IObject3D {
 		
-		function get geom():Geometry;
-		function set geom(value:Geometry):void;
+		function dispose():void;
 		
-		function get material():Vector.<TextureResource>;
-		function set material(value:Vector.<TextureResource>):void;
+		function get geometries():Vector.<Geometry>;
+		function set geometries(value:Vector.<Geometry>):void;
 		
-		function get shader():Shader3D;
-		function set shader(value:Shader3D):void;
+		function get materials():Vector.<Vector.<TextureResource>>;
+		function set materials(value:Vector.<Vector.<TextureResource>>):void;
+		
+		function get shaders():Vector.<Shader3D>;
+		function set shaders(value:Vector.<Shader3D>):void;
+		
+		function get skinInfo():SkinInfo;
+		function set skinInfo(value:SkinInfo):void;
 		
 		function get bound():Bound;
-		
-		function get parameters():Dictionary;
 		
 		function get cliping():Boolean;
 		function set cliping(value:Boolean):void;
@@ -36,6 +38,9 @@ package nest.object
 		
 		function get mouseEnabled():Boolean;
 		function set mouseEnabled(value:Boolean):void;
+		
+		function get id():uint;
+		function set id(value:uint):void;
 		
 		function get triangleCulling():String;
 		function set triangleCulling(value:String):void;
