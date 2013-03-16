@@ -7,12 +7,12 @@ package nest.object.geom
 	 */
 	public class Joint {
 		
-		public static function calculateMatrixes(joint:Joint, parent:Matrix3D):void {
+		public static function calculateMatrixes(joint:Joint, parent:Matrix3D = null):void {
 			joint.combinedMatrix.copyFrom(joint.transformMatrix);
-			joint.combinedMatrix.append(parent);
+			if (parent) joint.combinedMatrix.append(parent);
 			joint.finalMatrix.copyFrom(joint.combinedMatrix);
 			joint.finalMatrix.append(joint.offsetMatrix);
-			if (joint.sibling) calculateMatrixes(joint.sibling, parent);
+			if (joint.sibling && parent) calculateMatrixes(joint.sibling, parent);
 			if (joint.firstChild) calculateMatrixes(joint.firstChild, joint.combinedMatrix);
 		}
 		

@@ -8,6 +8,9 @@ package nest.control.partition
 		
 		function get root():IPNode;
 		
+		function get frustum():Boolean;
+		function set frustum(value:Boolean):void;
+		
 	}
 	
 }

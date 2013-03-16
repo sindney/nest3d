@@ -6,7 +6,8 @@ package nest.object.geom
 	 */
 	public class SkinInfo {
 		
-		public static function copyToGeometries(target:Vector.<Geometry>, skin:SkinInfo):void {
+		// TODO: 决定要不要copyToGeometries函数
+		/*public static function copyToGeometries(target:Vector.<Geometry>, skin:SkinInfo):void {
 			var i:int, j:int, k:int, l:int = skin.vertices.length;
 			var m:int, n:int;
 			var geom:Geometry;
@@ -42,13 +43,10 @@ package nest.object.geom
 													triangle.uvs[4], triangle.uvs[5]));
 				}
 			}
-		}
+		}*/
 		
 		public var root:Joint;
 		public var joints:Vector.<Joint>;
-		
-		public var vertices:Vector.<Vector.<Vertex>> = new Vector.<Vector.<Vertex>>();
-		public var triangles:Vector.<Vector.<Triangle>> = new Vector.<Vector.<Triangle>>();
 		
 		public function SkinInfo(root:Joint, joints:Vector.<Joint>) {
 			this.root = root;

@@ -22,7 +22,7 @@ package nest.control.controller
 	 * MouseController
 	 */
 	public class MouseController {
-		
+		// TODO: 实现MouseOver, MouseUp, RightMouseUp
 		private var id:uint;
 		private var mouseX:Number = 0;
 		private var mouseY:Number = 0;

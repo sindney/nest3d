@@ -9,7 +9,6 @@ package nest.control.animation
 		private var _time:Number;
 		private var _name:String;
 		
-		// TODO: 更新bounds数组
 		public var bounds:Vector.<Number> = new Vector.<Number>(6, true);
 		public var vertices:Vector.<Number> = new Vector.<Number>();
 		public var normals:Vector.<Number> = new Vector.<Number>();

@@ -1,28 +1,39 @@
 package nest.control.controller 
 {
+	import flash.events.EventDispatcher;
 	import flash.utils.getTimer;
 	
 	import nest.control.animation.AnimationTrack;
 	import nest.control.animation.IKeyFrame;
 	
 	/**
+	 * Dispatched when one loop is finished.
+	 */
+	[AnimationEvent(name = "loopComplete", type = "nest.control.controller.AnimationEvent")]
+	
+	/**
+	 * Dispatched when all loops are finished.
+	 */
+	[AnimationEvent(name = "loopsComplete", type = "nest.control.controller.AnimationEvent")]
+	
+	/**
 	 * AnimationController
 	 */
-	public class AnimationController {
+	public class AnimationController extends EventDispatcher {
 		
 		private var _time:Number = 0;
 		private var _length:Number = 0;
+		private var _paused:Boolean = true;
 		
 		private var last:int = 0;
 		private var count:int = 0;
 		
 		public var tracks:Vector.<AnimationTrack> = new Vector.<AnimationTrack>();
-		public var paused:Boolean = true;
 		public var speed:Number = 1;
 		public var loops:int = 0;
 		
 		public function calculate():void {
-			if (paused) return;
+			if (_paused) return;
 			
 			var ct:int = getTimer();
 			var dt:Number = (ct - last) / 1000;
@@ -33,7 +44,11 @@ package nest.control.controller
 			if (_time > _length) {
 				_time = 0;
 				count++;
-				if (count >= loops) paused = true;
+				dispatchEvent(new AnimationEvent(AnimationEvent.LOOP_COMPLETE));
+				if (count >= loops) {
+					_paused = true;
+					dispatchEvent(new AnimationEvent(AnimationEvent.LOOPS_COMPLETE));
+				}
 			}
 			
 			var flag:Boolean;
@@ -62,6 +77,9 @@ package nest.control.controller
 			}
 		}
 		
+		/**
+		 * Call this when tracks array is changed.
+		 */
 		public function setup():void {
 			var i:Number, j:Number = 0;
 			for each(var track:AnimationTrack in tracks) {
@@ -78,7 +96,8 @@ package nest.control.controller
 		}
 		
 		public function restart():void {
-			paused = false;
+			_paused = false;
+			_time = 0;
 			count = 0;
 			last = getTimer();
 		}
@@ -98,6 +117,15 @@ package nest.control.controller
 		
 		public function get length():Number {
 			return _length;
+		}
+		
+		public function get paused():Boolean {
+			return _paused;
+		}
+		
+		public function set paused(value:Boolean):void {
+			_paused = value;
+			if (!_paused) last = getTimer();
 		}
 		
 	}

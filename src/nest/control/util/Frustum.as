@@ -1,6 +1,5 @@
 package nest.control.util 
 {
-	import flash.geom.Matrix3D;
 	import flash.geom.Vector3D;
 	
 	/**
@@ -85,35 +84,33 @@ package nest.control.util
 		}
 		
 		public function classifyAABB(vertices:Vector.<Vector3D>):Boolean {
-			var length:int = vertices.length;
-			var near:Boolean = findIntersection(vertices, length, planes[4]);
-			var far:Boolean = findIntersection(vertices, length, planes[5]);
+			var near:Boolean = findIntersection(vertices, planes[4]);
+			var far:Boolean = findIntersection(vertices, planes[5]);
 			if (near != far) return false;
-			var left:Boolean = findIntersection(vertices, length, planes[2]);
-			var right:Boolean = findIntersection(vertices, length, planes[3]);
+			var left:Boolean = findIntersection(vertices, planes[2]);
+			var right:Boolean = findIntersection(vertices, planes[3]);
 			if (left != right) return false;
-			var top:Boolean = findIntersection(vertices, length, planes[0]);
-			var bottom:Boolean = findIntersection(vertices, length, planes[1]);
+			var top:Boolean = findIntersection(vertices, planes[0]);
+			var bottom:Boolean = findIntersection(vertices, planes[1]);
 			if (top != bottom) return false;
 			return true;
 		}
 		
-		private function findIntersection(vertices:Vector.<Vector3D>, length:int, plane:Plane):Boolean {
-			var index:int = findNearestPoint(vertices, length, plane);
+		private function findIntersection(vertices:Vector.<Vector3D>, plane:Plane):Boolean {
+			var index:int = findNearestPoint(vertices, plane);
 			var v0:Vector3D = vertices[index];
-			var v1:Vector3D = vertices[findFarestPoint(vertices, length, plane, index)];
+			var v1:Vector3D = vertices[findFarestPoint(vertices, plane, index)];
 			var a:Boolean = plane.getDistance(v0) > 0;
 			var b:Boolean = plane.getDistance(v1) > 0;
-			
 			if (!a && !b) return false;
 			return true;
 		}
 		
-		private function findNearestPoint(vertices:Vector.<Vector3D>, length:int, plane:Plane):int {
+		private function findNearestPoint(vertices:Vector.<Vector3D>, plane:Plane):int {
 			var i:int, index:int;
 			var j:int, k:int;
 			var v:Vector3D;
-			for (i = 0; i < length; i++) {
+			for (i = 0; i < 8; i++) {
 				v = vertices[i];
 				j = Math.abs(plane.getDistance(v));
 				if (!k) {
@@ -128,11 +125,11 @@ package nest.control.util
 			return index;
 		}
 		
-		private function findFarestPoint(vertices:Vector.<Vector3D>, length:int, plane:Plane, p:int):int {
+		private function findFarestPoint(vertices:Vector.<Vector3D>, plane:Plane, p:int):int {
 			var i:int, index:int;
 			var j:int, k:int, l:int = plane.getDistance(vertices[p]);
 			var v:Vector3D;
-			for (i = 0; i < length; i++) {
+			for (i = 0; i < 8; i++) {
 				if (i != p) {
 					v = vertices[i];
 					j = plane.getDistance(v);

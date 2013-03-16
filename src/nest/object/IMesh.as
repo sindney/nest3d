@@ -11,7 +11,7 @@ package nest.object
 	 */
 	public interface IMesh extends IObject3D {
 		
-		function dispose():void;
+		function dispose(all:Boolean = true):void;
 		
 		function get geometries():Vector.<Geometry>;
 		function set geometries(value:Vector.<Geometry>):void;
@@ -26,6 +26,7 @@ package nest.object
 		function set skinInfo(value:SkinInfo):void;
 		
 		function get bound():Bound;
+		function set bound(value:Bound):void;
 		
 		function get cliping():Boolean;
 		function set cliping(value:Boolean):void;

@@ -17,6 +17,7 @@ package nest.control.partition
 	public class QuadTree implements IPTree {
 		
 		private var _root:QuadNode;
+		private var _frustum:Boolean = false;
 		
 		public function QuadTree() {
 			_root = new QuadNode();
@@ -93,7 +94,7 @@ package nest.control.partition
 			var radius:Number;
 			var mesh:IMesh;
 			var objects:Vector.<IMesh> = node.objects;
-			var a:Vector3D, b:Vector3D, c:Vector3D = new Vector3D(0.707, 0, 0.707);
+			var a:Vector3D, b:Vector3D, c:Vector3D = new Vector3D(0.707, 0, 0.707), d:Vector3D = new Vector3D();
 			
 			j = objects.length;
 			node.objects = new Vector.<IMesh>();
@@ -110,7 +111,7 @@ package nest.control.partition
 					BBL = Bound.AABB_AABB(a, b, BL.max, BL.min);
 					BBR = Bound.AABB_AABB(a, b, BR.max, BR.min);
 				} else {
-					a = mesh.worldMatrix.transformVector(mesh.matrix.transformVector(mesh.bound.center));
+					a = mesh.worldMatrix.transformVector(mesh.matrix.transformVector(d));
 					b = mesh.worldMatrix.transformVector(mesh.matrix.transformVector(c));
 					a.y = b.y = 0;
 					radius = mesh.bound.radius * b.length;
@@ -152,6 +153,14 @@ package nest.control.partition
 		
 		public function get root():IPNode {
 			return _root;
+		}
+		
+		public function get frustum():Boolean {
+			return _frustum;
+		}
+		
+		public function set frustum(value:Boolean):void {
+			_frustum = value;
 		}
 		
 	}

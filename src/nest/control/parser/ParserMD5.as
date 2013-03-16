@@ -7,6 +7,7 @@ package nest.control.parser
 	import nest.control.animation.AnimationTrack;
 	import nest.control.animation.IKeyFrame;
 	import nest.control.animation.JointKeyFrame;
+	import nest.control.animation.JointModifier;
 	import nest.object.geom.Geometry;
 	import nest.object.geom.Joint;
 	import nest.object.geom.SkinInfo;
@@ -57,14 +58,18 @@ package nest.control.parser
 		}
 		
 		public function dispose():void {
+			data = null;
 			skinInfo = null;
 			track = null;
-			data = null;
+			jointInfo = null;
+			baseFrame = null;
 		}
 		
 		private var frameRate:int;
 		private var num_frames:int;
 		private var num_animatedComponents:int;
+		private var jointInfo:Vector.<int>;
+		private var baseFrame:Vector.<Number>;
 		
 		public function parseMD5Anim(anim:ByteArray):void {
 			data = anim.readUTFBytes(anim.bytesAvailable);
@@ -92,6 +97,9 @@ package nest.control.parser
 					case NUM_FRAMES_TOKEN:
 						num_frames = parseInt(getNextToken());
 						track = new AnimationTrack(new Vector.<IKeyFrame>(num_frames));
+						track.parameters[JointModifier.JOINT_POSITION] = true;
+						track.parameters[JointModifier.JOINT_ROTATION] = true;
+						track.parameters[JointModifier.JOINT_SCALE] = false;
 						break;
 					case NUM_JOINTS_TOKEN:
 						num_joints = parseInt(getNextToken());
@@ -103,17 +111,13 @@ package nest.control.parser
 						num_animatedComponents = parseInt(getNextToken());
 						break;
 					case HIERARCHY_TOKEN:
-						getNextToken();
-						for (i = 0; i < num_joints; i++) ignoreLine();
-						getNextToken();
+						parseHierarchy();
 						break;
 					case BOUNDS_TOKEN:
 						parseBounds();
 						break;
 					case BASE_FRAME_TOKEN:
-						getNextToken();
-						for (i = 0; i < num_joints; i++) ignoreLine();
-						getNextToken();
+						parseBaseFrame();
 						break;
 					case FRAME_TOKEN:
 						parseFrame();
@@ -121,6 +125,28 @@ package nest.control.parser
 				}
 				if (eof) break;
 			}
+		}
+		
+		private function parseHierarchy():void {
+			var ch:String;
+			var token:String = getNextToken();
+			var i:int = 0;
+			jointInfo = new Vector.<int>();
+			do {
+				parseLiteralString();
+				// parent
+				getNextInt()
+				// flag, start index
+				jointInfo.push(getNextInt(), getNextInt());
+				ch = getNextChar();
+				if (ch == "/") {
+					putBack();
+					ch = getNextToken();
+					if (ch == COMMENT_TOKEN) ignoreLine();
+					ch = getNextChar();
+				}
+				if (ch != "}") putBack();
+			} while (ch != "}");
 		}
 		
 		private function parseBounds():void {
@@ -139,7 +165,30 @@ package nest.control.parser
 				frame.bounds[3] = vector3.x;
 				frame.bounds[4] = vector3.y;
 				frame.bounds[5] = vector3.z;
+				frame.time = i;
 				track.frames[i++] = frame;
+				ch = getNextChar();
+				if (ch == "/") {
+					putBack();
+					ch = getNextToken();
+					if (ch == COMMENT_TOKEN) ignoreLine();
+					ch = getNextChar();
+				}
+				if (ch != "}") putBack();
+			} while (ch != "}");
+		}
+		
+		private function parseBaseFrame():void {
+			var ch:String;
+			var token:String = getNextToken();
+			baseFrame = new Vector.<Number>();
+			do {
+				getNextToken();
+				baseFrame.push(parseFloat(getNextToken()), parseFloat(getNextToken()), parseFloat(getNextToken()));
+				getNextToken();
+				getNextToken();
+				baseFrame.push(parseFloat(getNextToken()), parseFloat(getNextToken()), parseFloat(getNextToken()));
+				getNextToken();
 				ch = getNextChar();
 				if (ch == "/") {
 					putBack();
@@ -154,22 +203,38 @@ package nest.control.parser
 		private function parseFrame():void {
 			var ch:String;
 			var frame:JointKeyFrame = track.frames[parseInt(getNextToken())] as JointKeyFrame;
+			var frameData:Vector.<Number>;
 			var token:String = getNextToken();
-			var i:int, j:int;
-			var x:Number, y:Number, z:Number, w:Number;
+			var i:int, j:int, k:int, l:int, flag:int, index:int;
+			var t:Number, x:Number, y:Number, z:Number;
 			do {
-				for (i = 0; i < num_joints; i++) {
-					j = i * 3;
-					frame.positions[j] = parseFloat(getNextToken());
-					frame.positions[j + 1] = parseFloat(getNextToken());
-					frame.positions[j + 2] = parseFloat(getNextToken());
-					j = i * 4;
-					x = frame.rotations[j] = parseFloat(getNextToken());
-					y = frame.rotations[j + 1] = parseFloat(getNextToken());
-					z = frame.rotations[j + 2] = parseFloat(getNextToken());
-					w = 1 - x * x - y * y - z * z;
-					frame.rotations[j + 3] = w < 0 ? 0 : -Math.sqrt(w);
-					// TODO: 更新KeyFrame.time
+				frameData = new Vector.<Number>();
+				for (i = 0; i < num_animatedComponents; i++) {
+					frameData.push(parseFloat(getNextToken()));
+				}
+				// TODO: JointKeyFrame初始化这里需要修改
+				frame = new JointKeyFrame();
+				j = jointInfo.length;
+				for (i = 0; i < j; i++) {
+					baseFrameData = baseFrame[i];
+					k = i * 2;
+					flag = jointInfo[k];
+					index = jointInfo[k + 1];
+					l = i * 6, k = 0;
+					frame.transforms[l + k] = (flag & 1) ? frameData[index + k] : baseFrame[l + k];
+					k++;
+					frame.transforms[l + k] = (flag & 2) ? frameData[index + k] : baseFrame[l + k];
+					k++;
+					frame.transforms[l + k] = (flag & 4) ? frameData[index + k] : baseFrame[l + k];
+					k++;
+					x = frame.transforms[l + k] = (flag & 8) ? frameData[index + k] : baseFrame[l + k];
+					k++;
+					y = frame.transforms[l + k] = (flag & 16) ? frameData[index + k] : baseFrame[l + k];
+					k++;
+					z = frame.transforms[l + k] = (flag & 32) ? frameData[index + k] : baseFrame[l + k];
+					k++;
+					t = 1 - (x * x) - (y * y) - (z * z);
+					frame.transforms[l + k] = t < 0 ? 0 : -Math.sqrt(t);
 				}
 				ch = getNextChar();
 				if (ch == "/") {
@@ -284,7 +349,6 @@ package nest.control.parser
 			var rawJointIndex:Vector.<int> = new Vector.<int>();
 			var rawWeightBias:Vector.<Number> = new Vector.<Number>();
 			var rawWeightPosition:Vector.<Vector3D> = new Vector.<Vector3D>();
-			
 			getNextToken();
 			while (ch != "}") {
 				ch = getNextToken();
@@ -316,13 +380,12 @@ package nest.control.parser
 						break;
 					case MESH_WEIGHT_TOKEN:
 						index = parseInt(getNextToken());
-						rawJointIndex[index] = parseInt(getNextToken())
+						rawJointIndex[index] = parseInt(getNextToken());
 						rawWeightBias[index] = parseFloat(getNextToken());
 						rawWeightPosition[index] = parseVector3D();
 						break;
 				}
 			}
-			
 			var weight:Number;
 			var i:int, j:int, k:int, l:int;
 			var vertex:Vertex;
@@ -359,7 +422,6 @@ package nest.control.parser
 			skinInfo.vertices.push(vertices);
 			skinInfo.triangles.push(triangles);
 			Geometry.calculateNormal(vertices, triangles);
-			// TODO: 将normal从object local转换至joint bind space
 		}
 		
 		private function parseVector3D():Vector3D {

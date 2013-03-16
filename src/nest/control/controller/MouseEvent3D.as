@@ -17,15 +17,12 @@ package nest.control.controller
 		public static const RIGHT_CLICK:String = "rightClick";
 		public static const RIGHT_MOUSE_DOWN:String = "rightMouseDown";
 		
-		public var data:uint;
-		
 		public function MouseEvent3D(type:String, bubbles:Boolean = false, cancelable:Boolean = false) {
 			super(type, bubbles, cancelable);
 		}
 		
 		override public function clone():Event {
 			var copy:MouseEvent3D = new MouseEvent3D(type, bubbles, cancelable);
-			copy.data = data;
 			return copy;
 		}
 	}

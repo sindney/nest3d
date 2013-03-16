@@ -1,8 +1,8 @@
 package nest.control.animation 
 {
 	import flash.geom.Vector3D;
-	import nest.object.geom.Bound;
 	
+	import nest.object.geom.Bound;
 	import nest.object.geom.Geometry;
 	import nest.object.geom.Vertex;
 	
@@ -35,8 +35,8 @@ package nest.control.animation
 				vertex.ny = nm0[j + 1] * w1 + nm1[j + 1] * w2;
 				vertex.nz = nm0[j + 2] * w1 + nm1[j + 2] * w2;
 			}
-			var min:Vector3D, max:Vector3D;
 			var bound:Bound = track.target.bound;
+			var min:Vector3D = bound.vertices[0], max:Vector3D = bound.vertices[7];
 			min.setTo(bd0[0] * w1 + bd1[0] * w2, bd0[1] * w1 + bd1[1] * w2, bd0[2] * w1 + bd1[2] * w2);
 			max.setTo(bd0[3] * w1 + bd1[3] * w2, bd0[4] * w1 + bd1[4] * w2, bd0[5] * w1 + bd1[5] * w2);
 			bound.vertices[1].setTo(max.x, min.y, min.z);
@@ -45,8 +45,6 @@ package nest.control.animation
 			bound.vertices[4].setTo(min.x, min.y, max.z);
 			bound.vertices[5].setTo(max.x, min.y, max.z);
 			bound.vertices[6].setTo(min.x, max.y, max.z);
-			bound.center.setTo((max.x + min.x) * 0.5, (max.y + min.y) * 0.5, (max.z + min.z) * 0.5);
-			
 			Geometry.uploadGeometry(geom, true, geom.normalBuffer != null, geom.uvBuffer != null, false);
 		}
 		

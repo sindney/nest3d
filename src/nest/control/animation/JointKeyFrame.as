@@ -10,12 +10,7 @@ package nest.control.animation
 		private var _name:String;
 		
 		public var bounds:Vector.<Number> = new Vector.<Number>(6, true);
-		public var positions:Vector.<Number> = new Vector.<Number>();
-		public var rotations:Vector.<Number> = new Vector.<Number>();
-		
-		public function JointKeyFrame() {
-			
-		}
+		public var transforms:Vector.<Number> = new Vector.<Number>();
 		
 		public function clone():IKeyFrame {
 			var result:JointKeyFrame = new JointKeyFrame();
@@ -23,9 +18,8 @@ package nest.control.animation
 			result.name = _name;
 			var i:int, j:int = positions.length;
 			for (i = 0; i < 6; i++) result.bounds[i] = bounds[i];
-			for (i = 0; i < j; i++) result.positions[i] = positions[i];
-			j = rotations.length;
-			for (i = 0; i < j; i++) result.rotations[i] = rotations[i];
+			j = transforms.length;
+			for (i = 0; i < j; i++) result.transforms[i] = transforms[i];
 			return result;
 		}
 		

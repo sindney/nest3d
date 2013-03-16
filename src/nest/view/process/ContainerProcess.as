@@ -99,6 +99,7 @@ package nest.view.process
 				if (container.partition) {
 					var nodes:Vector.<IPNode> = new Vector.<IPNode>();
 					var node:IPNode = container.partition.root;
+					var flag:Boolean;
 					while (node) {
 						if (node.classify(_camera)) {
 							j = node.childs.length;
@@ -111,7 +112,9 @@ package nest.view.process
 								j = node.objects.length;
 								for (i = 0; i < j; i++) {
 									mesh = node.objects[i];
-									if (mesh.visible) {
+									flag = true;
+									if (container.partition.frustum) flag = mesh.cliping ? classifyMesh(mesh) : true;
+									if (mesh.visible && flag) {
 										if (mesh.alphaTest) {
 											dx = _camera.position.x - mesh.position.x;
 											dy = _camera.position.y - mesh.position.y;
@@ -252,7 +255,7 @@ package nest.view.process
 			var id:Vector3D = mesh.worldMatrix.transformVector(mesh.matrix.transformVector(new Vector3D(0.577, 0.577, 0.577)));
 			var scale:Number = id.length;
 			return _camera.frustum.classifyBSphere(
-						_camera.invertMatrix.transformVector(mesh.worldMatrix.transformVector(mesh.matrix.transformVector(mesh.bound.center))), 
+						_camera.invertMatrix.transformVector(mesh.worldMatrix.transformVector(mesh.matrix.transformVector(new Vector3D()))), 
 						mesh.bound.radius * scale
 					);
 		}

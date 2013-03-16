@@ -61,7 +61,6 @@ package nest.object.geom
 				min = bound.vertices[0];
 				max.setTo(0, 0, 0);
 				min.setTo(0, 0, 0);
-				
 				for each(geom in geoms) {
 					for each(vertex in geom.vertices) {
 						if (vertex.x > max.x) max.x = vertex.x;
@@ -72,7 +71,6 @@ package nest.object.geom
 						else if (vertex.z < min.z) min.z = vertex.z;
 					}
 				}
-				
 				bound.vertices[1].setTo(max.x, min.y, min.z);
 				bound.vertices[2].setTo(min.x, max.y, min.z);
 				bound.vertices[3].setTo(max.x, max.y, min.z);
@@ -91,10 +89,8 @@ package nest.object.geom
 				bound.radius = max.x > max.y ? max.x : max.y;
 				if (max.z > bound.radius) bound.radius = max.z;
 			}
-			bound.center.setTo((max.x + min.x) * 0.5, (max.y + min.y) * 0.5, (max.z + min.z) * 0.5);
 		}
 		
-		public var center:Vector3D = new Vector3D();
 		public var radius:Number = 0;
 		public var vertices:Vector.<Vector3D> = new Vector.<Vector3D>(8, true);
 		
@@ -109,19 +105,6 @@ package nest.object.geom
 			vertices[5] = new Vector3D();
 			vertices[6] = new Vector3D();
 			vertices[7] = new Vector3D();
-		}
-		
-		public function copyFrom(value:Bound):void {
-			var i:int;
-			var v1:Vector3D, v2:Vector3D;
-			for (i = 0; i < 8; i++) {
-				v1 = vertices[i];
-				v2 = value.vertices[i];
-				v1.copyFrom(v2);
-			}
-			radius = value.radius;
-			center.copyFrom(value.center);
-			aabb = value.aabb;
 		}
 		
 	}

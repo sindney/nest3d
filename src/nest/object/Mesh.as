@@ -2,24 +2,34 @@ package nest.object
 {
 	import flash.display3D.Context3DTriangleFace;
 	
+	import nest.control.controller.MouseEvent3D;
 	import nest.object.geom.Bound;
 	import nest.object.geom.Geometry;
 	import nest.object.geom.SkinInfo;
 	import nest.view.shader.Shader3D;
 	import nest.view.TextureResource;
 	
+	[MouseEvent3D(name = "mouseDown", type = "nest.control.controller.MouseEvent3D")]
+	[MouseEvent3D(name = "mouseOver", type = "nest.control.controller.MouseEvent3D")]
+	[MouseEvent3D(name = "mouseMove", type = "nest.control.controller.MouseEvent3D")]
+	[MouseEvent3D(name = "mouseOut", type = "nest.control.controller.MouseEvent3D")]
+	[MouseEvent3D(name = "click", type = "nest.control.controller.MouseEvent3D")]
+	[MouseEvent3D(name = "doubleClick", type = "nest.control.controller.MouseEvent3D")]
+	[MouseEvent3D(name = "rightClick", type = "nest.control.controller.MouseEvent3D")]
+	[MouseEvent3D(name = "rightMouseDown", type = "nest.control.controller.MouseEvent3D")]
+	
 	/**
 	 * Mesh
 	 */
 	public class Mesh extends Object3D implements IMesh {
 		
-		protected var _geometries:Vector.<Geometry> = new Vector.<Geometry>();
-		protected var _materials:Vector.<Vector.<TextureResource>> = new Vector.<Vector.<TextureResource>>();
-		protected var _shaders:Vector.<Shader3D> = new Vector.<Shader3D>();
+		protected var _geometries:Vector.<Geometry>;
+		protected var _materials:Vector.<Vector.<TextureResource>>;
+		protected var _shaders:Vector.<Shader3D>;
 		
 		protected var _skinInfo:SkinInfo;
 		
-		protected var _bound:Bound = new Bound();
+		protected var _bound:Bound;
 		protected var _triangleCulling:String = Context3DTriangleFace.BACK;
 		
 		protected var _visible:Boolean = true;
@@ -30,16 +40,30 @@ package nest.object
 		protected var _ignorePosition:Boolean = false;
 		protected var _id:uint = 0;
 		
-		public function dispose():void {
-			for each(var geom:Geometry in _geometries) geom.dispose();
-			_geometries = null;
-			for each(var mats:Vector.<TextureResource> in _materials) {
-				for each(var mat:TextureResource in mats) {
-					mat.dispose();
-				}
+		public function Mesh(create:Boolean = true, geometries:Vector.<Geometry> = null, materials:Vector.<Vector.<TextureResource>> = null, shaders:Vector.<Shader3D> = null, bound:Bound = null) {
+			if (create) {
+				_geometries = new Vector.<Geometry>();
+				_materials = new Vector.<Vector.<TextureResource>>();
+				_shaders = new Vector.<Shader3D>();
+				_bound = new Bound();
+			} else {
+				_geometries = geometries;
+				_materials = materials;
+				_shaders = shaders;
+				_bound = bound;
 			}
+		}
+		
+		public function dispose(all:Boolean = true):void {
+			if (all) {
+				for each(var geom:Geometry in _geometries) geom.dispose();
+				for each(var mats:Vector.<TextureResource> in _materials) {
+					for each(var mat:TextureResource in mats) mat.dispose();
+				}
+				for each(var shader:Shader3D in _shaders) shader.dispose();
+			}
+			_geometries = null;
 			_materials = null;
-			for each(var shader:Shader3D in _shaders) shader.dispose();
 			_shaders = null;
 			_skinInfo = null;
 			_bound = null;
@@ -83,6 +107,10 @@ package nest.object
 		
 		public function get bound():Bound {
 			return _bound;
+		}
+		
+		public function set bound(value:Bound):void {
+			_bound = value;
 		}
 		
 		public function get visible():Boolean {

@@ -11,7 +11,7 @@ package nest.control.util
 	 * RayIntersection
 	 * <p>Orgion and delta should be translated into mesh's croodinate space.</p>
 	 * <p>result.w == 0 means they aren't intersected.</p>
-	 * <p>result.w == 1 means they're intersected.</p>
+	 * <p>result.w == 1 means they are intersected.</p>
 	 * <p>Refer to Graphics Gems I</p>
 	 */
 	public class RayIntersection {
@@ -21,13 +21,11 @@ package nest.control.util
 			const a:Number = e.dotProduct(delta) / delta.length;
 			var f:Number = radius * radius - e.lengthSquared + a * a;
 			if (f < 0) {
-				// no intersection.
 				result.w = 0;
 				return;
 			}
 			f = a - Math.sqrt(f);
 			if (f > delta.length || f < 0) {
-				// no intersection.
 				result.w = 0;
 				return;
 			}
@@ -200,34 +198,33 @@ package nest.control.util
 			} else {
 				Ray_BSphere(result, orgion, delta, mesh.bound.center, mesh.bound.radius);
 			}
+			if (result.w == 0) return;
+			result.w = 0;
 			var vt1:Vector3D = new Vector3D(), vt2:Vector3D = new Vector3D();
 			var v1:Vertex, v2:Vertex, v3:Vertex;
 			var geom:Geometry;
-			if (result.w == 1) {
-				var t:Number;
-				var triangle:Triangle;
-				for each(geom in mesh.geometries) {
-					for each(triangle in geom.triangles) {
-						v1 = geom.vertices[triangle.indices[0]];
-						v2 = geom.vertices[triangle.indices[1]];
-						v3 = geom.vertices[triangle.indices[2]];
-						vt1.setTo(v2.x - v1.x, v2.y - v1.y, v2.z - v1.z);
-						vt2.setTo(v3.x - v2.x, v3.y - v2.y, v3.z - v2.z);
-						vt1 = vt1.crossProduct(vt2);
-						vt1.normalize();
-						t = Ray_Triangle(orgion, delta, v1, v2, v3, vt1);
-						if (t <= 1) {
-							result.copyFrom(delta);
-							result.scaleBy(t);
-							result.x += orgion.x;
-							result.y += orgion.y;
-							result.z += orgion.z;
-							result.w = 1;
-							return;
-						}
+			var t:Number;
+			var triangle:Triangle;
+			for each(geom in mesh.geometries) {
+				for each(triangle in geom.triangles) {
+					v1 = geom.vertices[triangle.indices[0]];
+					v2 = geom.vertices[triangle.indices[1]];
+					v3 = geom.vertices[triangle.indices[2]];
+					vt1.setTo(v2.x - v1.x, v2.y - v1.y, v2.z - v1.z);
+					vt2.setTo(v3.x - v2.x, v3.y - v2.y, v3.z - v2.z);
+					vt1 = vt1.crossProduct(vt2);
+					vt1.normalize();
+					t = Ray_Triangle(orgion, delta, v1, v2, v3, vt1);
+					if (t <= 1) {
+						result.copyFrom(delta);
+						result.scaleBy(t);
+						result.x += orgion.x;
+						result.y += orgion.y;
+						result.z += orgion.z;
+						result.w = 1;
+						return;
 					}
 				}
-				result.w = 0;
 			}
 		}
 		

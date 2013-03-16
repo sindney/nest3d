@@ -35,51 +35,23 @@ package nest.control.parser
 			model.position = 0;
 			model.endian = Endian.LITTLE_ENDIAN;
 			
-			//header
 			if (model.readInt() != 844121161) throw new Error("Error reading MD2 file: Not a valid MD2 file");
 			if (model.readInt() != 8) throw new Error("Error reading MD2 file: Bad version");
 			
-			//skin size
 			var skin_width:int = model.readInt();
 			var skin_height:int = model.readInt();
-			
-			//frame size
 			var frame_size:int = model.readInt();
-			
-			//num skins
 			var num_skins:int = model.readInt();
-			
-			//num vertices
 			var num_vertices:int = model.readInt();
-			
-			//num uvs
 			var num_uvs:int = model.readInt();
-			
-			//num triangles
 			var num_triangles:int = model.readInt();
-			
-			//num OpenGL commands
 			var num_glCommands:int = model.readInt();
-			
-			//num frames
 			var num_frames:int = model.readInt();
-			
-			//offset skins
 			var offset_skins:int = model.readInt();
-			
-			//offset uvs
 			var offset_uvs:int = model.readInt();
-			
-			//offset triangles
 			var offset_triangles:int = model.readInt();
-			
-			//offset frames
 			var offset_frames:int = model.readInt();
-			
-			//offset OpenGL commands
 			var offset_glCommands:int = model.readInt();
-			
-			//offset end of the file
 			var offset_end:int = model.readInt();
 			
 			var vertices:Vector.<Vertex> = new Vector.<Vertex>(num_vertices, true);
@@ -173,7 +145,9 @@ package nest.control.parser
 					frame.vertices[k] = (sx * model.readUnsignedByte() + tx);
 					frame.vertices[k + 1] = (sy * model.readUnsignedByte() + ty);
 					frame.vertices[k + 2] = (sz * model.readUnsignedByte() + tz);
-					frame.normals[k] = frame.normals[k + 1] = frame.normals[k + 2] = 0;
+					frame.normals[k] = 0;
+					frame.normals[k + 1] = 0;
+					frame.normals[k + 2] = 0;
 					model.readUnsignedByte();
 				}
 				vertexTrack.frames.push(frame);
@@ -185,6 +159,8 @@ package nest.control.parser
 			var v1:int, v2:int, v3:int;
 			var n1:Number, n2:Number, n3:Number;
 			var mag:Number;
+			var max:Vector3D = new Vector3D();
+			var min:Vector3D = new Vector3D();
 			
 			j = triangles.length;
 			for each(frame in vertexTrack.frames) {
@@ -193,17 +169,14 @@ package nest.control.parser
 					v1 = tri.indices[0] * 3;
 					v2 = tri.indices[1] * 3;
 					v3 = tri.indices[2] * 3;
-					
 					vt1.x = frame.vertices[v2]     - frame.vertices[v1];
 					vt1.y = frame.vertices[v2 + 1] - frame.vertices[v1 + 1];
 					vt1.z = frame.vertices[v2 + 2] - frame.vertices[v1 + 2];
 					vt2.x = frame.vertices[v3]     - frame.vertices[v2];
 					vt2.y = frame.vertices[v3 + 1] - frame.vertices[v2 + 1];
 					vt2.z = frame.vertices[v3 + 2] - frame.vertices[v2 + 2];
-					
 					vt1 = vt1.crossProduct(vt2);
 					vt1.normalize();
-					
 					frame.normals[v1]     += vt1.x;
 					frame.normals[v1 + 1] += vt1.y;
 					frame.normals[v1 + 2] += vt1.z;
@@ -214,6 +187,8 @@ package nest.control.parser
 					frame.normals[v3 + 1] += vt1.y;
 					frame.normals[v3 + 2] += vt1.z;
 				}
+				max.setTo(0, 0, 0);
+				min.setTo(0, 0, 0);
 				k = frame.normals.length;
 				for (i = 0; i < k; i += 3) {
 					n1 = frame.normals[i];
@@ -223,14 +198,26 @@ package nest.control.parser
 					frame.normals[i] *= mag;
 					frame.normals[i + 1] *= mag;
 					frame.normals[i + 2] *= mag;
+					n1 = frame.vertices[i];
+					n2 = frame.vertices[i + 1];
+					n3 = frame.vertices[i + 2];
+					if (n1 > max.x) max.x = n1;
+					else if (n1 < min.x) min.x = n1;
+					if (n2 > max.y) max.y = n2;
+					else if (n2 < min.y) min.y = n2;
+					if (n3 > max.z) max.z = n3;
+					else if (n3 < min.z) min.z = n3;
 				}
+				frame.bounds[0] = min.x; frame.bounds[1] = min.y; frame.bounds[2] = min.z;
+				frame.bounds[3] = max.x; frame.bounds[4] = max.y; frame.bounds[5] = max.z;
 			}
 			
 			//reset vertex data to frame0
 			var vs0:Vector.<Number> = (vertexTrack.frames[0] as VertexKeyFrame).vertices;
 			var vn0:Vector.<Number> = (vertexTrack.frames[0] as VertexKeyFrame).normals;
 			var vertex:Vertex;
-			for (i = 0, j = 0; i < num_vertices; i++, j += 3) {
+			for (i = 0; i < num_vertices; i++) {
+				j = i * 3;
 				vertex = vertices[i];
 				vertex.x = vs0[j];
 				vertex.y = vs0[j + 1];

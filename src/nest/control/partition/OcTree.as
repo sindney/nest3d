@@ -17,6 +17,7 @@ package nest.control.partition
 	public class OcTree implements IPTree {
 		
 		private var _root:OcNode;
+		private var _frustum:Boolean = false;
 		
 		public function OcTree() {
 			_root = new OcNode();
@@ -124,7 +125,7 @@ package nest.control.partition
 			var radius:Number;
 			var mesh:IMesh;
 			var objects:Vector.<IMesh> = node.objects;
-			var a:Vector3D, b:Vector3D, c:Vector3D = new Vector3D(0.577, 0.577, 0.577);
+			var a:Vector3D, b:Vector3D, c:Vector3D = new Vector3D(0.577, 0.577, 0.577), d:Vector3D = new Vector3D();
 			
 			j = objects.length;
 			node.objects = new Vector.<IMesh>();
@@ -145,7 +146,7 @@ package nest.control.partition
 					BTBL = Bound.AABB_AABB(a, b, TBL.max, TBL.min);
 					BTBR = Bound.AABB_AABB(a, b, TBR.max, TBR.min);
 				} else {
-					a = mesh.worldMatrix.transformVector(mesh.matrix.transformVector(mesh.bound.center));
+					a = mesh.worldMatrix.transformVector(mesh.matrix.transformVector(d));
 					b = mesh.worldMatrix.transformVector(mesh.matrix.transformVector(c));
 					radius = mesh.bound.radius * b.length;
 					BBTL = Bound.AABB_BSphere(BTL.max, BTL.min, a, radius);
@@ -212,6 +213,14 @@ package nest.control.partition
 		
 		public function get root():IPNode {
 			return _root;
+		}
+		
+		public function get frustum():Boolean {
+			return _frustum;
+		}
+		
+		public function set frustum(value:Boolean):void {
+			_frustum = value;
 		}
 		
 	}
