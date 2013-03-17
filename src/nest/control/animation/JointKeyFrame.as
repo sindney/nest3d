@@ -16,9 +16,8 @@ package nest.control.animation
 			var result:JointKeyFrame = new JointKeyFrame();
 			result.time = _time;
 			result.name = _name;
-			var i:int, j:int = positions.length;
+			var i:int, j:int = transforms.length;
 			for (i = 0; i < 6; i++) result.bounds[i] = bounds[i];
-			j = transforms.length;
 			for (i = 0; i < j; i++) result.transforms[i] = transforms[i];
 			return result;
 		}

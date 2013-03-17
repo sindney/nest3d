@@ -12,10 +12,11 @@ package nest.control.controller
 		public static const MOUSE_OVER:String = "mouseOver";
 		public static const MOUSE_MOVE:String = "mouseMove";
 		public static const MOUSE_OUT:String = "mouseOut";
+		public static const MOUSE_UP:String = "mouseUp";
 		public static const CLICK:String = "click";
-		public static const DOUBLE_CLICK:String = "doubleClick";
 		public static const RIGHT_CLICK:String = "rightClick";
 		public static const RIGHT_MOUSE_DOWN:String = "rightMouseDown";
+		public static const RIGHT_MOUSE_UP:String = "rightMouseUp";
 		
 		public function MouseEvent3D(type:String, bubbles:Boolean = false, cancelable:Boolean = false) {
 			super(type, bubbles, cancelable);

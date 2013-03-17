@@ -88,19 +88,30 @@ package nest.control.animation
 			bound.vertices[4].setTo(min.x, min.y, max.z);
 			bound.vertices[5].setTo(max.x, min.y, max.z);
 			bound.vertices[6].setTo(min.x, max.y, max.z);
-			bound.center.setTo((max.x + min.x) * 0.5, (max.y + min.y) * 0.5, (max.z + min.z) * 0.5);
 			Joint.calculateMatrixes(skin.root);
-			for each(var geom:Geometry in track.target.geometries) {
+			var i:int, j:int = track.target.geometries.length;
+			var k:int, l:int, m:int;
+			var weight:Number;
+			var geom:Geometry;
+			var vertex:Vertex;
+			var bindPose:Vector.<Number>;
+			for (i = 0; i < j; i++) {
+				geom = track.target.geometries[i];
+				bindPose = track.target.skinInfo.bindPose[i];
+				l = geom.vertices.length;
 				b0 = false;
-				for each(var vertex:Vertex in geom) {
+				for (k = 0; k < l; k++) {
+					vertex = geom.vertices[k];
 					if (vertex.indices) {
 						b0 = true;
-						comp0.x = comp1.x = vertex.x, comp0.y = comp1.y = vertex.y, comp0.z = comp1.z = vertex.z;
+						m = k * 6;
+						// TODO: 记得变换normal
+						comp0.x = comp1.x = bindPose[m], comp0.y = comp1.y = bindPose[m + 1], comp0.z = comp1.z = bindPose[m + 2];
 						j = vertex.indices.length;
 						for (i = 0; i < j; i++) {
-							k = vertex.weights[i];
+							weight = vertex.weights[i];
 							comp2 = skin.joints[vertex.indices[i]].finalMatrix.transformVector(comp0);
-							comp1.x += comp2.x * k, comp1.y += comp2.y * k, comp1.z += comp2.z * k;
+							comp1.x += comp2.x * weight, comp1.y += comp2.y * weight, comp1.z += comp2.z * weight;
 						}
 						vertex.x = comp1.x, vertex.y = comp1.y, vertex.z = comp1.z;
 					}

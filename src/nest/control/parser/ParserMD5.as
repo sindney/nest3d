@@ -50,6 +50,7 @@ package nest.control.parser
 		private var parseIndex:int;
 		private var charLineIndex:int;
 		
+		public var geometries:Vector.<Geometry>;
 		public var skinInfo:SkinInfo;
 		public var track:AnimationTrack;
 		
@@ -59,6 +60,7 @@ package nest.control.parser
 		
 		public function dispose():void {
 			data = null;
+			geometries = null;
 			skinInfo = null;
 			track = null;
 			jointInfo = null;
@@ -135,9 +137,9 @@ package nest.control.parser
 			do {
 				parseLiteralString();
 				// parent
-				getNextInt()
+				parseInt(getNextToken())
 				// flag, start index
-				jointInfo.push(getNextInt(), getNextInt());
+				jointInfo.push(parseInt(getNextToken()), parseInt(getNextToken()));
 				ch = getNextChar();
 				if (ch == "/") {
 					putBack();
@@ -212,11 +214,9 @@ package nest.control.parser
 				for (i = 0; i < num_animatedComponents; i++) {
 					frameData.push(parseFloat(getNextToken()));
 				}
-				// TODO: JointKeyFrame初始化这里需要修改
 				frame = new JointKeyFrame();
 				j = jointInfo.length;
 				for (i = 0; i < j; i++) {
-					baseFrameData = baseFrame[i];
 					k = i * 2;
 					flag = jointInfo[k];
 					index = jointInfo[k + 1];
@@ -258,6 +258,7 @@ package nest.control.parser
 			charLineIndex = 0;
 			num_joints = 0;
 			num_meshes = 0;
+			geometries = new Vector.<Geometry>();
 			
 			var token:String;
 			while(true){
@@ -393,6 +394,7 @@ package nest.control.parser
 			var joint:Joint;
 			var vertices:Vector.<Vertex> = new Vector.<Vertex>();
 			var triangles:Vector.<Triangle> = new Vector.<Triangle>();
+			var bindPose:Vector.<Number> = new Vector.<Number>();
 			for (i = 0; i < num_verts; i++) {
 				vertex = vertices[i] = new Vertex(0, 0, 0, rawUV[i][0], rawUV[i][1]);
 				vertex.weights = new Vector.<Number>();
@@ -419,9 +421,16 @@ package nest.control.parser
 															vertices[k].u, vertices[k].v, 
 															vertices[j].u, vertices[j].v);
 			}
-			skinInfo.vertices.push(vertices);
-			skinInfo.triangles.push(triangles);
+			var geom:Geometry = new Geometry(vertices, triangles);
 			Geometry.calculateNormal(vertices, triangles);
+			j = vertices.length;
+			for (i = 0; i < j; i++) {
+				vertex = vertices[i];
+				// TODO: 将bind pos的normal变换到joint local
+				bindPose.push(vertex.x, vertex.y, vertex.z, vertex.nx, vertex.ny, vertex.nz);
+			}
+			geometries.push(geom);
+			skinInfo.bindPose.push(bindPose);
 		}
 		
 		private function parseVector3D():Vector3D {

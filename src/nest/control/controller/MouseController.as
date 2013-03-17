@@ -22,13 +22,12 @@ package nest.control.controller
 	 * MouseController
 	 */
 	public class MouseController {
-		// TODO: 实现MouseOver, MouseUp, RightMouseUp
+		
 		private var id:uint;
 		private var mouseX:Number = 0;
 		private var mouseY:Number = 0;
 		private var target:IMesh;
 		private var program:Program3D;
-		private var type:String;
 		
 		public var stage:Stage;
 		public var containerProcess:IContainerProcess;
@@ -43,10 +42,12 @@ package nest.control.controller
 			
 			stage.addEventListener(MouseEvent.MOUSE_MOVE, onMouseEvent);
 			stage.addEventListener(MouseEvent.MOUSE_DOWN, onMouseEvent);
+			stage.addEventListener(MouseEvent.MOUSE_OVER, onMouseEvent);
+			stage.addEventListener(MouseEvent.MOUSE_UP, onMouseEvent);
 			stage.addEventListener(MouseEvent.CLICK, onMouseEvent);
-			stage.addEventListener(MouseEvent.DOUBLE_CLICK, onMouseEvent);
 			stage.addEventListener(MouseEvent.RIGHT_CLICK, onMouseEvent);
 			stage.addEventListener(MouseEvent.RIGHT_MOUSE_DOWN, onMouseEvent);
+			stage.addEventListener(MouseEvent.RIGHT_MOUSE_UP, onMouseEvent);
 		}
 		
 		public function calculate():void {
@@ -135,12 +136,11 @@ package nest.control.controller
 						if (mesh.mouseEnabled && mesh.id == id) {
 							if (target != mesh) {
 								if (target) target.dispatchEvent(new MouseEvent3D(MouseEvent3D.MOUSE_OUT));
-								type = MouseEvent3D.MOUSE_OVER;
+								mesh.dispatchEvent(new MouseEvent3D(MouseEvent3D.MOUSE_OVER));
 							}
 							target = mesh;
 						}
 					}
-					target.dispatchEvent(new MouseEvent3D(type));
 				} else {
 					if (target) target.dispatchEvent(new MouseEvent3D(MouseEvent3D.MOUSE_OUT));
 					target = null;
@@ -155,14 +155,17 @@ package nest.control.controller
 			target = null;
 			stage.removeEventListener(MouseEvent.MOUSE_MOVE, onMouseEvent);
 			stage.removeEventListener(MouseEvent.MOUSE_DOWN, onMouseEvent);
+			stage.removeEventListener(MouseEvent.MOUSE_OVER, onMouseEvent);
+			stage.removeEventListener(MouseEvent.MOUSE_UP, onMouseEvent);
 			stage.removeEventListener(MouseEvent.CLICK, onMouseEvent);
-			stage.removeEventListener(MouseEvent.DOUBLE_CLICK, onMouseEvent);
 			stage.removeEventListener(MouseEvent.RIGHT_CLICK, onMouseEvent);
 			stage.removeEventListener(MouseEvent.RIGHT_MOUSE_DOWN, onMouseEvent);
+			stage.removeEventListener(MouseEvent.RIGHT_MOUSE_UP, onMouseEvent);
 			stage = null;
 		}
 		
 		private function onMouseEvent(e:MouseEvent):void {
+			var type:String;
 			mouseX = stage.mouseX;
 			mouseY = stage.mouseY;
 			switch(e.type) {
@@ -172,11 +175,11 @@ package nest.control.controller
 				case MouseEvent.MOUSE_DOWN:
 					type = MouseEvent3D.MOUSE_DOWN;
 					break;
+				case MouseEvent.MOUSE_UP:
+					type = MouseEvent3D.MOUSE_UP;
+					break;
 				case MouseEvent.CLICK:
 					type = MouseEvent3D.CLICK;
-					break;
-				case MouseEvent.DOUBLE_CLICK:
-					type = MouseEvent3D.DOUBLE_CLICK;
 					break;
 				case MouseEvent.RIGHT_CLICK:
 					type = MouseEvent3D.RIGHT_CLICK;
@@ -184,7 +187,11 @@ package nest.control.controller
 				case MouseEvent.RIGHT_MOUSE_DOWN:
 					type = MouseEvent3D.RIGHT_MOUSE_DOWN;
 					break;
+				case MouseEvent.RIGHT_MOUSE_UP:
+					type = MouseEvent3D.RIGHT_MOUSE_UP;
+					break;
 			}
+			if (target && type) target.dispatchEvent(new MouseEvent3D(type));
 		}
 		
 	}
