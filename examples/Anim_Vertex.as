@@ -1,15 +1,19 @@
 package  
 {
+	import flash.display3D.Context3DProgramType;
+	import flash.events.MouseEvent;
+	
 	import nest.control.animation.AnimationTrack;
 	import nest.control.animation.VertexModifier;
 	import nest.control.controller.AnimationController;
 	import nest.control.parser.ParserMD2;
+	import nest.control.util.Primitives;
 	import nest.object.geom.Bound;
 	import nest.object.geom.Geometry;
 	import nest.object.Mesh;
 	import nest.object.Container3D;
 	import nest.view.process.*;
-	import nest.view.shader.Shader3D;
+	import nest.view.shader.*;
 	import nest.view.TextureResource;
 	
 	/**
@@ -26,11 +30,6 @@ package
 		private var process0:ContainerProcess;
 		private var container:Container3D;
 		private var anim_controller:AnimationController;
-		
-		public function Anim_Vertex() {
-			super();
-			
-		}
 		
 		override public function init():void {
 			container = new Container3D();
@@ -67,9 +66,6 @@ package
 			track.modifier = new VertexModifier();
 			track.parameters[VertexModifier.GEOM_INDEX] = 0;
 			track.target = mesh;
-			track.enabled = true;
-			
-			parser.dispose();
 			
 			anim_controller = new AnimationController();
 			anim_controller.tracks.push(track);
@@ -78,8 +74,14 @@ package
 			anim_controller.setup();
 			anim_controller.restart();
 			
+			parser.dispose();
+			
 			camera.position.z = -100;
 			camera.recompose();
+		}
+		
+		override protected function onRightClick(e:MouseEvent):void {
+			anim_controller.paused = !anim_controller.paused;
 		}
 		
 		override public function loop():void {

@@ -89,12 +89,12 @@ package nest.control.animation
 			bound.vertices[5].setTo(max.x, min.y, max.z);
 			bound.vertices[6].setTo(min.x, max.y, max.z);
 			Joint.calculateMatrixes(skin.root);
-			var i:int, j:int = track.target.geometries.length;
-			var k:int, l:int, m:int;
+			var m:int, n:int, o:int;
 			var weight:Number;
 			var geom:Geometry;
 			var vertex:Vertex;
 			var bindPose:Vector.<Number>;
+			j = track.target.geometries.length;
 			for (i = 0; i < j; i++) {
 				geom = track.target.geometries[i];
 				bindPose = track.target.skinInfo.bindPose[i];
@@ -105,15 +105,25 @@ package nest.control.animation
 					if (vertex.indices) {
 						b0 = true;
 						m = k * 6;
-						// TODO: 记得变换normal
-						comp0.x = comp1.x = bindPose[m], comp0.y = comp1.y = bindPose[m + 1], comp0.z = comp1.z = bindPose[m + 2];
-						j = vertex.indices.length;
-						for (i = 0; i < j; i++) {
-							weight = vertex.weights[i];
-							comp2 = skin.joints[vertex.indices[i]].finalMatrix.transformVector(comp0);
-							comp1.x += comp2.x * weight, comp1.y += comp2.y * weight, comp1.z += comp2.z * weight;
+						comp0.x = bindPose[m++];
+						comp0.y = bindPose[m++];
+						comp0.z = bindPose[m++];
+						comp2.x = bindPose[m++];
+						comp2.y = bindPose[m++];
+						comp2.z = bindPose[m++];
+						comp1.x = comp1.y = comp1.z = 0;
+						comp3.x = comp3.y = comp3.z = 0;
+						o = vertex.indices.length;
+						for (n = 0; n < o; n++) {
+							weight = vertex.weights[n];
+							joint = skin.joints[vertex.indices[n]];
+							comp4 = joint.finalMatrix.transformVector(comp0);
+							comp1.x += comp4.x * weight, comp1.y += comp4.y * weight, comp1.z += comp4.z * weight;
+							comp4 = joint.finalMatrix.transformVector(comp2);
+							comp3.x += comp4.x * weight, comp3.y += comp4.y * weight, comp3.z += comp4.z * weight;
 						}
 						vertex.x = comp1.x, vertex.y = comp1.y, vertex.z = comp1.z;
+						vertex.nx = comp3.x, vertex.ny = comp3.y, vertex.nz = comp3.z;
 					}
 				}
 				if (b0) Geometry.uploadGeometry(geom, true, geom.normalBuffer != null, geom.uvBuffer != null, false);

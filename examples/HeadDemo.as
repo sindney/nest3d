@@ -258,14 +258,13 @@ package
 		
 		override public function loop():void {
 			var orgion:Vector3D = mesh.invertWorldMatrix.transformVector(mesh.invertMatrix.transformVector(camera.position));
-			var delta:Vector3D = mesh.invertWorldMatrix.transformVector(mesh.invertMatrix.transformVector(camera.matrix.transformVector(new Vector3D(0, 0, 600))));
+			var delta:Vector3D = mesh.invertWorldMatrix.transformVector(mesh.invertMatrix.transformVector(camera.matrix.transformVector(new Vector3D(0, 0, 1000))));
 			var result:Vector3D = new Vector3D();
 			RayIntersection.Ray_Mesh(result, orgion, delta, mesh);
-			result = mesh.worldMatrix.transformVector(mesh.matrix.transformVector(result));
+			result.copyFrom(mesh.worldMatrix.transformVector(mesh.matrix.transformVector(result)));
 			box.position.copyFrom(result);
 			box.recompose();
 			box.visible = result.w != 0;
-			
 			orgion.normalize();
 			orgion.negate();
 			lights.data[8] = orgion.x;

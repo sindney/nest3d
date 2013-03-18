@@ -11,6 +11,7 @@ package
 	import nest.object.Container3D;
 	import nest.view.shader.*;
 	import nest.view.process.*;
+	import nest.view.TextureResource;
 	
 	/**
 	 * BasicDemo
@@ -19,10 +20,6 @@ package
 		
 		private var process0:ContainerProcess;
 		private var container:Container3D;
-		
-		public function BasicDemo() {
-			
-		}
 		
 		override public function init():void {
 			container = new Container3D();
@@ -44,15 +41,17 @@ package
 			var offsetX:Number = 0, offsetY:Number = 0, offsetZ:Number = 0;
 			var mesh:Mesh;
 			
+			var geoms:Vector.<Geometry> = Vector.<Geometry>([geom]);
+			var materials:Vector.<Vector.<TextureResource>> = Vector.<Vector.<TextureResource>>([null]);
+			var shaders:Vector.<Shader3D> = Vector.<Shader3D>([shader]);
+			var bound:Bound = new Bound();
+			Bound.calculate(bound, geoms);
+			
 			var i:int, j:int, k:int, l:int = 15, m:int = l * 25;
 			for (i = 0; i < l; i++) {
 				for (j = 0; j < l; j++) {
 					for (k = 0; k < l; k++) {
-						mesh = new Mesh();
-						mesh.geometries.push(geom);
-						mesh.materials.push(null);
-						mesh.shaders.push(shader);
-						Bound.calculate(mesh.bound, mesh.geometries);
+						mesh = new Mesh(false, geoms, materials, shaders, bound);
 						mesh.position.setTo(i * 50 - m + offsetX, j * 50 - m + offsetY, k * 50 - m + offsetZ);
 						mesh.scale.setTo(10, 10, 10);
 						container.addChild(mesh);

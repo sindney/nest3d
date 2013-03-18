@@ -81,6 +81,7 @@ package
 						container.addChild(mesh);
 						mesh.addEventListener(MouseEvent3D.MOUSE_OVER, onMouseOver);
 						mesh.addEventListener(MouseEvent3D.MOUSE_DOWN, onMouseDown);
+						mesh.addEventListener(MouseEvent3D.MOUSE_UP, onMouseOut);
 						mesh.addEventListener(MouseEvent3D.MOUSE_OUT, onMouseOut);
 					}
 				}
