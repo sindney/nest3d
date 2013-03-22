@@ -83,8 +83,9 @@ package
 			
 			parser.dispose();
 			
-			Geometry.setupGeometry(mesh.geometries[0], true, true, true);
-			Geometry.uploadGeometry(mesh.geometries[0], true, true, true, true);
+			Geometry.setupGeometry(mesh.geometries[0], true, true, false, true);
+			Geometry.calculateNormal(mesh.geometries[0]);
+			Geometry.uploadGeometry(mesh.geometries[0], true, true, false, true, true);
 			
 			var material:Vector.<TextureResource> = new Vector.<TextureResource>();
 			var diffuse:TextureResource = new TextureResource(0, null);
@@ -122,8 +123,8 @@ package
 			
 			box = new Mesh();
 			box.geometries.push(Primitives.createBox());
-			Geometry.setupGeometries(box.geometries, true, false, false);
-			Geometry.uploadGeometries(box.geometries, true, false, false, true);
+			Geometry.setupGeometries(box.geometries, true, false, false, false);
+			Geometry.uploadGeometries(box.geometries, true, false, false, false, true);
 			Bound.calculate(box.bound, box.geometries);
 			box.materials.push(null);
 			box.shaders.push(box_shader);
@@ -157,8 +158,8 @@ package
 			skybox.geometries.push(Primitives.createSkybox());
 			skybox.materials.push(skybox_material);
 			skybox.shaders.push(skybox_shader);
-			Geometry.setupGeometry(skybox.geometries[0], true, false, false);
-			Geometry.uploadGeometry(skybox.geometries[0], true, false, false, true);
+			Geometry.setupGeometry(skybox.geometries[0], true, false, false, false);
+			Geometry.uploadGeometry(skybox.geometries[0], true, false, false, false, true);
 			Bound.calculate(skybox.bound, skybox.geometries);
 			skybox.cliping = false;
 			skybox.scale.setTo(10000, 10000, 10000);
@@ -170,7 +171,7 @@ package
 		}
 		
 		private function vertexShader():String {
-			var result:String = // va0 = vertex, va2 = uv, vc0 = mesh.matrix
+			var result:String = // va0 = vertex, va3 = uv, vc0 = mesh.matrix
 			// vc4 = mesh.worldMatrix, vc8 = camera.invertMatrix * camera.pm
 			"m44 vt0, va0, vc0\n" + 
 			// v0 = vertex * mesh.matrix
@@ -178,7 +179,7 @@ package
 			// v1 = normal
 			"mov v1, va1\n" + 
 			// v2 = uv
-			"mov v2, va2\n" + 
+			"mov v2, va3\n" + 
 			// project vertex
 			"m44 vt0, vt0, vc4\n" + 
 			"m44 op, vt0, vc8\n" + 
@@ -210,7 +211,7 @@ package
 			"nrm vt5.xyz, vt0\n" + 
 			"mov v4, vt5\n" + 
 			// v3 = binormal
-			"crs vt6.xyz, va2, vt0\n" + 
+			"crs vt6.xyz, va3, vt0\n" + 
 			"mov vt6.w, vc21.x\n" + 
 			"mov v3, vt6\n";
 			return result;

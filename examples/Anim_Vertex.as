@@ -48,23 +48,24 @@ package
 			
 			var shader:Shader3D = new Shader3D();
 			shader.comply("m44 vt0, va0, vc0\nm44 vt0, vt0, vc4\n" + 
-							"m44 op, vt0, vc8\nmov v0, va2\n", 
+							"m44 op, vt0, vc8\nmov v0, va3\n", 
 							"tex oc, v0, fs0 <2d,linear,mipnone>\n");
 			
 			var mesh:Mesh = new Mesh();
 			mesh.geometries.push(parser.geom);
 			mesh.materials.push(material);
 			mesh.shaders.push(shader);
-			Geometry.setupGeometry(parser.geom, true, false, true);
-			Geometry.uploadGeometry(parser.geom, true, false, true, true);
+			Geometry.setupGeometry(parser.geom, true, false, false, true);
+			Geometry.uploadGeometry(parser.geom, true, false, false, true, true);
 			Bound.calculate(mesh.bound, mesh.geometries);
-			mesh.rotation.x = -Math.PI / 2;
 			mesh.rotation.y = Math.PI / 2;
 			container.addChild(mesh);
 			
 			var track:AnimationTrack = parser.track;
 			track.modifier = new VertexModifier();
 			track.parameters[VertexModifier.GEOM_INDEX] = 0;
+			track.parameters[VertexModifier.VERTEX_NORMAL] = false;
+			track.parameters[VertexModifier.VERTEX_TANGENT] = false;
 			track.target = mesh;
 			
 			anim_controller = new AnimationController();

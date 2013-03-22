@@ -4,7 +4,6 @@ package nest.control.animation
 	
 	import nest.object.geom.Bound;
 	import nest.object.geom.Geometry;
-	import nest.object.geom.Vertex;
 	
 	/**
 	 * VertexModifier
@@ -12,28 +11,39 @@ package nest.control.animation
 	public class VertexModifier implements IAnimationModifier {
 		
 		public static const GEOM_INDEX:String = "geom_index";
+		public static const VERTEX_NORMAL:String = "vertex_normal";
+		public static const VERTEX_TANGENT:String = "vertex_tangent";
 		
 		public function calculate(track:AnimationTrack, k1:IKeyFrame, k2:IKeyFrame, time:Number):void {
 			var w1:Number = track.weight * (k2.time - time) / (k2.time - k1.time);
 			var w2:Number = track.weight - w1;
-			
 			var geom:Geometry = track.target.geometries[track.parameters[GEOM_INDEX]];
 			var vt0:Vector.<Number> = (k1 as VertexKeyFrame).vertices;
 			var vt1:Vector.<Number> = (k2 as VertexKeyFrame).vertices;
 			var nm0:Vector.<Number> = (k1 as VertexKeyFrame).normals;
 			var nm1:Vector.<Number> = (k2 as VertexKeyFrame).normals;
+			var tg0:Vector.<Number> = (k1 as VertexKeyFrame).tangents;
+			var tg1:Vector.<Number> = (k2 as VertexKeyFrame).tangents;
 			var bd0:Vector.<Number> = (k1 as VertexKeyFrame).bounds;
 			var bd1:Vector.<Number> = (k2 as VertexKeyFrame).bounds;
+			var normal:Boolean = track.parameters[VERTEX_NORMAL];
+			var tangent:Boolean = track.parameters[VERTEX_TANGENT];
 			var i:int, j:int;
-			var l:int = vt0.length / 3;
-			for (i = 0, j = 0; i < l; i++, j += 3) {
-				var vertex:Vertex = geom.vertices[i];
-				vertex.x = vt0[j] * w1 + vt1[j] * w2;
-				vertex.y = vt0[j + 1] * w1 + vt1[j + 1] * w2;
-				vertex.z = vt0[j + 2] * w1 + vt1[j + 2] * w2;
-				vertex.nx = nm0[j] * w1 + nm1[j] * w2;
-				vertex.ny = nm0[j + 1] * w1 + nm1[j + 1] * w2;
-				vertex.nz = nm0[j + 2] * w1 + nm1[j + 2] * w2;
+			for (i = 0; i < geom.numVertices; i++) {
+				j = i * 3;
+				geom.vertices[j] = vt0[j] * w1 + vt1[j] * w2;
+				geom.vertices[j + 1] = vt0[j + 1] * w1 + vt1[j + 1] * w2;
+				geom.vertices[j + 2] = vt0[j + 2] * w1 + vt1[j + 2] * w2;
+				if (normal) {
+					geom.normals[j] = nm0[j] * w1 + nm1[j] * w2;
+					geom.normals[j + 1] = nm0[j + 1] * w1 + nm1[j + 1] * w2;
+					geom.normals[j + 2] = nm0[j + 2] * w1 + nm1[j + 2] * w2;
+				}
+				if (tangent) {
+					geom.tangents[j] = tg0[j] * w1 + tg1[j] * w2;
+					geom.tangents[j + 1] = tg0[j + 1] * w1 + tg1[j + 1] * w2;
+					geom.tangents[j + 2] = tg0[j + 2] * w1 + tg1[j + 2] * w2;
+				}
 			}
 			var bound:Bound = track.target.bound;
 			var min:Vector3D = bound.vertices[0], max:Vector3D = bound.vertices[7];
@@ -45,7 +55,7 @@ package nest.control.animation
 			bound.vertices[4].setTo(min.x, min.y, max.z);
 			bound.vertices[5].setTo(max.x, min.y, max.z);
 			bound.vertices[6].setTo(min.x, max.y, max.z);
-			Geometry.uploadGeometry(geom, true, geom.normalBuffer != null, geom.uvBuffer != null, false);
+			Geometry.uploadGeometry(geom, true, normal, tangent, false, false);
 		}
 		
 	}

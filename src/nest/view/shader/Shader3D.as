@@ -9,9 +9,13 @@ package nest.view.shader
 	
 	/**
 	 * Shader3D
-	 * <p>vc0: mesh.invertMatrix</p>
-	 * <p>vc4: mesh.invertWorldMatrix</p>
-	 * <p>vc8: projectionMatrix</p>
+	 * <p>vc0-3: mesh.invertMatrix</p>
+	 * <p>vc4-7: mesh.invertWorldMatrix</p>
+	 * <p>vc8-11: projectionMatrix</p>
+	 * <p>va0: vertexBuffer</p>
+	 * <p>va1: normalBuffer</p>
+	 * <p>va2: tangentBuffer</p>
+	 * <p>va3: uvBuffer</p>
 	 */
 	public class Shader3D {
 		

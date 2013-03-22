@@ -5,7 +5,6 @@ package nest.object
 	import nest.control.controller.MouseEvent3D;
 	import nest.object.geom.Bound;
 	import nest.object.geom.Geometry;
-	import nest.object.geom.SkinInfo;
 	import nest.view.shader.Shader3D;
 	import nest.view.TextureResource;
 	
@@ -26,8 +25,6 @@ package nest.object
 		protected var _geometries:Vector.<Geometry>;
 		protected var _materials:Vector.<Vector.<TextureResource>>;
 		protected var _shaders:Vector.<Shader3D>;
-		
-		protected var _skinInfo:SkinInfo;
 		
 		protected var _bound:Bound;
 		protected var _triangleCulling:String = Context3DTriangleFace.BACK;
@@ -65,7 +62,6 @@ package nest.object
 			_geometries = null;
 			_materials = null;
 			_shaders = null;
-			_skinInfo = null;
 			_bound = null;
 		}
 		
@@ -95,14 +91,6 @@ package nest.object
 		
 		public function set shaders(value:Vector.<Shader3D>):void {
 			_shaders = value;
-		}
-		
-		public function get skinInfo():SkinInfo {
-			return _skinInfo;
-		}
-		
-		public function set skinInfo(value:SkinInfo):void {
-			_skinInfo = value;
 		}
 		
 		public function get bound():Bound {

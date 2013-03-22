@@ -60,8 +60,8 @@ package
 							"mov oc, fc0\n");
 			
 			var geom:Geometry = Primitives.createBox();
-			Geometry.setupGeometry(geom, true, false, false);
-			Geometry.uploadGeometry(geom, true, false, false, true);
+			Geometry.setupGeometry(geom, true, false, false, false);
+			Geometry.uploadGeometry(geom, true, false, false, false, true);
 			
 			var mesh:Mesh;
 			var offsetX:Number = 0, offsetY:Number = 0, offsetZ:Number = 0;

@@ -8,13 +8,16 @@ package nest.control.parser
 	import nest.control.animation.IKeyFrame;
 	import nest.control.animation.VertexKeyFrame;
 	import nest.object.geom.Geometry;
-	import nest.object.geom.Triangle;
-	import nest.object.geom.Vertex;
 	
 	/**
 	 * ParserMD2
+	 * <p>Refer to Away3d.</p>
 	 */
 	public class ParserMD2 {
+		
+		private var vertexIndices:Vector.<uint>;
+		private var uvIndices:Vector.<uint>;
+		private var indices:Vector.<uint>;
 		
 		public var geom:Geometry;
 		public var track:AnimationTrack;
@@ -24,13 +27,17 @@ package nest.control.parser
 		}
 		
 		public function dispose():void {
+			vertexIndices = null;
+			uvIndices = null;
+			indices = null;
 			geom = null;
 			track = null;
 		}
 		
 		public function parse(model:ByteArray):void {
-			geom = null;
-			track = null;
+			vertexIndices = new Vector.<uint>();
+			uvIndices = new Vector.<uint>();
+			indices = new Vector.<uint>();
 			
 			model.position = 0;
 			model.endian = Endian.LITTLE_ENDIAN;
@@ -54,181 +61,139 @@ package nest.control.parser
 			var offset_glCommands:int = model.readInt();
 			var offset_end:int = model.readInt();
 			
-			var vertices:Vector.<Vertex> = new Vector.<Vertex>(num_vertices, true);
-			var uvs:Vector.<Number> = new Vector.<Number>(num_uvs * 2, true);
-			var triangles:Vector.<Triangle> = new Vector.<Triangle>(num_triangles, true);
-			var vertexTrack:AnimationTrack = new AnimationTrack(new Vector.<IKeyFrame>());
-			
-			//get texture name
 			model.position = offset_skins;
-			var texture_name:String = "";
-			var i:int, j:int, k:int, char:uint;
-			var u:Number, v:Number;
-			var tri:Triangle;
-			var frame:VertexKeyFrame;
-			if (num_skins > 0) {
-				for (i = 0; i < 64; i++) {
-					char = model.readUnsignedByte();
-					if (char == 0) {
-						break;
-					} else {
-						texture_name += String.fromCharCode(char);
-					}
-				}
-			}
+			var i:int, j:int, k:int;
 			
-			//get uvs
+			var uvs:Vector.<Number> = new Vector.<Number>(num_uvs * 2, true);
 			model.position = offset_uvs;
 			for (i = 0; i < num_uvs; i++) {
 				uvs[i << 1] = model.readShort() / skin_width;
 				uvs[(i << 1) + 1] = model.readShort() / skin_height;
 			}
 			
-			//get triangles
+			var a:int, b:int, c:int, d:int, e:int, f:int;
 			model.position = offset_triangles;
-			for (i = 0; i < num_triangles;i++ ) {
-				var index0:uint = model.readUnsignedShort();
-				var index1:uint = model.readUnsignedShort();
-				var index2:uint = model.readUnsignedShort();
-				
-				var uv0:uint = model.readUnsignedShort();
-				var uv1:uint = model.readUnsignedShort();
-				var uv2:uint = model.readUnsignedShort();
-				
-				tri = new Triangle(index2, index1, index0);
-				
-				u = uvs[uv0 << 1];
-				v = uvs[(uv0 << 1) + 1];
-				vertices[index0] = new Vertex(0, 0, 0, u, v);
-				tri.uvs[4] = u;
-				tri.uvs[5] = v;
-				
-				u = uvs[uv1 << 1];
-				v = uvs[(uv1 << 1) + 1];
-				vertices[index1] = new Vertex(0, 0, 0, u, v);
-				tri.uvs[2] = u;
-				tri.uvs[3] = v;
-				
-				u = uvs[uv2 << 1];
-				v = uvs[(uv2 << 1) + 1];
-				vertices[index2] = new Vertex(0, 0, 0, u, v);
-				tri.uvs[0] = u;
-				tri.uvs[1] = v;
-				
-				triangles[i] = tri;
+			for (i = 0; i < num_triangles; i++) {
+				a = model.readUnsignedShort();
+				b = model.readUnsignedShort();
+				c = model.readUnsignedShort();
+				d = model.readUnsignedShort();
+				e = model.readUnsignedShort();
+				f = model.readUnsignedShort();
+				addIndex(a, d);
+				addIndex(b, e);
+				addIndex(c, f);
+			}
+			indices.fixed = true;
+			
+			j = uvIndices.length;
+			var finalUVs:Vector.<Number> = new Vector.<Number>(j * 2, true);
+			for (i = 0; i < j; i++) {
+				a = i * 2;
+				b = uvIndices[i] * 2;
+				finalUVs[a] = uvs[b];
+				finalUVs[a + 1] = uvs[b + 1];
 			}
 			
-			//get animation frames
+			var char:uint;
+			var name:String;
+			var flag:Boolean;
+			var sx:Number, sy:Number, sz:Number, tx:Number, ty:Number, tz:Number;
+			var frame:VertexKeyFrame;
+			var vertices:Vector.<Number> = new Vector.<Number>();
+			track = new AnimationTrack(new Vector.<IKeyFrame>());
 			for (i = 0; i < num_frames; i++ ) {
-				//frame scale and translate
-				var sx:Number = model.readFloat();
-				var sy:Number = model.readFloat();
-				var sz:Number = model.readFloat();
+				sx = model.readFloat();
+				sy = model.readFloat();
+				sz = model.readFloat();
+				tx = model.readFloat();
+				ty = model.readFloat();
+				tz = model.readFloat();
 				
-				var tx:Number = model.readFloat();
-				var ty:Number = model.readFloat();
-				var tz:Number = model.readFloat();
-				
-				//frame name
-				var name:String = ""; var notEnd:Boolean = true;
-				for (j = 0; j < 16;j++ ) {
+				name = "";
+				flag = true;
+				for (j = 0; j < 16; j++) {
 					char = model.readUnsignedByte();
-					notEnd &&= (char != 0);
-					if (notEnd) name += String.fromCharCode(char);
+					flag &&= (char != 0);
+					if (flag) name += String.fromCharCode(char);
 				}
 				
-				//frame vertices
-				frame = new VertexKeyFrame();
-				frame.name = name;
-				frame.time = i;
-				for (j = 0, k = 0; j < num_vertices; j++, k += 3) {
-					frame.vertices[k] = (sx * model.readUnsignedByte() + tx);
-					frame.vertices[k + 1] = (sy * model.readUnsignedByte() + ty);
-					frame.vertices[k + 2] = (sz * model.readUnsignedByte() + tz);
-					frame.normals[k] = 0;
-					frame.normals[k + 1] = 0;
-					frame.normals[k + 2] = 0;
+				for (j = 0; j < num_vertices; j++) {
+					k = j * 3;
+					vertices[k] = (sx * model.readUnsignedByte() + tx);
+					vertices[k + 1] = (sy * model.readUnsignedByte() + ty);
+					vertices[k + 2] = (sz * model.readUnsignedByte() + tz);
 					model.readUnsignedByte();
 				}
-				vertexTrack.frames.push(frame);
+				
+				frame = new VertexKeyFrame();
+				frame.vertices = new Vector.<Number>();
+				frame.name = name;
+				frame.time = i;
+				k = vertexIndices.length;
+				for (j = 0; j < k; j++) {
+					a = j * 3;
+					b = vertexIndices[j] * 3;
+					frame.vertices[a] = vertices[b];
+					frame.vertices[a + 1] = vertices[b + 2];
+					frame.vertices[a + 2] = vertices[b + 1];
+				}
+				frame.vertices.fixed = true;
+				track.frames.push(frame);
 			}
 			
-			// calculate normals for each frame
-			var vt1:Vector3D = new Vector3D();
-			var vt2:Vector3D = new Vector3D();
-			var v1:int, v2:int, v3:int;
-			var n1:Number, n2:Number, n3:Number;
-			var mag:Number;
 			var max:Vector3D = new Vector3D();
 			var min:Vector3D = new Vector3D();
 			
-			j = triangles.length;
-			for each(frame in vertexTrack.frames) {
-				for (i = 0; i < j; i++) {
-					tri = triangles[i];
-					v1 = tri.indices[0] * 3;
-					v2 = tri.indices[1] * 3;
-					v3 = tri.indices[2] * 3;
-					vt1.x = frame.vertices[v2]     - frame.vertices[v1];
-					vt1.y = frame.vertices[v2 + 1] - frame.vertices[v1 + 1];
-					vt1.z = frame.vertices[v2 + 2] - frame.vertices[v1 + 2];
-					vt2.x = frame.vertices[v3]     - frame.vertices[v2];
-					vt2.y = frame.vertices[v3 + 1] - frame.vertices[v2 + 1];
-					vt2.z = frame.vertices[v3 + 2] - frame.vertices[v2 + 2];
-					vt1 = vt1.crossProduct(vt2);
-					vt1.normalize();
-					frame.normals[v1]     += vt1.x;
-					frame.normals[v1 + 1] += vt1.y;
-					frame.normals[v1 + 2] += vt1.z;
-					frame.normals[v2]     += vt1.x;
-					frame.normals[v2 + 1] += vt1.y;
-					frame.normals[v2 + 2] += vt1.z;
-					frame.normals[v3]     += vt1.x;
-					frame.normals[v3 + 1] += vt1.y;
-					frame.normals[v3 + 2] += vt1.z;
-				}
+			for each(frame in track.frames) {
 				max.setTo(0, 0, 0);
 				min.setTo(0, 0, 0);
-				k = frame.normals.length;
-				for (i = 0; i < k; i += 3) {
-					n1 = frame.normals[i];
-					n2 = frame.normals[i + 1];
-					n3 = frame.normals[i + 2];
-					mag = 1 / Math.sqrt(n1 * n1 + n2 * n2 + n3 * n3);
-					frame.normals[i] *= mag;
-					frame.normals[i + 1] *= mag;
-					frame.normals[i + 2] *= mag;
-					n1 = frame.vertices[i];
-					n2 = frame.vertices[i + 1];
-					n3 = frame.vertices[i + 2];
-					if (n1 > max.x) max.x = n1;
-					else if (n1 < min.x) min.x = n1;
-					if (n2 > max.y) max.y = n2;
-					else if (n2 < min.y) min.y = n2;
-					if (n3 > max.z) max.z = n3;
-					else if (n3 < min.z) min.z = n3;
+				j = frame.vertices.length / 3;
+				for (i = 0; i < j; i++) {
+					k = i * 3;
+					sx = frame.vertices[k];
+					if (sx > max.x) max.x = sx;
+					else if (sx < min.x) min.x = sx;
+					sx = frame.vertices[k + 1];
+					if (sx > max.y) max.y = sx;
+					else if (sx < min.y) min.y = sx;
+					sx = frame.vertices[k + 2];
+					if (sx > max.z) max.z = sx;
+					else if (sx < min.z) min.z = sx;
 				}
 				frame.bounds[0] = min.x; frame.bounds[1] = min.y; frame.bounds[2] = min.z;
 				frame.bounds[3] = max.x; frame.bounds[4] = max.y; frame.bounds[5] = max.z;
 			}
 			
-			//reset vertex data to frame0
-			var vs0:Vector.<Number> = (vertexTrack.frames[0] as VertexKeyFrame).vertices;
-			var vn0:Vector.<Number> = (vertexTrack.frames[0] as VertexKeyFrame).normals;
-			var vertex:Vertex;
-			for (i = 0; i < num_vertices; i++) {
-				j = i * 3;
-				vertex = vertices[i];
-				vertex.x = vs0[j];
-				vertex.y = vs0[j + 1];
-				vertex.z = vs0[j + 2];
-				vertex.nx = vn0[j];
-				vertex.ny = vn0[j + 1];
-				vertex.nz = vn0[j + 2];
-			}
+			frame = track.frames[0] as VertexKeyFrame;
 			
-			geom = new Geometry(vertices, triangles);
-			track = vertexTrack;
+			geom = new Geometry();
+			geom.indices = indices;
+			geom.uvs = finalUVs;
+			geom.vertices = frame.vertices.concat();
+			geom.vertices.fixed = true;
+			
+			vertexIndices = null;
+			uvIndices = null;
+			indices = null;
+		}
+		
+		private function addIndex(vertexIndex:uint, uvIndex:uint):void {
+			var index:int = findIndex(vertexIndex, uvIndex);
+			if (index == -1) {
+				indices.push(vertexIndices.length);
+				vertexIndices.push(vertexIndex);
+				uvIndices.push(uvIndex);
+			} else {
+				indices.push(index);
+			}
+		}
+		
+		private function findIndex(vertexIndex:uint, uvIndex:uint):int {
+			var i:int, l:int = vertexIndices.length;
+			for (i = 0; i < l; ++i)
+				if (vertexIndices[i] == vertexIndex && uvIndices[i] == uvIndex) return i;
+			return -1;
 		}
 		
 	}

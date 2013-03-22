@@ -55,20 +55,25 @@ package nest.object.geom
 		public static function calculate(bound:Bound, geoms:Vector.<Geometry>):void {
 			var max:Vector3D, min:Vector3D;
 			var geom:Geometry;
-			var vertex:Vertex;
+			var i:int, j:int;
+			var a:Number;
 			if (bound.aabb) {
 				max = bound.vertices[7];
 				min = bound.vertices[0];
 				max.setTo(0, 0, 0);
 				min.setTo(0, 0, 0);
 				for each(geom in geoms) {
-					for each(vertex in geom.vertices) {
-						if (vertex.x > max.x) max.x = vertex.x;
-						else if (vertex.x < min.x) min.x = vertex.x;
-						if (vertex.y > max.y) max.y = vertex.y;
-						else if (vertex.y < min.y) min.y = vertex.y;
-						if (vertex.z > max.z) max.z = vertex.z;
-						else if (vertex.z < min.z) min.z = vertex.z;
+					for (i = 0; i < geom.numVertices; i++) {
+						j = i * 3;
+						a = geom.vertices[j];
+						if (a > max.x) max.x = a;
+						else if (a < min.x) min.x = a;
+						a = geom.vertices[j + 1];
+						if (a > max.y) max.y = a;
+						else if (a < min.y) min.y = a;
+						a = geom.vertices[j + 2];
+						if (a > max.z) max.z = a;
+						else if (a < min.z) min.z = a;
 					}
 				}
 				bound.vertices[1].setTo(max.x, min.y, min.z);
@@ -80,10 +85,14 @@ package nest.object.geom
 			} else {
 				max = new Vector3D();
 				for each(geom in geoms) {
-					for each(vertex in geom.vertices) {
-						if (vertex.x > max.x) max.x = vertex.x;
-						if (vertex.y > max.y) max.y = vertex.y;
-						if (vertex.z > max.z) max.z = vertex.z;
+					for (i = 0; i < geom.numVertices; i++) {
+						j = i * 3;
+						a = geom.vertices[j];
+						if (a > max.x) max.x = a;
+						a = geom.vertices[j + 1];
+						if (a > max.y) max.y = a;
+						a = geom.vertices[j + 2];
+						if (a > max.z) max.z = a;
 					}
 				}
 				bound.radius = max.x > max.y ? max.x : max.y;

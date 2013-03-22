@@ -25,6 +25,8 @@ package nest.view.process
 		
 		protected var _renderTarget:RenderTarget;
 		
+		protected var _constantParts:Vector.<IConstantShaderPart> = new Vector.<IConstantShaderPart>();
+		
 		protected var _container:IContainer3D;
 		
 		protected var _objects:Vector.<IMesh>;
@@ -89,6 +91,27 @@ package nest.view.process
 				context3d.setRenderToBackBuffer();
 			}
 			context3d.clear(_rgba[0], _rgba[1], _rgba[2], _rgba[3]);
+			
+			var byteArraySP:ByteArrayShaderPart;
+			var matrixSP:MatrixShaderPart;
+			var vectorSP:VectorShaderPart;
+			
+			for each(var csp:IConstantShaderPart in _constantParts) {
+				if (csp is ByteArrayShaderPart) {
+					byteArraySP = csp as ByteArrayShaderPart;
+					context3d.setProgramConstantsFromByteArray(byteArraySP.programType, byteArraySP.firstRegister, 
+																byteArraySP.numRegisters, byteArraySP.data, 
+																byteArraySP.byteArrayOffset);
+				} else if (csp is MatrixShaderPart) {
+					matrixSP = csp as MatrixShaderPart;
+					context3d.setProgramConstantsFromMatrix(matrixSP.programType, matrixSP.firstRegister, 
+															matrixSP.matrix, matrixSP.transposedMatrix);
+				} else if (csp is VectorShaderPart) {
+					vectorSP = csp as VectorShaderPart;
+					context3d.setProgramConstantsFromVector(vectorSP.programType, vectorSP.firstRegister, 
+															vectorSP.data, vectorSP.numRegisters);
+				}
+			}
 			
 			while (container) {
 				if (!container.visible) {
@@ -189,7 +212,7 @@ package nest.view.process
 			context3d.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 8, pm, true);
 			
 			var i:int, j:int = mesh.geometries.length;
-			var uv:Boolean, normal:Boolean;
+			var uv:Boolean, normal:Boolean, tangent:Boolean;
 			var byteArraySP:ByteArrayShaderPart;
 			var matrixSP:MatrixShaderPart;
 			var vectorSP:VectorShaderPart;
@@ -222,11 +245,13 @@ package nest.view.process
 				for each(var tr:TextureResource in material) context3d.setTextureAt(tr.sampler, tr.texture);
 				
 				normal = geom.normalBuffer != null;
+				tangent = geom.tangentBuffer != null;
 				uv = geom.uvBuffer != null;
 				
 				context3d.setVertexBufferAt(0, geom.vertexBuffer, 0, Context3DVertexBufferFormat.FLOAT_3);
 				if (normal) context3d.setVertexBufferAt(1, geom.normalBuffer, 0, Context3DVertexBufferFormat.FLOAT_3);
-				if (uv) context3d.setVertexBufferAt(2, geom.uvBuffer, 0, Context3DVertexBufferFormat.FLOAT_2);
+				if (tangent) context3d.setVertexBufferAt(2, geom.tangentBuffer, 0, Context3DVertexBufferFormat.FLOAT_3);
+				if (uv) context3d.setVertexBufferAt(3, geom.uvBuffer, 0, Context3DVertexBufferFormat.FLOAT_2);
 				
 				context3d.setProgram(shader.program);
 				
@@ -236,7 +261,8 @@ package nest.view.process
 				
 				context3d.setVertexBufferAt(0, null);
 				if (normal) context3d.setVertexBufferAt(1, null);
-				if (uv) context3d.setVertexBufferAt(2, null);
+				if (tangent) context3d.setVertexBufferAt(2, null);
+				if (uv) context3d.setVertexBufferAt(3, null);
 			}
 		}
 		
@@ -288,6 +314,7 @@ package nest.view.process
 		
 		public function dispose():void {
 			_renderTarget = null;
+			_constantParts = null;
 			_container = null;
 			_objects = null;
 			_alphaObjects = null;
@@ -301,6 +328,14 @@ package nest.view.process
 		
 		public function get renderTarget():RenderTarget {
 			return _renderTarget;
+		}
+		
+		public function get constantParts():Vector.<IConstantShaderPart> {
+			return _constantParts;
+		}
+		
+		public function set constantParts(value:Vector.<IConstantShaderPart>):void {
+			_constantParts = value;
 		}
 		
 		public function get container():IContainer3D {

@@ -2,7 +2,6 @@ package nest.object
 {	
 	import nest.object.geom.Bound;
 	import nest.object.geom.Geometry;
-	import nest.object.geom.SkinInfo;
 	import nest.view.shader.Shader3D;
 	import nest.view.TextureResource;
 	
@@ -21,9 +20,6 @@ package nest.object
 		
 		function get shaders():Vector.<Shader3D>;
 		function set shaders(value:Vector.<Shader3D>):void;
-		
-		function get skinInfo():SkinInfo;
-		function set skinInfo(value:SkinInfo):void;
 		
 		function get bound():Bound;
 		function set bound(value:Bound):void;

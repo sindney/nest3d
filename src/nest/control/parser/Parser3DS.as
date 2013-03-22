@@ -5,8 +5,6 @@ package nest.control.parser
 	import flash.utils.Endian;
 	
 	import nest.object.geom.Geometry;
-	import nest.object.geom.Triangle;
-	import nest.object.geom.Vertex;
 	import nest.object.Mesh;
 	
 	/**
@@ -26,10 +24,10 @@ package nest.control.parser
 		private var _objects:Vector.<Mesh>;
 		
 		private var last:Mesh;
-		private var name:String;
 		
-		private var rawVertices:Vector.<Vertex>;
-		private var rawTriangles:Vector.<Triangle>;
+		private var vertices:Vector.<Number>;
+		private var uvs:Vector.<Number>;
+		private var indices:Vector.<uint>;
 		
 		public function Parser3DS() {
 			
@@ -38,9 +36,9 @@ package nest.control.parser
 		public function dispose():void {
 			_objects = null;
 			last = null;
-			name = null;
-			rawVertices = null;
-			rawTriangles = null;
+			vertices = null;
+			uvs = null;
+			indices = null;
 		}
 		
 		public function getObjectByName(name:String):Mesh {
@@ -59,14 +57,8 @@ package nest.control.parser
 			
 			if (model.readUnsignedShort() != HEADER) throw new Error("Error reading 3DS file: Not a valid 3DS file");
 			
-			rawVertices = new Vector.<Vertex>();
-			rawTriangles = new Vector.<Triangle>();
-			
 			model.position = 6;
 			readChunk(model, model.length);
-			
-			rawVertices = null;
-			rawTriangles = null;
 		}
 		
 		private function readChunk(data:ByteArray, size:uint):void {
@@ -75,8 +67,6 @@ package nest.control.parser
 			var length:uint = data.readUnsignedInt();
 			
 			var i:int, j:int, k:int;
-			var vertex:Vertex;
-			var triangle:Triangle;
 			
 			switch(id) {
 				case VERSION:
@@ -86,46 +76,41 @@ package nest.control.parser
 					readChunk(data, init + length);
 					break;
 				case OBJECTS:
-					name = readName(data);
+					last = new Mesh();
+					last.name = readName(data);
+					_objects.push(last);
 					readChunk(data, init + length);
 					return;
 				case MESH:
-					last = new Mesh();
-					last.name = name;
 					readChunk(data, init + length);
 					return;
 				case VERTICES:
+					vertices = new Vector.<Number>();
 					j = data.readUnsignedShort();
 					for (i = 0; i < j; i++) {
-						rawVertices.push(new Vertex(data.readFloat(), data.readFloat(), data.readFloat()));
+						vertices.push(data.readFloat(), data.readFloat(), data.readFloat());
 					}
 					break;
 				case UVS:
-					i = 0;
-					j = rawVertices.length;
-					data.position += 2;
+					uvs = new Vector.<Number>();
+					j = data.readUnsignedShort();
 					for (i = 0; i < j; i++) {
-						vertex = rawVertices[i];
-						vertex.u = data.readFloat();
-						vertex.v = 1 - data.readFloat();
+						uvs.push(data.readFloat(), 1 - data.readFloat());
 					}
 					break;
 				case INDICES:
+					indices = new Vector.<uint>();
 					j = data.readUnsignedShort();
 					for (i = 0; i < j; i++) {
-						triangle = new Triangle(data.readUnsignedShort(), data.readUnsignedShort(), data.readUnsignedShort());
-						rawTriangles.push(triangle);
-						for (k = 0; k < 3; k++) {
-							vertex = rawVertices[triangle.indices[k]];
-							triangle.uvs[k * 2] = vertex.u;
-							triangle.uvs[k * 2 + 1] = vertex.v;
-						}
+						indices.push(data.readUnsignedShort(), data.readUnsignedShort(), data.readUnsignedShort());
 						data.position += 2;
 					}
-					Geometry.calculateNormal(rawVertices, rawTriangles);
-					last.geometries.push(new Geometry(rawVertices, rawTriangles));
-					_objects.push(last);
-					last = null;
+					vertices.fixed = uvs.fixed = indices.fixed = true;
+					var geom:Geometry = new Geometry();
+					geom.vertices = vertices;
+					geom.uvs = uvs;
+					geom.indices = indices;
+					last.geometries.push(geom);
 					break;
 			}
 			

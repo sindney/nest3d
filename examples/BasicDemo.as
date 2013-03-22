@@ -30,8 +30,8 @@ package
 			view.processes.push(process0);
 			
 			var geom:Geometry = Primitives.createBox();
-			Geometry.setupGeometry(geom, true, false, false);
-			Geometry.uploadGeometry(geom, true, false, false, true);
+			Geometry.setupGeometry(geom, true, false, false, false);
+			Geometry.uploadGeometry(geom, true, false, false, false, true);
 			
 			var shader:Shader3D = new Shader3D();
 			shader.constantParts.push(new VectorShaderPart(Context3DProgramType.FRAGMENT, 0, Vector.<Number>([1, 1, 1, 1])));

@@ -4,6 +4,7 @@ package nest.view.process
 	
 	import nest.object.IContainer3D;
 	import nest.object.IMesh;
+	import nest.view.shader.IConstantShaderPart;
 	import nest.view.Camera3D;
 	
 	/**
@@ -12,6 +13,9 @@ package nest.view.process
 	public interface IContainerProcess extends IRenderProcess {
 		
 		function drawMesh(mesh:IMesh, pm:Matrix3D):void;
+		
+		function get constantParts():Vector.<IConstantShaderPart>;
+		function set constantParts(value:Vector.<IConstantShaderPart>):void;
 		
 		function get container():IContainer3D;
 		function set container(value:IContainer3D):void;

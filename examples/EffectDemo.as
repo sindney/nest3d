@@ -47,8 +47,8 @@ package
 			parser.parse(new model());
 			
 			mesh = parser.objects[0];
-			Geometry.setupGeometries(mesh.geometries, true, false, true);
-			Geometry.uploadGeometries(mesh.geometries, true, false, true, true);
+			Geometry.setupGeometries(mesh.geometries, true, false, false, true);
+			Geometry.uploadGeometries(mesh.geometries, true, false, false, true, true);
 			Bound.calculate(mesh.bound, mesh.geometries);
 			mesh.scale.setTo(30, 30, 30);
 			mesh.rotation.y = Math.PI;
@@ -64,7 +64,7 @@ package
 			
 			var shader:Shader3D = new Shader3D();
 			shader.comply("m44 vt0, va0, vc0\nm44 vt0, vt0, vc4\n" + 
-								"m44 op, vt0, vc8\nmov v0, va2\n", 
+								"m44 op, vt0, vc8\nmov v0, va3\n", 
 								"tex oc, v0, fs0 <2d,linear,mipnone>\n");
 			mesh.shaders.push(shader);
 			

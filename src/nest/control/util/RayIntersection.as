@@ -3,8 +3,6 @@ package nest.control.util
 	import flash.geom.Vector3D;
 	
 	import nest.object.geom.Geometry;
-	import nest.object.geom.Triangle;
-	import nest.object.geom.Vertex;
 	import nest.object.IMesh;
 	
 	/**
@@ -131,7 +129,7 @@ package nest.control.util
 			result.z += orgion.z;
 		}
 		
-		public static function Ray_Triangle(orgion:Vector3D, delta:Vector3D, p0:Vertex, p1:Vertex, p2:Vertex, normal:Vector3D, minT:Number = 1):Number {
+		public static function Ray_Triangle(orgion:Vector3D, delta:Vector3D, p0:Vector3D, p1:Vector3D, p2:Vector3D, normal:Vector3D, minT:Number = 1):Number {
 			const dot:Number = normal.dotProduct(delta);
 			if (!(dot < 0)) return Number.MAX_VALUE;
 			const d:Number = normal.x * p0.x + normal.y * p0.y + normal.z * p0.z;
@@ -196,20 +194,30 @@ package nest.control.util
 			if (mesh.bound.aabb) {
 				Ray_AABB(result, orgion, delta, mesh.bound.vertices[7], mesh.bound.vertices[0]);
 			} else {
-				Ray_BSphere(result, orgion, delta, mesh.bound.center, mesh.bound.radius);
+				Ray_BSphere(result, orgion, delta, new Vector3D(), mesh.bound.radius);
 			}
 			if (result.w == 0) return;
 			result.w = 0;
 			var vt1:Vector3D = new Vector3D(), vt2:Vector3D = new Vector3D();
-			var v1:Vertex, v2:Vertex, v3:Vertex;
+			var v1:Vector3D = new Vector3D(), v2:Vector3D = new Vector3D(), v3:Vector3D = new Vector3D();
 			var geom:Geometry;
 			var t:Number;
-			var triangle:Triangle;
+			var i:int, j:int, k:int;
 			for each(geom in mesh.geometries) {
-				for each(triangle in geom.triangles) {
-					v1 = geom.vertices[triangle.indices[0]];
-					v2 = geom.vertices[triangle.indices[1]];
-					v3 = geom.vertices[triangle.indices[2]];
+				for (i = 0; i < geom.numTriangles; i++) {
+					j = i * 3;
+					k = geom.indices[j] * 3;
+					v1.x = geom.vertices[k];
+					v1.y = geom.vertices[k + 1];
+					v1.z = geom.vertices[k + 2];
+					k = geom.indices[j + 1] * 3;
+					v2.x = geom.vertices[k];
+					v2.y = geom.vertices[k + 1];
+					v2.z = geom.vertices[k + 2];
+					k = geom.indices[j + 2] * 3;
+					v3.x = geom.vertices[k];
+					v3.y = geom.vertices[k + 1];
+					v3.z = geom.vertices[k + 2];
 					vt1.setTo(v2.x - v1.x, v2.y - v1.y, v2.z - v1.z);
 					vt2.setTo(v3.x - v2.x, v3.y - v2.y, v3.z - v2.z);
 					vt1 = vt1.crossProduct(vt2);

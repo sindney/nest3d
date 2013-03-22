@@ -49,15 +49,15 @@ package
 			
 			var shader:Shader3D = new Shader3D();
 			shader.comply("m44 vt0, va0, vc0\nm44 vt0, vt0, vc4\n" + 
-							"m44 op, vt0, vc8\nmov v0, va2\n", 
+							"m44 op, vt0, vc8\nmov v0, va3\n", 
 							"tex ft0, v0, fs0 <2d,linear,mipnone>\nkil ft0.w\nmov oc, ft0\n");
 			
 			var mesh:Mesh = new Mesh();
 			mesh.geometries.push(Primitives.createPlane());
 			mesh.materials.push(material);
 			mesh.shaders.push(shader);
-			Geometry.setupGeometry(mesh.geometries[0], true, false, true);
-			Geometry.uploadGeometry(mesh.geometries[0], true, false, true, true);
+			Geometry.setupGeometry(mesh.geometries[0], true, false, false, true);
+			Geometry.uploadGeometry(mesh.geometries[0], true, false, false, true, true);
 			Bound.calculate(mesh.bound, mesh.geometries);
 			mesh.ignoreRotation = true;
 			mesh.scale.setTo(100, 100, 100);

@@ -2,6 +2,7 @@ package
 {
 	import flash.display3D.Context3DProgramType;
 	import flash.display3D.Context3DTextureFormat;
+	import flash.display3D.Context3DTriangleFace;
 	
 	import nest.control.util.Primitives;
 	import nest.object.geom.Bound;
@@ -51,8 +52,8 @@ package
 			mesh.geometries.push(Primitives.createBox());
 			mesh.materials.push(null);
 			mesh.shaders.push(shader0);
-			Geometry.setupGeometry(mesh.geometries[0], true, false, false);
-			Geometry.uploadGeometry(mesh.geometries[0], true, false, false, true);
+			Geometry.setupGeometry(mesh.geometries[0], true, false, false, false);
+			Geometry.uploadGeometry(mesh.geometries[0], true, false, false, false, true);
 			Bound.calculate(mesh.bound, mesh.geometries);
 			mesh.position.z = 400;
 			mesh.scale.setTo(100, 100, 100);
@@ -63,19 +64,19 @@ package
 			
 			var shader1:Shader3D = new Shader3D();
 			shader1.comply("m44 vt0, va0, vc0\nm44 vt0, vt0, vc4\n" + 
-							"m44 op, vt0, vc8\nmov v0, va2\n",
+							"m44 op, vt0, vc8\nmov v0, va3\n",
 							"tex oc, v0, fs0 <2d,linear,mipnone>\n");
 			
 			var mesh1:Mesh = new Mesh();
-			mesh1.geometries.push(Primitives.createBox());
+			mesh1.geometries.push(Primitives.createPlane());
 			mesh1.materials.push(Vector.<TextureResource>([material]));
 			mesh1.shaders.push(shader1);
-			Geometry.setupGeometries(mesh1.geometries, true, false, true);
-			Geometry.uploadGeometries(mesh1.geometries, true, false, true, true);
+			Geometry.setupGeometries(mesh1.geometries, true, false, false, true);
+			Geometry.uploadGeometries(mesh1.geometries, true, false, false, true, true);
 			Bound.calculate(mesh1.bound, mesh1.geometries);
-			mesh1.rotation.x = Math.PI * 1.5;
-			mesh1.position.z = 200;
 			mesh1.scale.setTo(100, 100, 100);
+			mesh1.position.z = 200;
+			mesh1.triangleCulling = Context3DTriangleFace.NONE;
 			container1.addChild(mesh1);
 			
 			process0.renderTarget.texture = material.texture;
