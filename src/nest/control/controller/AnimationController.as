@@ -6,15 +6,8 @@ package nest.control.controller
 	import nest.control.animation.AnimationTrack;
 	import nest.control.animation.IKeyFrame;
 	
-	/**
-	 * Dispatched when one loop is finished.
-	 */
-	[AnimationEvent(name = "loopComplete", type = "nest.control.controller.AnimationEvent")]
-	
-	/**
-	 * Dispatched when all loops are finished.
-	 */
-	[AnimationEvent(name = "loopsComplete", type = "nest.control.controller.AnimationEvent")]
+	[Event(name = "loopComplete", type = "nest.control.controller.AnimationEvent")]
+	[Event(name = "loopsComplete", type = "nest.control.controller.AnimationEvent")]
 	
 	/**
 	 * AnimationController

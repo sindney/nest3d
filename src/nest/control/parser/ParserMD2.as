@@ -34,7 +34,7 @@ package nest.control.parser
 			track = null;
 		}
 		
-		public function parse(model:ByteArray):void {
+		public function parse(model:ByteArray, normal:Boolean = false, tangent:Boolean = false):void {
 			vertexIndices = new Vector.<uint>();
 			uvIndices = new Vector.<uint>();
 			indices = new Vector.<uint>();
@@ -142,10 +142,26 @@ package nest.control.parser
 				track.frames.push(frame);
 			}
 			
+			geom = new Geometry();
+			geom.numVertices = (track.frames[0] as VertexKeyFrame).vertices.length / 3;
+			geom.numTriangles = indices.length / 3;
+			geom.indices = indices;
+			geom.uvs = finalUVs;
+			
 			var max:Vector3D = new Vector3D();
 			var min:Vector3D = new Vector3D();
 			
 			for each(frame in track.frames) {
+				if (normal) {
+					geom.vertices = frame.vertices;
+					Geometry.calculateNormal(geom);
+					frame.normals = geom.normals;
+				}
+				if (tangent) {
+					geom.vertices = frame.vertices;
+					Geometry.calculateTangent(geom);
+					frame.tangents = geom.tangents;
+				}
 				max.setTo(0, 0, 0);
 				min.setTo(0, 0, 0);
 				j = frame.vertices.length / 3;
@@ -167,11 +183,16 @@ package nest.control.parser
 			
 			frame = track.frames[0] as VertexKeyFrame;
 			
-			geom = new Geometry();
-			geom.indices = indices;
-			geom.uvs = finalUVs;
 			geom.vertices = frame.vertices.concat();
 			geom.vertices.fixed = true;
+			if (normal) {
+				geom.normals = frame.normals.concat();
+				geom.normals.fixed = true;
+			}
+			if (tangent) {
+				geom.tangents = frame.tangents.concat();
+				geom.tangents.fixed = true;
+			}
 			
 			vertexIndices = null;
 			uvIndices = null;

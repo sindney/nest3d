@@ -2,6 +2,7 @@ package
 {
 	import flash.display.BitmapData;
 	import flash.display3D.Context3DProgramType;
+	import flash.geom.Matrix3D;
 	import flash.geom.Vector3D;
 	
 	import nest.control.parser.Parser3DS;
@@ -78,14 +79,17 @@ package
 			
 			mesh = parser.objects[0];
 			mesh.scale.setTo(30, 30, 30);
-			mesh.rotation.y = Math.PI;
 			container.addChild(mesh);
 			
 			parser.dispose();
 			
-			Geometry.setupGeometry(mesh.geometries[0], true, true, false, true);
+			var matrix:Matrix3D = new Matrix3D();
+			matrix.appendRotation(180, Vector3D.Y_AXIS);
+			Geometry.setupGeometry(mesh.geometries[0], true, true, true, true);
 			Geometry.calculateNormal(mesh.geometries[0]);
-			Geometry.uploadGeometry(mesh.geometries[0], true, true, false, true, true);
+			Geometry.calculateTangent(mesh.geometries[0]);
+			Geometry.transformGeometry(mesh.geometries[0], matrix);
+			Geometry.uploadGeometry(mesh.geometries[0], true, true, true, true, true);
 			
 			var material:Vector.<TextureResource> = new Vector.<TextureResource>();
 			var diffuse:TextureResource = new TextureResource(0, null);
@@ -99,7 +103,7 @@ package
 			var shader:Shader3D = new Shader3D();
 			shader.constantParts.push(new MatrixShaderPart(Context3DProgramType.VERTEX, 12, mesh.invertWorldMatrix, true));
 			shader.constantParts.push(new MatrixShaderPart(Context3DProgramType.VERTEX, 16, mesh.invertMatrix, true));
-			cameraPos = new VectorShaderPart(Context3DProgramType.VERTEX, 20, Vector.<Number>([0, 0, -400, 1, 1, 0, 0, 0]), 2);
+			cameraPos = new VectorShaderPart(Context3DProgramType.VERTEX, 20, Vector.<Number>([0, 0, -400, 1]));
 			shader.constantParts.push(cameraPos);
 			// ambient light color, directional light color, directional light direction
 			lights = new VectorShaderPart(Context3DProgramType.FRAGMENT, 0, Vector.<Number>([0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 1]), 3);
@@ -171,15 +175,16 @@ package
 		}
 		
 		private function vertexShader():String {
-			var result:String = // va0 = vertex, va3 = uv, vc0 = mesh.matrix
+			var result:String = 
+			// va0 = vertex, va3 = uv, vc0 = mesh.matrix
 			// vc4 = mesh.worldMatrix, vc8 = camera.invertMatrix * camera.pm
 			"m44 vt0, va0, vc0\n" + 
 			// v0 = vertex * mesh.matrix
 			"mov v0, vt0\n" + 
-			// v1 = normal
-			"mov v1, va1\n" + 
-			// v2 = uv
-			"mov v2, va3\n" + 
+			// v1 = uv
+			"mov v1, va3\n" + 
+			// v2 = normal
+			"mov v2, va1\n" + 
 			// project vertex
 			"m44 vt0, vt0, vc4\n" + 
 			"m44 op, vt0, vc8\n" + 
@@ -191,49 +196,31 @@ package
 			// v5 = cameraDir in object space
 			"nrm vt0.xyz, vt0\n" + 
 			"mov v5, vt0.xyz\n" + 
-			// normalmap part
-			"mov vt0, vc21.y\n" + 
-			"mov vt0.z, vc21.x\n" + 
-			"crs vt1.xyz, va1, vt0\n" + 
-			"mov vt1.w, vc21.x\n" + 
-			"mov vt0, vc21.y\n" + 
-			"mov vt0.y, vc21.x\n" + 
-			"crs vt0.xyz, va1, vt0\n" + 
-			// vt0 = (vt1.length > vt0.length ? vt1 : vt0);
-			"dp3 vt3, vt1, vt1\n" + 
-			"dp3 vt4, vt0, vt0\n" + 
-			"slt vt5, vt4, vt3\n" + 
-			"mul vt1, vt1, vt5\n" + 
-			"slt vt5, vt3, vt4\n" + 
-			"mul vt0, vt0, vt5\n" + 
-			"add vt0, vt0, vt1\n" + 
 			// v4 = tangent
-			"nrm vt5.xyz, vt0\n" + 
-			"mov v4, vt5\n" + 
+			"mov v4, va2\n" + 
 			// v3 = binormal
-			"crs vt6.xyz, va3, vt0\n" + 
-			"mov vt6.w, vc21.x\n" + 
-			"mov v3, vt6\n";
+			"crs vt0.xyz, va1, va2\n" + 
+			"mov v3, vt0\n";
 			return result;
 		}
 		
 		private function fragmentShader():String {
-			var result:String = // diffuse = ft7, specular = ft6, normalmap = ft5
-			"tex ft7, v2, fs0 <2d,linear,mipnone>\n" + 
-			"tex ft6, v2, fs1 <2d,linear,mipnone>\n" + 
-			"tex ft5, v2, fs2 <2d,linear,mipnone>\n" + 
+			var result:String = 
+			// diffuse = ft7, specular = ft6, normalmap = ft5
+			"tex ft7, v1, fs0 <2d,linear,mipnone>\n" + 
+			"tex ft6, v1, fs1 <2d,linear,mipnone>\n" + 
+			"tex ft5, v1, fs2 <2d,linear,mipnone>\n" + 
 			"add ft5, ft5, ft5\n" + 
 			"sub ft5, ft5, fc3.y\n" + 
 			"mul ft0, v4, ft5.x\n" + 
 			"mul ft1, v3, ft5.y\n" + 
 			"add ft0, ft0, ft1\n" + 
-			"mul ft1, v1, ft5.z\n" + 
+			"mul ft1, v2, ft5.z\n" + 
 			"add ft5, ft0, ft1\n" + 
 			// ambient light, fc0 = color
 			"mul ft0, ft7, fc0\n" + 
 			// directional light, fc1 = color, fc2 = direction
 			"mov ft2, fc2\n" + 
-			//"m44 ft2, ft2, fc4\n" + 
 			"nrm ft2.xyz, ft2\n" + 
 			"neg ft2, ft2\n" + 
 			"dp3 ft4, ft2, ft5\n" + 

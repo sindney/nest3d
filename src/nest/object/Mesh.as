@@ -2,20 +2,19 @@ package nest.object
 {
 	import flash.display3D.Context3DTriangleFace;
 	
-	import nest.control.controller.MouseEvent3D;
 	import nest.object.geom.Bound;
 	import nest.object.geom.Geometry;
 	import nest.view.shader.Shader3D;
 	import nest.view.TextureResource;
 	
-	[MouseEvent3D(name = "mouseDown", type = "nest.control.controller.MouseEvent3D")]
-	[MouseEvent3D(name = "mouseOver", type = "nest.control.controller.MouseEvent3D")]
-	[MouseEvent3D(name = "mouseMove", type = "nest.control.controller.MouseEvent3D")]
-	[MouseEvent3D(name = "mouseOut", type = "nest.control.controller.MouseEvent3D")]
-	[MouseEvent3D(name = "click", type = "nest.control.controller.MouseEvent3D")]
-	[MouseEvent3D(name = "doubleClick", type = "nest.control.controller.MouseEvent3D")]
-	[MouseEvent3D(name = "rightClick", type = "nest.control.controller.MouseEvent3D")]
-	[MouseEvent3D(name = "rightMouseDown", type = "nest.control.controller.MouseEvent3D")]
+	[Event(name = "mouseDown", type = "nest.control.controller.MouseEvent3D")]
+	[Event(name = "mouseOver", type = "nest.control.controller.MouseEvent3D")]
+	[Event(name = "mouseMove", type = "nest.control.controller.MouseEvent3D")]
+	[Event(name = "mouseOut", type = "nest.control.controller.MouseEvent3D")]
+	[Event(name = "click", type = "nest.control.controller.MouseEvent3D")]
+	[Event(name = "doubleClick", type = "nest.control.controller.MouseEvent3D")]
+	[Event(name = "rightClick", type = "nest.control.controller.MouseEvent3D")]
+	[Event(name = "rightMouseDown", type = "nest.control.controller.MouseEvent3D")]
 	
 	/**
 	 * Mesh

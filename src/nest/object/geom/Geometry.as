@@ -9,6 +9,7 @@ package nest.object.geom
 	
 	/**
 	 * Geometry
+	 * <p>When you use calculateNormal/Tangent(), make sure you'v setup the geometry using setupGeometry().</p>
 	 */
 	public class Geometry {
 		
@@ -195,7 +196,6 @@ package nest.object.geom
 			for each(var geom:Geometry in geoms) calculateTangent(geom);
 		}
 		
-		// TODO: 检查transformGeometry的tangent是否正确
 		public static function transformGeometry(geom:Geometry, matrix:Matrix3D):void {
 			var i:int, j:int;
 			var tmp:Vector3D = new Vector3D();
@@ -243,12 +243,11 @@ package nest.object.geom
 		public var uvBuffer:VertexBuffer3D;
 		public var indexBuffer:IndexBuffer3D;
 		
-		public var indices:Vector.<uint>;
-		
 		public var vertices:Vector.<Number>;
-		public var uvs:Vector.<Number>;
-		public var tangents:Vector.<Number>;
 		public var normals:Vector.<Number>;
+		public var tangents:Vector.<Number>;
+		public var uvs:Vector.<Number>;
+		public var indices:Vector.<uint>;
 		
 		public var numVertices:int = 0;
 		public var numTriangles:int = 0;
@@ -264,11 +263,11 @@ package nest.object.geom
 			uvBuffer = null;
 			if (indexBuffer) indexBuffer.dispose();
 			indexBuffer = null;
-			indices = null;
 			vertices = null;
-			uvs = null;
-			tangents = null;
 			normals = null;
+			tangents = null;
+			uvs = null;
+			indices = null;
 			numVertices = numTriangles = 0;
 		}
 		

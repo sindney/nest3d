@@ -40,7 +40,7 @@ package
 			view.processes.push(process0);
 			
 			var parser:ParserMD2 = new ParserMD2();
-			parser.parse(new model());
+			parser.parse(new model(), false, false);
 			
 			var material:Vector.<TextureResource> = new Vector.<TextureResource>();
 			material.push(new TextureResource(0, null));
