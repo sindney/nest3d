@@ -34,7 +34,8 @@ package nest.view.process
 		protected var _color:uint;
 		protected var _rgba:Vector.<Number> = new Vector.<Number>(4, true);
 		
-		public function DepthMapProcess(color:uint = 0xff000000) {
+		public function DepthMapProcess(container:Container3D = null, color:uint = 0xff000000) {
+			this.container = container;
 			this.color = color;
 			_renderTarget = new RenderTarget();
 			_program = ViewPort.context3d.createProgram();
@@ -57,22 +58,8 @@ package nest.view.process
 			var mesh:IMesh;
 			var geom:Geometry;
 			
-			var pm0:Matrix3D = _ivm.clone();
-			pm0.append(_pm);
-			
-			var pm1:Matrix3D = _ivm.clone();
-			var components:Vector.<Vector3D> = pm1.decompose();
-			components[0].setTo(0, 0, 0);
-			pm1.recompose(components);
-			pm1.append(_pm);
-			
-			var pm2:Matrix3D = _ivm.clone();
-			components = pm2.decompose();
-			components[1].setTo(0, 0, 0);
-			pm2.recompose(components);
-			pm2.append(_pm);
-			
-			var pm3:Matrix3D = _pm;
+			var pm:Matrix3D = _ivm.clone();
+			pm.append(_pm);
 			
 			if (_renderTarget.texture) {
 				context3d.setRenderToTexture(_renderTarget.texture, _renderTarget.enableDepthAndStencil, _renderTarget.antiAlias, _renderTarget.surfaceSelector);
@@ -98,7 +85,7 @@ package nest.view.process
 						if (mesh.visible && mesh.castShadows && !mesh.alphaTest) {
 							context3d.setCulling(mesh.triangleCulling);
 							context3d.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 0, mesh.worldMatrix, true);
-							context3d.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 4, mesh.ignorePosition ? (mesh.ignoreRotation ? pm3 : pm1) : (mesh.ignoreRotation ? pm2 : pm0), true);
+							context3d.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 4, pm, true);
 							l = mesh.geometries.length;
 							for (k = 0; k < l; k++) {
 								geom = mesh.geometries[k];
@@ -121,6 +108,8 @@ package nest.view.process
 			_pm = null;
 			_container = null;
 			_rgba = null;
+			_program.dispose();
+			_program = null;
 		}
 		
 		///////////////////////////////////

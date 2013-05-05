@@ -50,7 +50,7 @@ package nest.control.partition
 			_root.parent = null;
 			_root.objects = meshes;
 			_root.max.setTo(size + offset.x, 0, size + offset.z);
-			_root.min.setTo( -size + offsetX, 0, -size + offsetZ);
+			_root.min.setTo( -size + offset.x, 0, -size + offset.z);
 			_root.vertices[1].setTo(_root.max.x, 0, _root.min.z);
 			_root.vertices[2].setTo(_root.min.x, 0, _root.max.z);
 			if (depth > 0) divide(_root, size, 1, depth);
