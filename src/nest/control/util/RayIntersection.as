@@ -8,13 +8,12 @@ package nest.control.util
 	/**
 	 * RayIntersection
 	 * <p>Orgion and delta should be translated into mesh's croodinate space.</p>
-	 * <p>result.w == 0 means they aren't intersected.</p>
-	 * <p>result.w == 1 means they are intersected.</p>
 	 * <p>Refer to Graphics Gems I</p>
+	 * @see nest.control.util.RayIntersectionResult
 	 */
 	public class RayIntersection {
 		
-		public static function Ray_BSphere(result:Vector3D, orgion:Vector3D, delta:Vector3D, center:Vector3D, radius:Number):void {
+		public static function RayBSphere(result:Vector3D, orgion:Vector3D, delta:Vector3D, center:Vector3D, radius:Number):void {
 			const e:Vector3D = new Vector3D(center.x - orgion.x, center.y - orgion.y, center.z - orgion.z);
 			const a:Number = e.dotProduct(delta) / delta.length;
 			var f:Number = radius * radius - e.lengthSquared + a * a;
@@ -35,7 +34,7 @@ package nest.control.util
 			result.z += orgion.z;
 		}
 		
-		public static function Ray_AABB(result:Vector3D, orgion:Vector3D, delta:Vector3D, max:Vector3D, min:Vector3D):void {
+		public static function RayAABB(result:Vector3D, orgion:Vector3D, delta:Vector3D, max:Vector3D, min:Vector3D):void {
 			result.w = 0;
 			var inside:Boolean = true;
 			var xt:Number, xn:Number;
@@ -129,7 +128,7 @@ package nest.control.util
 			result.z += orgion.z;
 		}
 		
-		public static function Ray_Triangle(orgion:Vector3D, delta:Vector3D, p0:Vector3D, p1:Vector3D, p2:Vector3D, normal:Vector3D, minT:Number = 1):Number {
+		public static function RayTriangle(orgion:Vector3D, delta:Vector3D, p0:Vector3D, p1:Vector3D, p2:Vector3D, normal:Vector3D, minT:Number = 1):Number {
 			const dot:Number = normal.dotProduct(delta);
 			if (!(dot < 0)) return Number.MAX_VALUE;
 			const d:Number = normal.x * p0.x + normal.y * p0.y + normal.z * p0.z;
@@ -190,15 +189,19 @@ package nest.control.util
 			return t;
 		}
 		
-		public static function Ray_Mesh(result:Vector3D, orgion:Vector3D, delta:Vector3D, mesh:IMesh):void {
+		public static function RayMesh(result:RayIntersectionResult, results:Vector.<RayIntersectionResult>, orgion:Vector3D, delta:Vector3D, mesh:IMesh):void {
+			var vt1:Vector3D = new Vector3D(); 
 			if (mesh.bound.aabb) {
-				Ray_AABB(result, orgion, delta, mesh.bound.vertices[7], mesh.bound.vertices[0]);
+				RayAABB(vt1, orgion, delta, mesh.bound.vertices[7], mesh.bound.vertices[0]);
 			} else {
-				Ray_BSphere(result, orgion, delta, new Vector3D(), mesh.bound.radius);
+				RayBSphere(vt1, orgion, delta, new Vector3D(), mesh.bound.radius);
 			}
-			if (result.w == 0) return;
-			result.w = 0;
-			var vt1:Vector3D = new Vector3D(), vt2:Vector3D = new Vector3D();
+			var flag:Boolean = (result != null);
+			var current:RayIntersectionResult = flag ? result : new RayIntersectionResult();
+			current.flag = (vt1.w != 0);
+			if (!current.flag) return;
+			current.flag = false;
+			var vt2:Vector3D = new Vector3D();
 			var v1:Vector3D = new Vector3D(), v2:Vector3D = new Vector3D(), v3:Vector3D = new Vector3D();
 			var geom:Geometry;
 			var t:Number;
@@ -222,15 +225,21 @@ package nest.control.util
 					vt2.setTo(v3.x - v2.x, v3.y - v2.y, v3.z - v2.z);
 					vt1 = vt1.crossProduct(vt2);
 					vt1.normalize();
-					t = Ray_Triangle(orgion, delta, v1, v2, v3, vt1);
+					t = RayTriangle(orgion, delta, v1, v2, v3, vt1);
 					if (t <= 1) {
-						result.copyFrom(delta);
-						result.scaleBy(t);
-						result.x += orgion.x;
-						result.y += orgion.y;
-						result.z += orgion.z;
-						result.w = 1;
-						return;
+						current.point.copyFrom(delta);
+						current.point.scaleBy(t);
+						current.point.x += orgion.x;
+						current.point.y += orgion.y;
+						current.point.z += orgion.z;
+						current.index = geom.indices[j];
+						current.flag = true;
+						if (flag) {
+							return;
+						} else {
+							results.push(current);
+							current = new RayIntersectionResult();
+						}
 					}
 				}
 			}

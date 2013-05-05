@@ -22,10 +22,6 @@ package nest.control.parser
 		public var geom:Geometry;
 		public var track:AnimationTrack;
 		
-		public function ParserMD2() {
-			
-		}
-		
 		public function dispose():void {
 			vertexIndices = null;
 			uvIndices = null;

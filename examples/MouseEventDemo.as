@@ -43,20 +43,17 @@ package
 			
 			shader0 = new Shader3D();
 			shader0.constantParts.push(new VectorShaderPart(Context3DProgramType.FRAGMENT, 0, Vector.<Number>([1, 1, 1, 1])));
-			shader0.comply("m44 vt0, va0, vc0\nm44 vt0, vt0, vc4\n" + 
-							"m44 op, vt0, vc8\n",
+			shader0.comply("m44 vt0, va0, vc0\nm44 op, vt0, vc4\n",
 							"mov oc, fc0\n");
 			
 			shader1 = new Shader3D();
 			shader1.constantParts.push(new VectorShaderPart(Context3DProgramType.FRAGMENT, 0, Vector.<Number>([1, 0, 0, 1])));
-			shader1.comply("m44 vt0, va0, vc0\nm44 vt0, vt0, vc4\n" + 
-							"m44 op, vt0, vc8\n",
+			shader1.comply("m44 vt0, va0, vc0\nm44 op, vt0, vc4\n",
 							"mov oc, fc0\n");
 			
 			shader2 = new Shader3D();
 			shader2.constantParts.push(new VectorShaderPart(Context3DProgramType.FRAGMENT, 0, Vector.<Number>([0, 0, 1, 1])));
-			shader2.comply("m44 vt0, va0, vc0\nm44 vt0, vt0, vc4\n" + 
-							"m44 op, vt0, vc8\n",
+			shader2.comply("m44 vt0, va0, vc0\nm44 op, vt0, vc4\n",
 							"mov oc, fc0\n");
 			
 			var geom:Geometry = Primitives.createBox();
@@ -64,7 +61,6 @@ package
 			Geometry.uploadGeometry(geom, true, false, false, false, true);
 			
 			var mesh:Mesh;
-			var offsetX:Number = 0, offsetY:Number = 0, offsetZ:Number = 0;
 			
 			var i:int, j:int, k:int, l:int = 15, m:int = l * 25;
 			for (i = 0; i < l; i++) {
@@ -75,7 +71,7 @@ package
 						mesh.materials.push(null);
 						mesh.shaders.push(shader0);
 						Bound.calculate(mesh.bound, mesh.geometries);
-						mesh.position.setTo(i * 50 - m + offsetX, j * 50 - m + offsetY, k * 50 - m + offsetZ);
+						mesh.position.setTo(i * 50 - m, j * 50 - m, k * 50 - m);
 						mesh.scale.setTo(10, 10, 10);
 						mesh.mouseEnabled = true;
 						container.addChild(mesh);
@@ -88,7 +84,7 @@ package
 			}
 			
 			container.partition = new OcTree();
-			(container.partition as OcTree).create(container, 4, l * 50, offsetX, offsetY, offsetZ);
+			(container.partition as OcTree).create(container, 4, l * 50);
 			
 			camera.recompose();
 		}

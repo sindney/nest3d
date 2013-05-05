@@ -10,9 +10,6 @@ package nest.control.partition
 	
 	/**
 	 * OcTree
-	 * <p>OcTree divides meshes in specific container to cubes.</p>
-	 * <p>If any of the container's child mesh's transform matrix is changed, you should regenerate the tree.</p>
-	 * <p>So you'd better put only constant meshes here.</p>
 	 */
 	public class OcTree implements IPTree {
 		
@@ -23,12 +20,13 @@ package nest.control.partition
 			_root = new OcNode();
 		}
 		
-		public function create(target:IContainer3D, depth:int, size:Number, offsetX:Number = 0, offsetY:Number = 0, offsetZ:Number = 0):void {
+		public function create(target:IContainer3D, depth:int, size:Number):void {
 			var size:Number = size / 2;
 			
 			var containers:Vector.<IContainer3D> = new Vector.<IContainer3D>();
 			var meshes:Vector.<IMesh> = new Vector.<IMesh>();
 			var container:IContainer3D = target;
+			var offset:Vector3D = target.worldMatrix.transformVector(new Vector3D());
 			
 			var object:IObject3D;
 			var i:int, j:int;
@@ -44,14 +42,15 @@ package nest.control.partition
 					}
 				}
 				container = containers.pop();
+				if (container && container.partition) throw new Error("Can't use partition tree inside another one.");
 			}
 			
 			_root.dispose();
 			_root.depth = 0;
 			_root.parent = null;
 			_root.objects = meshes;
-			_root.max.setTo(  size + offsetX,  size + offsetY,  size + offsetZ);
-			_root.min.setTo( -size + offsetX, -size + offsetY, -size + offsetZ);
+			_root.max.setTo(  size + offset.x,  size + offset.y,  size + offset.z);
+			_root.min.setTo( -size + offset.x, -size + offset.y, -size + offset.z);
 			_root.vertices[1].setTo(_root.max.x, _root.min.y, _root.min.z);
 			_root.vertices[2].setTo(_root.min.x, _root.max.y, _root.min.z);
 			_root.vertices[3].setTo(_root.max.x, _root.max.y, _root.min.z);
@@ -135,8 +134,8 @@ package nest.control.partition
 				BBTL = BBTR = BBBL = BBBR = false;
 				BTTL = BTTR = BTBL = BTBR = false;
 				if (mesh.bound.aabb) {
-					a = mesh.worldMatrix.transformVector(mesh.matrix.transformVector(mesh.bound.vertices[7]));
-					b = mesh.worldMatrix.transformVector(mesh.matrix.transformVector(mesh.bound.vertices[0]));
+					a = mesh.worldMatrix.transformVector(mesh.bound.vertices[7]);
+					b = mesh.worldMatrix.transformVector(mesh.bound.vertices[0]);
 					BBTL = Bound.AABB_AABB(a, b, BTL.max, BTL.min);
 					BBTR = Bound.AABB_AABB(a, b, BTR.max, BTR.min);
 					BBBL = Bound.AABB_AABB(a, b, BBL.max, BBL.min);
@@ -146,8 +145,8 @@ package nest.control.partition
 					BTBL = Bound.AABB_AABB(a, b, TBL.max, TBL.min);
 					BTBR = Bound.AABB_AABB(a, b, TBR.max, TBR.min);
 				} else {
-					a = mesh.worldMatrix.transformVector(mesh.matrix.transformVector(d));
-					b = mesh.worldMatrix.transformVector(mesh.matrix.transformVector(c));
+					a = mesh.worldMatrix.transformVector(d);
+					b = mesh.worldMatrix.transformVector(c);
 					radius = mesh.bound.radius * b.length;
 					BBTL = Bound.AABB_BSphere(BTL.max, BTL.min, a, radius);
 					BBTR = Bound.AABB_BSphere(BTR.max, BTR.min, a, radius);

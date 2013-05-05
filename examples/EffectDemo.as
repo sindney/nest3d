@@ -63,8 +63,7 @@ package
 			mesh.materials.push(material);
 			
 			var shader:Shader3D = new Shader3D();
-			shader.comply("m44 vt0, va0, vc0\nm44 vt0, vt0, vc4\n" + 
-								"m44 op, vt0, vc8\nmov v0, va3\n", 
+			shader.comply("m44 vt0, va0, vc0\nm44 op, vt0, vc4\nmov v0, va3\n", 
 								"tex oc, v0, fs0 <2d,linear,mipnone>\n");
 			mesh.shaders.push(shader);
 			

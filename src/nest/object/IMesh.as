@@ -48,6 +48,9 @@ package nest.object
 		function get ignorePosition():Boolean;
 		function set ignorePosition(value:Boolean):void;
 		
+		function get castShadows():Boolean;
+		function set castShadows(value:Boolean):void;
+		
 	}
 	
 }

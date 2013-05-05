@@ -35,6 +35,7 @@ package nest.object
 		protected var _ignoreRotation:Boolean = false;
 		protected var _ignorePosition:Boolean = false;
 		protected var _id:uint = 0;
+		protected var _castShadows:Boolean = false;
 		
 		public function Mesh(create:Boolean = true, geometries:Vector.<Geometry> = null, materials:Vector.<Vector.<TextureResource>> = null, shaders:Vector.<Shader3D> = null, bound:Bound = null) {
 			if (create) {
@@ -162,6 +163,14 @@ package nest.object
 		
 		public function set id(value:uint):void {
 			_id = value;
+		}
+		
+		public function get castShadows():Boolean {
+			return _castShadows;
+		}
+		
+		public function set castShadows(value:Boolean):void {
+			_castShadows = value;
 		}
 		
 	}

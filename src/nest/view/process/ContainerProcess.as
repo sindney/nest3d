@@ -25,7 +25,8 @@ package nest.view.process
 		
 		protected var _renderTarget:RenderTarget;
 		
-		protected var _constantParts:Vector.<IConstantShaderPart> = new Vector.<IConstantShaderPart>();
+		protected var _constantParts:Vector.<IConstantShaderPart>;
+		protected var _textures:Vector.<TextureResource>;
 		
 		protected var _container:IContainer3D;
 		
@@ -61,16 +62,16 @@ package nest.view.process
 			
 			var alphaParms:Vector.<int> = new Vector.<int>();
 			
-			var pm0:Matrix3D = camera.invertMatrix.clone();
+			var pm0:Matrix3D = camera.invertWorldMatrix.clone();
 			pm0.append(camera.pm);
 			
-			var pm1:Matrix3D = camera.invertMatrix.clone();
+			var pm1:Matrix3D = camera.invertWorldMatrix.clone();
 			var components:Vector.<Vector3D> = pm1.decompose();
 			components[0].setTo(0, 0, 0);
 			pm1.recompose(components);
 			pm1.append(camera.pm);
 			
-			var pm2:Matrix3D = camera.invertMatrix.clone();
+			var pm2:Matrix3D = camera.invertWorldMatrix.clone();
 			components = pm2.decompose();
 			components[1].setTo(0, 0, 0);
 			pm2.recompose(components);
@@ -92,24 +93,31 @@ package nest.view.process
 			}
 			context3d.clear(_rgba[0], _rgba[1], _rgba[2], _rgba[3]);
 			
-			var byteArraySP:ByteArrayShaderPart;
-			var matrixSP:MatrixShaderPart;
-			var vectorSP:VectorShaderPart;
+			if (_constantParts) {
+				var byteArraySP:ByteArrayShaderPart;
+				var matrixSP:MatrixShaderPart;
+				var vectorSP:VectorShaderPart;
+				for each(var csp:IConstantShaderPart in _constantParts) {
+					if (csp is ByteArrayShaderPart) {
+						byteArraySP = csp as ByteArrayShaderPart;
+						context3d.setProgramConstantsFromByteArray(byteArraySP.programType, byteArraySP.firstRegister, 
+																	byteArraySP.numRegisters, byteArraySP.data, 
+																	byteArraySP.byteArrayOffset);
+					} else if (csp is MatrixShaderPart) {
+						matrixSP = csp as MatrixShaderPart;
+						context3d.setProgramConstantsFromMatrix(matrixSP.programType, matrixSP.firstRegister, 
+																matrixSP.matrix, matrixSP.transposedMatrix);
+					} else if (csp is VectorShaderPart) {
+						vectorSP = csp as VectorShaderPart;
+						context3d.setProgramConstantsFromVector(vectorSP.programType, vectorSP.firstRegister, 
+																vectorSP.data, vectorSP.numRegisters);
+					}
+				}
+			}
 			
-			for each(var csp:IConstantShaderPart in _constantParts) {
-				if (csp is ByteArrayShaderPart) {
-					byteArraySP = csp as ByteArrayShaderPart;
-					context3d.setProgramConstantsFromByteArray(byteArraySP.programType, byteArraySP.firstRegister, 
-																byteArraySP.numRegisters, byteArraySP.data, 
-																byteArraySP.byteArrayOffset);
-				} else if (csp is MatrixShaderPart) {
-					matrixSP = csp as MatrixShaderPart;
-					context3d.setProgramConstantsFromMatrix(matrixSP.programType, matrixSP.firstRegister, 
-															matrixSP.matrix, matrixSP.transposedMatrix);
-				} else if (csp is VectorShaderPart) {
-					vectorSP = csp as VectorShaderPart;
-					context3d.setProgramConstantsFromVector(vectorSP.programType, vectorSP.firstRegister, 
-															vectorSP.data, vectorSP.numRegisters);
+			if (_textures) {
+				for each(var texture:TextureResource in _textures) {
+					if (texture.texture) context3d.setTextureAt(texture.sampler, texture.texture);
 				}
 			}
 			
@@ -207,9 +215,8 @@ package nest.view.process
 			var context3d:Context3D = ViewPort.context3d;
 			
 			context3d.setCulling(mesh.triangleCulling);
-			context3d.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 0, mesh.matrix, true);
-			context3d.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 4, mesh.worldMatrix, true);
-			context3d.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 8, pm, true);
+			context3d.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 0, mesh.worldMatrix, true);
+			context3d.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 4, pm, true);
 			
 			var i:int, j:int = mesh.geometries.length;
 			var uv:Boolean, normal:Boolean, tangent:Boolean;
@@ -271,17 +278,15 @@ package nest.view.process
 			if (mesh.bound.aabb) {
 				var vertices:Vector.<Vector3D> = new Vector.<Vector3D>(8, true);
 				for (i = 0; i < 8; i++) {
-					vertices[i] = _camera.invertMatrix.transformVector(
-									mesh.worldMatrix.transformVector(mesh.matrix.transformVector(mesh.bound.vertices[i]))
-								);
+					vertices[i] = _camera.invertWorldMatrix.transformVector(mesh.worldMatrix.transformVector(mesh.bound.vertices[i]));
 				}
 				return _camera.frustum.classifyAABB(vertices);
 			}
 			
-			var id:Vector3D = mesh.worldMatrix.transformVector(mesh.matrix.transformVector(new Vector3D(0.577, 0.577, 0.577)));
+			var id:Vector3D = mesh.worldMatrix.transformVector(new Vector3D(0.577, 0.577, 0.577));
 			var scale:Number = id.length;
 			return _camera.frustum.classifyBSphere(
-						_camera.invertMatrix.transformVector(mesh.worldMatrix.transformVector(mesh.matrix.transformVector(new Vector3D()))), 
+						_camera.invertWorldMatrix.transformVector(mesh.worldMatrix.transformVector(new Vector3D())), 
 						mesh.bound.radius * scale
 					);
 		}
@@ -315,6 +320,7 @@ package nest.view.process
 		public function dispose():void {
 			_renderTarget = null;
 			_constantParts = null;
+			_textures = null;
 			_container = null;
 			_objects = null;
 			_alphaObjects = null;
@@ -336,6 +342,14 @@ package nest.view.process
 		
 		public function set constantParts(value:Vector.<IConstantShaderPart>):void {
 			_constantParts = value;
+		}
+		
+		public function get textures():Vector.<TextureResource> {
+			return _textures;
+		}
+		
+		public function set textures(value:Vector.<TextureResource>):void {
+			_textures = value;
 		}
 		
 		public function get container():IContainer3D {

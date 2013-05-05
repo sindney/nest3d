@@ -29,10 +29,6 @@ package nest.control.parser
 		private var uvs:Vector.<Number>;
 		private var indices:Vector.<uint>;
 		
-		public function Parser3DS() {
-			
-		}
-		
 		public function dispose():void {
 			_objects = null;
 			last = null;

@@ -31,7 +31,7 @@ package nest.control.partition
 			var i:int, j:int = _vertices.length;
 			var vertices:Vector.<Vector3D> = new Vector.<Vector3D>(j, true);
 			for (i = 0; i < j; i++) {
-				vertices[i] = camera.invertMatrix.transformVector(_vertices[i]);
+				vertices[i] = camera.invertWorldMatrix.transformVector(_vertices[i]);
 			}
 			return camera.frustum.classifyAABB(vertices);
 		}

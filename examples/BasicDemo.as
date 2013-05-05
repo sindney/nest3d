@@ -1,6 +1,7 @@
 package  
 {
 	import flash.display3D.Context3DProgramType;
+	import flash.geom.Vector3D;
 	
 	import nest.control.util.Primitives;
 	import nest.control.partition.OcNode;
@@ -35,10 +36,8 @@ package
 			
 			var shader:Shader3D = new Shader3D();
 			shader.constantParts.push(new VectorShaderPart(Context3DProgramType.FRAGMENT, 0, Vector.<Number>([1, 1, 1, 1])));
-			shader.comply("m44 vt0, va0, vc0\nm44 vt0, vt0, vc4\n" + 
-							"m44 op, vt0, vc8\n", "mov oc, fc0\n");
+			shader.comply("m44 vt0, va0, vc0\nm44 op, vt0, vc4\n", "mov oc, fc0\n");
 			
-			var offsetX:Number = 0, offsetY:Number = 0, offsetZ:Number = 0;
 			var mesh:Mesh;
 			
 			var geoms:Vector.<Geometry> = Vector.<Geometry>([geom]);
@@ -52,7 +51,7 @@ package
 				for (j = 0; j < l; j++) {
 					for (k = 0; k < l; k++) {
 						mesh = new Mesh(false, geoms, materials, shaders, bound);
-						mesh.position.setTo(i * 50 - m + offsetX, j * 50 - m + offsetY, k * 50 - m + offsetZ);
+						mesh.position.setTo(i * 50 - m, j * 50 - m, k * 50 - m);
 						mesh.scale.setTo(10, 10, 10);
 						container.addChild(mesh);
 					}
@@ -60,7 +59,7 @@ package
 			}
 			
 			container.partition = new OcTree();
-			(container.partition as OcTree).create(container, 4, l * 50, offsetX, offsetY, offsetZ);
+			(container.partition as OcTree).create(container, 4, l * 50);
 			
 			camera.recompose();
 		}

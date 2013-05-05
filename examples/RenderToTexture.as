@@ -44,8 +44,7 @@ package
 			
 			var shader0:Shader3D = new Shader3D();
 			shader0.constantParts.push(new VectorShaderPart(Context3DProgramType.FRAGMENT, 0, Vector.<Number>([1, 0, 0, 1])));
-			shader0.comply("m44 vt0, va0, vc0\nm44 vt0, vt0, vc4\n" + 
-							"m44 op, vt0, vc8\n",
+			shader0.comply("m44 vt0, va0, vc0\nm44 op, vt0, vc4\n",
 							"mov oc, fc0\n");
 			
 			mesh = new Mesh();
@@ -63,8 +62,7 @@ package
 			material.texture = ViewPort.context3d.createTexture(512, 512, Context3DTextureFormat.BGRA, true);
 			
 			var shader1:Shader3D = new Shader3D();
-			shader1.comply("m44 vt0, va0, vc0\nm44 vt0, vt0, vc4\n" + 
-							"m44 op, vt0, vc8\nmov v0, va3\n",
+			shader1.comply("m44 vt0, va0, vc0\nm44 op, vt0, vc4\nmov v0, va3\n",
 							"tex oc, v0, fs0 <2d,linear,mipnone>\n");
 			
 			var mesh1:Mesh = new Mesh();

@@ -263,6 +263,7 @@ package nest.object.geom
 			uvBuffer = null;
 			if (indexBuffer) indexBuffer.dispose();
 			indexBuffer = null;
+			name = null;
 			vertices = null;
 			normals = null;
 			tangents = null;

@@ -8,6 +8,7 @@ package
 	import nest.control.parser.Parser3DS;
 	import nest.control.util.Primitives;
 	import nest.control.util.RayIntersection;
+	import nest.control.util.RayIntersectionResult;
 	import nest.object.geom.Bound;
 	import nest.object.geom.Geometry;
 	import nest.object.Mesh;
@@ -101,9 +102,8 @@ package
 			material.push(diffuse, specular, normalmap);
 			
 			var shader:Shader3D = new Shader3D();
-			shader.constantParts.push(new MatrixShaderPart(Context3DProgramType.VERTEX, 12, mesh.invertWorldMatrix, true));
-			shader.constantParts.push(new MatrixShaderPart(Context3DProgramType.VERTEX, 16, mesh.invertMatrix, true));
-			cameraPos = new VectorShaderPart(Context3DProgramType.VERTEX, 20, Vector.<Number>([0, 0, -400, 1]));
+			shader.constantParts.push(new MatrixShaderPart(Context3DProgramType.VERTEX, 8, mesh.invertWorldMatrix, true));
+			cameraPos = new VectorShaderPart(Context3DProgramType.VERTEX, 12, Vector.<Number>([0, 0, -400, 1]));
 			shader.constantParts.push(cameraPos);
 			// ambient light color, directional light color, directional light direction
 			lights = new VectorShaderPart(Context3DProgramType.FRAGMENT, 0, Vector.<Number>([0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 1]), 3);
@@ -122,8 +122,7 @@ package
 			
 			var box_shader:Shader3D = new Shader3D();
 			box_shader.constantParts.push(new VectorShaderPart(Context3DProgramType.FRAGMENT, 0, Vector.<Number>([1, 0, 0, 1])));
-			box_shader.comply("m44 vt0, va0, vc0\nm44 vt0, vt0, vc4\n" + 
-							"m44 op, vt0, vc8\n", "mov oc, fc0\n");
+			box_shader.comply("m44 vt0, va0, vc0\nm44 op, vt0, vc4\n", "mov oc, fc0\n");
 			
 			box = new Mesh();
 			box.geometries.push(Primitives.createBox());
@@ -154,8 +153,7 @@ package
 			skybox_material.push(skybox_resource);
 			
 			var skybox_shader:Shader3D = new Shader3D();
-			skybox_shader.comply("m44 vt0, va0, vc0\nm44 vt0, vt0, vc4\n" + 
-								"m44 op, vt0, vc8\nmov v0, va0\n", 
+			skybox_shader.comply("m44 vt0, va0, vc0\nm44 op, vt0, vc4\nmov v0, va0\n", 
 								"tex oc, v0, fs0 <cube,linear,miplinear>\n");
 			
 			skybox = new Mesh();
@@ -176,23 +174,21 @@ package
 		
 		private function vertexShader():String {
 			var result:String = 
-			// va0 = vertex, va3 = uv, vc0 = mesh.matrix
-			// vc4 = mesh.worldMatrix, vc8 = camera.invertMatrix * camera.pm
+			// va0 = vertex, va3 = uv, vc0 = mesh.worldMatrix
+			// vc4 = camera.invertWorldMatrix * camera.pm
 			"m44 vt0, va0, vc0\n" + 
-			// v0 = vertex * mesh.matrix
+			// v0 = vertex * mesh.worldMatrix
 			"mov v0, vt0\n" + 
 			// v1 = uv
 			"mov v1, va3\n" + 
 			// v2 = normal
 			"mov v2, va1\n" + 
 			// project vertex
-			"m44 vt0, vt0, vc4\n" + 
-			"m44 op, vt0, vc8\n" + 
+			"m44 op, vt0, vc4\n" + 
 			// cameraPos
-			"mov vt0, vc20.xyz\n" + 
+			"mov vt0, vc12.xyz\n" + 
 			// cameraPos to object space
-			"m44 vt0, vt0, vc12\n" + 
-			"m44 vt0, vt0, vc16\n" + 
+			"m44 vt0, vt0, vc8\n" + 
 			// v5 = cameraDir in object space
 			"nrm vt0.xyz, vt0\n" + 
 			"mov v5, vt0.xyz\n" + 
@@ -245,22 +241,34 @@ package
 		}
 		
 		override public function loop():void {
-			var orgion:Vector3D = mesh.invertWorldMatrix.transformVector(mesh.invertMatrix.transformVector(camera.position));
-			var delta:Vector3D = mesh.invertWorldMatrix.transformVector(mesh.invertMatrix.transformVector(camera.matrix.transformVector(new Vector3D(0, 0, 1000))));
-			var result:Vector3D = new Vector3D();
-			RayIntersection.Ray_Mesh(result, orgion, delta, mesh);
-			result.copyFrom(mesh.worldMatrix.transformVector(mesh.matrix.transformVector(result)));
-			box.position.copyFrom(result);
-			box.recompose();
-			box.visible = result.w != 0;
+			var camPos:Vector3D = camera.worldMatrix.transformVector(new Vector3D());
+			var orgion:Vector3D = mesh.invertWorldMatrix.transformVector(camPos);
+			var delta:Vector3D = mesh.invertWorldMatrix.transformVector(camera.worldMatrix.transformVector(new Vector3D(0, 0, 1000)));
+			var results:Vector.<RayIntersectionResult> = new Vector.<RayIntersectionResult>();
+			RayIntersection.RayMesh(null, results, orgion, delta, mesh);
+			var tmp0:RayIntersectionResult, tmp1:RayIntersectionResult;
+			var flag:Number = Number.MAX_VALUE;
+			for each(tmp0 in results) {
+				if (Vector3D.distance(camPos, mesh.worldMatrix.transformVector(tmp0.point)) < flag) tmp1 = tmp0;
+			}
+			if (tmp1) {
+				tmp1.point.copyFrom(mesh.worldMatrix.transformVector(tmp1.point));
+				box.position.copyFrom(tmp1.point);
+				box.recompose();
+				box.visible = true;
+				view.diagram.message.text = "Flag: " + tmp1.flag.toString() + "\nPoint: " + tmp1.point.toString() + "\nIndex: " + tmp1.index.toString();
+			} else {
+				box.visible = false;
+				view.diagram.message.text = "Flag: false";
+			}
 			orgion.normalize();
 			orgion.negate();
 			lights.data[8] = orgion.x;
 			lights.data[9] = orgion.y;
 			lights.data[10] = orgion.z;
-			cameraPos.data[0] = camera.position.x;
-			cameraPos.data[1] = camera.position.y;
-			cameraPos.data[2] = camera.position.z;
+			cameraPos.data[0] = camPos.x;
+			cameraPos.data[1] = camPos.y;
+			cameraPos.data[2] = camPos.z;
 		}
 	}
 

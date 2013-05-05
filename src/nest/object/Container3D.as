@@ -16,6 +16,8 @@ package nest.object
 		
 		protected var _partition:IPTree;
 		
+		protected var _castShadows:Boolean = false;
+		
 		public function Container3D() {
 			super();
 			_objects = new Vector.<IObject3D>();
@@ -107,6 +109,14 @@ package nest.object
 		
 		public function get objects():Vector.<IObject3D> {
 			return _objects;
+		}
+		
+		public function get castShadows():Boolean {
+			return _castShadows;
+		}
+		
+		public function set castShadows(value:Boolean):void {
+			_castShadows = value;
 		}
 		
 	}

@@ -29,33 +29,24 @@ package nest.object
 			_components[2] = new Vector3D(1, 1, 1, 1);
 		}
 		
-		/**
-		 * Call this when you changed object3d's transform matrix.
-		 */
 		public function decompose():void {
 			_components = _matrix.decompose(_orientation);
 			_invertMatrix.copyFrom(_matrix);
 			_invertMatrix.invert();
-			if (parent) {
-				_worldMatrix.copyFrom(parent.worldMatrix);
-				_invertWorldMatrix.copyFrom(_worldMatrix);
-				_invertWorldMatrix.invert();
-			}
+			_worldMatrix.copyFrom(_matrix);
+			if (parent) _worldMatrix.append(parent.worldMatrix);
+			_invertWorldMatrix.copyFrom(_worldMatrix);
+			_invertWorldMatrix.invert();
 		}
 		
-		/**
-		 * Call this when your changed object3d's parent, position, rotation vector or orientation type.
-		 */
 		public function recompose():void {
 			_matrix.recompose(_components, _orientation);
 			_invertMatrix.copyFrom(_matrix);
 			_invertMatrix.invert();
-			if (parent) {
-				_worldMatrix.copyFrom(parent.matrix);
-				_worldMatrix.append(parent.worldMatrix);
-				_invertWorldMatrix.copyFrom(_worldMatrix);
-				_invertWorldMatrix.invert();
-			}
+			_worldMatrix.copyFrom(_matrix);
+			if (parent) _worldMatrix.append(parent.worldMatrix);
+			_invertWorldMatrix.copyFrom(_worldMatrix);
+			_invertWorldMatrix.invert();
 		}
 		
 		///////////////////////////////////
@@ -75,8 +66,7 @@ package nest.object
 		}
 		
 		/**
-		 * You can call matrix's function to transform this object3d.
-		 * <p>matrix.appendTranslation ... </p>
+		 * Call decompose() after you changed this matrix.
 		 */
 		public function get matrix():Matrix3D {
 			return _matrix;
