@@ -43,41 +43,36 @@ package
 			view.processes.push(process0, process1);
 			
 			var shader0:Shader3D = new Shader3D();
-			shader0.constantParts.push(new VectorShaderPart(Context3DProgramType.FRAGMENT, 0, Vector.<Number>([1, 0, 0, 1])));
+			shader0.constantsPart.push(new VectorShaderPart(Context3DProgramType.FRAGMENT, 0, Vector.<Number>([1, 0, 0, 1])));
 			shader0.comply("m44 vt0, va0, vc0\nm44 op, vt0, vc4\n",
 							"mov oc, fc0\n");
 			
-			mesh = new Mesh();
-			mesh.geometries.push(Primitives.createBox());
-			mesh.materials.push(null);
+			mesh = new Mesh(Primitives.createBox());
 			mesh.shaders.push(shader0);
-			Geometry.setupGeometry(mesh.geometries[0], true, false, false, false);
-			Geometry.uploadGeometry(mesh.geometries[0], true, false, false, false, true);
-			Bound.calculate(mesh.bound, mesh.geometries);
+			Geometry.setupGeometry(mesh.geometry, true, false, false, false);
+			Geometry.uploadGeometry(mesh.geometry, true, false, false, false, true);
+			Bound.calculate(mesh.bound, mesh.geometry);
 			mesh.position.z = 400;
 			mesh.scale.setTo(100, 100, 100);
 			container0.addChild(mesh);
 			
-			var material:TextureResource = new TextureResource(0, null);
-			material.texture = ViewPort.context3d.createTexture(512, 512, Context3DTextureFormat.BGRA, true);
-			
 			var shader1:Shader3D = new Shader3D();
+			shader1.texturesPart.push(new TextureResource(0, null));
 			shader1.comply("m44 vt0, va0, vc0\nm44 op, vt0, vc4\nmov v0, va3\n",
 							"tex oc, v0, fs0 <2d,linear,mipnone>\n");
+			shader1.texturesPart[0].texture = ViewPort.context3d.createTexture(512, 512, Context3DTextureFormat.BGRA, true);
 			
-			var mesh1:Mesh = new Mesh();
-			mesh1.geometries.push(Primitives.createPlane());
-			mesh1.materials.push(Vector.<TextureResource>([material]));
+			var mesh1:Mesh = new Mesh(Primitives.createPlane());
 			mesh1.shaders.push(shader1);
-			Geometry.setupGeometries(mesh1.geometries, true, false, false, true);
-			Geometry.uploadGeometries(mesh1.geometries, true, false, false, true, true);
-			Bound.calculate(mesh1.bound, mesh1.geometries);
+			Geometry.setupGeometry(mesh1.geometry, true, false, false, true);
+			Geometry.uploadGeometry(mesh1.geometry, true, false, false, true, true);
+			Bound.calculate(mesh1.bound, mesh1.geometry);
 			mesh1.scale.setTo(100, 100, 100);
 			mesh1.position.z = 200;
 			mesh1.triangleCulling = Context3DTriangleFace.NONE;
 			container1.addChild(mesh1);
 			
-			process0.renderTarget.texture = material.texture;
+			process0.renderTarget.texture = shader1.texturesPart[0].texture;
 		}
 		
 		private var mesh:Mesh;

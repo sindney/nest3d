@@ -5,6 +5,7 @@ package nest.view.shader
 	import flash.display3D.Context3DProgramType;
 	import flash.display3D.Program3D;
 	
+	import nest.view.TextureResource;
 	import nest.view.ViewPort;
 	
 	/**
@@ -22,7 +23,8 @@ package nest.view.shader
 		
 		private var _program:Program3D;
 		
-		public var constantParts:Vector.<IConstantShaderPart> = new Vector.<IConstantShaderPart>();
+		public var constantsPart:Vector.<IConstantShaderPart> = new Vector.<IConstantShaderPart>();
+		public var texturesPart:Vector.<TextureResource> = new Vector.<TextureResource>();
 		
 		public function Shader3D() {
 			_program = ViewPort.context3d.createProgram();
@@ -35,10 +37,15 @@ package nest.view.shader
 			);
 		}
 		
-		public function dispose():void {
+		/**
+		 * @param	all Dispose texturesPart array.
+		 */
+		public function dispose(all:Boolean = true):void {
+			if (all) for each(var texture:TextureResource in texturesPart) texture.dispose();
+			texturesPart = null;
 			if(_program)_program.dispose();
 			_program = null;
-			constantParts = null;
+			constantsPart = null;
 		}
 		
 		///////////////////////////////////

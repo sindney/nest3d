@@ -86,50 +86,46 @@ package
 			
 			var matrix:Matrix3D = new Matrix3D();
 			matrix.appendRotation(180, Vector3D.Y_AXIS);
-			Geometry.setupGeometry(mesh.geometries[0], true, true, true, true);
-			Geometry.calculateNormal(mesh.geometries[0]);
-			Geometry.calculateTangent(mesh.geometries[0]);
-			Geometry.transformGeometry(mesh.geometries[0], matrix);
-			Geometry.uploadGeometry(mesh.geometries[0], true, true, true, true, true);
+			Geometry.setupGeometry(mesh.geometry, true, true, true, true);
+			Geometry.calculateNormal(mesh.geometry);
+			Geometry.calculateTangent(mesh.geometry);
+			Geometry.transformGeometry(mesh.geometry, matrix);
+			Geometry.uploadGeometry(mesh.geometry, true, true, true, true, true);
+			Bound.calculate(mesh.bound, mesh.geometry);
 			
-			var material:Vector.<TextureResource> = new Vector.<TextureResource>();
 			var diffuse:TextureResource = new TextureResource(0, null);
 			TextureResource.uploadToTexture(diffuse, new bitmap_diffuse().bitmapData, false);
 			var specular:TextureResource = new TextureResource(1, null);
 			TextureResource.uploadToTexture(specular, new bitmap_specular().bitmapData, false);
 			var normalmap:TextureResource = new TextureResource(2, null);
 			TextureResource.uploadToTexture(normalmap, new bitmap_normalmap().bitmapData, false);
-			material.push(diffuse, specular, normalmap);
 			
 			var shader:Shader3D = new Shader3D();
-			shader.constantParts.push(new MatrixShaderPart(Context3DProgramType.VERTEX, 8, mesh.invertWorldMatrix, true));
+			shader.constantsPart.push(new MatrixShaderPart(Context3DProgramType.VERTEX, 8, mesh.invertWorldMatrix, true));
 			cameraPos = new VectorShaderPart(Context3DProgramType.VERTEX, 12, Vector.<Number>([0, 0, -400, 1]));
-			shader.constantParts.push(cameraPos);
+			shader.constantsPart.push(cameraPos);
 			// ambient light color, directional light color, directional light direction
 			lights = new VectorShaderPart(Context3DProgramType.FRAGMENT, 0, Vector.<Number>([0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 1]), 3);
-			shader.constantParts.push(lights);
+			shader.constantsPart.push(lights);
 			// glossiness
-			shader.constantParts.push(new VectorShaderPart(Context3DProgramType.FRAGMENT, 3, Vector.<Number>([20, 1, 1, 1])));
+			shader.constantsPart.push(new VectorShaderPart(Context3DProgramType.FRAGMENT, 3, Vector.<Number>([20, 1, 1, 1])));
+			shader.texturesPart.push(diffuse, specular, normalmap);
 			shader.comply(vertexShader(), fragmentShader());
 			
-			mesh.materials.push(material);
 			mesh.shaders.push(shader);
-			Bound.calculate(mesh.bound, mesh.geometries);
 			
 			///////////////////////////////////
 			// Box
 			///////////////////////////////////
 			
 			var box_shader:Shader3D = new Shader3D();
-			box_shader.constantParts.push(new VectorShaderPart(Context3DProgramType.FRAGMENT, 0, Vector.<Number>([1, 0, 0, 1])));
+			box_shader.constantsPart.push(new VectorShaderPart(Context3DProgramType.FRAGMENT, 0, Vector.<Number>([1, 0, 0, 1])));
 			box_shader.comply("m44 vt0, va0, vc0\nm44 op, vt0, vc4\n", "mov oc, fc0\n");
 			
-			box = new Mesh();
-			box.geometries.push(Primitives.createBox());
-			Geometry.setupGeometries(box.geometries, true, false, false, false);
-			Geometry.uploadGeometries(box.geometries, true, false, false, false, true);
-			Bound.calculate(box.bound, box.geometries);
-			box.materials.push(null);
+			box = new Mesh(Primitives.createBox());
+			Geometry.setupGeometry(box.geometry, true, false, false, false);
+			Geometry.uploadGeometry(box.geometry, true, false, false, false, true);
+			Bound.calculate(box.bound, box.geometry);
 			box.shaders.push(box_shader);
 			box.position.x = 500;
 			box.scale.setTo(10, 10, 10);
@@ -147,22 +143,19 @@ package
 			cubicmap[4] = new front().bitmapData;
 			cubicmap[5] = new back().bitmapData;
 			
-			var skybox_material:Vector.<TextureResource> = new Vector.<TextureResource>();
 			var skybox_resource:TextureResource = new TextureResource(0, null);
 			TextureResource.uploadToCubeTexture(skybox_resource, cubicmap);
-			skybox_material.push(skybox_resource);
 			
 			var skybox_shader:Shader3D = new Shader3D();
+			skybox_shader.texturesPart.push(skybox_resource);
 			skybox_shader.comply("m44 vt0, va0, vc0\nm44 op, vt0, vc4\nmov v0, va0\n", 
 								"tex oc, v0, fs0 <cube,linear,miplinear>\n");
 			
-			skybox = new Mesh();
-			skybox.geometries.push(Primitives.createSkybox());
-			skybox.materials.push(skybox_material);
+			skybox = new Mesh(Primitives.createSkybox());
+			Geometry.setupGeometry(skybox.geometry, true, false, false, false);
+			Geometry.uploadGeometry(skybox.geometry, true, false, false, false, true);
+			Bound.calculate(skybox.bound, skybox.geometry);
 			skybox.shaders.push(skybox_shader);
-			Geometry.setupGeometry(skybox.geometries[0], true, false, false, false);
-			Geometry.uploadGeometry(skybox.geometries[0], true, false, false, false, true);
-			Bound.calculate(skybox.bound, skybox.geometries);
 			skybox.cliping = false;
 			skybox.scale.setTo(10000, 10000, 10000);
 			skybox.ignorePosition = true;

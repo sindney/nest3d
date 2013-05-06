@@ -41,28 +41,23 @@ package
 			
 			var parser:ParserMD2 = new ParserMD2();
 			parser.parse(new model(), false, false);
-			
-			var material:Vector.<TextureResource> = new Vector.<TextureResource>();
-			material.push(new TextureResource(0, null));
-			TextureResource.uploadToTexture(material[0], new diffuse().bitmapData, false);
-			
-			var shader:Shader3D = new Shader3D();
-			shader.comply("m44 vt0, va0, vc0\nm44 op, vt0, vc4\nmov v0, va3\n", 
-							"tex oc, v0, fs0 <2d,linear,mipnone>\n");
-			
-			var mesh:Mesh = new Mesh();
-			mesh.geometries.push(parser.geom);
-			mesh.materials.push(material);
-			mesh.shaders.push(shader);
 			Geometry.setupGeometry(parser.geom, true, false, false, true);
 			Geometry.uploadGeometry(parser.geom, true, false, false, true, true);
-			Bound.calculate(mesh.bound, mesh.geometries);
+			
+			var shader:Shader3D = new Shader3D();
+			shader.texturesPart.push(new TextureResource(0, null));
+			shader.comply("m44 vt0, va0, vc0\nm44 op, vt0, vc4\nmov v0, va3\n", 
+							"tex oc, v0, fs0 <2d,linear,mipnone>\n");
+			TextureResource.uploadToTexture(shader.texturesPart[0], new diffuse().bitmapData, false);
+			
+			var mesh:Mesh = new Mesh(parser.geom);
+			Bound.calculate(mesh.bound, mesh.geometry);
+			mesh.shaders.push(shader);
 			mesh.rotation.y = Math.PI / 2;
 			container.addChild(mesh);
 			
 			var track:AnimationTrack = parser.track;
 			track.modifier = new VertexModifier();
-			track.parameters[VertexModifier.GEOM_INDEX] = 0;
 			track.parameters[VertexModifier.VERTEX_NORMAL] = false;
 			track.parameters[VertexModifier.VERTEX_TANGENT] = false;
 			track.target = mesh;

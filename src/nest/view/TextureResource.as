@@ -16,6 +16,7 @@ package nest.view
 	
 	/**
 	 * TextureResource
+	 * TODO: AnimationTrack的每一帧的bmd有无必要预先生成为context3d的texture对象
 	 */
 	public class TextureResource {
 		

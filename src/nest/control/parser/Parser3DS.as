@@ -23,7 +23,7 @@ package nest.control.parser
 		
 		private var _objects:Vector.<Mesh>;
 		
-		private var last:Mesh;
+		private var mesh:Mesh;
 		
 		private var vertices:Vector.<Number>;
 		private var uvs:Vector.<Number>;
@@ -31,7 +31,7 @@ package nest.control.parser
 		
 		public function dispose():void {
 			_objects = null;
-			last = null;
+			mesh = null;
 			vertices = null;
 			uvs = null;
 			indices = null;
@@ -72,9 +72,9 @@ package nest.control.parser
 					readChunk(data, init + length);
 					break;
 				case OBJECTS:
-					last = new Mesh();
-					last.name = readName(data);
-					_objects.push(last);
+					mesh = new Mesh();
+					mesh.name = readName(data);
+					_objects.push(mesh);
 					readChunk(data, init + length);
 					return;
 				case MESH:
@@ -106,7 +106,7 @@ package nest.control.parser
 					geom.vertices = vertices;
 					geom.uvs = uvs;
 					geom.indices = indices;
-					last.geometries.push(geom);
+					mesh.geometry = geom;
 					break;
 			}
 			

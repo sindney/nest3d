@@ -25,10 +25,6 @@ package
 		private var container:Container3D;
 		private var anim_controller:AnimationController;
 		
-		public function Anim_Texture() {
-			
-		}
-		
 		override public function init():void {
 			container = new Container3D();
 			
@@ -39,25 +35,24 @@ package
 			
 			var track:AnimationTrack = TextureResource.getTrackFromSpriteSheet(new data().bitmapData, false, 96, 128, 0, 10);
 			track.modifier = new TextureModifier();
-			track.parameters[TextureModifier.MATERIAL_INDEX] = 0;
+			track.parameters[TextureModifier.SHADER_INDEX] = 0;
 			track.parameters[TextureModifier.TEXTURE_INDEX] = 0;
 			track.enabled = true;
 			
-			var material:Vector.<TextureResource> = new Vector.<TextureResource>();
-			material.push(new TextureResource(0, null));
-			TextureResource.uploadToTexture(material[0], (track.frames[0] as TextureKeyFrame).data, false);
-			
 			var shader:Shader3D = new Shader3D();
+			shader.texturesPart.push(new TextureResource(0, null));
 			shader.comply("m44 vt0, va0, vc0\nm44 op, vt0, vc4\nmov v0, va3\n", 
 							"tex ft0, v0, fs0 <2d,linear,mipnone>\nkil ft0.w\nmov oc, ft0\n");
 			
-			var mesh:Mesh = new Mesh();
-			mesh.geometries.push(Primitives.createPlane());
-			mesh.materials.push(material);
+			TextureResource.uploadToTexture(shader.texturesPart[0], (track.frames[0] as TextureKeyFrame).data, false);
+			
+			var geom:Geometry = Primitives.createPlane();
+			Geometry.setupGeometry(geom, true, false, false, true);
+			Geometry.uploadGeometry(geom, true, false, false, true, true);
+			
+			var mesh:Mesh = new Mesh(geom);
+			Bound.calculate(mesh.bound, geom);
 			mesh.shaders.push(shader);
-			Geometry.setupGeometry(mesh.geometries[0], true, false, false, true);
-			Geometry.uploadGeometry(mesh.geometries[0], true, false, false, true, true);
-			Bound.calculate(mesh.bound, mesh.geometries);
 			mesh.ignoreRotation = true;
 			mesh.scale.setTo(100, 100, 100);
 			container.addChild(mesh);

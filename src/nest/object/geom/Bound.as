@@ -52,7 +52,7 @@ package nest.object.geom
 			return true;
 		}
 		
-		public static function calculate(bound:Bound, geoms:Vector.<Geometry>):void {
+		public static function calculate(bound:Bound, geom:Geometry):void {
 			var max:Vector3D, min:Vector3D;
 			var geom:Geometry;
 			var i:int, j:int;
@@ -62,19 +62,17 @@ package nest.object.geom
 				min = bound.vertices[0];
 				max.setTo(0, 0, 0);
 				min.setTo(0, 0, 0);
-				for each(geom in geoms) {
-					for (i = 0; i < geom.numVertices; i++) {
-						j = i * 3;
-						a = geom.vertices[j];
-						if (a > max.x) max.x = a;
-						else if (a < min.x) min.x = a;
-						a = geom.vertices[j + 1];
-						if (a > max.y) max.y = a;
-						else if (a < min.y) min.y = a;
-						a = geom.vertices[j + 2];
-						if (a > max.z) max.z = a;
-						else if (a < min.z) min.z = a;
-					}
+				for (i = 0; i < geom.numVertices; i++) {
+					j = i * 3;
+					a = geom.vertices[j];
+					if (a > max.x) max.x = a;
+					else if (a < min.x) min.x = a;
+					a = geom.vertices[j + 1];
+					if (a > max.y) max.y = a;
+					else if (a < min.y) min.y = a;
+					a = geom.vertices[j + 2];
+					if (a > max.z) max.z = a;
+					else if (a < min.z) min.z = a;
 				}
 				bound.vertices[1].setTo(max.x, min.y, min.z);
 				bound.vertices[2].setTo(min.x, max.y, min.z);
@@ -84,16 +82,14 @@ package nest.object.geom
 				bound.vertices[6].setTo(min.x, max.y, max.z);
 			} else {
 				max = new Vector3D();
-				for each(geom in geoms) {
-					for (i = 0; i < geom.numVertices; i++) {
-						j = i * 3;
-						a = geom.vertices[j];
-						if (a > max.x) max.x = a;
-						a = geom.vertices[j + 1];
-						if (a > max.y) max.y = a;
-						a = geom.vertices[j + 2];
-						if (a > max.z) max.z = a;
-					}
+				for (i = 0; i < geom.numVertices; i++) {
+					j = i * 3;
+					a = geom.vertices[j];
+					if (a > max.x) max.x = a;
+					a = geom.vertices[j + 1];
+					if (a > max.y) max.y = a;
+					a = geom.vertices[j + 2];
+					if (a > max.z) max.z = a;
 				}
 				bound.radius = max.x > max.y ? max.x : max.y;
 				if (max.z > bound.radius) bound.radius = max.z;

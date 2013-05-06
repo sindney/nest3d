@@ -203,43 +203,41 @@ package nest.control.util
 			current.flag = false;
 			var vt2:Vector3D = new Vector3D();
 			var v1:Vector3D = new Vector3D(), v2:Vector3D = new Vector3D(), v3:Vector3D = new Vector3D();
-			var geom:Geometry;
+			var geom:Geometry = mesh.geometry;
 			var t:Number;
 			var i:int, j:int, k:int;
-			for each(geom in mesh.geometries) {
-				for (i = 0; i < geom.numTriangles; i++) {
-					j = i * 3;
-					k = geom.indices[j] * 3;
-					v1.x = geom.vertices[k];
-					v1.y = geom.vertices[k + 1];
-					v1.z = geom.vertices[k + 2];
-					k = geom.indices[j + 1] * 3;
-					v2.x = geom.vertices[k];
-					v2.y = geom.vertices[k + 1];
-					v2.z = geom.vertices[k + 2];
-					k = geom.indices[j + 2] * 3;
-					v3.x = geom.vertices[k];
-					v3.y = geom.vertices[k + 1];
-					v3.z = geom.vertices[k + 2];
-					vt1.setTo(v2.x - v1.x, v2.y - v1.y, v2.z - v1.z);
-					vt2.setTo(v3.x - v2.x, v3.y - v2.y, v3.z - v2.z);
-					vt1 = vt1.crossProduct(vt2);
-					vt1.normalize();
-					t = RayTriangle(orgion, delta, v1, v2, v3, vt1);
-					if (t <= 1) {
-						current.point.copyFrom(delta);
-						current.point.scaleBy(t);
-						current.point.x += orgion.x;
-						current.point.y += orgion.y;
-						current.point.z += orgion.z;
-						current.index = geom.indices[j];
-						current.flag = true;
-						if (flag) {
-							return;
-						} else {
-							results.push(current);
-							current = new RayIntersectionResult();
-						}
+			for (i = 0; i < geom.numTriangles; i++) {
+				j = i * 3;
+				k = geom.indices[j] * 3;
+				v1.x = geom.vertices[k];
+				v1.y = geom.vertices[k + 1];
+				v1.z = geom.vertices[k + 2];
+				k = geom.indices[j + 1] * 3;
+				v2.x = geom.vertices[k];
+				v2.y = geom.vertices[k + 1];
+				v2.z = geom.vertices[k + 2];
+				k = geom.indices[j + 2] * 3;
+				v3.x = geom.vertices[k];
+				v3.y = geom.vertices[k + 1];
+				v3.z = geom.vertices[k + 2];
+				vt1.setTo(v2.x - v1.x, v2.y - v1.y, v2.z - v1.z);
+				vt2.setTo(v3.x - v2.x, v3.y - v2.y, v3.z - v2.z);
+				vt1 = vt1.crossProduct(vt2);
+				vt1.normalize();
+				t = RayTriangle(orgion, delta, v1, v2, v3, vt1);
+				if (t <= 1) {
+					current.point.copyFrom(delta);
+					current.point.scaleBy(t);
+					current.point.x += orgion.x;
+					current.point.y += orgion.y;
+					current.point.z += orgion.z;
+					current.index = geom.indices[j];
+					current.flag = true;
+					if (flag) {
+						return;
+					} else {
+						results.push(current);
+						current = new RayIntersectionResult();
 					}
 				}
 			}

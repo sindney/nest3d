@@ -42,17 +42,17 @@ package
 			mouseController = new MouseController(stage, process0);
 			
 			shader0 = new Shader3D();
-			shader0.constantParts.push(new VectorShaderPart(Context3DProgramType.FRAGMENT, 0, Vector.<Number>([1, 1, 1, 1])));
+			shader0.constantsPart.push(new VectorShaderPart(Context3DProgramType.FRAGMENT, 0, Vector.<Number>([1, 1, 1, 1])));
 			shader0.comply("m44 vt0, va0, vc0\nm44 op, vt0, vc4\n",
 							"mov oc, fc0\n");
 			
 			shader1 = new Shader3D();
-			shader1.constantParts.push(new VectorShaderPart(Context3DProgramType.FRAGMENT, 0, Vector.<Number>([1, 0, 0, 1])));
+			shader1.constantsPart.push(new VectorShaderPart(Context3DProgramType.FRAGMENT, 0, Vector.<Number>([1, 0, 0, 1])));
 			shader1.comply("m44 vt0, va0, vc0\nm44 op, vt0, vc4\n",
 							"mov oc, fc0\n");
 			
 			shader2 = new Shader3D();
-			shader2.constantParts.push(new VectorShaderPart(Context3DProgramType.FRAGMENT, 0, Vector.<Number>([0, 0, 1, 1])));
+			shader2.constantsPart.push(new VectorShaderPart(Context3DProgramType.FRAGMENT, 0, Vector.<Number>([0, 0, 1, 1])));
 			shader2.comply("m44 vt0, va0, vc0\nm44 op, vt0, vc4\n",
 							"mov oc, fc0\n");
 			
@@ -60,17 +60,17 @@ package
 			Geometry.setupGeometry(geom, true, false, false, false);
 			Geometry.uploadGeometry(geom, true, false, false, false, true);
 			
+			var bound:Bound = new Bound();
+			Bound.calculate(bound, geom);
+			
 			var mesh:Mesh;
 			
 			var i:int, j:int, k:int, l:int = 15, m:int = l * 25;
 			for (i = 0; i < l; i++) {
 				for (j = 0; j < l; j++) {
 					for (k = 0; k < l; k++) {
-						mesh = new Mesh();
-						mesh.geometries.push(geom);
-						mesh.materials.push(null);
+						mesh = new Mesh(geom, null, bound);
 						mesh.shaders.push(shader0);
-						Bound.calculate(mesh.bound, mesh.geometries);
 						mesh.position.setTo(i * 50 - m, j * 50 - m, k * 50 - m);
 						mesh.scale.setTo(10, 10, 10);
 						mesh.mouseEnabled = true;

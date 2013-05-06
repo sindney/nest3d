@@ -5,7 +5,6 @@ package nest.object
 	import nest.object.geom.Bound;
 	import nest.object.geom.Geometry;
 	import nest.view.shader.Shader3D;
-	import nest.view.TextureResource;
 	
 	[Event(name = "mouseDown", type = "nest.control.controller.MouseEvent3D")]
 	[Event(name = "mouseOver", type = "nest.control.controller.MouseEvent3D")]
@@ -21,8 +20,7 @@ package nest.object
 	 */
 	public class Mesh extends Object3D implements IMesh {
 		
-		protected var _geometries:Vector.<Geometry>;
-		protected var _materials:Vector.<Vector.<TextureResource>>;
+		protected var _geometry:Geometry;
 		protected var _shaders:Vector.<Shader3D>;
 		
 		protected var _bound:Bound;
@@ -37,30 +35,22 @@ package nest.object
 		protected var _id:uint = 0;
 		protected var _castShadows:Boolean = false;
 		
-		public function Mesh(create:Boolean = true, geometries:Vector.<Geometry> = null, materials:Vector.<Vector.<TextureResource>> = null, shaders:Vector.<Shader3D> = null, bound:Bound = null) {
-			if (create) {
-				_geometries = new Vector.<Geometry>();
-				_materials = new Vector.<Vector.<TextureResource>>();
-				_shaders = new Vector.<Shader3D>();
-				_bound = new Bound();
-			} else {
-				_geometries = geometries;
-				_materials = materials;
-				_shaders = shaders;
-				_bound = bound;
-			}
+		public function Mesh(geometry:Geometry = null, shaders:Vector.<Shader3D> = null, bound:Bound = null) {
+			super();
+			_geometry = geometry;
+			_shaders = shaders ? shaders : new Vector.<Shader3D>();
+			_bound = bound ? bound : new Bound();
 		}
 		
+		/**
+		 * @param	all Dispose geometry buffers and shader textures.
+		 */
 		public function dispose(all:Boolean = true):void {
 			if (all) {
-				for each(var geom:Geometry in _geometries) geom.dispose();
-				for each(var mats:Vector.<TextureResource> in _materials) {
-					for each(var mat:TextureResource in mats) mat.dispose();
-				}
+				_geometry.dispose();
 				for each(var shader:Shader3D in _shaders) shader.dispose();
 			}
-			_geometries = null;
-			_materials = null;
+			_geometry = null;
 			_shaders = null;
 			_bound = null;
 		}
@@ -69,20 +59,12 @@ package nest.object
 		// getter/setters
 		///////////////////////////////////
 		
-		public function get geometries():Vector.<Geometry> {
-			return _geometries;
+		public function get geometry():Geometry {
+			return _geometry;
 		}
 		
-		public function set geometries(value:Vector.<Geometry>):void {
-			_geometries = value;
-		}
-		
-		public function get materials():Vector.<Vector.<TextureResource>> {
-			return _materials;
-		}
-		
-		public function set materials(value:Vector.<Vector.<TextureResource>>):void {
-			_materials = value;
+		public function set geometry(value:Geometry):void {
+			_geometry = value;
 		}
 		
 		public function get shaders():Vector.<Shader3D> {

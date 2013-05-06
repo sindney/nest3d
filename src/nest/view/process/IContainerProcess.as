@@ -14,8 +14,8 @@ package nest.view.process
 		
 		function drawMesh(mesh:IMesh, pm:Matrix3D):void;
 		
-		function get constantParts():Vector.<IConstantShaderPart>;
-		function set constantParts(value:Vector.<IConstantShaderPart>):void;
+		function get constantsPart():Vector.<IConstantShaderPart>;
+		function set constantsPart(value:Vector.<IConstantShaderPart>):void;
 		
 		function get container():IContainer3D;
 		function set container(value:IContainer3D):void;

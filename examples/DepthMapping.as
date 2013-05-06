@@ -54,28 +54,26 @@ package
 			lightPM.matrix.append(process0.pm);
 			
 			var shader:Shader3D = new Shader3D();
-			shader.constantParts.push(new VectorShaderPart(Context3DProgramType.FRAGMENT, 0, Vector.<Number>([1 / (255 * 255 * 255), 1 / (255 * 255), 1 / 255, 1])), 
+			shader.constantsPart.push(new VectorShaderPart(Context3DProgramType.FRAGMENT, 0, Vector.<Number>([1 / (255 * 255 * 255), 1 / (255 * 255), 1 / 255, 1])), 
 									lightPM, new VectorShaderPart(Context3DProgramType.VERTEX, 12, Vector.<Number>([0.5, 0, 0, 0])));
+			shader.texturesPart.push(depthMap);
 			shader.comply(getShadowVertexShader(), getShadowFragmentShader());
 			
 			var geom:Geometry = Primitives.createPlane();
 			Geometry.setupGeometry(geom, true, false, false, false);
 			Geometry.uploadGeometry(geom, true, false, false, false, true);
 			
-			var geometries:Vector.<Geometry> = Vector.<Geometry>([geom]);
-			var materials:Vector.<Vector.<TextureResource>> = new Vector.<Vector.<TextureResource>>(1, true);
-			materials[0] = Vector.<TextureResource>([depthMap]);
 			var shaders:Vector.<Shader3D> = Vector.<Shader3D>([shader]);
 			var bound:Bound = new Bound();
-			Bound.calculate(bound, geometries);
+			Bound.calculate(bound, geom);
 			
-			var mesh:Mesh = new Mesh(false, geometries, materials, shaders, bound);
+			var mesh:Mesh = new Mesh(geom, shaders, bound);
 			mesh.position.setTo(0, 0, 50);
 			mesh.scale.setTo(10, 10, 1);
 			mesh.castShadows = true;
 			container.addChild(mesh);
 			
-			mesh = new Mesh(false, geometries, materials, shaders, bound);
+			mesh = new Mesh(geom, shaders, bound);
 			mesh.position.setTo(0, 0, 100);
 			mesh.scale.setTo(50, 50, 1);
 			mesh.castShadows = true;

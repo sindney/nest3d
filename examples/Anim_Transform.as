@@ -11,6 +11,7 @@ package
 	import nest.control.controller.AnimationController;
 	import nest.control.util.Primitives;
 	import nest.control.util.Quaternion;
+	import nest.object.geom.Bound;
 	import nest.object.geom.Geometry;
 	import nest.object.Mesh;
 	import nest.object.Container3D;
@@ -42,13 +43,14 @@ package
 			var geom:Geometry = Primitives.createBox();
 			Geometry.setupGeometry(geom, true, false, false, false);
 			Geometry.uploadGeometry(geom, true, false, false, false, true);
+			
 			var shader:Shader3D = new Shader3D();
-			shader.constantParts.push(new VectorShaderPart(Context3DProgramType.FRAGMENT, 0, Vector.<Number>([1, 1, 1, 1])));
+			shader.constantsPart.push(new VectorShaderPart(Context3DProgramType.FRAGMENT, 0, Vector.<Number>([1, 1, 1, 1])));
 			shader.comply("m44 vt0, va0, vc0\nm44 op, vt0, vc4\n",
 							"mov oc, fc0\n");
-			var mesh:Mesh = new Mesh();
-			mesh.geometries.push(geom);
-			mesh.materials.push(null);
+			
+			var mesh:Mesh = new Mesh(geom);
+			Bound.calculate(mesh.bound, geom);
 			mesh.shaders.push(shader);
 			mesh.orientation = Orientation3D.QUATERNION;
 			mesh.rotation.w = 1;

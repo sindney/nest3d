@@ -3,20 +3,19 @@ package nest.object
 	import nest.object.geom.Bound;
 	import nest.object.geom.Geometry;
 	import nest.view.shader.Shader3D;
-	import nest.view.TextureResource;
 	
 	/**
 	 * Mesh Interface
 	 */
 	public interface IMesh extends IObject3D {
 		
+		/**
+		 * @param	all Dispose context3d contents.
+		 */
 		function dispose(all:Boolean = true):void;
 		
-		function get geometries():Vector.<Geometry>;
-		function set geometries(value:Vector.<Geometry>):void;
-		
-		function get materials():Vector.<Vector.<TextureResource>>;
-		function set materials(value:Vector.<Vector.<TextureResource>>):void;
+		function get geometry():Geometry;
+		function set geometry(value:Geometry):void;
 		
 		function get shaders():Vector.<Shader3D>;
 		function set shaders(value:Vector.<Shader3D>):void;

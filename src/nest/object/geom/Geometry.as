@@ -49,20 +49,12 @@ package nest.object.geom
 			geom.indexBuffer = ViewPort.context3d.createIndexBuffer(geom.numTriangles * 3);
 		}
 		
-		public static function setupGeometries(geoms:Vector.<Geometry>, vertex:Boolean = true, normal:Boolean = true, tangent:Boolean = true, uv:Boolean = true):void {
-			for each(var geom:Geometry in geoms) setupGeometry(geom, vertex, normal, tangent, uv);
-		}
-		
 		public static function uploadGeometry(geom:Geometry, vertex:Boolean = true, normal:Boolean = true, tangent:Boolean = true, uv:Boolean = true, index:Boolean = true):void {
 			if (vertex) geom.vertexBuffer.uploadFromVector(geom.vertices, 0, geom.numVertices);
 			if (normal) geom.normalBuffer.uploadFromVector(geom.normals, 0, geom.numVertices);
 			if (tangent) geom.tangentBuffer.uploadFromVector(geom.tangents, 0, geom.numVertices);
 			if (uv) geom.uvBuffer.uploadFromVector(geom.uvs, 0, geom.numVertices);
 			if (index) geom.indexBuffer.uploadFromVector(geom.indices, 0, geom.numTriangles * 3);
-		}
-		
-		public static function uploadGeometries(geoms:Vector.<Geometry>, vertex:Boolean = true, normal:Boolean = true, tangent:Boolean = true, uv:Boolean = true, index:Boolean = true):void {
-			for each(var geom:Geometry in geoms) uploadGeometry(geom, vertex, normal, tangent, uv, index);
 		}
 		
 		public static function calculateNormal(geom:Geometry):void {
@@ -117,10 +109,6 @@ package nest.object.geom
 				geom.normals[j + 1] *= x1;
 				geom.normals[j + 2] *= x1;
 			}
-		}
-		
-		public static function calculateNormals(geoms:Vector.<Geometry>):void {
-			for each(var geom:Geometry in geoms) calculateNormal(geom);
 		}
 		
 		public static function calculateTangent(geom:Geometry):void {
@@ -192,10 +180,6 @@ package nest.object.geom
 			}
 		}
 		
-		public static function calculateTangents(geoms:Vector.<Geometry>):void {
-			for each(var geom:Geometry in geoms) calculateTangent(geom);
-		}
-		
 		public static function transformGeometry(geom:Geometry, matrix:Matrix3D):void {
 			var i:int, j:int;
 			var tmp:Vector3D = new Vector3D();
@@ -229,10 +213,6 @@ package nest.object.geom
 					geom.tangents[j + 2] = tmp.z;
 				}
 			}
-		}
-		
-		public static function transformGeometries(geoms:Vector.<Geometry>, matrix:Matrix3D):void {
-			for each(var geom:Geometry in geoms) transformGeometry(geom, matrix);
 		}
 		
 		public var name:String;

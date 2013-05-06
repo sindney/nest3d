@@ -10,14 +10,13 @@ package nest.control.animation
 	 */
 	public class VertexModifier implements IAnimationModifier {
 		
-		public static const GEOM_INDEX:String = "geom_index";
 		public static const VERTEX_NORMAL:String = "vertex_normal";
 		public static const VERTEX_TANGENT:String = "vertex_tangent";
 		
 		public function calculate(track:AnimationTrack, k1:IKeyFrame, k2:IKeyFrame, time:Number):void {
 			var w1:Number = track.weight * (k2.time - time) / (k2.time - k1.time);
 			var w2:Number = track.weight - w1;
-			var geom:Geometry = track.target.geometries[track.parameters[GEOM_INDEX]];
+			var geom:Geometry = track.target.geometry;
 			var vt0:Vector.<Number> = (k1 as VertexKeyFrame).vertices;
 			var vt1:Vector.<Number> = (k2 as VertexKeyFrame).vertices;
 			var nm0:Vector.<Number> = (k1 as VertexKeyFrame).normals;

@@ -7,7 +7,6 @@ package nest.view.process
 	import flash.geom.Matrix3D;
 	import flash.geom.Vector3D;
 	
-	import nest.object.geom.Geometry;
 	import nest.object.Container3D;
 	import nest.object.IContainer3D;
 	import nest.object.IMesh;
@@ -56,7 +55,6 @@ package nest.view.process
 			var container:IContainer3D = _container;
 			var object:IObject3D;
 			var mesh:IMesh;
-			var geom:Geometry;
 			
 			var pm:Matrix3D = _ivm.clone();
 			pm.append(_pm);
@@ -71,7 +69,7 @@ package nest.view.process
 			context3d.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, 0, Vector.<Number>([255 * 255 * 255, 255 * 255, 255, 1, 0, 1 / 255, 1 / 255, 1 / 255]), 2);
 			context3d.setProgram(_program);
 			
-			var i:int, j:int, k:int, l:int;
+			var i:int, j:int;
 			while (container) {
 				if (!container.visible || !container.castShadows) {
 					container = containers.pop();
@@ -86,12 +84,8 @@ package nest.view.process
 							context3d.setCulling(mesh.triangleCulling);
 							context3d.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 0, mesh.worldMatrix, true);
 							context3d.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 4, pm, true);
-							l = mesh.geometries.length;
-							for (k = 0; k < l; k++) {
-								geom = mesh.geometries[k];
-								context3d.setVertexBufferAt(0, geom.vertexBuffer, 0, Context3DVertexBufferFormat.FLOAT_3);
-								context3d.drawTriangles(geom.indexBuffer);
-							}
+							context3d.setVertexBufferAt(0, mesh.geometry.vertexBuffer, 0, Context3DVertexBufferFormat.FLOAT_3);
+							context3d.drawTriangles(mesh.geometry.indexBuffer);
 						}
 					} else if (object is IContainer3D) {
 						containers.push(object as IContainer3D);
@@ -108,7 +102,7 @@ package nest.view.process
 			_pm = null;
 			_container = null;
 			_rgba = null;
-			_program.dispose();
+			if (_program) _program.dispose();
 			_program = null;
 		}
 		
@@ -122,6 +116,10 @@ package nest.view.process
 		
 		public function get program():Program3D {
 			return _program;
+		}
+		
+		public function set program(value:Program3D):void {
+			_program = value;
 		}
 		
 		public function get vm():Matrix3D {

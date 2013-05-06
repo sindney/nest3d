@@ -47,22 +47,20 @@ package
 			parser.parse(new model());
 			
 			mesh = parser.objects[0];
-			Geometry.setupGeometries(mesh.geometries, true, false, false, true);
-			Geometry.uploadGeometries(mesh.geometries, true, false, false, true, true);
-			Bound.calculate(mesh.bound, mesh.geometries);
+			Geometry.setupGeometry(mesh.geometry, true, false, false, true);
+			Geometry.uploadGeometry(mesh.geometry, true, false, false, true, true);
+			Bound.calculate(mesh.bound, mesh.geometry);
 			mesh.scale.setTo(30, 30, 30);
 			mesh.rotation.y = Math.PI;
 			container.addChild(mesh);
 			
 			parser.dispose();
 			
-			var material:Vector.<TextureResource> = new Vector.<TextureResource>();
 			var diffuse:TextureResource = new TextureResource(0, null);
 			TextureResource.uploadToTexture(diffuse, new bitmap_diffuse().bitmapData, false);
-			material.push(diffuse);
-			mesh.materials.push(material);
 			
 			var shader:Shader3D = new Shader3D();
+			shader.texturesPart.push(diffuse);
 			shader.comply("m44 vt0, va0, vc0\nm44 op, vt0, vc4\nmov v0, va3\n", 
 								"tex oc, v0, fs0 <2d,linear,mipnone>\n");
 			mesh.shaders.push(shader);
