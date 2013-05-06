@@ -43,6 +43,7 @@ package
 			var geom:Geometry = Primitives.createBox();
 			Geometry.setupGeometry(geom, true, false, false, false);
 			Geometry.uploadGeometry(geom, true, false, false, false, true);
+			Geometry.calculateBound(geom);
 			
 			var shader:Shader3D = new Shader3D();
 			shader.constantsPart.push(new VectorShaderPart(Context3DProgramType.FRAGMENT, 0, Vector.<Number>([1, 1, 1, 1])));
@@ -50,7 +51,6 @@ package
 							"mov oc, fc0\n");
 			
 			var mesh:Mesh = new Mesh(geom);
-			Bound.calculate(mesh.bound, geom);
 			mesh.shaders.push(shader);
 			mesh.orientation = Orientation3D.QUATERNION;
 			mesh.rotation.w = 1;

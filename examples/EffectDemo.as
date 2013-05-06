@@ -49,7 +49,7 @@ package
 			mesh = parser.objects[0];
 			Geometry.setupGeometry(mesh.geometry, true, false, false, true);
 			Geometry.uploadGeometry(mesh.geometry, true, false, false, true, true);
-			Bound.calculate(mesh.bound, mesh.geometry);
+			Geometry.calculateBound(mesh.geometry);
 			mesh.scale.setTo(30, 30, 30);
 			mesh.rotation.y = Math.PI;
 			container.addChild(mesh);

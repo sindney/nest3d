@@ -43,6 +43,7 @@ package
 			parser.parse(new model(), false, false);
 			Geometry.setupGeometry(parser.geom, true, false, false, true);
 			Geometry.uploadGeometry(parser.geom, true, false, false, true, true);
+			Geometry.calculateBound(parser.geom);
 			
 			var shader:Shader3D = new Shader3D();
 			shader.texturesPart.push(new TextureResource(0, null));
@@ -51,7 +52,6 @@ package
 			TextureResource.uploadToTexture(shader.texturesPart[0], new diffuse().bitmapData, false);
 			
 			var mesh:Mesh = new Mesh(parser.geom);
-			Bound.calculate(mesh.bound, mesh.geometry);
 			mesh.shaders.push(shader);
 			mesh.rotation.y = Math.PI / 2;
 			container.addChild(mesh);

@@ -80,7 +80,6 @@ package
 			
 			mesh = parser.objects[0];
 			mesh.scale.setTo(30, 30, 30);
-			container.addChild(mesh);
 			
 			parser.dispose();
 			
@@ -91,7 +90,7 @@ package
 			Geometry.calculateTangent(mesh.geometry);
 			Geometry.transformGeometry(mesh.geometry, matrix);
 			Geometry.uploadGeometry(mesh.geometry, true, true, true, true, true);
-			Bound.calculate(mesh.bound, mesh.geometry);
+			Geometry.calculateBound(mesh.geometry);
 			
 			var diffuse:TextureResource = new TextureResource(0, null);
 			TextureResource.uploadToTexture(diffuse, new bitmap_diffuse().bitmapData, false);
@@ -113,6 +112,7 @@ package
 			shader.comply(vertexShader(), fragmentShader());
 			
 			mesh.shaders.push(shader);
+			container.addChild(mesh);
 			
 			///////////////////////////////////
 			// Box
@@ -125,7 +125,7 @@ package
 			box = new Mesh(Primitives.createBox());
 			Geometry.setupGeometry(box.geometry, true, false, false, false);
 			Geometry.uploadGeometry(box.geometry, true, false, false, false, true);
-			Bound.calculate(box.bound, box.geometry);
+			Geometry.calculateBound(box.geometry);
 			box.shaders.push(box_shader);
 			box.position.x = 500;
 			box.scale.setTo(10, 10, 10);
@@ -154,7 +154,7 @@ package
 			skybox = new Mesh(Primitives.createSkybox());
 			Geometry.setupGeometry(skybox.geometry, true, false, false, false);
 			Geometry.uploadGeometry(skybox.geometry, true, false, false, false, true);
-			Bound.calculate(skybox.bound, skybox.geometry);
+			Geometry.calculateBound(skybox.geometry);
 			skybox.shaders.push(skybox_shader);
 			skybox.cliping = false;
 			skybox.scale.setTo(10000, 10000, 10000);
@@ -249,7 +249,7 @@ package
 				box.position.copyFrom(tmp1.point);
 				box.recompose();
 				box.visible = true;
-				view.diagram.message.text = "Flag: " + tmp1.flag.toString() + "\nPoint: " + tmp1.point.toString() + "\nIndex: " + tmp1.index.toString();
+				view.diagram.message.text = "Flag: " + tmp1.flag.toString() + "\nHits: " + results.length.toString() + "\nPoint: " + tmp1.point.toString() + "\nIndex: " + tmp1.index.toString();
 			} else {
 				box.visible = false;
 				view.diagram.message.text = "Flag: false";

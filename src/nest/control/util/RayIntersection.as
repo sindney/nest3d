@@ -26,7 +26,7 @@ package nest.control.util
 				result.w = 0;
 				return;
 			}
-			result.w = 0;
+			result.w = 1;
 			result.copyFrom(delta);
 			result.scaleBy(f);
 			result.x += orgion.x;
@@ -127,7 +127,7 @@ package nest.control.util
 			result.y += orgion.y;
 			result.z += orgion.z;
 		}
-		
+		// TODO: 检查射线和反向构成的三角形的检测是否正确
 		public static function RayTriangle(orgion:Vector3D, delta:Vector3D, p0:Vector3D, p1:Vector3D, p2:Vector3D, normal:Vector3D, minT:Number = 1):Number {
 			const dot:Number = normal.dotProduct(delta);
 			if (!(dot < 0)) return Number.MAX_VALUE;
@@ -191,11 +191,7 @@ package nest.control.util
 		
 		public static function RayMesh(result:RayIntersectionResult, results:Vector.<RayIntersectionResult>, orgion:Vector3D, delta:Vector3D, mesh:IMesh):void {
 			var vt1:Vector3D = new Vector3D(); 
-			if (mesh.bound.aabb) {
-				RayAABB(vt1, orgion, delta, mesh.bound.vertices[7], mesh.bound.vertices[0]);
-			} else {
-				RayBSphere(vt1, orgion, delta, new Vector3D(), mesh.bound.radius);
-			}
+			RayAABB(vt1, orgion, delta, mesh.geometry.bound.vertices[7], mesh.geometry.bound.vertices[0]);
 			var flag:Boolean = (result != null);
 			var current:RayIntersectionResult = flag ? result : new RayIntersectionResult();
 			current.flag = (vt1.w != 0);

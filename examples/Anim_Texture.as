@@ -5,7 +5,6 @@ package
 	import nest.control.animation.TextureModifier;
 	import nest.control.controller.AnimationController;
 	import nest.control.util.Primitives;
-	import nest.object.geom.Bound;
 	import nest.object.geom.Geometry;
 	import nest.object.Mesh;
 	import nest.object.Container3D;
@@ -49,9 +48,9 @@ package
 			var geom:Geometry = Primitives.createPlane();
 			Geometry.setupGeometry(geom, true, false, false, true);
 			Geometry.uploadGeometry(geom, true, false, false, true, true);
+			Geometry.calculateBound(geom);
 			
 			var mesh:Mesh = new Mesh(geom);
-			Bound.calculate(mesh.bound, geom);
 			mesh.shaders.push(shader);
 			mesh.ignoreRotation = true;
 			mesh.scale.setTo(100, 100, 100);

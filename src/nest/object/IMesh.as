@@ -21,7 +21,6 @@ package nest.object
 		function set shaders(value:Vector.<Shader3D>):void;
 		
 		function get bound():Bound;
-		function set bound(value:Bound):void;
 		
 		function get cliping():Boolean;
 		function set cliping(value:Boolean):void;

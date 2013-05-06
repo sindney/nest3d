@@ -59,9 +59,7 @@ package
 			var geom:Geometry = Primitives.createBox();
 			Geometry.setupGeometry(geom, true, false, false, false);
 			Geometry.uploadGeometry(geom, true, false, false, false, true);
-			
-			var bound:Bound = new Bound();
-			Bound.calculate(bound, geom);
+			Geometry.calculateBound(geom);
 			
 			var mesh:Mesh;
 			
@@ -69,7 +67,7 @@ package
 			for (i = 0; i < l; i++) {
 				for (j = 0; j < l; j++) {
 					for (k = 0; k < l; k++) {
-						mesh = new Mesh(geom, null, bound);
+						mesh = new Mesh(geom, null);
 						mesh.shaders.push(shader0);
 						mesh.position.setTo(i * 50 - m, j * 50 - m, k * 50 - m);
 						mesh.scale.setTo(10, 10, 10);

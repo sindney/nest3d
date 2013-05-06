@@ -1,6 +1,7 @@
 package nest.object
 {
 	import flash.display3D.Context3DTriangleFace;
+	import flash.geom.Vector3D;
 	
 	import nest.object.geom.Bound;
 	import nest.object.geom.Geometry;
@@ -23,7 +24,7 @@ package nest.object
 		protected var _geometry:Geometry;
 		protected var _shaders:Vector.<Shader3D>;
 		
-		protected var _bound:Bound;
+		protected var _bound:Bound = new Bound();
 		protected var _triangleCulling:String = Context3DTriangleFace.BACK;
 		
 		protected var _visible:Boolean = true;
@@ -35,11 +36,10 @@ package nest.object
 		protected var _id:uint = 0;
 		protected var _castShadows:Boolean = false;
 		
-		public function Mesh(geometry:Geometry = null, shaders:Vector.<Shader3D> = null, bound:Bound = null) {
+		public function Mesh(geometry:Geometry = null, shaders:Vector.<Shader3D> = null) {
 			super();
 			_geometry = geometry;
 			_shaders = shaders ? shaders : new Vector.<Shader3D>();
-			_bound = bound ? bound : new Bound();
 		}
 		
 		/**
@@ -53,6 +53,16 @@ package nest.object
 			_geometry = null;
 			_shaders = null;
 			_bound = null;
+		}
+		
+		override public function recompose():void {
+			super.recompose();
+			if (_geometry) {
+				var i:int;
+				for (i = 0; i < 8; i++) {
+					_bound.vertices[i].copyFrom(_worldMatrix.transformVector(_geometry.bound.vertices[i]));
+				}
+			}
 		}
 		
 		///////////////////////////////////
@@ -77,10 +87,6 @@ package nest.object
 		
 		public function get bound():Bound {
 			return _bound;
-		}
-		
-		public function set bound(value:Bound):void {
-			_bound = value;
 		}
 		
 		public function get visible():Boolean {

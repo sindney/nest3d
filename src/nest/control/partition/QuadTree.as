@@ -26,7 +26,7 @@ package nest.control.partition
 			var containers:Vector.<IContainer3D> = new Vector.<IContainer3D>();
 			var meshes:Vector.<IMesh> = new Vector.<IMesh>();
 			var container:IContainer3D = target;
-			var offset:Vector3D = target.worldMatrix.transformVector(new Vector3D());
+			var offset:Vector3D = target.worldMatrix.position;
 			
 			var object:IObject3D;
 			var i:int, j:int;
@@ -89,10 +89,9 @@ package nest.control.partition
 			
 			var BTL:Boolean, BTR:Boolean, BBL:Boolean, BBR:Boolean;
 			
-			var radius:Number;
 			var mesh:IMesh;
 			var objects:Vector.<IMesh> = node.objects;
-			var a:Vector3D, b:Vector3D, c:Vector3D = new Vector3D(0.707, 0, 0.707), d:Vector3D = new Vector3D();
+			var a:Vector3D, b:Vector3D;
 			
 			j = objects.length;
 			node.objects = new Vector.<IMesh>();
@@ -100,24 +99,13 @@ package nest.control.partition
 			for (i = 0; i < j; i++) {
 				mesh = objects[i];
 				BTL = BTR = BBL = BBR = false;
-				if (mesh.bound.aabb) {
-					a = mesh.worldMatrix.transformVector(mesh.bound.vertices[7]);
-					b = mesh.worldMatrix.transformVector(mesh.bound.vertices[0]);
-					a.y = b.y = 0;
-					BTL = Bound.AABB_AABB(a, b, TL.max, TL.min);
-					BTR = Bound.AABB_AABB(a, b, TR.max, TR.min);
-					BBL = Bound.AABB_AABB(a, b, BL.max, BL.min);
-					BBR = Bound.AABB_AABB(a, b, BR.max, BR.min);
-				} else {
-					a = mesh.worldMatrix.transformVector(d);
-					b = mesh.worldMatrix.transformVector(c);
-					a.y = b.y = 0;
-					radius = mesh.bound.radius * b.length;
-					BTL = Bound.AABB_BSphere(TL.max, TL.min, a, radius);
-					BTR = Bound.AABB_BSphere(TR.max, TR.min, a, radius);
-					BBL = Bound.AABB_BSphere(BL.max, BL.min, a, radius);
-					BBR = Bound.AABB_BSphere(BR.max, BR.min, a, radius);
-				}
+				a = mesh.bound.vertices[7].clone();
+				b = mesh.bound.vertices[0].clone();
+				a.y = b.y = 0;
+				BTL = Bound.AABB_AABB(a, b, TL.max, TL.min);
+				BTR = Bound.AABB_AABB(a, b, TR.max, TR.min);
+				BBL = Bound.AABB_AABB(a, b, BL.max, BL.min);
+				BBR = Bound.AABB_AABB(a, b, BR.max, BR.min);
 				
 				if (BTL && (BTR || BBL || BBR) || BTR && (BTL || BBL || BBR) || 
 					BBL && (BTL || BTR || BBR) || BBR && (BTL || BTR || BBL)) {

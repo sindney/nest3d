@@ -215,6 +215,34 @@ package nest.object.geom
 			}
 		}
 		
+		public static function calculateBound(geom:Geometry):void {
+			var max:Vector3D, min:Vector3D;
+			var i:int, j:int;
+			var a:Number;
+			max = geom.bound.vertices[7];
+			min = geom.bound.vertices[0];
+			max.setTo(0, 0, 0);
+			min.setTo(0, 0, 0);
+			for (i = 0; i < geom.numVertices; i++) {
+				j = i * 3;
+				a = geom.vertices[j];
+				if (a > max.x) max.x = a;
+				else if (a < min.x) min.x = a;
+				a = geom.vertices[j + 1];
+				if (a > max.y) max.y = a;
+				else if (a < min.y) min.y = a;
+				a = geom.vertices[j + 2];
+				if (a > max.z) max.z = a;
+				else if (a < min.z) min.z = a;
+			}
+			geom.bound.vertices[1].setTo(max.x, min.y, min.z);
+			geom.bound.vertices[2].setTo(min.x, max.y, min.z);
+			geom.bound.vertices[3].setTo(max.x, max.y, min.z);
+			geom.bound.vertices[4].setTo(min.x, min.y, max.z);
+			geom.bound.vertices[5].setTo(max.x, min.y, max.z);
+			geom.bound.vertices[6].setTo(min.x, max.y, max.z);
+		}
+		
 		public var name:String;
 		
 		public var vertexBuffer:VertexBuffer3D;
@@ -228,6 +256,8 @@ package nest.object.geom
 		public var tangents:Vector.<Number>;
 		public var uvs:Vector.<Number>;
 		public var indices:Vector.<uint>;
+		
+		public var bound:Bound = new Bound();
 		
 		public var numVertices:int = 0;
 		public var numTriangles:int = 0;
@@ -249,6 +279,7 @@ package nest.object.geom
 			tangents = null;
 			uvs = null;
 			indices = null;
+			bound = null;
 			numVertices = numTriangles = 0;
 		}
 		

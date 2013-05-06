@@ -51,7 +51,7 @@ package
 			mesh.shaders.push(shader0);
 			Geometry.setupGeometry(mesh.geometry, true, false, false, false);
 			Geometry.uploadGeometry(mesh.geometry, true, false, false, false, true);
-			Bound.calculate(mesh.bound, mesh.geometry);
+			Geometry.calculateBound(mesh.geometry);
 			mesh.position.z = 400;
 			mesh.scale.setTo(100, 100, 100);
 			container0.addChild(mesh);
@@ -66,7 +66,7 @@ package
 			mesh1.shaders.push(shader1);
 			Geometry.setupGeometry(mesh1.geometry, true, false, false, true);
 			Geometry.uploadGeometry(mesh1.geometry, true, false, false, true, true);
-			Bound.calculate(mesh1.bound, mesh1.geometry);
+			Geometry.calculateBound(mesh1.geometry);
 			mesh1.scale.setTo(100, 100, 100);
 			mesh1.position.z = 200;
 			mesh1.triangleCulling = Context3DTriangleFace.NONE;

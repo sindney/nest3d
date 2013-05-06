@@ -26,7 +26,7 @@ package nest.control.partition
 			var containers:Vector.<IContainer3D> = new Vector.<IContainer3D>();
 			var meshes:Vector.<IMesh> = new Vector.<IMesh>();
 			var container:IContainer3D = target;
-			var offset:Vector3D = target.worldMatrix.transformVector(new Vector3D());
+			var offset:Vector3D = target.worldMatrix.position;
 			
 			var object:IObject3D;
 			var i:int, j:int;
@@ -121,10 +121,9 @@ package nest.control.partition
 			var BBTL:Boolean, BBTR:Boolean, BBBL:Boolean, BBBR:Boolean;
 			var BTTL:Boolean, BTTR:Boolean, BTBL:Boolean, BTBR:Boolean;
 			
-			var radius:Number;
 			var mesh:IMesh;
 			var objects:Vector.<IMesh> = node.objects;
-			var a:Vector3D, b:Vector3D, c:Vector3D = new Vector3D(0.577, 0.577, 0.577), d:Vector3D = new Vector3D();
+			var a:Vector3D, b:Vector3D;
 			
 			j = objects.length;
 			node.objects = new Vector.<IMesh>();
@@ -133,30 +132,16 @@ package nest.control.partition
 				mesh = objects[i];
 				BBTL = BBTR = BBBL = BBBR = false;
 				BTTL = BTTR = BTBL = BTBR = false;
-				if (mesh.bound.aabb) {
-					a = mesh.worldMatrix.transformVector(mesh.bound.vertices[7]);
-					b = mesh.worldMatrix.transformVector(mesh.bound.vertices[0]);
-					BBTL = Bound.AABB_AABB(a, b, BTL.max, BTL.min);
-					BBTR = Bound.AABB_AABB(a, b, BTR.max, BTR.min);
-					BBBL = Bound.AABB_AABB(a, b, BBL.max, BBL.min);
-					BBBR = Bound.AABB_AABB(a, b, BBR.max, BBR.min);
-					BTTL = Bound.AABB_AABB(a, b, TTL.max, TTL.min);
-					BTTR = Bound.AABB_AABB(a, b, TTR.max, TTR.min);
-					BTBL = Bound.AABB_AABB(a, b, TBL.max, TBL.min);
-					BTBR = Bound.AABB_AABB(a, b, TBR.max, TBR.min);
-				} else {
-					a = mesh.worldMatrix.transformVector(d);
-					b = mesh.worldMatrix.transformVector(c);
-					radius = mesh.bound.radius * b.length;
-					BBTL = Bound.AABB_BSphere(BTL.max, BTL.min, a, radius);
-					BBTR = Bound.AABB_BSphere(BTR.max, BTR.min, a, radius);
-					BBBL = Bound.AABB_BSphere(BBL.max, BBL.min, a, radius);
-					BBBR = Bound.AABB_BSphere(BBR.max, BBR.min, a, radius);
-					BTTL = Bound.AABB_BSphere(TTL.max, TTL.min, a, radius);
-					BTTR = Bound.AABB_BSphere(TTR.max, TTR.min, a, radius);
-					BTBL = Bound.AABB_BSphere(TBL.max, TBL.min, a, radius);
-					BTBR = Bound.AABB_BSphere(TBR.max, TBR.min, a, radius);
-				}
+				a = mesh.bound.vertices[7];
+				b = mesh.bound.vertices[0];
+				BBTL = Bound.AABB_AABB(a, b, BTL.max, BTL.min);
+				BBTR = Bound.AABB_AABB(a, b, BTR.max, BTR.min);
+				BBBL = Bound.AABB_AABB(a, b, BBL.max, BBL.min);
+				BBBR = Bound.AABB_AABB(a, b, BBR.max, BBR.min);
+				BTTL = Bound.AABB_AABB(a, b, TTL.max, TTL.min);
+				BTTR = Bound.AABB_AABB(a, b, TTR.max, TTR.min);
+				BTBL = Bound.AABB_AABB(a, b, TBL.max, TBL.min);
+				BTBR = Bound.AABB_AABB(a, b, TBR.max, TBR.min);
 				
 				if (BBTL && (BBTR || BBBL || BBBR || BTTL || BTTR || BTBL || BTBR) || 
 					BBTR && (BBTL || BBBL || BBBR || BTTL || BTTR || BTBL || BTBR) || 

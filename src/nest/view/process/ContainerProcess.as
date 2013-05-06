@@ -256,20 +256,11 @@ package nest.view.process
 		
 		protected function classifyMesh(mesh:IMesh):Boolean {
 			var i:int;
-			if (mesh.bound.aabb) {
-				var vertices:Vector.<Vector3D> = new Vector.<Vector3D>(8, true);
-				for (i = 0; i < 8; i++) {
-					vertices[i] = _camera.invertWorldMatrix.transformVector(mesh.worldMatrix.transformVector(mesh.bound.vertices[i]));
-				}
-				return _camera.frustum.classifyAABB(vertices);
+			var vertices:Vector.<Vector3D> = new Vector.<Vector3D>(8, true);
+			for (i = 0; i < 8; i++) {
+				vertices[i] = _camera.invertWorldMatrix.transformVector(mesh.bound.vertices[i]);
 			}
-			
-			var id:Vector3D = mesh.worldMatrix.transformVector(new Vector3D(0.577, 0.577, 0.577));
-			var scale:Number = id.length;
-			return _camera.frustum.classifyBSphere(
-						_camera.invertWorldMatrix.transformVector(mesh.worldMatrix.transformVector(new Vector3D())), 
-						mesh.bound.radius * scale
-					);
+			return _camera.frustum.classifyAABB(vertices);
 		}
 		
 		protected function quickSort(data:Vector.<int>, left:int, right:int):void {

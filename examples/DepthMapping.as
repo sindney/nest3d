@@ -62,18 +62,17 @@ package
 			var geom:Geometry = Primitives.createPlane();
 			Geometry.setupGeometry(geom, true, false, false, false);
 			Geometry.uploadGeometry(geom, true, false, false, false, true);
+			Geometry.calculateBound(geom);
 			
 			var shaders:Vector.<Shader3D> = Vector.<Shader3D>([shader]);
-			var bound:Bound = new Bound();
-			Bound.calculate(bound, geom);
 			
-			var mesh:Mesh = new Mesh(geom, shaders, bound);
+			var mesh:Mesh = new Mesh(geom, shaders);
 			mesh.position.setTo(0, 0, 50);
 			mesh.scale.setTo(10, 10, 1);
 			mesh.castShadows = true;
 			container.addChild(mesh);
 			
-			mesh = new Mesh(geom, shaders, bound);
+			mesh = new Mesh(geom, shaders);
 			mesh.position.setTo(0, 0, 100);
 			mesh.scale.setTo(50, 50, 1);
 			mesh.castShadows = true;
