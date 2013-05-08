@@ -5,6 +5,7 @@ package nest.object.geom
 	import flash.geom.Matrix3D;
 	import flash.geom.Vector3D;
 	
+	import nest.object.IMesh;
 	import nest.view.ViewPort;
 	
 	/**
@@ -216,11 +217,10 @@ package nest.object.geom
 		}
 		
 		public static function calculateBound(geom:Geometry):void {
-			var max:Vector3D, min:Vector3D;
+			var max:Vector3D = geom.bound.vertices[7];
+			var min:Vector3D = geom.bound.vertices[0];
 			var i:int, j:int;
 			var a:Number;
-			max = geom.bound.vertices[7];
-			min = geom.bound.vertices[0];
 			max.setTo(0, 0, 0);
 			min.setTo(0, 0, 0);
 			for (i = 0; i < geom.numVertices; i++) {
@@ -241,6 +241,49 @@ package nest.object.geom
 			geom.bound.vertices[4].setTo(min.x, min.y, max.z);
 			geom.bound.vertices[5].setTo(max.x, min.y, max.z);
 			geom.bound.vertices[6].setTo(min.x, max.y, max.z);
+		}
+		
+		public static function transformBound(local:Bound, world:Bound, matrix:Matrix3D):void {
+			var max:Vector3D = world.vertices[7];
+			var min:Vector3D = world.vertices[0];
+			var bmax:Vector3D = local.vertices[7];
+			var bmin:Vector3D = local.vertices[0];
+			var i:int;
+			var a:Number;
+			max.copyFrom(matrix.position);
+			min.copyFrom(max);
+			for (i = 0; i < 8; i += 4) {
+				a = matrix.rawData[i];
+				if (a > 0) {
+					min.x += a * bmin.x;
+					max.x += a * bmax.x;
+				} else {
+					min.x += a * bmax.x;
+					max.x += a * bmin.x;
+				}
+				a = matrix.rawData[i + 1];
+				if (a > 0) {
+					min.y += a * bmin.x;
+					max.y += a * bmax.x;
+				} else {
+					min.y += a * bmax.x;
+					max.y += a * bmin.x;
+				}
+				a = matrix.rawData[i + 2];
+				if (a > 0) {
+					min.z += a * bmin.x;
+					max.z += a * bmax.x;
+				} else {
+					min.z += a * bmax.x;
+					max.z += a * bmin.x;
+				}
+			}
+			world.vertices[1].setTo(max.x, min.y, min.z);
+			world.vertices[2].setTo(min.x, max.y, min.z);
+			world.vertices[3].setTo(max.x, max.y, min.z);
+			world.vertices[4].setTo(min.x, min.y, max.z);
+			world.vertices[5].setTo(max.x, min.y, max.z);
+			world.vertices[6].setTo(min.x, max.y, max.z);
 		}
 		
 		public var name:String;

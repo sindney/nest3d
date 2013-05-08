@@ -1,6 +1,7 @@
 package  
 {
 	import flash.display3D.Context3DProgramType;
+	import flash.geom.Matrix3D;
 	import flash.geom.Vector3D;
 	
 	import nest.control.util.Primitives;
@@ -12,7 +13,6 @@ package
 	import nest.object.Container3D;
 	import nest.view.shader.*;
 	import nest.view.process.*;
-	import nest.view.TextureResource;
 	
 	/**
 	 * BasicDemo
@@ -55,6 +55,7 @@ package
 			}
 			
 			container.partition = new OcTree();
+			//container.partition.frustum = true;
 			(container.partition as OcTree).create(container, 4, l * 50);
 			
 			camera.recompose();

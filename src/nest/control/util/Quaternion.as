@@ -68,21 +68,6 @@ package nest.control.util
 			object.z = axis.z * st2;
 		}
 		
-		// TODO: 检查
-		public static function rotateObject(quat:Vector3D, vec3:Vector3D, output:Vector3D):void {
-			var tmp:Vector3D = vec3.clone();
-			tmp.normalize();
-			tmp.w = 0;
-			var tmp0:Vector3D = new Vector3D();
-			conjugate(quat, tmp0);
-			var tmp1:Vector3D = new Vector3D();
-			multiply(tmp, tmp0, tmp1);
-			multiply(quat, tmp1, tmp0);
-			output.x = tmp0.x;
-			output.y = tmp0.y;
-			output.z = tmp0.z;
-		}
-		
 		public static function multiply(a:Vector3D, b:Vector3D, output:Vector3D):void {
 			output.w = a.w * b.w - a.x * b.x - a.y * b.y - a.z * b.z;
 			output.x = a.w * b.x + a.x * b.w + a.z * b.y - a.y * b.z;

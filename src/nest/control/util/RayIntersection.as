@@ -7,7 +7,6 @@ package nest.control.util
 	
 	/**
 	 * RayIntersection
-	 * <p>Orgion and delta should be translated into mesh's croodinate space.</p>
 	 * <p>Refer to Graphics Gems I</p>
 	 * @see nest.control.util.RayIntersectionResult
 	 */
@@ -127,7 +126,7 @@ package nest.control.util
 			result.y += orgion.y;
 			result.z += orgion.z;
 		}
-		// TODO: 检查射线和反向构成的三角形的检测是否正确
+		
 		public static function RayTriangle(orgion:Vector3D, delta:Vector3D, p0:Vector3D, p1:Vector3D, p2:Vector3D, normal:Vector3D, minT:Number = 1):Number {
 			const dot:Number = normal.dotProduct(delta);
 			if (!(dot < 0)) return Number.MAX_VALUE;
@@ -189,6 +188,9 @@ package nest.control.util
 			return t;
 		}
 		
+		/**
+		 * Translate ray orgion and delta to mesh's local coordinate space before intersection test.
+		 */
 		public static function RayMesh(result:RayIntersectionResult, results:Vector.<RayIntersectionResult>, orgion:Vector3D, delta:Vector3D, mesh:IMesh):void {
 			var vt1:Vector3D = new Vector3D(); 
 			RayAABB(vt1, orgion, delta, mesh.geometry.bound.vertices[7], mesh.geometry.bound.vertices[0]);

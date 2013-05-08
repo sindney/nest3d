@@ -57,12 +57,7 @@ package nest.object
 		
 		override public function recompose():void {
 			super.recompose();
-			if (_geometry) {
-				var i:int;
-				for (i = 0; i < 8; i++) {
-					_bound.vertices[i].copyFrom(_worldMatrix.transformVector(_geometry.bound.vertices[i]));
-				}
-			}
+			if (_geometry) Geometry.transformBound(_geometry.bound, _bound, _worldMatrix);
 		}
 		
 		///////////////////////////////////

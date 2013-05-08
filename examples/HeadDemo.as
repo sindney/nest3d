@@ -240,9 +240,13 @@ package
 			var results:Vector.<RayIntersectionResult> = new Vector.<RayIntersectionResult>();
 			RayIntersection.RayMesh(null, results, orgion, delta, mesh);
 			var tmp0:RayIntersectionResult, tmp1:RayIntersectionResult;
-			var flag:Number = Number.MAX_VALUE;
+			var flag0:Number, flag1:Number = Number.MAX_VALUE;
 			for each(tmp0 in results) {
-				if (Vector3D.distance(camPos, mesh.worldMatrix.transformVector(tmp0.point)) < flag) tmp1 = tmp0;
+				flag0 = Vector3D.distance(camPos, mesh.worldMatrix.transformVector(tmp0.point));
+				if (flag0 < flag1) {
+					tmp1 = tmp0;
+					flag1 = flag0;
+				}
 			}
 			if (tmp1) {
 				tmp1.point.copyFrom(mesh.worldMatrix.transformVector(tmp1.point));
