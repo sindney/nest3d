@@ -27,14 +27,11 @@ package nest.object
 		protected var _bound:Bound = new Bound();
 		protected var _triangleCulling:String = Context3DTriangleFace.BACK;
 		
-		protected var _visible:Boolean = true;
 		protected var _cliping:Boolean = true;
 		protected var _alphaTest:Boolean = false;
 		protected var _mouseEnabled:Boolean = false;
-		protected var _ignoreRotation:Boolean = false;
 		protected var _ignorePosition:Boolean = false;
 		protected var _id:uint = 0;
-		protected var _castShadows:Boolean = false;
 		
 		public function Mesh(geometry:Geometry = null, shaders:Vector.<Shader3D> = null) {
 			super();
@@ -84,14 +81,6 @@ package nest.object
 			return _bound;
 		}
 		
-		public function get visible():Boolean {
-			return _visible;
-		}
-		
-		public function set visible(value:Boolean):void {
-			_visible = value;
-		}
-		
 		public function get cliping():Boolean {
 			return _cliping;
 		}
@@ -124,22 +113,6 @@ package nest.object
 			_triangleCulling = value;
 		}
 		
-		public function get ignoreRotation():Boolean {
-			return _ignoreRotation;
-		}
-		
-		public function set ignoreRotation(value:Boolean):void {
-			_ignoreRotation = value;
-		}
-		
-		public function get ignorePosition():Boolean {
-			return _ignorePosition;
-		}
-		
-		public function set ignorePosition(value:Boolean):void {
-			_ignorePosition = value;
-		}
-		
 		public function get id():uint {
 			return _id;
 		}
@@ -148,12 +121,12 @@ package nest.object
 			_id = value;
 		}
 		
-		public function get castShadows():Boolean {
-			return _castShadows;
+		public function get ignorePosition():Boolean {
+			return _ignorePosition;
 		}
 		
-		public function set castShadows(value:Boolean):void {
-			_castShadows = value;
+		public function set ignorePosition(value:Boolean):void {
+			_ignorePosition = value;
 		}
 		
 	}

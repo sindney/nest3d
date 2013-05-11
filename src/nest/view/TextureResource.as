@@ -13,10 +13,10 @@ package nest.view
 	import nest.control.animation.AnimationTrack;
 	import nest.control.animation.IKeyFrame;
 	import nest.control.animation.TextureKeyFrame;
+	import nest.view.ViewPort;
 	
 	/**
 	 * TextureResource
-	 * TODO: AnimationTrack的每一帧的bmd有无必要预先生成为context3d的texture对象
 	 */
 	public class TextureResource {
 		
@@ -86,8 +86,8 @@ package nest.view
 				bitmapData.unlock();
 				frame = new TextureKeyFrame();
 				frame.time = i;
-				frame.data = bitmapData;
-				frame.mipmapping = mipmapping;
+				frame.data = ViewPort.context3d.createTexture(size, size, Context3DTextureFormat.BGRA, false);
+				mipmapping ? uploadWithMipmaps(frame.data, bitmapData) : (frame.data as Texture).uploadFromBitmapData(bitmapData);
 				result.frames.push(frame);
 			}
 			return result;
@@ -119,8 +119,8 @@ package nest.view
 				bitmapData.unlock();
 				frame = new TextureKeyFrame();
 				frame.time = i - startIndex;
-				frame.data = bitmapData;
-				frame.mipmapping = mipmapping;
+				frame.data = ViewPort.context3d.createTexture(size, size, Context3DTextureFormat.BGRA, false);
+				mipmapping ? uploadWithMipmaps(frame.data, bitmapData) : (frame.data as Texture).uploadFromBitmapData(bitmapData);
 				result.frames.push(frame);
 			}
 			return result;

@@ -7,7 +7,6 @@ package nest.object
 	 */
 	public class Container3D extends Object3D implements IContainer3D {
 		
-		protected var _visible:Boolean = true;
 		protected var _mouseEnabled:Boolean = false;
 		
 		protected var _numChildren:int = 0;
@@ -15,8 +14,6 @@ package nest.object
 		protected var _objects:Vector.<IObject3D>;
 		
 		protected var _partition:IPTree;
-		
-		protected var _castShadows:Boolean = false;
 		
 		public function Container3D() {
 			super();
@@ -65,38 +62,12 @@ package nest.object
 			}
 		}
 		
-		override public function decompose():void {
-			super.decompose();
-			var i:int;
-			var child:IObject3D;
-			for (i = 0; i < _numChildren; i++) {
-				child = _objects[i];
-				child.recompose();
-			}
-		}
-		
 		///////////////////////////////////
 		// getter/setters
 		///////////////////////////////////
 		
-		public function get visible():Boolean {
-			return _visible;
-		}
-		
-		public function set visible(value:Boolean):void {
-			_visible = value;
-		}
-		
 		public function get numChildren():int {
 			return _numChildren;
-		}
-		
-		public function get mouseEnabled():Boolean {
-			return _mouseEnabled;
-		}
-		
-		public function set mouseEnabled(value:Boolean):void {
-			_mouseEnabled = value;
 		}
 		
 		public function get partition():IPTree {
@@ -109,14 +80,6 @@ package nest.object
 		
 		public function get objects():Vector.<IObject3D> {
 			return _objects;
-		}
-		
-		public function get castShadows():Boolean {
-			return _castShadows;
-		}
-		
-		public function set castShadows(value:Boolean):void {
-			_castShadows = value;
 		}
 		
 	}

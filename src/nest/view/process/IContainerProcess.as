@@ -12,8 +12,6 @@ package nest.view.process
 	 */
 	public interface IContainerProcess extends IRenderProcess {
 		
-		function drawMesh(mesh:IMesh, pm:Matrix3D):void;
-		
 		function get constantsPart():Vector.<IConstantShaderPart>;
 		function set constantsPart(value:Vector.<IConstantShaderPart>):void;
 		
@@ -26,9 +24,6 @@ package nest.view.process
 		
 		function get camera():Camera3D;
 		function set camera(value:Camera3D):void;
-		
-		function get color():uint;
-		function set color(value:uint):void;
 		
 		function get numVertices():int;
 		function get numTriangles():int;

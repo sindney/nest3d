@@ -25,9 +25,6 @@ package nest.object
 		function get cliping():Boolean;
 		function set cliping(value:Boolean):void;
 		
-		function get visible():Boolean;
-		function set visible(value:Boolean):void;
-		
 		function get alphaTest():Boolean;
 		function set alphaTest(value:Boolean):void;
 		
@@ -37,17 +34,14 @@ package nest.object
 		function get id():uint;
 		function set id(value:uint):void;
 		
-		function get triangleCulling():String;
-		function set triangleCulling(value:String):void;
-		
-		function get ignoreRotation():Boolean;
-		function set ignoreRotation(value:Boolean):void;
-		
+		/**
+		 * Don't work with partition trees.
+		 */
 		function get ignorePosition():Boolean;
 		function set ignorePosition(value:Boolean):void;
 		
-		function get castShadows():Boolean;
-		function set castShadows(value:Boolean):void;
+		function get triangleCulling():String;
+		function set triangleCulling(value:String):void;
 		
 	}
 	

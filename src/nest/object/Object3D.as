@@ -23,6 +23,9 @@ package nest.object
 		
 		protected var _parent:IContainer3D;
 		
+		protected var _visible:Boolean = true;
+		protected var _castShadows:Boolean = false;
+		
 		public function Object3D() {
 			_components[0] = new Vector3D();
 			_components[1] = new Vector3D();
@@ -107,6 +110,22 @@ package nest.object
 		
 		public function set parent(value:IContainer3D):void {
 			_parent = value;
+		}
+		
+		public function get visible():Boolean {
+			return _visible;
+		}
+		
+		public function set visible(value:Boolean):void {
+			_visible = value;
+		}
+		
+		public function get castShadows():Boolean {
+			return _castShadows;
+		}
+		
+		public function set castShadows(value:Boolean):void {
+			_castShadows = value;
 		}
 		
 	}

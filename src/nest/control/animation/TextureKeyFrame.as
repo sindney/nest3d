@@ -1,6 +1,6 @@
 package nest.control.animation 
 {
-	import flash.display.BitmapData;
+	import flash.display3D.textures.TextureBase;
 	
 	/**
 	 * TextureKeyFrame
@@ -10,15 +10,13 @@ package nest.control.animation
 		private var _time:Number;
 		private var _name:String;
 		
-		public var data:BitmapData;
-		public var mipmapping:Boolean = false;
+		public var data:TextureBase;
 		
 		public function clone():IKeyFrame {
 			var result:TextureKeyFrame = new TextureKeyFrame();
 			result.time = _time;
 			result.name = _name;
 			result.data = data;
-			result.mipmapping = mipmapping;
 			return result;
 		}
 		

@@ -12,7 +12,7 @@ package nest.control.animation
 		
 		public function calculate(track:AnimationTrack, k1:IKeyFrame, k2:IKeyFrame, time:Number):void {
 			var key:TextureKeyFrame = k1 as TextureKeyFrame;
-			TextureResource.uploadToTexture(track.target.shaders[track.parameters[SHADER_INDEX]].texturesPart[track.parameters[TEXTURE_INDEX]], key.data, key.mipmapping);
+			track.target.shaders[track.parameters[SHADER_INDEX]].texturesPart[track.parameters[TEXTURE_INDEX]].texture = key.data;
 		}
 		
 	}
