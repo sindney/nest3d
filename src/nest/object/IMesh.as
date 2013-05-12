@@ -40,6 +40,9 @@ package nest.object
 		function get ignorePosition():Boolean;
 		function set ignorePosition(value:Boolean):void;
 		
+		function get ignoreRotation():Boolean;
+		function set ignoreRotation(value:Boolean):void;
+		
 		function get triangleCulling():String;
 		function set triangleCulling(value:String):void;
 		

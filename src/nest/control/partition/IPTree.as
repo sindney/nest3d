@@ -6,6 +6,8 @@ package nest.control.partition
 	 */
 	public interface IPTree {
 		
+		function dispose():void;
+		
 		function get root():IPNode;
 		
 		function get frustum():Boolean;

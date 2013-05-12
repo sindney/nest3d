@@ -5,6 +5,7 @@ package nest.control.controller
 	
 	import nest.control.animation.AnimationTrack;
 	import nest.control.animation.IKeyFrame;
+	import nest.control.event.AnimationEvent;
 	
 	[Event(name = "loopComplete", type = "nest.control.controller.AnimationEvent")]
 	[Event(name = "loopsComplete", type = "nest.control.controller.AnimationEvent")]

@@ -11,6 +11,7 @@ package nest.control.controller
 	import flash.geom.Matrix3D;
 	import flash.geom.Vector3D;
 	
+	import nest.control.event.MouseEvent3D;
 	import nest.object.IMesh;
 	import nest.view.process.IContainerProcess;
 	import nest.view.shader.Shader3D;
@@ -62,8 +63,8 @@ package nest.control.controller
 				raw[8] = -mouseX * 2 / width;
 				raw[9] = mouseY * 2 / height;
 				var pm:Matrix3D = new Matrix3D(raw);
-				var wm:Matrix3D = new Matrix3D();
 				
+				// TODO: 为ignoreRotation修改这里
 				var pm0:Matrix3D = camera.invertWorldMatrix.clone();
 				pm0.append(pm);
 				

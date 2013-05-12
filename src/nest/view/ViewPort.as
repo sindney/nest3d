@@ -11,11 +11,11 @@ package nest.view
 	 */
 	public class ViewPort extends EventDispatcher {
 		
-		private static var _context3d:Context3D;
-		
-		public static function get context3d():Context3D {
-			return _context3d;
-		}
+		/**
+		 * I suggest you to add a context3d device check in your rendering loop.
+		 * <p>Make sure that our context3d is avaliable, and request another one if it's not.</p>
+		 */
+		public static var context3d:Context3D;
 		
 		private static var _width:Number = 0;
 		
@@ -33,9 +33,8 @@ package nest.view
 		
 		private var _diagram:Diagram;
 		
-		public function ViewPort(context3d:Context3D, processes:Vector.<IRenderProcess>) {
+		public function ViewPort(processes:Vector.<IRenderProcess>) {
 			_diagram = new Diagram();
-			_context3d = context3d;
 			this.processes = processes;
 		}
 		
@@ -43,7 +42,7 @@ package nest.view
 									enableDepthAndStencil:Boolean = true):void {
 			_width = width;
 			_height = height;
-			_context3d.configureBackBuffer(width, height, antiAlias, enableDepthAndStencil);
+			context3d.configureBackBuffer(width, height, antiAlias, enableDepthAndStencil);
 		}
 		
 		/**
@@ -58,8 +57,8 @@ package nest.view
 			
 			_diagram.update(_processes);
 			
-			if (bitmapData) _context3d.drawToBitmapData(bitmapData);
-			_context3d.present();
+			if (bitmapData) context3d.drawToBitmapData(bitmapData);
+			context3d.present();
 		}
 		
 		///////////////////////////////////

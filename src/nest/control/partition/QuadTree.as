@@ -133,6 +133,10 @@ package nest.control.partition
 			}
  		}
 		
+		public function dispose():void {
+			// TODO: removeEventListener from Object3D in target Container3D.
+		}
+		
 		///////////////////////////////////
 		// getter/setters
 		///////////////////////////////////

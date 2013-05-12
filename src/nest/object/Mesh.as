@@ -7,14 +7,14 @@ package nest.object
 	import nest.object.geom.Geometry;
 	import nest.view.shader.Shader3D;
 	
-	[Event(name = "mouseDown", type = "nest.control.controller.MouseEvent3D")]
-	[Event(name = "mouseOver", type = "nest.control.controller.MouseEvent3D")]
-	[Event(name = "mouseMove", type = "nest.control.controller.MouseEvent3D")]
-	[Event(name = "mouseOut", type = "nest.control.controller.MouseEvent3D")]
-	[Event(name = "click", type = "nest.control.controller.MouseEvent3D")]
-	[Event(name = "doubleClick", type = "nest.control.controller.MouseEvent3D")]
-	[Event(name = "rightClick", type = "nest.control.controller.MouseEvent3D")]
-	[Event(name = "rightMouseDown", type = "nest.control.controller.MouseEvent3D")]
+	[Event(name = "mouseDown", type = "nest.control.event.MouseEvent3D")]
+	[Event(name = "mouseOver", type = "nest.control.event.MouseEvent3D")]
+	[Event(name = "mouseMove", type = "nest.control.event.MouseEvent3D")]
+	[Event(name = "mouseOut", type = "nest.control.event.MouseEvent3D")]
+	[Event(name = "click", type = "nest.control.event.MouseEvent3D")]
+	[Event(name = "doubleClick", type = "nest.control.event.MouseEvent3D")]
+	[Event(name = "rightClick", type = "nest.control.event.MouseEvent3D")]
+	[Event(name = "rightMouseDown", type = "nest.control.event.MouseEvent3D")]
 	
 	/**
 	 * Mesh
@@ -31,6 +31,7 @@ package nest.object
 		protected var _alphaTest:Boolean = false;
 		protected var _mouseEnabled:Boolean = false;
 		protected var _ignorePosition:Boolean = false;
+		protected var _ignoreRotation:Boolean = false;
 		protected var _id:uint = 0;
 		
 		public function Mesh(geometry:Geometry = null, shaders:Vector.<Shader3D> = null) {
@@ -50,6 +51,11 @@ package nest.object
 			_geometry = null;
 			_shaders = null;
 			_bound = null;
+		}
+		
+		override public function decompose():void {
+			super.decompose();
+			if (_geometry) Geometry.transformBound(_geometry.bound, _bound, _worldMatrix);
 		}
 		
 		override public function recompose():void {
@@ -127,6 +133,14 @@ package nest.object
 		
 		public function set ignorePosition(value:Boolean):void {
 			_ignorePosition = value;
+		}
+		
+		public function get ignoreRotation():Boolean {
+			return _ignoreRotation;
+		}
+		
+		public function set ignoreRotation(value:Boolean):void {
+			_ignoreRotation = value;
 		}
 		
 	}

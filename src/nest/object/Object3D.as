@@ -5,6 +5,13 @@ package nest.object
 	import flash.geom.Orientation3D;
 	import flash.geom.Vector3D;
 	
+	import nest.control.event.MatrixEvent;
+	
+	/**
+	 * Dispatched when object3d's transform matrix is changed.
+	 */
+	[Event(name = "transform_change", type = "nest.control.event.MatrixEvent")]
+	
 	/**
 	 * Object3D
 	 */
@@ -40,6 +47,7 @@ package nest.object
 			if (parent) _worldMatrix.append(parent.worldMatrix);
 			_invertWorldMatrix.copyFrom(_worldMatrix);
 			_invertWorldMatrix.invert();
+			dispatchEvent(new MatrixEvent(MatrixEvent.TRANSFORM_CHANGE));
 		}
 		
 		public function recompose():void {
@@ -50,6 +58,7 @@ package nest.object
 			if (parent) _worldMatrix.append(parent.worldMatrix);
 			_invertWorldMatrix.copyFrom(_worldMatrix);
 			_invertWorldMatrix.invert();
+			dispatchEvent(new MatrixEvent(MatrixEvent.TRANSFORM_CHANGE));
 		}
 		
 		///////////////////////////////////

@@ -11,9 +11,6 @@ package nest.view.process
 		
 		function get renderTarget():RenderTarget;
 		
-		function get color():uint;
-		function set color(value:uint):void;
-		
 	}
 	
 }

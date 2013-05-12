@@ -59,7 +59,7 @@ package nest.view.process
 			var dx:int, dy:int, dz:int;
 			
 			var alphaParms:Vector.<int> = new Vector.<int>();
-			
+			// TODO: 为ignoreRotation修改这里
 			var vm0:Matrix3D = _camera.invertWorldMatrix;
 			var pm0:Matrix3D = vm0.clone();
 			pm0.append(_camera.pm);
