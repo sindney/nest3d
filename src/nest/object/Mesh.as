@@ -3,10 +3,13 @@ package nest.object
 	import flash.display3D.Context3DTriangleFace;
 	import flash.geom.Vector3D;
 	
+	import nest.control.event.MatrixEvent;
+	import nest.control.partition.OcNode;
 	import nest.object.geom.Bound;
 	import nest.object.geom.Geometry;
 	import nest.view.shader.Shader3D;
 	
+	[Event(name = "transform_change", type = "nest.control.event.MatrixEvent")]
 	[Event(name = "mouseDown", type = "nest.control.event.MouseEvent3D")]
 	[Event(name = "mouseOver", type = "nest.control.event.MouseEvent3D")]
 	[Event(name = "mouseMove", type = "nest.control.event.MouseEvent3D")]
@@ -26,6 +29,7 @@ package nest.object
 		
 		protected var _bound:Bound = new Bound();
 		protected var _triangleCulling:String = Context3DTriangleFace.BACK;
+		protected var _node:OcNode;
 		
 		protected var _cliping:Boolean = true;
 		protected var _alphaTest:Boolean = false;
@@ -56,11 +60,13 @@ package nest.object
 		override public function decompose():void {
 			super.decompose();
 			if (_geometry) Geometry.transformBound(_geometry.bound, _bound, _worldMatrix);
+			dispatchEvent(new MatrixEvent(MatrixEvent.TRANSFORM_CHANGE));
 		}
 		
 		override public function recompose():void {
 			super.recompose();
 			if (_geometry) Geometry.transformBound(_geometry.bound, _bound, _worldMatrix);
+			dispatchEvent(new MatrixEvent(MatrixEvent.TRANSFORM_CHANGE));
 		}
 		
 		///////////////////////////////////
@@ -141,6 +147,14 @@ package nest.object
 		
 		public function set ignoreRotation(value:Boolean):void {
 			_ignoreRotation = value;
+		}
+		
+		public function get node():OcNode {
+			return _node;
+		}
+		
+		public function set node(value:OcNode):void {
+			_node = value;
 		}
 		
 	}

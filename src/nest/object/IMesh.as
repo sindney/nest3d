@@ -1,5 +1,6 @@
 package nest.object 
 {	
+	import nest.control.partition.OcNode;
 	import nest.object.geom.Bound;
 	import nest.object.geom.Geometry;
 	import nest.view.shader.Shader3D;
@@ -45,6 +46,9 @@ package nest.object
 		
 		function get triangleCulling():String;
 		function set triangleCulling(value:String):void;
+		
+		function get node():OcNode;
+		function set node(value:OcNode):void;
 		
 	}
 	

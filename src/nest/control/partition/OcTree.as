@@ -2,8 +2,8 @@ package nest.control.partition
 {
 	import flash.geom.Vector3D;
 	
+	import nest.control.event.MatrixEvent;
 	import nest.object.geom.Bound;
-	import nest.object.Mesh;
 	import nest.object.IContainer3D;
 	import nest.object.IMesh;
 	import nest.object.IObject3D;
@@ -11,16 +11,105 @@ package nest.control.partition
 	/**
 	 * OcTree
 	 */
-	public class OcTree implements IPTree {
+	public class OcTree {
 		
-		private var _root:OcNode;
-		private var _frustum:Boolean = false;
+		protected var _root:OcNode;
+		
+		protected var target:IContainer3D;
+		protected var size:Number;
+		protected var maxDepth:int;
+		
+		public var frustum:Boolean = false;
+		public var ignorePosition:Boolean = false;
 		
 		public function OcTree() {
 			_root = new OcNode();
 		}
 		
+		public function addChild(mesh:IMesh):void {
+			if (!target) return;
+			var node:OcNode = _root.depth < maxDepth ? findNode(mesh, _root) : _root;
+			if (node) {
+				mesh.node = node;
+				mesh.addEventListener(MatrixEvent.TRANSFORM_CHANGE, onTransformChange);
+				node.objects.push(mesh);
+			}
+		}
+		
+		public function removeChild(mesh:IMesh):void {
+			if (!target) return;
+			if (mesh.node) {
+				mesh.node.objects.splice(mesh.node.objects.indexOf(mesh), 1);
+				mesh.node = null;
+				mesh.removeEventListener(MatrixEvent.TRANSFORM_CHANGE, onTransformChange);
+			}
+		}
+		
+		public function onTransformChange(e:MatrixEvent):void {
+			var mesh:IMesh = e.target as IMesh;
+			mesh.node.objects.splice(mesh.node.objects.indexOf(mesh), 1);
+			mesh.node = null;
+			var node:OcNode = _root.depth < maxDepth ? findNode(mesh, _root) : _root;
+			if (node) {
+				mesh.node = node;
+				mesh.addEventListener(MatrixEvent.TRANSFORM_CHANGE, onTransformChange);
+				node.objects.push(mesh);
+			}
+		}
+		
+		public function findNode(mesh:IMesh, node:OcNode):OcNode {
+			var a:Vector3D = mesh.bound.vertices[7];
+			var b:Vector3D = mesh.bound.vertices[0];
+			var TTL:OcNode = node.childs[0];
+			var TTR:OcNode = node.childs[1];
+			var TBL:OcNode = node.childs[2];
+			var TBR:OcNode = node.childs[3];
+			var BTL:OcNode = node.childs[4];
+			var BTR:OcNode = node.childs[5];
+			var BBL:OcNode = node.childs[6];
+			var BBR:OcNode = node.childs[7];
+			var	BBTL:Boolean = Bound.AABB_AABB(a, b, BTL.bound[7], BTL.bound[0]);
+			var	BBTR:Boolean = Bound.AABB_AABB(a, b, BTR.bound[7], BTR.bound[0]);
+			var	BBBL:Boolean = Bound.AABB_AABB(a, b, BBL.bound[7], BBL.bound[0]);
+			var	BBBR:Boolean = Bound.AABB_AABB(a, b, BBR.bound[7], BBR.bound[0]);
+			var	BTTL:Boolean = Bound.AABB_AABB(a, b, TTL.bound[7], TTL.bound[0]);
+			var	BTTR:Boolean = Bound.AABB_AABB(a, b, TTR.bound[7], TTR.bound[0]);
+			var	BTBL:Boolean = Bound.AABB_AABB(a, b, TBL.bound[7], TBL.bound[0]);
+			var	BTBR:Boolean = Bound.AABB_AABB(a, b, TBR.bound[7], TBR.bound[0]);
+			if (BBTL && (BBTR || BBBL || BBBR || BTTL || BTTR || BTBL || BTBR) || 
+				BBTR && (BBTL || BBBL || BBBR || BTTL || BTTR || BTBL || BTBR) || 
+				BBBL && (BBTL || BBTR || BBBR || BTTL || BTTR || BTBL || BTBR) || 
+				BBBR && (BBTL || BBTR || BBBL || BTTL || BTTR || BTBL || BTBR) || 
+				BTTL && (BTTR || BTBL || BTBR || BBTL || BBTR || BBBL || BBBR) || 
+				BTTR && (BTTL || BTBL || BTBR || BBTL || BBTR || BBBL || BBBR) || 
+				BTBL && (BTTL || BTTR || BTBR || BBTL || BBTR || BBBL || BBBR) || 
+				BTBR && (BTTL || BTTR || BTBL || BBTL || BBTR || BBBL || BBBR)) {
+				return node;
+			} else if (BBTL) {
+				return BTL.depth + 1 < maxDepth ? findNode(mesh, BTL) : BTL;
+			} else if (BBTR) {
+				return BTR.depth + 1 < maxDepth ? findNode(mesh, BTR) : BTR;
+			} else if (BBBL) {
+				return BBL.depth + 1 < maxDepth ? findNode(mesh, BBL) : BBL;
+			} else if (BBBR) {
+				return BBR.depth + 1 < maxDepth ? findNode(mesh, BBR) : BBR;
+			} else if (BTTL) {
+				return TTL.depth + 1 < maxDepth ? findNode(mesh, TTL) : TTL;
+			} else if (BTTR) {
+				return TTR.depth + 1 < maxDepth ? findNode(mesh, TTR) : TTR;
+			} else if (BTBL) {
+				return TBL.depth + 1 < maxDepth ? findNode(mesh, TBL) : TBL;
+			} else if (BTBR) {
+				return TBR.depth + 1 < maxDepth ? findNode(mesh, TBR) : TBR;
+			}
+			return null;
+		}
+		
 		public function create(target:IContainer3D, depth:int, size:Number):void {
+			this.target = target;
+			this.size = size;
+			this.maxDepth = depth;
+			
 			var size:Number = size / 2;
 			
 			var containers:Vector.<IContainer3D> = new Vector.<IContainer3D>();
@@ -45,61 +134,59 @@ package nest.control.partition
 				if (container && container.partition) throw new Error("Can't use partition tree inside another one.");
 			}
 			
-			_root.dispose();
+			_root.dispose(this);
 			_root.depth = 0;
 			_root.parent = null;
-			_root.objects = meshes;
-			_root.max.setTo(  size + offset.x,  size + offset.y,  size + offset.z);
-			_root.min.setTo( -size + offset.x, -size + offset.y, -size + offset.z);
-			_root.vertices[1].setTo(_root.max.x, _root.min.y, _root.min.z);
-			_root.vertices[2].setTo(_root.min.x, _root.max.y, _root.min.z);
-			_root.vertices[3].setTo(_root.max.x, _root.max.y, _root.min.z);
-			_root.vertices[4].setTo(_root.min.x, _root.min.y, _root.max.z);
-			_root.vertices[5].setTo(_root.max.x, _root.min.y, _root.max.z);
-			_root.vertices[6].setTo(_root.min.x, _root.max.y, _root.max.z);
-			if (depth > 0) divide(_root, size, 1, depth);
+			_root.objects = new Vector.<IMesh>();
+			var max:Vector3D = _root.bound[7], min:Vector3D = _root.bound[0];
+			max.setTo(  size + offset.x,  size + offset.y,  size + offset.z);
+			min.setTo( -size + offset.x, -size + offset.y, -size + offset.z);
+			_root.bound[1].setTo(max.x, min.y, min.z);
+			_root.bound[2].setTo(min.x, max.y, min.z);
+			_root.bound[3].setTo(max.x, max.y, min.z);
+			_root.bound[4].setTo(min.x, min.y, max.z);
+			_root.bound[5].setTo(max.x, min.y, max.z);
+			_root.bound[6].setTo(min.x, max.y, max.z);
+			if (depth > 0) divide(_root, size, 1);
+			
+			j = meshes.length;
+			for (i = 0; i < j; i++) addChild(meshes[i]);
 		}
 		
-		private function divide(node:OcNode, size:int, depth:int, maxDepth:int):void {
-			var TTL:OcNode = new OcNode();
-			var TTR:OcNode = new OcNode();
-			var TBL:OcNode = new OcNode();
-			var TBR:OcNode = new OcNode();
-			var BTL:OcNode = new OcNode();
-			var BTR:OcNode = new OcNode();
-			var BBL:OcNode = new OcNode();
-			var BBR:OcNode = new OcNode();
+		private function divide(node:OcNode, size:int, depth:int):void {
+			node.childs = new Vector.<OcNode>(8, true);
 			
-			node.childs[0] = TTL;
-			node.childs[1] = TTR;
-			node.childs[2] = TBL;
-			node.childs[3] = TBR;
-			node.childs[4] = BTL;
-			node.childs[5] = BTR;
-			node.childs[6] = BBL;
-			node.childs[7] = BBR;
+			var TTL:OcNode = node.childs[0] = new OcNode();
+			var TTR:OcNode = node.childs[1] = new OcNode();
+			var TBL:OcNode = node.childs[2] = new OcNode();
+			var TBR:OcNode = node.childs[3] = new OcNode();
+			var BTL:OcNode = node.childs[4] = new OcNode();
+			var BTR:OcNode = node.childs[5] = new OcNode();
+			var BBL:OcNode = node.childs[6] = new OcNode();
+			var BBR:OcNode = node.childs[7] = new OcNode();
 			
-			var center:Number = node.min.y + size;
+			var max:Vector3D = node.bound[7], min:Vector3D = node.bound[0];
+			var center:Number = min.y + size;
 			
-			TTL.min.setTo(node.min.x,        center,     node.min.z + size);
-			TTL.max.setTo(TTL.min.x + size,  node.max.y, TTL.min.z + size);
-			TTR.min.setTo(node.min.x + size, center,     node.min.z + size);
-			TTR.max.setTo(node.max.x,        node.max.y, node.max.z);
+			TTL.bound[0].setTo(min.x, 					center, min.z + size);
+			TTL.bound[7].setTo(TTL.bound[0].x + size, 	max.y, 	TTL.bound[0].z + size);
+			TTR.bound[0].setTo(min.x + size, 			center, min.z + size);
+			TTR.bound[7].setTo(max.x,        			max.y, 	max.z);
 			
-			TBL.min.setTo(node.min.x,        center,     node.min.z);
-			TBL.max.setTo(node.min.x + size, node.max.y, node.min.z + size);
-			TBR.min.setTo(node.min.x + size, center,     node.min.z);
-			TBR.max.setTo(TBR.min.x + size,  node.max.y, TBR.min.z + size);
+			TBL.bound[0].setTo(min.x,        			center, min.z);
+			TBL.bound[7].setTo(min.x + size, 			max.y, 	min.z + size);
+			TBR.bound[0].setTo(min.x + size, 			center,	min.z);
+			TBR.bound[7].setTo(TBR.bound[0].x + size,  	max.y, 	TBR.bound[0].z + size);
 			
-			BTL.min.setTo(TTL.min.x, node.min.y, TTL.min.z);
-			BTL.max.setTo(TTL.max.x, center,     TTL.max.z);
-			BTR.min.setTo(TTR.min.x, node.min.y, TTR.min.z);
-			BTR.max.setTo(TTR.max.x, center,     TTR.max.z);
+			BTL.bound[0].setTo(TTL.bound[0].x, 			min.y, 	TTL.bound[0].z);
+			BTL.bound[7].setTo(TTL.bound[7].x, 			center, TTL.bound[7].z);
+			BTR.bound[0].setTo(TTR.bound[0].x, 			min.y, 	TTR.bound[0].z);
+			BTR.bound[7].setTo(TTR.bound[7].x, 			center, TTR.bound[7].z);
 			
-			BBL.min.setTo(TBL.min.x, node.min.y, TBL.min.z);
-			BBL.max.setTo(TBL.max.x, center,     TBL.max.z);
-			BBR.min.setTo(TBR.min.x, node.min.y, TBR.min.z);
-			BBR.max.setTo(TBR.max.x, center,     TBR.max.z);
+			BBL.bound[0].setTo(TBL.bound[0].x, 			min.y, 	TBL.bound[0].z);
+			BBL.bound[7].setTo(TBL.bound[7].x, 			center, TBL.bound[7].z);
+			BBR.bound[0].setTo(TBR.bound[0].x, 			min.y,	TBR.bound[0].z);
+			BBR.bound[7].setTo(TBR.bound[7].x, 			center,	TBR.bound[7].z);
 			
 			TTL.parent = TTR.parent = TBL.parent = TBR.parent = node;
 			TTL.depth = TTR.depth = TBL.depth = TBR.depth = depth;
@@ -107,108 +194,46 @@ package nest.control.partition
 			BTL.parent = BTR.parent = BBL.parent = BBR.parent = node;
 			BTL.depth = BTR.depth = BBL.depth = BBR.depth = depth;
 			
-			var i:int, j:int;
+			var i:int;
+			var tmp:OcNode;
 			for (i = 0; i < 8; i++) {
-				var tmp:OcNode = node.childs[i] as OcNode;
-				tmp.vertices[1].setTo(tmp.max.x, tmp.min.y, tmp.min.z);
-				tmp.vertices[2].setTo(tmp.min.x, tmp.max.y, tmp.min.z);
-				tmp.vertices[3].setTo(tmp.max.x, tmp.max.y, tmp.min.z);
-				tmp.vertices[4].setTo(tmp.min.x, tmp.min.y, tmp.max.z);
-				tmp.vertices[5].setTo(tmp.max.x, tmp.min.y, tmp.max.z);
-				tmp.vertices[6].setTo(tmp.min.x, tmp.max.y, tmp.max.z);
-			}
-			
-			var BBTL:Boolean, BBTR:Boolean, BBBL:Boolean, BBBR:Boolean;
-			var BTTL:Boolean, BTTR:Boolean, BTBL:Boolean, BTBR:Boolean;
-			
-			var mesh:IMesh;
-			var objects:Vector.<IMesh> = node.objects;
-			var a:Vector3D, b:Vector3D;
-			
-			j = objects.length;
-			node.objects = new Vector.<IMesh>();
-			
-			for (i = 0; i < j; i++) {
-				mesh = objects[i];
-				BBTL = BBTR = BBBL = BBBR = false;
-				BTTL = BTTR = BTBL = BTBR = false;
-				a = mesh.bound.vertices[7];
-				b = mesh.bound.vertices[0];
-				BBTL = Bound.AABB_AABB(a, b, BTL.max, BTL.min);
-				BBTR = Bound.AABB_AABB(a, b, BTR.max, BTR.min);
-				BBBL = Bound.AABB_AABB(a, b, BBL.max, BBL.min);
-				BBBR = Bound.AABB_AABB(a, b, BBR.max, BBR.min);
-				BTTL = Bound.AABB_AABB(a, b, TTL.max, TTL.min);
-				BTTR = Bound.AABB_AABB(a, b, TTR.max, TTR.min);
-				BTBL = Bound.AABB_AABB(a, b, TBL.max, TBL.min);
-				BTBR = Bound.AABB_AABB(a, b, TBR.max, TBR.min);
-				
-				if (BBTL && (BBTR || BBBL || BBBR || BTTL || BTTR || BTBL || BTBR) || 
-					BBTR && (BBTL || BBBL || BBBR || BTTL || BTTR || BTBL || BTBR) || 
-					BBBL && (BBTL || BBTR || BBBR || BTTL || BTTR || BTBL || BTBR) || 
-					BBBR && (BBTL || BBTR || BBBL || BTTL || BTTR || BTBL || BTBR) || 
-					BTTL && (BTTR || BTBL || BTBR || BBTL || BBTR || BBBL || BBBR) || 
-					BTTR && (BTTL || BTBL || BTBR || BBTL || BBTR || BBBL || BBBR) || 
-					BTBL && (BTTL || BTTR || BTBR || BBTL || BBTR || BBBL || BBBR) || 
-					BTBR && (BTTL || BTTR || BTBL || BBTL || BBTR || BBBL || BBBR)) {
-					node.objects.push(mesh);
-				} else if (BBTL) {
-					if (!BTL.objects) BTL.objects = new Vector.<IMesh>();
-					BTL.objects.push(mesh);
-				} else if (BBTR) {
-					if (!BTR.objects) BTR.objects = new Vector.<IMesh>();
-					BTR.objects.push(mesh);
-				} else if (BBBL) {
-					if (!BBL.objects) BBL.objects = new Vector.<IMesh>();
-					BBL.objects.push(mesh);
-				} else if (BBBR) {
-					if (!BBR.objects) BBR.objects = new Vector.<IMesh>();
-					BBR.objects.push(mesh);
-				} else if (BTTL) {
-					if (!TTL.objects) TTL.objects = new Vector.<IMesh>();
-					TTL.objects.push(mesh);
-				} else if (BTTR) {
-					if (!TTR.objects) TTR.objects = new Vector.<IMesh>();
-					TTR.objects.push(mesh);
-				} else if (BTBL) {
-					if (!TBL.objects) TBL.objects = new Vector.<IMesh>();
-					TBL.objects.push(mesh);
-				} else if (BTBR) {
-					if (!TBR.objects) TBR.objects = new Vector.<IMesh>();
-					TBR.objects.push(mesh);
-				}
+				tmp = node.childs[i];
+				max = tmp.bound[7], min = tmp.bound[0];
+				tmp.bound[1].setTo(max.x, min.y, min.z);
+				tmp.bound[2].setTo(min.x, max.y, min.z);
+				tmp.bound[3].setTo(max.x, max.y, min.z);
+				tmp.bound[4].setTo(min.x, min.y, max.z);
+				tmp.bound[5].setTo(max.x, min.y, max.z);
+				tmp.bound[6].setTo(min.x, max.y, max.z);
 			}
 			
 			if (depth + 1 < maxDepth) {
-				if (BTL.objects) divide(BTL, size / 2, depth + 1, maxDepth);
-				if (BTR.objects) divide(BTR, size / 2, depth + 1, maxDepth);
-				if (BBL.objects) divide(BBL, size / 2, depth + 1, maxDepth);
-				if (BBR.objects) divide(BBR, size / 2, depth + 1, maxDepth);
-				if (TTL.objects) divide(TTL, size / 2, depth + 1, maxDepth);
-				if (TTR.objects) divide(TTR, size / 2, depth + 1, maxDepth);
-				if (TBL.objects) divide(TBL, size / 2, depth + 1, maxDepth);
-				if (TBR.objects) divide(TBR, size / 2, depth + 1, maxDepth);
+				divide(BTL, size / 2, depth + 1);
+				divide(BTR, size / 2, depth + 1);
+				divide(BBL, size / 2, depth + 1);
+				divide(BBR, size / 2, depth + 1);
+				divide(TTL, size / 2, depth + 1);
+				divide(TTR, size / 2, depth + 1);
+				divide(TBL, size / 2, depth + 1);
+				divide(TBR, size / 2, depth + 1);
 			}
  		}
 		
 		public function dispose():void {
-			// TODO: removeEventListener from Object3D in target Container3D.
+			target = null;
+			size = 0;
+			maxDepth = 0;
+			frustum = false;
+			ignorePosition = false;
+			_root.dispose(this);
 		}
 		
 		///////////////////////////////////
 		// getter/setters
 		///////////////////////////////////
 		
-		public function get root():IPNode {
+		public function get root():OcNode {
 			return _root;
-		}
-		
-		public function get frustum():Boolean {
-			return _frustum;
-		}
-		
-		public function set frustum(value:Boolean):void {
-			_frustum = value;
 		}
 		
 	}

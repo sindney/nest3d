@@ -108,9 +108,9 @@ package nest.control.util
 		
 		private function findNearestPoint(vertices:Vector.<Vector3D>, plane:Plane):int {
 			var i:int, index:int;
-			var j:int, k:int, l:int = vertices.length;
+			var j:int, k:int;
 			var v:Vector3D;
-			for (i = 0; i < l; i++) {
+			for (i = 0; i < 8; i++) {
 				v = vertices[i];
 				j = Math.abs(plane.getDistance(v));
 				if (!k) {
@@ -127,9 +127,9 @@ package nest.control.util
 		
 		private function findFarestPoint(vertices:Vector.<Vector3D>, plane:Plane, p:int):int {
 			var i:int, index:int;
-			var j:int, k:int, l:int = plane.getDistance(vertices[p]), m:int = vertices.length;
+			var j:int, k:int, l:int = plane.getDistance(vertices[p]);
 			var v:Vector3D;
-			for (i = 0; i < m; i++) {
+			for (i = 0; i < 8; i++) {
 				if (i != p) {
 					v = vertices[i];
 					j = plane.getDistance(v);

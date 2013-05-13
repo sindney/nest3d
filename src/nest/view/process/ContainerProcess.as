@@ -7,7 +7,7 @@ package nest.view.process
 	import flash.geom.Matrix3D;
 	import flash.geom.Vector3D;
 	
-	import nest.control.partition.IPNode;
+	import nest.control.partition.OcNode;
 	import nest.object.geom.Bound;
 	import nest.object.IContainer3D;
 	import nest.object.IMesh;
@@ -23,9 +23,6 @@ package nest.view.process
 	public class ContainerProcess implements IContainerProcess {
 		
 		protected var _renderTarget:RenderTarget;
-		
-		protected var _constantsPart:Vector.<IConstantShaderPart>;
-		protected var _texturesPart:Vector.<TextureResource>;
 		
 		protected var _container:IContainer3D;
 		
@@ -85,72 +82,45 @@ package nest.view.process
 			}
 			context3d.clear(_rgba[0], _rgba[1], _rgba[2], _rgba[3]);
 			
-			if (_constantsPart) {
-				var byteArraySP:ByteArrayShaderPart;
-				var matrixSP:MatrixShaderPart;
-				var vectorSP:VectorShaderPart;
-				for each(var csp:IConstantShaderPart in _constantsPart) {
-					if (csp is ByteArrayShaderPart) {
-						byteArraySP = csp as ByteArrayShaderPart;
-						context3d.setProgramConstantsFromByteArray(byteArraySP.programType, byteArraySP.firstRegister, 
-																	byteArraySP.numRegisters, byteArraySP.data, 
-																	byteArraySP.byteArrayOffset);
-					} else if (csp is MatrixShaderPart) {
-						matrixSP = csp as MatrixShaderPart;
-						context3d.setProgramConstantsFromMatrix(matrixSP.programType, matrixSP.firstRegister, 
-																matrixSP.matrix, matrixSP.transposedMatrix);
-					} else if (csp is VectorShaderPart) {
-						vectorSP = csp as VectorShaderPart;
-						context3d.setProgramConstantsFromVector(vectorSP.programType, vectorSP.firstRegister, 
-																vectorSP.data, vectorSP.numRegisters);
-					}
-				}
-			}
-			
-			if (_texturesPart) {
-				for each(var texture:TextureResource in _texturesPart) {
-					if (texture.texture) context3d.setTextureAt(texture.sampler, texture.texture);
-				}
-			}
-			
 			while (container) {
 				if (!container.visible) {
 					container = containers.pop();
 					continue;
 				}
 				if (container.partition) {
-					var nodes:Vector.<IPNode> = new Vector.<IPNode>();
-					var node:IPNode = container.partition.root;
+					var nodes:Vector.<OcNode> = new Vector.<OcNode>();
+					var node:OcNode = container.partition.root;
 					var flag:Boolean;
 					while (node) {
-						if (node.classify(_camera)) {
-							j = node.childs.length;
-							for (i = 0; i < j; i++) {
-								if (node.childs[i]) {
-									nodes.push(node.childs[i]);
-								}
+						flag = container.partition.ignorePosition;
+						if (node.classify(_camera, flag ? vm1 : vm0)) {
+							if (node.childs) {
+								j = node.childs.length;
+								for (i = 0; i < j; i++) nodes.push(node.childs[i]);
 							}
-							if (node.objects) {
-								j = node.objects.length;
-								for (i = 0; i < j; i++) {
-									mesh = node.objects[i];
-									flag = true;
-									if (container.partition.frustum && mesh.cliping && !classifyMesh(mesh, vm0)) flag = false;
-									if (mesh.visible && flag) {
-										if (mesh.alphaTest) {
-											dx = _camera.position.x - mesh.position.x;
-											dy = _camera.position.y - mesh.position.y;
-											dz = _camera.position.z - mesh.position.z;
-											alphaParms.push(dx * dx + dy * dy + dz * dz);
-											_alphaObjects.push(mesh);
+							j = node.objects.length;
+							for (i = 0; i < j; i++) {
+								mesh = node.objects[i];
+								if (mesh.visible && (!mesh.cliping || !container.partition.frustum || classifyMesh(mesh, flag ? vm1 : vm0))) {
+									if (mesh.alphaTest) {
+										if (flag) {
+											dx = _camera.position.x - mesh.worldMatrix.position.x;
+											dy = _camera.position.y - mesh.worldMatrix.position.y;
+											dz = _camera.position.z - mesh.worldMatrix.position.z;
 										} else {
-											drawMesh(mesh, mesh.ignorePosition ? pm1 : pm0);
-											_objects.push(mesh);
+											dx = mesh.worldMatrix.position.x;
+											dy = mesh.worldMatrix.position.y;
+											dz = mesh.worldMatrix.position.z;
 										}
-										_numVertices += mesh.geometry.numVertices;
-										_numTriangles += mesh.geometry.numTriangles;
-										_numObjects++;
+										alphaParms.push(dx * dx + dy * dy + dz * dz);
+										_alphaObjects.push(mesh);
+									} else {
+										drawMesh(mesh, flag ? pm1 : pm0);
+										_objects.push(mesh);
 									}
+									_numVertices += mesh.geometry.numVertices;
+									_numTriangles += mesh.geometry.numTriangles;
+									_numObjects++;
 								}
 							}
 						}
@@ -162,22 +132,26 @@ package nest.view.process
 						object = container.getChildAt(i);
 						if (object is IMesh) {
 							mesh = object as IMesh;
-							if (mesh.visible) {
-								if (!mesh.cliping || classifyMesh(mesh, mesh.ignorePosition ? vm1 : vm0)) {
-									if (mesh.alphaTest) {
-										dx = _camera.position.x - mesh.position.x;
-										dy = _camera.position.y - mesh.position.y;
-										dz = _camera.position.z - mesh.position.z;
-										alphaParms.push(dx * dx + dy * dy + dz * dz);
-										_alphaObjects.push(mesh);
+							if (mesh.visible && (!mesh.cliping || classifyMesh(mesh, mesh.ignorePosition ? vm1 : vm0))) {
+								if (mesh.alphaTest) {
+									if (mesh.ignorePosition) {
+										dx = _camera.position.x - mesh.worldMatrix.position.x;
+										dy = _camera.position.y - mesh.worldMatrix.position.y;
+										dz = _camera.position.z - mesh.worldMatrix.position.z;
 									} else {
-										drawMesh(mesh, mesh.ignorePosition ? pm1 : pm0);
-										_objects.push(mesh);
+										dx = mesh.worldMatrix.position.x;
+										dy = mesh.worldMatrix.position.y;
+										dz = mesh.worldMatrix.position.z;
 									}
-									_numVertices += mesh.geometry.numVertices;
-									_numTriangles += mesh.geometry.numTriangles;
-									_numObjects++;
+									alphaParms.push(dx * dx + dy * dy + dz * dz);
+									_alphaObjects.push(mesh);
+								} else {
+									drawMesh(mesh, mesh.ignorePosition ? pm1 : pm0);
+									_objects.push(mesh);
 								}
+								_numVertices += mesh.geometry.numVertices;
+								_numTriangles += mesh.geometry.numTriangles;
+								_numObjects++;
 							}
 						} else if (object is IContainer3D) {
 							containers.push(object as IContainer3D);
@@ -233,12 +207,9 @@ package nest.view.process
 																vectorSP.data, vectorSP.numRegisters);
 					}
 				}
-				
 				for each(var tr:TextureResource in shader.texturesPart) context3d.setTextureAt(tr.sampler, tr.texture);
-				
 				context3d.setProgram(shader.program);
 				context3d.drawTriangles(mesh.geometry.indexBuffer);
-				
 				for each(tr in shader.texturesPart) context3d.setTextureAt(tr.sampler, null);
 			}
 			
@@ -285,8 +256,6 @@ package nest.view.process
 		
 		public function dispose():void {
 			_renderTarget = null;
-			_constantsPart = null;
-			_texturesPart = null;
 			_container = null;
 			_objects = null;
 			_alphaObjects = null;
@@ -300,22 +269,6 @@ package nest.view.process
 		
 		public function get renderTarget():RenderTarget {
 			return _renderTarget;
-		}
-		
-		public function get constantsPart():Vector.<IConstantShaderPart> {
-			return _constantsPart;
-		}
-		
-		public function set constantsPart(value:Vector.<IConstantShaderPart>):void {
-			_constantsPart = value;
-		}
-		
-		public function get texturesPart():Vector.<TextureResource> {
-			return _texturesPart;
-		}
-		
-		public function set texturesPart(value:Vector.<TextureResource>):void {
-			_texturesPart = value;
 		}
 		
 		public function get container():IContainer3D {

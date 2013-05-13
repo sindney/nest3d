@@ -1,6 +1,6 @@
 package nest.object 
 {
-	import nest.control.partition.IPTree;
+	import nest.control.partition.OcTree;
 	
 	/**
 	 * Container3D
@@ -13,7 +13,7 @@ package nest.object
 		
 		protected var _objects:Vector.<IObject3D>;
 		
-		protected var _partition:IPTree;
+		protected var _partition:OcTree;
 		
 		public function Container3D() {
 			super();
@@ -70,11 +70,11 @@ package nest.object
 			return _numChildren;
 		}
 		
-		public function get partition():IPTree {
+		public function get partition():OcTree {
 			return _partition;
 		}
 		
-		public function set partition(value:IPTree):void {
+		public function set partition(value:OcTree):void {
 			_partition = value;
 		}
 		
