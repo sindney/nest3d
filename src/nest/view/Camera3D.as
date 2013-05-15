@@ -27,7 +27,7 @@ package nest.view
 		}
 		
 		/**
-		 * Update camera's matrix.
+		 * Update camera's projection matrix.
 		 */
 		public function update():void {
 			var ys:Number = 1.0 / Math.tan(fov / 2.0);

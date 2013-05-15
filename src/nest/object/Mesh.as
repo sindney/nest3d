@@ -36,6 +36,8 @@ package nest.object
 		protected var _mouseEnabled:Boolean = false;
 		protected var _ignorePosition:Boolean = false;
 		protected var _ignoreRotation:Boolean = false;
+		protected var _visible:Boolean = true;
+		protected var _castShadows:Boolean = false;
 		protected var _id:uint = 0;
 		
 		public function Mesh(geometry:Geometry = null, shaders:Vector.<Shader3D> = null) {
@@ -147,6 +149,22 @@ package nest.object
 		
 		public function set ignoreRotation(value:Boolean):void {
 			_ignoreRotation = value;
+		}
+		
+		public function get visible():Boolean {
+			return _visible;
+		}
+		
+		public function set visible(value:Boolean):void {
+			_visible = value;
+		}
+		
+		public function get castShadows():Boolean {
+			return _castShadows;
+		}
+		
+		public function set castShadows(value:Boolean):void {
+			_castShadows = value;
 		}
 		
 		public function get node():OcNode {

@@ -38,6 +38,9 @@ package nest.view.process
 		protected var _numTriangles:int = 0;
 		protected var _numObjects:int = 0;
 		
+		protected var negativeY:Vector3D = new Vector3D(0, -1, 0);
+		protected var negativeZ:Vector3D = new Vector3D(0, 0, -1);
+		
 		public function ContainerProcess(camera:Camera3D, container:IContainer3D, color:uint = 0xff000000) {
 			this.camera = camera;
 			this.container = container;
@@ -56,7 +59,7 @@ package nest.view.process
 			var dx:int, dy:int, dz:int;
 			
 			var alphaParms:Vector.<int> = new Vector.<int>();
-			// TODO: 为ignoreRotation修改这里
+			
 			var vm0:Matrix3D = _camera.invertWorldMatrix;
 			var pm0:Matrix3D = vm0.clone();
 			pm0.append(_camera.pm);
@@ -173,6 +176,12 @@ package nest.view.process
 		
 		public function drawMesh(mesh:IMesh, pm:Matrix3D):void {
 			var context3d:Context3D = ViewPort.context3d;
+			
+			if (mesh.ignoreRotation) {
+				mesh.worldMatrix.pointAt(_camera.worldMatrix.position, negativeZ, negativeY);
+				mesh.invertWorldMatrix.copyFrom(mesh.worldMatrix);
+				mesh.invertWorldMatrix.invert();
+			}
 			
 			context3d.setCulling(mesh.triangleCulling);
 			context3d.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 0, mesh.worldMatrix, true);

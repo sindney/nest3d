@@ -16,29 +16,24 @@ package nest.object.geom
 		
 		public static function AABB_BSphere(max:Vector3D, min:Vector3D, center:Vector3D, r:Number):Boolean {
 			var x:Number = center.x, y:Number = center.y, z:Number = center.z;
-			
 			if (x < min.x) {
 				x = min.x;
 			} else if (x > max.x) {
 				x = max.x;
 			}
-			
 			if (y < min.y) {
 				y = min.y;
 			} else if (y > max.y) {
 				y = max.y;
 			}
-			
 			if (z < min.z) {
 				z = min.z;
 			} else if (z > max.z) {
 				z = max.z;
 			}
-			
 			x -= center.x;
 			y -= center.y;
 			z -= center.z;
-			
 			return (x * x + y * y + z * z) <= (r * r);
 		}
 		

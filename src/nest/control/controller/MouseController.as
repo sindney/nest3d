@@ -64,7 +64,6 @@ package nest.control.controller
 				raw[9] = mouseY * 2 / height;
 				var pm:Matrix3D = new Matrix3D(raw);
 				
-				// TODO: 为ignoreRotation修改这里
 				var pm0:Matrix3D = camera.invertWorldMatrix.clone();
 				pm0.append(pm);
 				

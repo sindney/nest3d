@@ -22,6 +22,12 @@ package nest.object
 		
 		function get numChildren():int;
 		
+		function get visible():Boolean;
+		function set visible(value:Boolean):void;
+		
+		function get castShadows():Boolean;
+		function set castShadows(value:Boolean):void;
+		
 	}
 	
 }

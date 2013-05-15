@@ -73,11 +73,15 @@ package nest.view
 			}
 		}
 		
-		public static function getTrackFromMovieClip(source:MovieClip, mipmapping:Boolean = false, size:uint = 128):AnimationTrack {
+		public static function getTrackFromMovieClip(source:MovieClip, mipmapping:Boolean = false, tileWidth:Number = 100, tileHeight:Number = 100):AnimationTrack {
 			var result:AnimationTrack = new AnimationTrack(new Vector.<IKeyFrame>());
 			var bitmapData:BitmapData;
 			var frame:TextureKeyFrame;
 			var totalFrames:uint = source.totalFrames;
+			var size:Number = 1;
+			while (size < tileWidth || size < tileHeight) {
+				size *= 2;
+			}
 			for (var i:int = 0; i < totalFrames; i++) {
 				bitmapData = new BitmapData(size, size, true, 0);
 				bitmapData.lock();
