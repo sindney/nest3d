@@ -18,8 +18,8 @@ package nest.object
 		function get geometry():Geometry;
 		function set geometry(value:Geometry):void;
 		
-		function get shaders():Vector.<Shader3D>;
-		function set shaders(value:Vector.<Shader3D>):void;
+		function get shader():Shader3D;
+		function set shader(value:Shader3D):void;
 		
 		function get bound():Bound;
 		

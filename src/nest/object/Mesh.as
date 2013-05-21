@@ -25,7 +25,7 @@ package nest.object
 	public class Mesh extends Object3D implements IMesh {
 		
 		protected var _geometry:Geometry;
-		protected var _shaders:Vector.<Shader3D>;
+		protected var _shader:Shader3D;
 		
 		protected var _bound:Bound = new Bound();
 		protected var _triangleCulling:String = Context3DTriangleFace.BACK;
@@ -40,10 +40,10 @@ package nest.object
 		protected var _castShadows:Boolean = false;
 		protected var _id:uint = 0;
 		
-		public function Mesh(geometry:Geometry = null, shaders:Vector.<Shader3D> = null) {
+		public function Mesh(geometry:Geometry = null, shader:Shader3D = null) {
 			super();
 			_geometry = geometry;
-			_shaders = shaders ? shaders : new Vector.<Shader3D>();
+			_shader = shader;
 		}
 		
 		/**
@@ -52,10 +52,10 @@ package nest.object
 		public function dispose(all:Boolean = true):void {
 			if (all) {
 				_geometry.dispose();
-				for each(var shader:Shader3D in _shaders) shader.dispose();
+				_shader.dispose();
 			}
 			_geometry = null;
-			_shaders = null;
+			_shader = null;
 			_bound = null;
 		}
 		
@@ -83,12 +83,12 @@ package nest.object
 			_geometry = value;
 		}
 		
-		public function get shaders():Vector.<Shader3D> {
-			return _shaders;
+		public function get shader():Shader3D {
+			return _shader;
 		}
 		
-		public function set shaders(value:Vector.<Shader3D>):void {
-			_shaders = value;
+		public function set shader(value:Shader3D):void {
+			_shader = value;
 		}
 		
 		public function get bound():Bound {

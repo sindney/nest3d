@@ -199,28 +199,26 @@ package nest.view.process
 			if (tangent) context3d.setVertexBufferAt(2, mesh.geometry.tangentBuffer, 0, Context3DVertexBufferFormat.FLOAT_3);
 			if (uv) context3d.setVertexBufferAt(3, mesh.geometry.uvBuffer, 0, Context3DVertexBufferFormat.FLOAT_2);
 			
-			for each(var shader:Shader3D in mesh.shaders) {
-				for each(var csp:IConstantShaderPart in shader.constantsPart) {
-					if (csp is ByteArrayShaderPart) {
-						byteArraySP = csp as ByteArrayShaderPart;
-						context3d.setProgramConstantsFromByteArray(byteArraySP.programType, byteArraySP.firstRegister, 
-																	byteArraySP.numRegisters, byteArraySP.data, 
-																	byteArraySP.byteArrayOffset);
-					} else if (csp is MatrixShaderPart) {
-						matrixSP = csp as MatrixShaderPart;
-						context3d.setProgramConstantsFromMatrix(matrixSP.programType, matrixSP.firstRegister, 
-																matrixSP.matrix, matrixSP.transposedMatrix);
-					} else if (csp is VectorShaderPart) {
-						vectorSP = csp as VectorShaderPart;
-						context3d.setProgramConstantsFromVector(vectorSP.programType, vectorSP.firstRegister, 
-																vectorSP.data, vectorSP.numRegisters);
-					}
+			for each(var csp:IConstantShaderPart in mesh.shader.constantsPart) {
+				if (csp is ByteArrayShaderPart) {
+					byteArraySP = csp as ByteArrayShaderPart;
+					context3d.setProgramConstantsFromByteArray(byteArraySP.programType, byteArraySP.firstRegister, 
+																byteArraySP.numRegisters, byteArraySP.data, 
+																byteArraySP.byteArrayOffset);
+				} else if (csp is MatrixShaderPart) {
+					matrixSP = csp as MatrixShaderPart;
+					context3d.setProgramConstantsFromMatrix(matrixSP.programType, matrixSP.firstRegister, 
+															matrixSP.matrix, matrixSP.transposedMatrix);
+				} else if (csp is VectorShaderPart) {
+					vectorSP = csp as VectorShaderPart;
+					context3d.setProgramConstantsFromVector(vectorSP.programType, vectorSP.firstRegister, 
+															vectorSP.data, vectorSP.numRegisters);
 				}
-				for each(var tr:TextureResource in shader.texturesPart) context3d.setTextureAt(tr.sampler, tr.texture);
-				context3d.setProgram(shader.program);
-				context3d.drawTriangles(mesh.geometry.indexBuffer);
-				for each(tr in shader.texturesPart) context3d.setTextureAt(tr.sampler, null);
 			}
+			for each(var tr:TextureResource in mesh.shader.texturesPart) context3d.setTextureAt(tr.sampler, tr.texture);
+			context3d.setProgram(mesh.shader.program);
+			context3d.drawTriangles(mesh.geometry.indexBuffer);
+			for each(tr in mesh.shader.texturesPart) context3d.setTextureAt(tr.sampler, null);
 			
 			context3d.setVertexBufferAt(0, null);
 			if (normal) context3d.setVertexBufferAt(1, null);
