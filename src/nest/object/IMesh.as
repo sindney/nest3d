@@ -1,8 +1,9 @@
 package nest.object 
 {	
+	import flash.geom.Vector3D;
+	
 	import nest.control.partition.OcNode;
-	import nest.object.geom.Bound;
-	import nest.object.geom.Geometry;
+	import nest.object.Geometry;
 	import nest.view.shader.Shader3D;
 	
 	/**
@@ -21,7 +22,12 @@ package nest.object
 		function get shader():Shader3D;
 		function set shader(value:Shader3D):void;
 		
-		function get bound():Bound;
+		function get batch():Vector.<IParticlePart>;
+		function set batch(value:Vector.<IParticlePart>):void;
+		
+		function get max():Vector3D;
+		
+		function get min():Vector3D;
 		
 		function get cliping():Boolean;
 		function set cliping(value:Boolean):void;

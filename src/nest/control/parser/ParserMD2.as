@@ -7,7 +7,7 @@ package nest.control.parser
 	import nest.control.animation.AnimationTrack;
 	import nest.control.animation.IKeyFrame;
 	import nest.control.animation.VertexKeyFrame;
-	import nest.object.geom.Geometry;
+	import nest.object.Geometry;
 	
 	/**
 	 * ParserMD2

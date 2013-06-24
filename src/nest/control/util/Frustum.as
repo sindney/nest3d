@@ -1,5 +1,6 @@
 package nest.control.util 
 {
+	import flash.geom.Matrix3D;
 	import flash.geom.Vector3D;
 	
 	/**
@@ -34,20 +35,26 @@ package nest.control.util
 			var xv:Vector3D = new Vector3D( -1, 0, 0);
 			var yv:Vector3D = new Vector3D(0, 1, 0);
 			
-			vn = scaleVector(zv, near);
+			vn = new Vector3D(zv.x * near, zv.y * near, zv.z * near);
 			vn.negate();
-			vf = scaleVector(zv, far);
+			vf = new Vector3D(zv.x * far, zv.y * far, zv.z * far);
 			vf.negate();
 			
-			nTL = vn.add(scaleVector(yv, nH)).subtract(scaleVector(xv, nW));
-			nTR = vn.add(scaleVector(yv, nH)).add(scaleVector(xv, nW));
-			nBL = vn.subtract(scaleVector(yv, nH)).subtract(scaleVector(xv, nW));
-			nBR = vn.subtract(scaleVector(yv, nH)).add(scaleVector(xv, nW));
+			var yv_nH:Vector3D = new Vector3D(yv.x * nH, yv.y * nH, yv.z * nH);
+			var xv_nW:Vector3D = new Vector3D(xv.x * nW, xv.y * nW, xv.z * nW);
 			
-			fTL = vf.add(scaleVector(yv, fH)).subtract(scaleVector(xv, fW));
-			fTR = vf.add(scaleVector(yv, fH)).add(scaleVector(xv, fW));
-			fBL = vf.subtract(scaleVector(yv, fH)).subtract(scaleVector(xv, fW));
-			fBR = vf.subtract(scaleVector(yv, fH)).add(scaleVector(xv, fW));
+			nTL = vn.add(yv_nH).subtract(xv_nW);
+			nTR = vn.add(yv_nH).add(xv_nW);
+			nBL = vn.subtract(yv_nH).subtract(xv_nW);
+			nBR = vn.subtract(yv_nH).add(xv_nW);
+			
+			var yv_fH:Vector3D = new Vector3D(yv.x * fH, yv.y * fH, yv.z * fH);
+			var xv_fW:Vector3D = new Vector3D(xv.x * fW, xv.y * fW, xv.z * fW);
+			
+			fTL = vf.add(yv_fH).subtract(xv_fW);
+			fTR = vf.add(yv_fH).add(xv_fW);
+			fBL = vf.subtract(yv_fH).subtract(xv_fW);
+			fBR = vf.subtract(yv_fH).add(xv_fW);
 			
 			// top
 			planes[0].create(fTR, nTR, nTL);
@@ -83,7 +90,16 @@ package nest.control.util
 			return true;
 		}
 		
-		public function classifyAABB(vertices:Vector.<Vector3D>):Boolean {
+		public function classifyAABB(max:Vector3D, min:Vector3D, ivm:Matrix3D):Boolean {
+			var vertices:Vector.<Vector3D> = new Vector.<Vector3D>(8, true);
+			vertices[0] = ivm.transformVector(new Vector3D(min.x, min.y, min.z));
+			vertices[1] = ivm.transformVector(new Vector3D(max.x, min.y, min.z));
+			vertices[2] = ivm.transformVector(new Vector3D(min.x, max.y, min.z));
+			vertices[3] = ivm.transformVector(new Vector3D(max.x, max.y, min.z));
+			vertices[4] = ivm.transformVector(new Vector3D(min.x, min.y, max.z));
+			vertices[5] = ivm.transformVector(new Vector3D(max.x, min.y, max.z));
+			vertices[6] = ivm.transformVector(new Vector3D(min.x, max.y, max.z));
+			vertices[7] = ivm.transformVector(new Vector3D(max.x, max.y, max.z));
 			var near:Boolean = findIntersection(vertices, planes[4]);
 			var far:Boolean = findIntersection(vertices, planes[5]);
 			if (near != far) return false;
@@ -151,10 +167,6 @@ package nest.control.util
 				}
 			}
 			return index;
-		}
-		
-		private function scaleVector(v:Vector3D, k:Number):Vector3D {
-			return new Vector3D(v.x * k, v.y * k, v.z * k);
 		}
 		
 	}

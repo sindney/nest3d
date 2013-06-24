@@ -6,9 +6,9 @@ package nest.view.process
 	import flash.display3D.Context3DVertexBufferFormat;
 	import flash.geom.Matrix3D;
 	import flash.geom.Vector3D;
+	import nest.object.IParticlePart;
 	
 	import nest.control.partition.OcNode;
-	import nest.object.geom.Bound;
 	import nest.object.IContainer3D;
 	import nest.object.IMesh;
 	import nest.object.IObject3D;
@@ -21,6 +21,9 @@ package nest.view.process
 	 * ContainerProcess
 	 */
 	public class ContainerProcess implements IContainerProcess {
+		
+		protected const negativeY:Vector3D = new Vector3D(0, -1, 0);
+		protected const negativeZ:Vector3D = new Vector3D(0, 0, -1);
 		
 		protected var _renderTarget:RenderTarget;
 		
@@ -37,9 +40,6 @@ package nest.view.process
 		protected var _numVertices:int = 0;
 		protected var _numTriangles:int = 0;
 		protected var _numObjects:int = 0;
-		
-		protected var negativeY:Vector3D = new Vector3D(0, -1, 0);
-		protected var negativeZ:Vector3D = new Vector3D(0, 0, -1);
 		
 		public function ContainerProcess(camera:Camera3D, container:IContainer3D, color:uint = 0xff000000) {
 			this.camera = camera;
@@ -96,7 +96,7 @@ package nest.view.process
 					var flag:Boolean;
 					while (node) {
 						flag = container.partition.ignorePosition;
-						if (node.classify(_camera, flag ? vm1 : vm0)) {
+						if (_camera.frustum.classifyAABB(node.max, node.min, flag ? vm1 : vm0)) {
 							if (node.childs) {
 								j = node.childs.length;
 								for (i = 0; i < j; i++) nodes.push(node.childs[i]);
@@ -104,7 +104,7 @@ package nest.view.process
 							j = node.objects.length;
 							for (i = 0; i < j; i++) {
 								mesh = node.objects[i];
-								if (mesh.visible && (!mesh.cliping || !container.partition.frustum || classifyMesh(mesh, flag ? vm1 : vm0))) {
+								if (mesh.visible && (!mesh.cliping || !container.partition.frustum || _camera.frustum.classifyAABB(mesh.max, mesh.min, flag ? vm1 : vm0))) {
 									if (mesh.alphaTest) {
 										if (flag) {
 											dx = _camera.position.x - mesh.worldMatrix.position.x;
@@ -135,7 +135,7 @@ package nest.view.process
 						object = container.getChildAt(i);
 						if (object is IMesh) {
 							mesh = object as IMesh;
-							if (mesh.visible && (!mesh.cliping || classifyMesh(mesh, mesh.ignorePosition ? vm1 : vm0))) {
+							if (mesh.visible && (!mesh.cliping || _camera.frustum.classifyAABB(mesh.max, mesh.min, mesh.ignorePosition ? vm1 : vm0))) {
 								if (mesh.alphaTest) {
 									if (mesh.ignorePosition) {
 										dx = _camera.position.x - mesh.worldMatrix.position.x;
@@ -216,23 +216,39 @@ package nest.view.process
 				}
 			}
 			for each(var tr:TextureResource in mesh.shader.texturesPart) context3d.setTextureAt(tr.sampler, tr.texture);
-			context3d.setProgram(mesh.shader.program);
-			context3d.drawTriangles(mesh.geometry.indexBuffer);
+			
+			if (mesh.batch) {
+				for each(var part:IParticlePart in mesh.batch) {
+					for each(csp in part.constantsPart) {
+						if (csp is ByteArrayShaderPart) {
+							byteArraySP = csp as ByteArrayShaderPart;
+							context3d.setProgramConstantsFromByteArray(byteArraySP.programType, byteArraySP.firstRegister, 
+																		byteArraySP.numRegisters, byteArraySP.data, 
+																		byteArraySP.byteArrayOffset);
+						} else if (csp is MatrixShaderPart) {
+							matrixSP = csp as MatrixShaderPart;
+							context3d.setProgramConstantsFromMatrix(matrixSP.programType, matrixSP.firstRegister, 
+																	matrixSP.matrix, matrixSP.transposedMatrix);
+						} else if (csp is VectorShaderPart) {
+							vectorSP = csp as VectorShaderPart;
+							context3d.setProgramConstantsFromVector(vectorSP.programType, vectorSP.firstRegister, 
+															vectorSP.data, vectorSP.numRegisters);
+						}
+					}
+					context3d.setProgram(mesh.shader.program);
+					context3d.drawTriangles(mesh.geometry.indexBuffer);
+				}
+			} else {
+				context3d.setProgram(mesh.shader.program);
+				context3d.drawTriangles(mesh.geometry.indexBuffer);
+			}
+			
 			for each(tr in mesh.shader.texturesPart) context3d.setTextureAt(tr.sampler, null);
 			
 			context3d.setVertexBufferAt(0, null);
 			if (normal) context3d.setVertexBufferAt(1, null);
 			if (tangent) context3d.setVertexBufferAt(2, null);
 			if (uv) context3d.setVertexBufferAt(3, null);
-		}
-		
-		protected function classifyMesh(mesh:IMesh, ivm:Matrix3D):Boolean {
-			var i:int;
-			var vertices:Vector.<Vector3D> = new Vector.<Vector3D>(8, true);
-			for (i = 0; i < 8; i++) {
-				vertices[i] = ivm.transformVector(mesh.bound.vertices[i]);
-			}
-			return _camera.frustum.classifyAABB(vertices);
 		}
 		
 		protected function quickSort(data:Vector.<int>, left:int, right:int):void {

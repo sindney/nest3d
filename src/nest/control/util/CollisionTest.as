@@ -1,11 +1,11 @@
-package nest.object.geom 
+package nest.control.util 
 {
 	import flash.geom.Vector3D;
 	
 	/**
-	 * Bound
+	 * CollisionTest
 	 */
-	public class Bound {
+	public class CollisionTest {
 		
 		public static function BSphere_BSphere(center:Vector3D, r:Number, center1:Vector3D, r1:Number):Boolean {
 			var x:Number = center.x - center1.x;
@@ -45,19 +45,6 @@ package nest.object.geom
 			if (min.z > max1.z) return false;
 			if (max.z < min1.z) return false;
 			return true;
-		}
-		
-		public var vertices:Vector.<Vector3D> = new Vector.<Vector3D>(8, true);
-		
-		public function Bound() {
-			vertices[0] = new Vector3D();
-			vertices[1] = new Vector3D();
-			vertices[2] = new Vector3D();
-			vertices[3] = new Vector3D();
-			vertices[4] = new Vector3D();
-			vertices[5] = new Vector3D();
-			vertices[6] = new Vector3D();
-			vertices[7] = new Vector3D();
 		}
 		
 	}

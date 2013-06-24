@@ -1,4 +1,4 @@
-package nest.object.geom
+package nest.object
 {
 	import flash.display3D.IndexBuffer3D;
 	import flash.display3D.VertexBuffer3D;
@@ -217,8 +217,8 @@ package nest.object.geom
 		}
 		
 		public static function calculateBound(geom:Geometry):void {
-			var max:Vector3D = geom.bound.vertices[7];
-			var min:Vector3D = geom.bound.vertices[0];
+			var max:Vector3D = geom.max;
+			var min:Vector3D = geom.min;
 			var i:int, j:int;
 			var a:Number;
 			max.setTo(0, 0, 0);
@@ -235,55 +235,6 @@ package nest.object.geom
 				if (a > max.z) max.z = a;
 				else if (a < min.z) min.z = a;
 			}
-			geom.bound.vertices[1].setTo(max.x, min.y, min.z);
-			geom.bound.vertices[2].setTo(min.x, max.y, min.z);
-			geom.bound.vertices[3].setTo(max.x, max.y, min.z);
-			geom.bound.vertices[4].setTo(min.x, min.y, max.z);
-			geom.bound.vertices[5].setTo(max.x, min.y, max.z);
-			geom.bound.vertices[6].setTo(min.x, max.y, max.z);
-		}
-		
-		public static function transformBound(local:Bound, world:Bound, matrix:Matrix3D):void {
-			var max:Vector3D = world.vertices[7];
-			var min:Vector3D = world.vertices[0];
-			var bmax:Vector3D = local.vertices[7];
-			var bmin:Vector3D = local.vertices[0];
-			var i:int;
-			var a:Number;
-			max.copyFrom(matrix.position);
-			min.copyFrom(max);
-			for (i = 0; i < 8; i += 4) {
-				a = matrix.rawData[i];
-				if (a > 0) {
-					min.x += a * bmin.x;
-					max.x += a * bmax.x;
-				} else {
-					min.x += a * bmax.x;
-					max.x += a * bmin.x;
-				}
-				a = matrix.rawData[i + 1];
-				if (a > 0) {
-					min.y += a * bmin.x;
-					max.y += a * bmax.x;
-				} else {
-					min.y += a * bmax.x;
-					max.y += a * bmin.x;
-				}
-				a = matrix.rawData[i + 2];
-				if (a > 0) {
-					min.z += a * bmin.x;
-					max.z += a * bmax.x;
-				} else {
-					min.z += a * bmax.x;
-					max.z += a * bmin.x;
-				}
-			}
-			world.vertices[1].setTo(max.x, min.y, min.z);
-			world.vertices[2].setTo(min.x, max.y, min.z);
-			world.vertices[3].setTo(max.x, max.y, min.z);
-			world.vertices[4].setTo(min.x, min.y, max.z);
-			world.vertices[5].setTo(max.x, min.y, max.z);
-			world.vertices[6].setTo(min.x, max.y, max.z);
 		}
 		
 		public var name:String;
@@ -300,7 +251,8 @@ package nest.object.geom
 		public var uvs:Vector.<Number>;
 		public var indices:Vector.<uint>;
 		
-		public var bound:Bound = new Bound();
+		public var max:Vector3D = new Vector3D();
+		public var min:Vector3D = new Vector3D();
 		
 		public var numVertices:int = 0;
 		public var numTriangles:int = 0;
@@ -322,7 +274,7 @@ package nest.object.geom
 			tangents = null;
 			uvs = null;
 			indices = null;
-			bound = null;
+			max = min = null;
 			numVertices = numTriangles = 0;
 		}
 		

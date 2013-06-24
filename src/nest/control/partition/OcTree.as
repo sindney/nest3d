@@ -3,7 +3,7 @@ package nest.control.partition
 	import flash.geom.Vector3D;
 	
 	import nest.control.event.MatrixEvent;
-	import nest.object.geom.Bound;
+	import nest.control.util.CollisionTest;
 	import nest.object.IContainer3D;
 	import nest.object.IMesh;
 	import nest.object.IObject3D;
@@ -58,8 +58,8 @@ package nest.control.partition
 		}
 		
 		public function findNode(mesh:IMesh, node:OcNode):OcNode {
-			var a:Vector3D = mesh.bound.vertices[7];
-			var b:Vector3D = mesh.bound.vertices[0];
+			var a:Vector3D = mesh.max;
+			var b:Vector3D = mesh.min;
 			var TTL:OcNode = node.childs[0];
 			var TTR:OcNode = node.childs[1];
 			var TBL:OcNode = node.childs[2];
@@ -68,14 +68,14 @@ package nest.control.partition
 			var BTR:OcNode = node.childs[5];
 			var BBL:OcNode = node.childs[6];
 			var BBR:OcNode = node.childs[7];
-			var	BBTL:Boolean = Bound.AABB_AABB(a, b, BTL.bound[7], BTL.bound[0]);
-			var	BBTR:Boolean = Bound.AABB_AABB(a, b, BTR.bound[7], BTR.bound[0]);
-			var	BBBL:Boolean = Bound.AABB_AABB(a, b, BBL.bound[7], BBL.bound[0]);
-			var	BBBR:Boolean = Bound.AABB_AABB(a, b, BBR.bound[7], BBR.bound[0]);
-			var	BTTL:Boolean = Bound.AABB_AABB(a, b, TTL.bound[7], TTL.bound[0]);
-			var	BTTR:Boolean = Bound.AABB_AABB(a, b, TTR.bound[7], TTR.bound[0]);
-			var	BTBL:Boolean = Bound.AABB_AABB(a, b, TBL.bound[7], TBL.bound[0]);
-			var	BTBR:Boolean = Bound.AABB_AABB(a, b, TBR.bound[7], TBR.bound[0]);
+			var	BBTL:Boolean = CollisionTest.AABB_AABB(a, b, BTL.max, BTL.min);
+			var	BBTR:Boolean = CollisionTest.AABB_AABB(a, b, BTR.max, BTR.min);
+			var	BBBL:Boolean = CollisionTest.AABB_AABB(a, b, BBL.max, BBL.min);
+			var	BBBR:Boolean = CollisionTest.AABB_AABB(a, b, BBR.max, BBR.min);
+			var	BTTL:Boolean = CollisionTest.AABB_AABB(a, b, TTL.max, TTL.min);
+			var	BTTR:Boolean = CollisionTest.AABB_AABB(a, b, TTR.max, TTR.min);
+			var	BTBL:Boolean = CollisionTest.AABB_AABB(a, b, TBL.max, TBL.min);
+			var	BTBR:Boolean = CollisionTest.AABB_AABB(a, b, TBR.max, TBR.min);
 			if (BBTL && (BBTR || BBBL || BBBR || BTTL || BTTR || BTBL || BTBR) || 
 				BBTR && (BBTL || BBBL || BBBR || BTTL || BTTR || BTBL || BTBR) || 
 				BBBL && (BBTL || BBTR || BBBR || BTTL || BTTR || BTBL || BTBR) || 
@@ -138,15 +138,8 @@ package nest.control.partition
 			_root.depth = 0;
 			_root.parent = null;
 			_root.objects = new Vector.<IMesh>();
-			var max:Vector3D = _root.bound[7], min:Vector3D = _root.bound[0];
-			max.setTo(  size + offset.x,  size + offset.y,  size + offset.z);
-			min.setTo( -size + offset.x, -size + offset.y, -size + offset.z);
-			_root.bound[1].setTo(max.x, min.y, min.z);
-			_root.bound[2].setTo(min.x, max.y, min.z);
-			_root.bound[3].setTo(max.x, max.y, min.z);
-			_root.bound[4].setTo(min.x, min.y, max.z);
-			_root.bound[5].setTo(max.x, min.y, max.z);
-			_root.bound[6].setTo(min.x, max.y, max.z);
+			_root.max.setTo(  size + offset.x,  size + offset.y,  size + offset.z);
+			_root.min.setTo( -size + offset.x, -size + offset.y, -size + offset.z);
 			if (depth > 0) divide(_root, size, 1);
 			
 			j = meshes.length;
@@ -165,47 +158,34 @@ package nest.control.partition
 			var BBL:OcNode = node.childs[6] = new OcNode();
 			var BBR:OcNode = node.childs[7] = new OcNode();
 			
-			var max:Vector3D = node.bound[7], min:Vector3D = node.bound[0];
+			var max:Vector3D = node.max, min:Vector3D = node.min;
 			var center:Number = min.y + size;
 			
-			TTL.bound[0].setTo(min.x, 					center, min.z + size);
-			TTL.bound[7].setTo(TTL.bound[0].x + size, 	max.y, 	TTL.bound[0].z + size);
-			TTR.bound[0].setTo(min.x + size, 			center, min.z + size);
-			TTR.bound[7].setTo(max.x,        			max.y, 	max.z);
+			TTL.min.setTo(min.x, 			center, min.z + size);
+			TTL.max.setTo(TTL.min.x + size, max.y, 	TTL.min.z + size);
+			TTR.min.setTo(min.x + size, 	center, min.z + size);
+			TTR.max.setTo(max.x,        	max.y, 	max.z);
 			
-			TBL.bound[0].setTo(min.x,        			center, min.z);
-			TBL.bound[7].setTo(min.x + size, 			max.y, 	min.z + size);
-			TBR.bound[0].setTo(min.x + size, 			center,	min.z);
-			TBR.bound[7].setTo(TBR.bound[0].x + size,  	max.y, 	TBR.bound[0].z + size);
+			TBL.min.setTo(min.x,        	center, min.z);
+			TBL.max.setTo(min.x + size, 	max.y, 	min.z + size);
+			TBR.min.setTo(min.x + size, 	center,	min.z);
+			TBR.max.setTo(TBR.min.x + size, max.y, 	TBR.min.z + size);
 			
-			BTL.bound[0].setTo(TTL.bound[0].x, 			min.y, 	TTL.bound[0].z);
-			BTL.bound[7].setTo(TTL.bound[7].x, 			center, TTL.bound[7].z);
-			BTR.bound[0].setTo(TTR.bound[0].x, 			min.y, 	TTR.bound[0].z);
-			BTR.bound[7].setTo(TTR.bound[7].x, 			center, TTR.bound[7].z);
+			BTL.min.setTo(TTL.min.x, 		min.y, 	TTL.min.z);
+			BTL.max.setTo(TTL.max.x, 		center, TTL.max.z);
+			BTR.min.setTo(TTR.min.x, 		min.y, 	TTR.min.z);
+			BTR.max.setTo(TTR.max.x, 		center, TTR.max.z);
 			
-			BBL.bound[0].setTo(TBL.bound[0].x, 			min.y, 	TBL.bound[0].z);
-			BBL.bound[7].setTo(TBL.bound[7].x, 			center, TBL.bound[7].z);
-			BBR.bound[0].setTo(TBR.bound[0].x, 			min.y,	TBR.bound[0].z);
-			BBR.bound[7].setTo(TBR.bound[7].x, 			center,	TBR.bound[7].z);
+			BBL.min.setTo(TBL.min.x, 		min.y, 	TBL.min.z);
+			BBL.max.setTo(TBL.max.x, 		center, TBL.max.z);
+			BBR.min.setTo(TBR.min.x, 		min.y,	TBR.min.z);
+			BBR.max.setTo(TBR.max.x, 		center,	TBR.max.z);
 			
 			TTL.parent = TTR.parent = TBL.parent = TBR.parent = node;
 			TTL.depth = TTR.depth = TBL.depth = TBR.depth = depth;
 			
 			BTL.parent = BTR.parent = BBL.parent = BBR.parent = node;
 			BTL.depth = BTR.depth = BBL.depth = BBR.depth = depth;
-			
-			var i:int;
-			var tmp:OcNode;
-			for (i = 0; i < 8; i++) {
-				tmp = node.childs[i];
-				max = tmp.bound[7], min = tmp.bound[0];
-				tmp.bound[1].setTo(max.x, min.y, min.z);
-				tmp.bound[2].setTo(min.x, max.y, min.z);
-				tmp.bound[3].setTo(max.x, max.y, min.z);
-				tmp.bound[4].setTo(min.x, min.y, max.z);
-				tmp.bound[5].setTo(max.x, min.y, max.z);
-				tmp.bound[6].setTo(min.x, max.y, max.z);
-			}
 			
 			if (depth + 1 < maxDepth) {
 				divide(BTL, size / 2, depth + 1);

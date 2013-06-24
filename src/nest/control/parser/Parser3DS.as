@@ -4,7 +4,7 @@ package nest.control.parser
 	import flash.utils.ByteArray;
 	import flash.utils.Endian;
 	
-	import nest.object.geom.Geometry;
+	import nest.object.Geometry;
 	import nest.object.Mesh;
 	
 	/**

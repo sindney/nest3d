@@ -2,7 +2,7 @@ package nest.control.util
 {
 	import flash.geom.Vector3D;
 	
-	import nest.object.geom.Geometry;
+	import nest.object.Geometry;
 	import nest.object.IMesh;
 	
 	/**
@@ -193,7 +193,7 @@ package nest.control.util
 		 */
 		public static function RayMesh(result:RayIntersectionResult, results:Vector.<RayIntersectionResult>, orgion:Vector3D, delta:Vector3D, mesh:IMesh):void {
 			var vt1:Vector3D = new Vector3D(); 
-			RayAABB(vt1, orgion, delta, mesh.geometry.bound.vertices[7], mesh.geometry.bound.vertices[0]);
+			RayAABB(vt1, orgion, delta, mesh.geometry.max, mesh.geometry.min);
 			var flag:Boolean = (result != null);
 			var current:RayIntersectionResult = flag ? result : new RayIntersectionResult();
 			current.flag = (vt1.w != 0);

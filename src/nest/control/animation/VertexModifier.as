@@ -2,8 +2,7 @@ package nest.control.animation
 {
 	import flash.geom.Vector3D;
 	
-	import nest.object.geom.Bound;
-	import nest.object.geom.Geometry;
+	import nest.object.Geometry;
 	
 	/**
 	 * VertexModifier
@@ -44,18 +43,11 @@ package nest.control.animation
 					geom.tangents[j + 2] = tg0[j + 2] * w1 + tg1[j + 2] * w2;
 				}
 			}
-			var bound:Bound = track.target.geometry.bound;
-			var min:Vector3D = bound.vertices[0], max:Vector3D = bound.vertices[7];
+			var min:Vector3D = track.target.geometry.min, max:Vector3D = track.target.geometry.max;
 			min.setTo(bd0[0] * w1 + bd1[0] * w2, bd0[1] * w1 + bd1[1] * w2, bd0[2] * w1 + bd1[2] * w2);
 			max.setTo(bd0[3] * w1 + bd1[3] * w2, bd0[4] * w1 + bd1[4] * w2, bd0[5] * w1 + bd1[5] * w2);
-			bound.vertices[1].setTo(max.x, min.y, min.z);
-			bound.vertices[2].setTo(min.x, max.y, min.z);
-			bound.vertices[3].setTo(max.x, max.y, min.z);
-			bound.vertices[4].setTo(min.x, min.y, max.z);
-			bound.vertices[5].setTo(max.x, min.y, max.z);
-			bound.vertices[6].setTo(min.x, max.y, max.z);
-			var wbound:Bound = track.target.bound;
-			for (i = 0; i < 8; i++) wbound.vertices[i].copyFrom(track.target.worldMatrix.transformVector(bound.vertices[i]));
+			track.target.min.copyFrom(track.target.worldMatrix.transformVector(min));
+			track.target.max.copyFrom(track.target.worldMatrix.transformVector(max));
 			Geometry.uploadGeometry(geom, true, normal, tangent, false, false);
 		}
 		

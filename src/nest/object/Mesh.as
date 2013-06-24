@@ -5,8 +5,7 @@ package nest.object
 	
 	import nest.control.event.MatrixEvent;
 	import nest.control.partition.OcNode;
-	import nest.object.geom.Bound;
-	import nest.object.geom.Geometry;
+	import nest.object.Geometry;
 	import nest.view.shader.Shader3D;
 	
 	[Event(name = "transform_change", type = "nest.control.event.MatrixEvent")]
@@ -26,8 +25,10 @@ package nest.object
 		
 		protected var _geometry:Geometry;
 		protected var _shader:Shader3D;
+		protected var _batch:Vector.<IParticlePart>;
 		
-		protected var _bound:Bound = new Bound();
+		protected var _max:Vector3D = new Vector3D();
+		protected var _min:Vector3D = new Vector3D();
 		protected var _triangleCulling:String = Context3DTriangleFace.BACK;
 		protected var _node:OcNode;
 		
@@ -53,21 +54,33 @@ package nest.object
 			if (all) {
 				_geometry.dispose();
 				_shader.dispose();
+				if (_batch) {
+					for each(var part:IParticlePart in _batch) {
+						part.dispose();
+					}
+				}
 			}
 			_geometry = null;
 			_shader = null;
-			_bound = null;
+			_batch = null;
+			_max = _min = null;
 		}
 		
 		override public function decompose():void {
 			super.decompose();
-			if (_geometry) Geometry.transformBound(_geometry.bound, _bound, _worldMatrix);
+			if (_geometry) {
+				_max.copyFrom(_worldMatrix.transformVector(_geometry.max));
+				_min.copyFrom(_worldMatrix.transformVector(_geometry.min));
+			}
 			dispatchEvent(new MatrixEvent(MatrixEvent.TRANSFORM_CHANGE));
 		}
 		
 		override public function recompose():void {
 			super.recompose();
-			if (_geometry) Geometry.transformBound(_geometry.bound, _bound, _worldMatrix);
+			if (_geometry) {
+				_max.copyFrom(_worldMatrix.transformVector(_geometry.max));
+				_min.copyFrom(_worldMatrix.transformVector(_geometry.min));
+			}
 			dispatchEvent(new MatrixEvent(MatrixEvent.TRANSFORM_CHANGE));
 		}
 		
@@ -91,8 +104,20 @@ package nest.object
 			_shader = value;
 		}
 		
-		public function get bound():Bound {
-			return _bound;
+		public function get batch():Vector.<IParticlePart> {
+			return _batch;
+		}
+		
+		public function set batch(value:Vector.<IParticlePart>):void {
+			_batch = value;
+		}
+		
+		public function get max():Vector3D {
+			return _max;
+		}
+		
+		public function get min():Vector3D {
+			return _min;
 		}
 		
 		public function get cliping():Boolean {

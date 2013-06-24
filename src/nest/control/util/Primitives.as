@@ -1,6 +1,6 @@
 package nest.control.util
 {	
-	import nest.object.geom.Geometry;
+	import nest.object.Geometry;
 	
 	/**
 	 * Primitives
