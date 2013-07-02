@@ -9,6 +9,8 @@ package nest.control.animation
 	 */
 	public class VertexModifier implements IAnimationModifier {
 		
+		public static const instance:IAnimationModifier = new VertexModifier();
+		
 		public static const VERTEX_NORMAL:String = "vertex_normal";
 		public static const VERTEX_TANGENT:String = "vertex_tangent";
 		

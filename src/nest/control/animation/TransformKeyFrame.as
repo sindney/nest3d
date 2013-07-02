@@ -24,6 +24,12 @@ package nest.control.animation
 			return result;
 		}
 		
+		public function dispose():void {
+			position = null;
+			rotation = null;
+			scale = null;
+		}
+		
 		///////////////////////////////////
 		// getter/setters
 		///////////////////////////////////

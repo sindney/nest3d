@@ -31,6 +31,16 @@ package nest.control.animation
 			this.frames = frames;
 		}
 		
+		public function dispose():void {
+			if (frames) {
+				for each(var frame:IKeyFrame in frames) frame.dispose();
+			}
+			frames = null;
+			modifier = null;
+			target = null;
+			parameters = null;
+		}
+		
 		///////////////////////////////////
 		// getter/setters
 		///////////////////////////////////

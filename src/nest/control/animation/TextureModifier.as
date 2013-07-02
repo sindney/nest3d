@@ -7,6 +7,8 @@ package nest.control.animation
 	 */
 	public class TextureModifier implements IAnimationModifier {
 		
+		public static const instance:IAnimationModifier = new TextureModifier();
+		
 		public static const TEXTURE_INDEX:String = "texture_index";
 		
 		public function calculate(track:AnimationTrack, k1:IKeyFrame, k2:IKeyFrame, time:Number):void {

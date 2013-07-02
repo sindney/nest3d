@@ -6,12 +6,12 @@ package nest.view.process
 	import flash.display3D.Context3DVertexBufferFormat;
 	import flash.geom.Matrix3D;
 	import flash.geom.Vector3D;
-	import nest.object.IParticlePart;
 	
 	import nest.control.partition.OcNode;
 	import nest.object.IContainer3D;
 	import nest.object.IMesh;
 	import nest.object.IObject3D;
+	import nest.object.IParticlePart;
 	import nest.view.shader.*;
 	import nest.view.Camera3D;
 	import nest.view.TextureResource;

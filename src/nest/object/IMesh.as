@@ -14,7 +14,7 @@ package nest.object
 		/**
 		 * @param	all Dispose context3d contents.
 		 */
-		function dispose(all:Boolean = true):void;
+		function dispose(geometry:Boolean = false, shader:Boolean = false, batch:Boolean = false):void;
 		
 		function get geometry():Geometry;
 		function set geometry(value:Geometry):void;

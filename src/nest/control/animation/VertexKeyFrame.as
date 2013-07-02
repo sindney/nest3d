@@ -35,6 +35,13 @@ package nest.control.animation
 			return result;
 		}
 		
+		public function dispose():void {
+			bounds = null;
+			vertices = null;
+			normals = null;
+			tangents = null;
+		}
+		
 		///////////////////////////////////
 		// getter/setters
 		///////////////////////////////////

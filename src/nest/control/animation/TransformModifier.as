@@ -7,6 +7,8 @@ package nest.control.animation
 	 */
 	public class TransformModifier implements IAnimationModifier {
 		
+		public static const instance:IAnimationModifier = new TransformModifier();
+		
 		public function calculate(track:AnimationTrack, k1:IKeyFrame, k2:IKeyFrame, time:Number):void {
 			var w1:Number = track.weight * (k2.time - time) / (k2.time - k1.time);
 			var w2:Number = track.weight - w1;

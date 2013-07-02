@@ -20,6 +20,11 @@ package nest.control.animation
 			return result;
 		}
 		
+		public function dispose():void {
+			if (data) data.dispose();
+			data = null;
+		}
+		
 		///////////////////////////////////
 		// getter/setters
 		///////////////////////////////////

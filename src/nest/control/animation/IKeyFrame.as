@@ -8,6 +8,8 @@ package nest.control.animation
 		
 		function clone():IKeyFrame;
 		
+		function dispose():void;
+		
 		function get time():Number;
 		function set time(value:Number):void;
 		

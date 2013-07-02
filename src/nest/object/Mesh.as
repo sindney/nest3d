@@ -50,16 +50,10 @@ package nest.object
 		/**
 		 * @param	all Dispose geometry buffers and shader textures.
 		 */
-		public function dispose(all:Boolean = true):void {
-			if (all) {
-				_geometry.dispose();
-				_shader.dispose();
-				if (_batch) {
-					for each(var part:IParticlePart in _batch) {
-						part.dispose();
-					}
-				}
-			}
+		public function dispose(geometry:Boolean = false, shader:Boolean = false, batch:Boolean = false):void {
+			if (geometry) _geometry.dispose();
+			if (shader)_shader.dispose();
+			if (batch) for each(var part:IParticlePart in _batch) part.dispose();
 			_geometry = null;
 			_shader = null;
 			_batch = null;

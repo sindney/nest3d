@@ -11,10 +11,6 @@ package nest.view
 	 */
 	public class ViewPort extends EventDispatcher {
 		
-		/**
-		 * I suggest you to add a context3d device check in your rendering loop.
-		 * <p>Make sure that our context3d is avaliable, and request another one if it's not.</p>
-		 */
 		public static var context3d:Context3D;
 		
 		private static var _width:Number = 0;
