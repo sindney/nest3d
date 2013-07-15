@@ -41,12 +41,6 @@ package nest.object
 		function get id():uint;
 		function set id(value:uint):void;
 		
-		/**
-		 * Don't work with partition trees.
-		 */
-		function get ignorePosition():Boolean;
-		function set ignorePosition(value:Boolean):void;
-		
 		function get ignoreRotation():Boolean;
 		function set ignoreRotation(value:Boolean):void;
 		

@@ -60,16 +60,9 @@ package nest.view.process
 			
 			var alphaParms:Vector.<int> = new Vector.<int>();
 			
-			var vm0:Matrix3D = _camera.invertWorldMatrix;
-			var pm0:Matrix3D = vm0.clone();
-			pm0.append(_camera.pm);
-			
-			var vm1:Matrix3D = _camera.invertWorldMatrix.clone();
-			var components:Vector.<Vector3D> = vm1.decompose();
-			components[0].setTo(0, 0, 0);
-			vm1.recompose(components);
-			var pm1:Matrix3D = vm1.clone();
-			pm1.append(_camera.pm);
+			var ivm:Matrix3D = _camera.invertWorldMatrix;
+			var pm:Matrix3D = ivm.clone();
+			pm.append(_camera.pm);
 			
 			_objects = new Vector.<IMesh>();
 			_alphaObjects = new Vector.<IMesh>();
@@ -95,8 +88,7 @@ package nest.view.process
 					var node:OcNode = container.partition.root;
 					var flag:Boolean;
 					while (node) {
-						flag = container.partition.ignorePosition;
-						if (_camera.frustum.classifyAABB(node.max, node.min, flag ? vm1 : vm0)) {
+						if (_camera.frustum.classifyAABB(node.max, node.min, ivm)) {
 							if (node.childs) {
 								j = node.childs.length;
 								for (i = 0; i < j; i++) nodes.push(node.childs[i]);
@@ -104,21 +96,15 @@ package nest.view.process
 							j = node.objects.length;
 							for (i = 0; i < j; i++) {
 								mesh = node.objects[i];
-								if (mesh.visible && (!mesh.cliping || !container.partition.frustum || _camera.frustum.classifyAABB(mesh.max, mesh.min, flag ? vm1 : vm0))) {
+								if (mesh.visible && (!mesh.cliping || !container.partition.frustum || _camera.frustum.classifyAABB(mesh.max, mesh.min, ivm))) {
 									if (mesh.alphaTest) {
-										if (flag) {
-											dx = _camera.position.x - mesh.worldMatrix.position.x;
-											dy = _camera.position.y - mesh.worldMatrix.position.y;
-											dz = _camera.position.z - mesh.worldMatrix.position.z;
-										} else {
-											dx = mesh.worldMatrix.position.x;
-											dy = mesh.worldMatrix.position.y;
-											dz = mesh.worldMatrix.position.z;
-										}
+										dx = mesh.worldMatrix.position.x;
+										dy = mesh.worldMatrix.position.y;
+										dz = mesh.worldMatrix.position.z;
 										alphaParms.push(dx * dx + dy * dy + dz * dz);
 										_alphaObjects.push(mesh);
 									} else {
-										drawMesh(mesh, flag ? pm1 : pm0);
+										drawMesh(mesh, pm);
 										_objects.push(mesh);
 									}
 									_numVertices += mesh.geometry.numVertices;
@@ -135,21 +121,15 @@ package nest.view.process
 						object = container.getChildAt(i);
 						if (object is IMesh) {
 							mesh = object as IMesh;
-							if (mesh.visible && (!mesh.cliping || _camera.frustum.classifyAABB(mesh.max, mesh.min, mesh.ignorePosition ? vm1 : vm0))) {
+							if (mesh.visible && (!mesh.cliping || _camera.frustum.classifyAABB(mesh.max, mesh.min, ivm))) {
 								if (mesh.alphaTest) {
-									if (mesh.ignorePosition) {
-										dx = _camera.position.x - mesh.worldMatrix.position.x;
-										dy = _camera.position.y - mesh.worldMatrix.position.y;
-										dz = _camera.position.z - mesh.worldMatrix.position.z;
-									} else {
-										dx = mesh.worldMatrix.position.x;
-										dy = mesh.worldMatrix.position.y;
-										dz = mesh.worldMatrix.position.z;
-									}
+									dx = mesh.worldMatrix.position.x;
+									dy = mesh.worldMatrix.position.y;
+									dz = mesh.worldMatrix.position.z;
 									alphaParms.push(dx * dx + dy * dy + dz * dz);
 									_alphaObjects.push(mesh);
 								} else {
-									drawMesh(mesh, mesh.ignorePosition ? pm1 : pm0);
+									drawMesh(mesh, pm);
 									_objects.push(mesh);
 								}
 								_numVertices += mesh.geometry.numVertices;
@@ -169,7 +149,7 @@ package nest.view.process
 			i = _alphaObjects.length - 1;
 			if (i > 0) quickSort(alphaParms, 0, i);
 			
-			for each(mesh in _alphaObjects) drawMesh(mesh, mesh.ignorePosition ? pm1 : pm0);
+			for each(mesh in _alphaObjects) drawMesh(mesh, pm);
 			
 			context3d.setBlendFactors(Context3DBlendFactor.ONE, Context3DBlendFactor.ZERO);
 		}

@@ -35,7 +35,6 @@ package nest.object
 		protected var _cliping:Boolean = true;
 		protected var _alphaTest:Boolean = false;
 		protected var _mouseEnabled:Boolean = false;
-		protected var _ignorePosition:Boolean = false;
 		protected var _ignoreRotation:Boolean = false;
 		protected var _visible:Boolean = true;
 		protected var _castShadows:Boolean = false;
@@ -47,9 +46,6 @@ package nest.object
 			_shader = shader;
 		}
 		
-		/**
-		 * @param	all Dispose geometry buffers and shader textures.
-		 */
 		public function dispose(geometry:Boolean = false, shader:Boolean = false, batch:Boolean = false):void {
 			if (geometry) _geometry.dispose();
 			if (shader)_shader.dispose();
@@ -152,14 +148,6 @@ package nest.object
 		
 		public function set id(value:uint):void {
 			_id = value;
-		}
-		
-		public function get ignorePosition():Boolean {
-			return _ignorePosition;
-		}
-		
-		public function set ignorePosition(value:Boolean):void {
-			_ignorePosition = value;
 		}
 		
 		public function get ignoreRotation():Boolean {

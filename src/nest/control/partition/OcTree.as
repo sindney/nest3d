@@ -20,7 +20,6 @@ package nest.control.partition
 		protected var maxDepth:int;
 		
 		public var frustum:Boolean = false;
-		public var ignorePosition:Boolean = false;
 		
 		public function OcTree() {
 			_root = new OcNode();
@@ -204,7 +203,6 @@ package nest.control.partition
 			size = 0;
 			maxDepth = 0;
 			frustum = false;
-			ignorePosition = false;
 			_root.dispose(this);
 		}
 		

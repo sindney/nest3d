@@ -21,10 +21,6 @@ package nest.control.util
 		}
 		
 		public function create(angle:Number, ratio:Number, near:Number, far:Number):void {
-			var nTL:Vector3D, nTR:Vector3D, nBL:Vector3D, nBR:Vector3D;
-			var fTL:Vector3D, fTR:Vector3D, fBL:Vector3D, fBR:Vector3D;
-			var vn:Vector3D, vf:Vector3D;
-			
 			var r:Number = Math.tan(angle * 0.5);
 			var nH:Number = near * r;
 			var nW:Number = nH * ratio;
@@ -35,26 +31,26 @@ package nest.control.util
 			var xv:Vector3D = new Vector3D( -1, 0, 0);
 			var yv:Vector3D = new Vector3D(0, 1, 0);
 			
-			vn = new Vector3D(zv.x * near, zv.y * near, zv.z * near);
+			var vn:Vector3D = new Vector3D(zv.x * near, zv.y * near, zv.z * near);
 			vn.negate();
-			vf = new Vector3D(zv.x * far, zv.y * far, zv.z * far);
+			var vf:Vector3D = new Vector3D(zv.x * far, zv.y * far, zv.z * far);
 			vf.negate();
 			
 			var yv_nH:Vector3D = new Vector3D(yv.x * nH, yv.y * nH, yv.z * nH);
 			var xv_nW:Vector3D = new Vector3D(xv.x * nW, xv.y * nW, xv.z * nW);
 			
-			nTL = vn.add(yv_nH).subtract(xv_nW);
-			nTR = vn.add(yv_nH).add(xv_nW);
-			nBL = vn.subtract(yv_nH).subtract(xv_nW);
-			nBR = vn.subtract(yv_nH).add(xv_nW);
+			var nTL:Vector3D = vn.add(yv_nH).subtract(xv_nW);
+			var nTR:Vector3D = vn.add(yv_nH).add(xv_nW);
+			var nBL:Vector3D = vn.subtract(yv_nH).subtract(xv_nW);
+			var nBR:Vector3D = vn.subtract(yv_nH).add(xv_nW);
 			
 			var yv_fH:Vector3D = new Vector3D(yv.x * fH, yv.y * fH, yv.z * fH);
 			var xv_fW:Vector3D = new Vector3D(xv.x * fW, xv.y * fW, xv.z * fW);
 			
-			fTL = vf.add(yv_fH).subtract(xv_fW);
-			fTR = vf.add(yv_fH).add(xv_fW);
-			fBL = vf.subtract(yv_fH).subtract(xv_fW);
-			fBR = vf.subtract(yv_fH).add(xv_fW);
+			var fTL:Vector3D = vf.add(yv_fH).subtract(xv_fW);
+			var fTR:Vector3D = vf.add(yv_fH).add(xv_fW);
+			var fBL:Vector3D = vf.subtract(yv_fH).subtract(xv_fW);
+			var fBR:Vector3D = vf.subtract(yv_fH).add(xv_fW);
 			
 			// top
 			planes[0].create(fTR, nTR, nTL);
